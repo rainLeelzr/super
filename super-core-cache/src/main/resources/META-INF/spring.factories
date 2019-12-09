@@ -1,4 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wegood.core.cache.redis.RedisConfig,\
-com.wegood.core.cache.redis.RedisService
+vip.isass.core.cache.redis.RedisConfig,\
+vip.isass.core.cache.redis.RedisService

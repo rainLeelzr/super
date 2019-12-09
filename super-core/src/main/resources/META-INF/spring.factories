@@ -1,4 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wegood.core.support.SpringContextUtil,\
-com.wegood.core.exception.BuildInCoreExceptionMapping
+vip.isass.core.support.SpringContextUtil,\
+vip.isass.core.exception.BuildInCoreExceptionMapping

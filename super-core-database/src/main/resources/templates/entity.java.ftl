@@ -11,14 +11,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 <#break>
 </#if>
 </#list>
-import com.wegood.core.entity.*;
-import com.wegood.core.sequence.impl.LongSequence;
-import com.wegood.core.support.JsonUtil;
+import vip.isass.core.entity.*;
+import vip.isass.core.sequence.impl.LongSequence;
+import vip.isass.core.support.JsonUtil;
 <#list table.fields as field>
 <#if field.propertyType == "LocalDate"
 || field.propertyType == "LocalTime"
 || field.propertyType == "LocalDateTime">
-import com.wegood.core.support.LocalDateTimeUtil;
+import vip.isass.core.support.LocalDateTimeUtil;
 <#break>
 </#if>
 </#list>

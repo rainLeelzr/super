@@ -1,4 +1,4 @@
-package com.wegood.foundation.${cfg.moduleName};
+package vip.isass.foundation.${cfg.moduleName};
 
 #foreach($table in ${tables})
 import ${cfg.package}.${cfg.moduleName}.auto.service.${cfg.prefix?cap_first}${table.entityName}ServiceTest;

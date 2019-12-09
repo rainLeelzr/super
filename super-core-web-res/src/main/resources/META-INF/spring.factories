@@ -1,4 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wegood.core.web.res.ResAutoConfiguration,\
-com.wegood.core.web.res.RestTemplateResRegister
+vip.isass.core.web.res.ResAutoConfiguration,\
+vip.isass.core.web.res.RestTemplateResRegister

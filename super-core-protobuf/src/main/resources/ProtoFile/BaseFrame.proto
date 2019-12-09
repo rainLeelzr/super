@@ -1,5 +1,5 @@
 package Platform.Model;
-option java_package = "com.wegood.core.protobuf";
+option java_package = "vip.isass.core.protobuf";
 option java_outer_classname = "Base";
 
 message HttpFrame {

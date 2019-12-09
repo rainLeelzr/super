@@ -1,5 +1,5 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wegood.core.net.websocket.WebsocketServer,\
-com.wegood.core.net.websocket.WebsocketChannelInitializerHandler,\
-com.wegood.core.net.websocket.WebsocketChannelEventHandler
+vip.isass.core.net.websocket.WebsocketServer,\
+vip.isass.core.net.websocket.WebsocketChannelInitializerHandler,\
+vip.isass.core.net.websocket.WebsocketChannelEventHandler

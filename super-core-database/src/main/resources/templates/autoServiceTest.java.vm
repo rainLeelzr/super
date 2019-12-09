@@ -1,9 +1,9 @@
 package ${package.Service.replace(".service",".auto.service")};
 
-import com.wegood.core.entity.IEntity;
-import com.wegood.core.web.ICriteria;
-import com.wegood.core.web.IService;
-import com.wegood.core.web.test.AbstractRollbackServiceTestClass;
+import vip.isass.core.entity.IEntity;
+import vip.isass.core.web.ICriteria;
+import vip.isass.core.web.IService;
+import vip.isass.core.web.test.AbstractRollbackServiceTestClass;
 import ${cfg.package}.${cfg.moduleName}.${cfg.moduleName.substring(0,1).toUpperCase()}${cfg.moduleName.substring(1)}App;
 import ${cfg.package}.${cfg.moduleName}.api.criteria.${entity}Criteria;
 import ${package.Entity}.${entity};

@@ -1,3 +1,3 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wegood.core.mq.MqAutoConfiguration
+vip.isass.core.mq.MqAutoConfiguration

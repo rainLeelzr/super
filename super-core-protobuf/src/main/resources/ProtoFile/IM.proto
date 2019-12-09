@@ -1,5 +1,5 @@
 package Platform.Model;
-option java_package = "com.wegood.core.protobuf.im";
+option java_package = "vip.isass.core.protobuf.im";
 option java_outer_classname = "IM";
 
 // 请求_发送文本信息给好友

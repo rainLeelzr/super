@@ -1,7 +1,7 @@
-package com.wegood.foundation;
+package vip.isass.foundation;
 
 import ${cfg.package}.${cfg.moduleName}.${cfg.prefix?cap_first}${cfg.moduleName.substring(0,1).toUpperCase()}${cfg.moduleName.substring(1)}TestSuite;
-import com.wegood.foundation.auth.${cfg.prefix?cap_first}AuthTestSuite;
+import vip.isass.foundation.auth.${cfg.prefix?cap_first}AuthTestSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 

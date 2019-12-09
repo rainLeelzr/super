@@ -6,7 +6,7 @@ import ${cfg.package}.core.criteria.IdCriteria;
 </#if>
 <#list table.fields as field>
 <#if field.propertyType == "Json">
-import com.wegood.core.entity.Json;
+import vip.isass.core.entity.Json;
 <#break>
 </#if>
 </#list>
