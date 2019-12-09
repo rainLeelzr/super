@@ -201,6 +201,7 @@ public abstract class AbstractPageCriteria<E, C extends AbstractPageCriteria<E, 
 
     private Boolean searchCountFlag;
 
+    @Override
     public Long getPageNum() {
         return pageNum == null ? DEFAULT_PAGE_NUM : pageNum < 1L ? 1L : pageNum;
     }
@@ -212,6 +213,7 @@ public abstract class AbstractPageCriteria<E, C extends AbstractPageCriteria<E, 
         return (C) this;
     }
 
+    @Override
     public Long getPageSize() {
         return pageSize == null ? DEFAULT_PAGE_SIZE : pageSize < 1L ? DEFAULT_PAGE_SIZE : pageSize;
     }
@@ -230,6 +232,7 @@ public abstract class AbstractPageCriteria<E, C extends AbstractPageCriteria<E, 
         return (C) this;
     }
 
+    @Override
     public Boolean getSearchCountFlag() {
         return searchCountFlag == null ? DEFAULT_SEARCH_COUNT_FLAG : searchCountFlag;
     }

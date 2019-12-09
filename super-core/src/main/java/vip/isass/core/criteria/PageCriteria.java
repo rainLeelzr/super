@@ -203,14 +203,17 @@ public class PageCriteria implements IPageCriteria<Object, PageCriteria> {
 
     private Boolean searchCountFlag;
 
+    @Override
     public Long getPageNum() {
         return pageNum == null ? DEFAULT_PAGE_NUM : pageNum < 1L ? 1L : pageNum;
     }
 
+    @Override
     public Long getPageSize() {
         return pageSize == null ? DEFAULT_PAGE_SIZE : pageSize < 1L ? DEFAULT_PAGE_SIZE : pageSize;
     }
 
+    @Override
     public Boolean getSearchCountFlag() {
         return searchCountFlag == null ? DEFAULT_SEARCH_COUNT_FLAG : searchCountFlag;
     }
