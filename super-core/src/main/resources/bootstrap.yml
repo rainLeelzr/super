@@ -1,0 +1,84 @@
+#########################################
+##########                     ##########
+##########       default       ##########
+##########                     ##########
+#########################################
+spring:
+  # config 配置中心
+  cloud:
+    nacos:
+      discovery:
+        registerEnabled: false
+        server-addr: nacos.wegood.shop:80
+      config:
+        serverAddr: nacos.wegood.shop:80
+        fileExtension: yaml
+        shared-dataids: application.yaml,application-${spring.profiles.active:}.yaml
+        refreshableDataids: application.yaml,application-${spring.profiles.active:}.yaml
+
+    inetutils:
+      ignoredInterfaces:
+        - docker0
+        - veth.*
+
+info:
+  company: wegood
+  name: ${spring.application.name}
+
+jasypt:
+  encryptor:
+    password: EbfYkXoaxZTKJ7
+
+#########################################
+##########                     ##########
+##########       master        ##########
+##########                     ##########
+#########################################
+---
+spring:
+  profiles: master
+
+#########################################
+##########                     ##########
+##########         test        ##########
+##########                     ##########
+#########################################
+---
+spring:
+  profiles: test
+
+#########################################
+##########                     ##########
+##########         uat         ##########
+##########                     ##########
+#########################################
+---
+spring:
+  profiles: uat
+
+#########################################
+##########                     ##########
+##########         prod        ##########
+##########                     ##########
+#########################################
+---
+spring:
+  profiles: prod
+  cloud:
+    nacos:
+      discovery:
+        registerEnabled: true
+        server-addr: nacos.outer:30040
+        namespace: 2b366ca9-e1c6-4cf4-b9aa-8bb32f9e13bd
+
+      config:
+        serverAddr: nacos.outer:30040
+
+#########################################
+##########                     ##########
+##########       mirror        ##########
+##########                     ##########
+#########################################
+---
+spring:
+  profiles: mirror

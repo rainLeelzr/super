@@ -1,0 +1,5 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.wegood.core.net.tcp.TcpServer,\
+com.wegood.core.net.tcp.TcpChannelInitializerHandler,\
+com.wegood.core.net.tcp.TcpChannelEventHandler

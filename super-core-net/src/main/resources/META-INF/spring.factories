@@ -1,0 +1,14 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.wegood.core.net.packet.impl.coder.BlueBinaryPacketEncoder,\
+com.wegood.core.net.packet.impl.coder.BlueBinaryPacketDecoder,\
+com.wegood.core.net.request.worker.normal.DefaultWorkerPool,\
+com.wegood.core.net.request.worker.normal.DefaultWorker,\
+com.wegood.core.net.request.RequestManager,\
+com.wegood.core.net.request.handler.DefaultHttpRequestHandler,\
+com.wegood.core.net.session.SessionManager,\
+com.wegood.core.net.request.worker.event.handler.WorkStartHandler,\
+com.wegood.core.net.request.worker.event.handler.WorkExceptionHandler,\
+com.wegood.core.net.request.worker.event.handler.WorkCompletedHandler,\
+com.wegood.core.net.request.mapping.LoginMappingProperties,\
+com.wegood.core.net.config.NetProperties

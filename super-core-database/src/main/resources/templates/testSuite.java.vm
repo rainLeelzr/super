@@ -1,0 +1,16 @@
+package com.wegood.foundation;
+
+import ${cfg.package}.${cfg.moduleName}.${cfg.prefix?cap_first}${cfg.moduleName.substring(0,1).toUpperCase()}${cfg.moduleName.substring(1)}TestSuite;
+import com.wegood.foundation.auth.${cfg.prefix?cap_first}AuthTestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
+/**
+ * @author ipas
+ */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+        ${cfg.prefix?cap_first}${cfg.moduleName.substring(0,1).toUpperCase()}${cfg.moduleName.substring(1)}TestSuite.class
+})
+public class TestSuite {
+}
