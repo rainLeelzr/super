@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = "git@code.aliyun.com:wegood/super-core.git"
+        GIT_REPO = "git@gitee.com:isass/super.git"
         AUTHORS = sh(script: "git log --oneline -1 --format=%an", returnStdout: true).trim()
         COMMIT_LOGS = sh(script: "git log -1 --pretty='%s'", returnStdout: true).trim()
         RESULT = '成功'
