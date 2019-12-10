@@ -193,6 +193,7 @@
         <module>super-core-database-sharding-jdbc</module>
         <module>super-core-database-postgresql</module>
         <module>super-core-mq</module>
+        <module>super-core-mq-ons</module>
         <module>super-core-web</module>
         <module>super-core-web-security</module>
         <module>super-core-web-res</module>
@@ -229,6 +230,7 @@
         <core-database-postgresql.version>super.1.1.0-SNAPSHOT</core-database-postgresql.version>
         <core-database-listener.version>super.1.1.0-SNAPSHOT</core-database-listener.version>
         <core-mq.version>super.1.1.0-SNAPSHOT</core-mq.version>
+        <core-mq-ons.version>super.1.1.0-SNAPSHOT</core-mq-ons.version>
         <core-net.version>super.1.1.0-SNAPSHOT</core-net.version>
         <core-net-tcp.version>super.1.1.0-SNAPSHOT</core-net-tcp.version>
         <core-net-websocket.version>super.1.1.0-SNAPSHOT</core-net-websocket.version>
@@ -403,6 +405,12 @@
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-mq</artifactId>
                 <version>${core-mq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-mq-ons</artifactId>
+                <version>${core-mq-ons.version}</version>
             </dependency>
 
             <dependency>

@@ -175,12 +175,9 @@ import vip.isass.core.mq.MessageType;
 import vip.isass.core.mq.core.MqMessageContext;
 import vip.isass.core.mq.core.producer.MqProducer;
 import vip.isass.core.mq.core.producer.ProducerSelector;
+import vip.isass.core.mq.ons.OnsConst;
 import vip.isass.core.mq.ons.config.*;
 import org.springframework.stereotype.Component;
-import vip.isass.core.mq.MessageType;
-import vip.isass.core.mq.core.MqMessageContext;
-import vip.isass.core.mq.core.producer.MqProducer;
-import vip.isass.core.mq.core.producer.ProducerSelector;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
