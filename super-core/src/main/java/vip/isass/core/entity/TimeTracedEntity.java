@@ -176,7 +176,7 @@ import java.time.LocalDateTime;
 /**
  * @author Rain
  */
-public interface TimeTracedEntity extends IEntity {
+public interface TimeTracedEntity<E extends TimeTracedEntity<E>> extends IEntity<E> {
 
     /**
      * 数据库字段名
@@ -200,7 +200,7 @@ public interface TimeTracedEntity extends IEntity {
     /**
      * 设置创建记录的时间
      */
-    TimeTracedEntity setCreateTime(LocalDateTime createTime);
+    E setCreateTime(LocalDateTime createTime);
 
     /**
      * 获取修改记录的时间
@@ -210,11 +210,12 @@ public interface TimeTracedEntity extends IEntity {
     /**
      * 设置修改记录的时间
      */
-    TimeTracedEntity setModifyTime(LocalDateTime modifyTime);
+    E setModifyTime(LocalDateTime modifyTime);
 
     @Override
-    default TimeTracedEntity randomEntity() {
-        return setCreateTime(LocalDateTimeUtil.now()).setModifyTime(LocalDateTimeUtil.now());
+    @SuppressWarnings("unchecked")
+    default E randomEntity() {
+        return (E) setCreateTime(LocalDateTimeUtil.now()).setModifyTime(LocalDateTimeUtil.now());
     }
 
 }

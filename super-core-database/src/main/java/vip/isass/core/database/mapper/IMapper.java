@@ -180,14 +180,14 @@ import java.util.Collection;
  * @author rain
  */
 @Mapper
-public interface IMapper<T> extends BaseMapper<T> {
+public interface IMapper<EDB> extends BaseMapper<EDB> {
 
     /**
      * 批量插入所有列
      */
     // Integer batchInsertAllColumn(@Param("coll") Collection<T> entityList);
 
-    Integer insertBatchSomeColumn(@Param("list") Collection<T> entityList);
+    Integer insertBatchSomeColumn(@Param("list") Collection<EDB> entityList);
 
     Integer hardDeleteById(Serializable id);
 

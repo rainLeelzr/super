@@ -172,7 +172,7 @@ package vip.isass.core.entity;
 /**
  * @author Rain
  */
-public interface VersionEntity extends IEntity {
+public interface VersionEntity<E extends VersionEntity<E>> extends IEntity<E> {
 
     /**
      * 数据库字段名
@@ -192,20 +192,21 @@ public interface VersionEntity extends IEntity {
     /**
      * 设置版本号
      */
-    VersionEntity setVersion(Integer id);
+    E setVersion(Integer id);
 
     /**
      * 如果版本号为 null, 则设置版本号为1，并返回版本号
      */
-    default VersionEntity computeVersionAsOneIfAbsent() {
+    @SuppressWarnings("unchecked")
+    default E computeVersionAsOneIfAbsent() {
         if (getVersion() == null) {
             setVersion(1);
         }
-        return this;
+        return (E) this;
     }
 
     @Override
-    default VersionEntity randomEntity() {
+    default E randomEntity() {
         return computeVersionAsOneIfAbsent();
     }
 

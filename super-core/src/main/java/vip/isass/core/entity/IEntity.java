@@ -187,7 +187,9 @@ public interface IEntity<E> extends Serializable {
      * 生成随机的entity
      * 所有字段都随机赋值
      */
-    E randomEntity();
+    default E randomEntity() {
+        throw new UnsupportedOperationException();
+    }
 
     default String randomString() {
         return RandomUtil.randomString(6);

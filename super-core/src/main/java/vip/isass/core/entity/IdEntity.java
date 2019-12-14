@@ -179,7 +179,7 @@ import java.io.Serializable;
 /**
  * @author Rain
  */
-public interface IdEntity<PK extends Serializable, E extends IdEntity> extends IEntity {
+public interface IdEntity<PK extends Serializable, E extends IdEntity<PK, E>> extends IEntity<E> {
 
     String ID_COLUMN_NAME = "id";
 

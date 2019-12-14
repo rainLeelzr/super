@@ -291,7 +291,7 @@ public class Resp<T> {
     public T notNullDataOrException(String message, String... args) {
         exceptionIfUnSuccess();
         if (this.getData() == null) {
-            throw new UnifiedException(StatusMessageEnum.ABSENT, StrUtil.format(message, args));
+            throw new UnifiedException(StatusMessageEnum.ABSENT, StrUtil.format(message, (Object[]) args));
         }
         return this.getData();
     }
@@ -310,4 +310,5 @@ public class Resp<T> {
             .append('}')
             .toString();
     }
+
 }

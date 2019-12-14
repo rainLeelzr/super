@@ -185,7 +185,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.List;
 
-
 /**
  * @author Rain
  */
@@ -199,7 +198,7 @@ public class WebSwaggerAutoConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(apiInfo())
             .select()
-            .apis(RequestHandlerSelectors.basePackage("com.wegood"))
+            .apis(RequestHandlerSelectors.basePackage("vip.isass"))
             .paths(PathSelectors.any())
             .build()
             .securityContexts(CollUtil.newArrayList(
@@ -214,10 +213,10 @@ public class WebSwaggerAutoConfiguration {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-            .title("微好店api文档")
+            .title("isass api文档")
             .description("本文档聚合各微服务的接口文档，文档内容根据代码自动生成。")
-            .termsOfServiceUrl("https://ms.wegood.shop/apidoc/doc.html?plus=1&cache=1&lang=zh")
-            .contact(new Contact("rain", "https://www.wegood.shop", "lizhirong100@163.com"))
+            .termsOfServiceUrl("https://ms.isass.vip/apidoc/doc.html?plus=1&cache=1&lang=zh")
+            .contact(new Contact("rain", "https://www.isass.vip", "lizhirong100@163.com"))
             .version("1.0")
             .build();
     }

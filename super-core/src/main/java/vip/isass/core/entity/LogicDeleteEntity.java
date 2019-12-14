@@ -172,7 +172,7 @@ package vip.isass.core.entity;
 /**
  * @author Rain
  */
-public interface LogicDeleteEntity<T> extends IEntity {
+public interface LogicDeleteEntity<E extends LogicDeleteEntity<E>> extends IEntity<E> {
 
     String DELETE_FLAG = "delete_flag";
 
@@ -188,22 +188,22 @@ public interface LogicDeleteEntity<T> extends IEntity {
     /**
      * 设置删除标识
      */
-    T setDeleteFlag(Boolean deleteFlag);
+    E setDeleteFlag(Boolean deleteFlag);
 
     /**
      * 如果删除标识为 null, 则设置删除标识为 false，并返回删除标识
      */
-    default T computeDefaultDeleteFlagIfAbsent() {
+    default E computeDefaultDeleteFlagIfAbsent() {
         if (getDeleteFlag() == null) {
             setDeleteFlag(Boolean.FALSE);
         }
-        return (T) this;
+        return (E) this;
     }
 
     @Override
-    default T randomEntity() {
+    default E randomEntity() {
         setDeleteFlag(randomBoolean());
-        return (T) this;
+        return (E) this;
     }
 
 }

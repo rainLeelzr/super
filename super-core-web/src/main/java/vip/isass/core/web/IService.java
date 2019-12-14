@@ -223,12 +223,12 @@ public interface IService<E, C extends ICriteria<E, C>> {
     }
 
     //****************************** 改 start ******************************
-    default Boolean updateById(E entity) {
-        return getMpRepository().updateById(entity);
+    default Boolean updateEntityById(E entity) {
+        return getMpRepository().updateEntityById(entity);
     }
 
     default void updateByIdOrException(E entity) {
-        if (!getMpRepository().updateById(entity)) {
+        if (!getMpRepository().updateEntityById(entity)) {
             throw new AbsentException("更新失败，记录不存在");
         }
     }
@@ -239,7 +239,7 @@ public interface IService<E, C extends ICriteria<E, C>> {
 
     // ****************************** 查 start ******************************
     default E getById(Serializable id) {
-        return getMpRepository().getById(id);
+        return getMpRepository().getEntityById(id);
     }
 
     default E getByIdOrException(Serializable id) {

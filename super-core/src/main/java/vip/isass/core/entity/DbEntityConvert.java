@@ -167,116 +167,81 @@
  *
  */
 
-package vip.isass.core.repository;
+package vip.isass.core.entity;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import vip.isass.core.criteria.ICriteria;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.StrUtil;
+import lombok.SneakyThrows;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Rain
  */
-public interface IRepository<E, C extends ICriteria<E, C>> {
+public class DbEntityConvert {
 
-    // ****************************** 增 start ******************************
-    default boolean add(E entity) {
-        throw new UnsupportedOperationException();
+    /**
+     * todo 改成 MapStruct 提高性能
+     */
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> EDB convertToDbEntity(E entity) {
+        if (entity == null || entity instanceof DbEntity) {
+            return (EDB) entity;
+        }
+
+        Class<EDB> dbEntityClass = getDbEntityClass(entity.getClass());
+        if (dbEntityClass == null) {
+            throw new UnsupportedOperationException(StrUtil.format("entity[{}]没有DbEntity的子类实现", entity.getClass().getName()));
+        }
+
+        EDB edb = dbEntityClass.newInstance();
+        BeanUtil.copyProperties(entity, edb);
+        return edb;
     }
 
-    default boolean addBatch(Collection<E> entities) {
-        throw new UnsupportedOperationException();
+    @SuppressWarnings("unchecked")
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> E convertToEntity(EDB entity) {
+        return (E) entity;
     }
 
-    default boolean addBatch(Collection<E> entities, int batchSize) {
-        throw new UnsupportedOperationException();
+    @SuppressWarnings("unchecked")
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<EDB> convertToEdbEntitys(Collection<E> entitys) {
+        List<EDB> edbEntitys = new ArrayList<>(entitys.size());
+        for (E entity : entitys) {
+            if (entity instanceof DbEntity) {
+                edbEntitys.add((EDB) entity);
+            } else {
+                edbEntitys.add(convertToDbEntity(entity));
+            }
+        }
+        return edbEntitys;
     }
 
-    // ****************************** 删 start ******************************
-
-    default boolean deleteById(Serializable id) {
-        throw new UnsupportedOperationException();
+    @SuppressWarnings("unchecked")
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<E> convertToEntitys(Collection<EDB> entitys) {
+        if (entitys == null) {
+            return null;
+        }
+        return entitys.stream()
+            .map(DbEntityConvert::convertToEntity)
+            .collect(Collectors.toList());
     }
 
-    default boolean deleteByIds(Collection<? extends Serializable> ids) {
-        throw new UnsupportedOperationException();
-    }
-
-    default boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    //****************************** 改 start ******************************
-    default boolean updateEntityById(E entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    default boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    // ****************************** 查 start ******************************
-
-    default E getEntityById(Serializable id) {
-        throw new UnsupportedOperationException();
-    }
-
-    default E getByIdOrException(Serializable id) {
-        throw new UnsupportedOperationException();
-    }
-
-    default E getByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default List<E> findAll() {
-        throw new UnsupportedOperationException();
-    }
-
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Integer countAll() {
-        throw new UnsupportedOperationException();
-    }
-
-    default boolean isPresentById(Serializable id) {
-        throw new UnsupportedOperationException();
-    }
-
-    default boolean isPresentByColumn(String columnName, Object value) {
-        throw new UnsupportedOperationException();
-    }
-
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
+    private static Class getDbEntityClass(Class entityClass) {
+        Set<Class<?>> classes = ClassUtil.scanPackageBySuper("vip.isass", entityClass);
+        if (classes.isEmpty()) {
+            return null;
+        }
+        return classes.stream()
+            .filter(c -> c.isAssignableFrom(DbEntity.class))
+            .findFirst()
+            .orElse(null);
     }
 
 }

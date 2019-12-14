@@ -169,10 +169,12 @@
 
 package vip.isass.core.entity;
 
+import java.io.Serializable;
+
 /**
  * @author Rain
  */
-public interface ChainedEntity<PK> extends IEntity {
+public interface ChainedEntity<PK extends Serializable, E extends ChainedEntity<PK, E>> extends IEntity<E> {
 
     String PARENT_ID_COLUMN_NAME = "parent_id";
 
@@ -186,15 +188,15 @@ public interface ChainedEntity<PK> extends IEntity {
     /**
      * 设置父 id
      */
-    ChainedEntity setParentId(PK parentId);
+    E setParentId(PK parentId);
 
     /**
      * 标记为顶级实体
      */
-    ChainedEntity markAsTopEntity();
+    E markAsTopEntity();
 
     @Override
-    default ChainedEntity randomEntity() {
+    default E randomEntity() {
         return markAsTopEntity();
     }
 

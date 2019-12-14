@@ -176,6 +176,8 @@ import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import vip.isass.core.criteria.*;
+import vip.isass.core.entity.DbEntity;
+import vip.isass.core.entity.IEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -201,6 +203,40 @@ public class WrapperUtil {
 
         if (criteria instanceof IPageCriteria) {
             processPageCriteria(wrapper, (IPageCriteria) criteria);
+        }
+
+        return wrapper;
+    }
+
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>, C extends ICriteria<E, C>>
+    QueryWrapper<EDB> getEdbQueryWrapper(ICriteria<E, C> criteria) {
+        return getEdbQueryWrapper(criteria, null);
+    }
+
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>, C extends ICriteria<E, C>>
+    QueryWrapper<EDB> getEdbQueryWrapper(ICriteria<E, C> criteria, Class<EDB> edbClass) {
+        QueryWrapper<EDB> wrapper = new QueryWrapper<>();
+
+        if (criteria instanceof ISelectColumnCriteria) {
+            processSelectColumnsCriteria(wrapper, (ISelectColumnCriteria) criteria);
+        }
+
+        if (criteria instanceof IWhereConditionCriteria) {
+            processWhereConditionCriteria(wrapper, (IWhereConditionCriteria) criteria);
+        }
+
+        if (criteria instanceof IPageCriteria) {
+            processPageCriteria(wrapper, (IPageCriteria) criteria);
+        }
+
+        return wrapper;
+    }
+
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>, C extends ICriteria<E, C>> UpdateWrapper<EDB> getEdbUpdateWrapper(ICriteria<E, C> criteria) {
+        UpdateWrapper<EDB> wrapper = new UpdateWrapper<>();
+
+        if (criteria instanceof IWhereConditionCriteria) {
+            processWhereConditionCriteria(wrapper, (IWhereConditionCriteria) criteria);
         }
 
         return wrapper;

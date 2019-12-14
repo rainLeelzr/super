@@ -170,6 +170,7 @@
 package vip.isass.core.database.config;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
@@ -196,6 +197,7 @@ import org.springframework.transaction.annotation.TransactionManagementConfigure
 import vip.isass.core.database.mybatis.plus.driver.MybatisXMLLanguageDriver;
 import vip.isass.core.database.mybatis.plus.handler.MybatisPlusMetaObjectHandler;
 import vip.isass.core.page.PageConst;
+import vip.isass.core.support.enums.DefaultEnumTypeHandler;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -228,6 +230,7 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         GlobalConfig.DbConfig dbConfig = new GlobalConfig.DbConfig();
         dbConfig.setLogicDeleteValue(Boolean.TRUE.toString());
         dbConfig.setLogicNotDeleteValue(Boolean.FALSE.toString());
+        dbConfig.setIdType(IdType.ID_WORKER_STR);
         GlobalConfig conf = new GlobalConfig();
         conf.setBanner(false);
         // conf.setSqlInjector(new BlueSqlInjector());
@@ -254,6 +257,7 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         configuration.setCacheEnabled(false);
         configuration.setDefaultScriptingLanguage(MybatisXMLLanguageDriver.class);
         configuration.setJdbcTypeForNull(JdbcType.NULL);
+        configuration.setDefaultEnumTypeHandler(DefaultEnumTypeHandler.class);
 
         if (CollUtil.isNotEmpty(baseTypeHandlers)) {
             TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
@@ -268,7 +272,6 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
          * AutoMappingUnknownColumnBehavior.FAILING：当作映射失败处理，并抛出异常和详细信息
          */
         configuration.setAutoMappingUnknownColumnBehavior(AutoMappingUnknownColumnBehavior.WARNING);
-        // configuration.setDefaultEnumTypeHandler(EnumAnnotationTypeHandler.class);
 
         sqlSessionFactory.setConfiguration(configuration);
 

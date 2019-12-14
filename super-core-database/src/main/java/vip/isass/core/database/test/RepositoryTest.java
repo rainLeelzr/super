@@ -244,7 +244,7 @@ public interface RepositoryTest<C extends ICriteria<E, C>, E extends IEntity<E>,
         Serializable id = ((IdEntity) entity).getId();
         entity.randomEntity();
         ((IdEntity) entity).setId(id);
-        getRepository().updateById(entity);
+        getRepository().updateEntityById(entity);
     }
 
     default void testUpdateByCriteria() {
@@ -287,9 +287,9 @@ public interface RepositoryTest<C extends ICriteria<E, C>, E extends IEntity<E>,
         Assert.isTrue(getRepository().add(entity));
 
         IdEntity idEntity = (IdEntity) entity;
-        IdEntity e = (IdEntity) getRepository().getById(idEntity.getId());
+        IdEntity e = (IdEntity) getRepository().getEntityById(idEntity.getId());
 
-        Assert.notNull(getRepository().getById(e.getId()));
+        Assert.notNull(getRepository().getEntityById(e.getId()));
     }
 
     default void testGetAnyOneByCriteria() {

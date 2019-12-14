@@ -174,7 +174,7 @@ import java.io.Serializable;
 /**
  * @author Rain
  */
-public interface UserTracedEntity<FK extends Serializable> extends IEntity {
+public interface UserTracedEntity<FK extends Serializable, E extends UserTracedEntity<FK, E>> extends IEntity<E> {
 
     String CREATE_USER_ID = "create_user_id";
     String CREATE_USER_ID_PROPERTY = "createUserId";
@@ -196,7 +196,7 @@ public interface UserTracedEntity<FK extends Serializable> extends IEntity {
     /**
      * 设置创建用户的 id
      */
-    UserTracedEntity<FK> setCreateUserId(FK createUserId);
+    E setCreateUserId(FK createUserId);
 
     /**
      * 获取创建用户的用户名
@@ -206,7 +206,7 @@ public interface UserTracedEntity<FK extends Serializable> extends IEntity {
     /**
      * 设置创建用户的用户名
      */
-    UserTracedEntity<FK> setCreateUserName(String createUserName);
+    E setCreateUserName(String createUserName);
 
     /**
      * 获取修改用户的 id
@@ -216,7 +216,7 @@ public interface UserTracedEntity<FK extends Serializable> extends IEntity {
     /**
      * 设置修改用户的 id
      */
-    UserTracedEntity<FK> setModifyUserId(FK modifyUserId);
+    E setModifyUserId(FK modifyUserId);
 
     /**
      * 获取修改用户的用户名
@@ -226,16 +226,17 @@ public interface UserTracedEntity<FK extends Serializable> extends IEntity {
     /**
      * 设置修改用户的用户名
      */
-    UserTracedEntity<FK> setModifyUserName(String modifyUserName);
+    E setModifyUserName(String modifyUserName);
 
 
-    UserTracedEntity<FK> randomUserTracedId();
+    E randomUserTracedId();
 
     @Override
-    default UserTracedEntity<FK> randomEntity() {
+    @SuppressWarnings("unchecked")
+    default E randomEntity() {
         return randomUserTracedId()
-                .setCreateUserName(randomString())
-                .setModifyUserName(randomString());
+            .setCreateUserName(randomString())
+            .setModifyUserName(randomString());
     }
 
 }

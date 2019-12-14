@@ -166,117 +166,98 @@
  * Library.
  *
  */
+package vip.isass.core.support.enums;
 
-package vip.isass.core.repository;
+import com.baomidou.mybatisplus.core.toolkit.EnumUtils;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
+import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import vip.isass.core.criteria.ICriteria;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author Rain
+ * 自定义枚举属性转换器
+ *
+ * @author hubin
+ * @since 2017-10-11
  */
-public interface IRepository<E, C extends ICriteria<E, C>> {
+@Slf4j
+public class DefaultEnumTypeHandler<E extends Enum<?>> extends BaseTypeHandler<Enum<?>> {
 
-    // ****************************** 增 start ******************************
-    default boolean add(E entity) {
-        throw new UnsupportedOperationException();
+    private static final Map<Class<?>, Method> TABLE_METHOD_OF_ENUM_TYPES = new ConcurrentHashMap<>();
+
+    private final Class<E> type;
+
+    private final Method method;
+
+    public DefaultEnumTypeHandler(Class<E> type) {
+        if (type == null) {
+            throw new IllegalArgumentException("Type argument cannot be null");
+        }
+        this.type = type;
+        this.method = TABLE_METHOD_OF_ENUM_TYPES.computeIfAbsent(type, k -> {
+            Field field = dealEnumType(this.type).orElseThrow(() -> new IllegalArgumentException(String.format("Could not find @EnumValue in Class: %s.", type.getName())));
+            return ReflectionKit.getMethod(this.type, field);
+        });
     }
 
-    default boolean addBatch(Collection<E> entities) {
-        throw new UnsupportedOperationException();
+    @SuppressWarnings("Duplicates")
+    @Override
+    public void setNonNullParameter(PreparedStatement ps, int i, Enum<?> parameter, JdbcType jdbcType)
+        throws SQLException {
+        try {
+            this.method.setAccessible(true);
+            if (jdbcType == null) {
+                ps.setObject(i, this.method.invoke(parameter));
+            } else {
+                // see r3589
+                ps.setObject(i, this.method.invoke(parameter), jdbcType.TYPE_CODE);
+            }
+        } catch (IllegalAccessException e) {
+            log.error("unrecognized jdbcType, failed to set StringValue for type=" + parameter);
+        } catch (InvocationTargetException e) {
+            throw ExceptionUtils.mpe("Error: NoSuchMethod in %s.  Cause:", e, this.type.getName());
+        }
     }
 
-    default boolean addBatch(Collection<E> entities, int batchSize) {
-        throw new UnsupportedOperationException();
+    @Override
+    public E getNullableResult(ResultSet rs, String columnName) throws SQLException {
+        if (null == rs.getObject(columnName) && rs.wasNull()) {
+            return null;
+        }
+        return EnumUtils.valueOf(this.type, rs.getObject(columnName), this.method);
     }
 
-    // ****************************** 删 start ******************************
-
-    default boolean deleteById(Serializable id) {
-        throw new UnsupportedOperationException();
+    @Override
+    public E getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+        if (null == rs.getObject(columnIndex) && rs.wasNull()) {
+            return null;
+        }
+        return EnumUtils.valueOf(this.type, rs.getObject(columnIndex), this.method);
     }
 
-    default boolean deleteByIds(Collection<? extends Serializable> ids) {
-        throw new UnsupportedOperationException();
+    @Override
+    public E getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+        if (null == cs.getObject(columnIndex) && cs.wasNull()) {
+            return null;
+        }
+        return EnumUtils.valueOf(this.type, cs.getObject(columnIndex), this.method);
     }
 
-    default boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    //****************************** 改 start ******************************
-    default boolean updateEntityById(E entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    default boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    // ****************************** 查 start ******************************
-
-    default E getEntityById(Serializable id) {
-        throw new UnsupportedOperationException();
-    }
-
-    default E getByIdOrException(Serializable id) {
-        throw new UnsupportedOperationException();
-    }
-
-    default E getByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default List<E> findAll() {
-        throw new UnsupportedOperationException();
-    }
-
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default Integer countAll() {
-        throw new UnsupportedOperationException();
-    }
-
-    default boolean isPresentById(Serializable id) {
-        throw new UnsupportedOperationException();
-    }
-
-    default boolean isPresentByColumn(String columnName, Object value) {
-        throw new UnsupportedOperationException();
-    }
-
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
-        throw new UnsupportedOperationException();
+    private static Optional<Field> dealEnumType(Class<?> clazz) {
+        return clazz.isEnum() ? Arrays.stream(clazz.getDeclaredFields()).filter(field -> "code".equals(field.getName())).findFirst() : Optional.empty();
     }
 
 }
