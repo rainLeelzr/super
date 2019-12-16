@@ -334,7 +334,7 @@
                 <version>${alibaba-nacos.version}</version>
             </dependency>
 
-            <!-- com.wegood 系列 -->
+            <!-- vip.isass 系列 -->
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core</artifactId>

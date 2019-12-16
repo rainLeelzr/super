@@ -194,7 +194,7 @@ import java.util.Collections;
  */
 @Configuration
 @ComponentScan
-@EnableFeignClients(basePackages = "com.wegood")
+@EnableFeignClients(basePackages = "vip.isass")
 public class WebAutoConfiguration {
 
     public static final int CONN_TIMEOUT_IN_MILLIS = 10_000;
