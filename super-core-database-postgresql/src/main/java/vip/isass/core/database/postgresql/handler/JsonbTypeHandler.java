@@ -169,9 +169,6 @@
 
 package vip.isass.core.database.postgresql.handler;
 
-import vip.isass.core.database.postgresql.entity.JsonPg;
-import vip.isass.core.entity.Json;
-import vip.isass.core.support.json.DefaultJson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
@@ -179,6 +176,9 @@ import org.apache.ibatis.type.MappedJdbcTypes;
 import org.apache.ibatis.type.MappedTypes;
 import org.springframework.stereotype.Component;
 import vip.isass.core.database.postgresql.entity.JsonPg;
+import vip.isass.core.database.type.handler.IJsonTypeHandler;
+import vip.isass.core.entity.Json;
+import vip.isass.core.support.json.DefaultJson;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -195,7 +195,7 @@ import java.sql.SQLException;
 @Component
 @MappedJdbcTypes(JdbcType.JAVA_OBJECT)
 @MappedTypes({Json.class, JsonPg.class, DefaultJson.class})
-public class JsonbTypeHandler extends BaseTypeHandler<Json> {
+public class JsonbTypeHandler extends BaseTypeHandler<Json> implements IJsonTypeHandler<Json> {
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Json parameter, JdbcType jdbcType) throws SQLException {

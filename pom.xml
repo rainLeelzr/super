@@ -246,7 +246,7 @@
 
         <!-- 数据库 -->
         <mybatis-spring-boot-starter.version>2.0.1</mybatis-spring-boot-starter.version>
-        <mybatis-plus.version>3.1.1</mybatis-plus.version>
+        <mybatis-plus.version>3.3.0</mybatis-plus.version>
         <flyway.version>5.2.4</flyway.version>
         <sharding-jdbc.version>4.0.0-RC2</sharding-jdbc.version>
         <!--<mysql-connector-java.version>5.1.47</mysql-connector-java.version>-->

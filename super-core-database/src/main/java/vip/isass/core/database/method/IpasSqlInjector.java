@@ -170,7 +170,6 @@ package vip.isass.core.database.method;
 
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
-import com.baomidou.mybatisplus.extension.injector.methods.additional.AlwaysUpdateSomeColumnById;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -180,16 +179,13 @@ import java.util.List;
  * <p>
  *
  * </p>
- *
  */
 @Component
 public class IpasSqlInjector extends DefaultSqlInjector {
 
-
     @Override
-    public List<AbstractMethod> getMethodList() {
-        List<AbstractMethod> methodList = super.getMethodList();
-        methodList.add(new AlwaysUpdateSomeColumnById());
+    public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
+        List<AbstractMethod> methodList = super.getMethodList(mapperClass);
         return methodList;
     }
 

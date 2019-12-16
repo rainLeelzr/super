@@ -119,7 +119,7 @@ public class ${entity} implements
      */
 <#-- 主键生成策略 -->
     <#if field.keyFlag>
-    @TableId(type = IdType.ID_WORKER_STR)
+    @TableId(type = IdType.ASSIGN_ID)
     </#if>
 <#-- 乐观锁注解 -->
     <#if versionFieldName == field.name>

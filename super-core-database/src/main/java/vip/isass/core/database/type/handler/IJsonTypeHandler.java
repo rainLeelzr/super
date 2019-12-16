@@ -167,42 +167,12 @@
  *
  */
 
-package vip.isass.core.database.mybatis.plus.handler;
+package vip.isass.core.database.type.handler;
 
-import com.baomidou.mybatisplus.core.MybatisDefaultParameterHandler;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
-
-import java.util.Collection;
-import java.util.Map;
+import org.apache.ibatis.type.TypeHandler;
 
 /**
- * @author rain
+ * @author Rain
  */
-public class MybatisPlusParameterHandler extends MybatisDefaultParameterHandler {
-
-
-    public MybatisPlusParameterHandler(MappedStatement mappedStatement,
-                                       Object parameterObject,
-                                       BoundSql boundSql) {
-        super(mappedStatement, parameterObject, boundSql);
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    protected static Collection<Object> getParameters(Object parameter) {
-        Collection<Object> parameters = MybatisDefaultParameterHandler.getParameters(parameter);
-        if (parameters != null) {
-            return parameters;
-        }
-
-        if (parameter instanceof Map) {
-            Map parameterMap = (Map) parameter;
-            if (parameterMap.containsKey("coll") && parameterMap.get("coll") instanceof Collection) {
-                parameters = (Collection) parameterMap.get("coll");
-            }
-        }
-        return parameters;
-    }
-
+public interface IJsonTypeHandler<T> extends TypeHandler<T> {
 }
-

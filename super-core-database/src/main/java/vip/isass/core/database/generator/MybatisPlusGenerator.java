@@ -170,9 +170,9 @@
 package vip.isass.core.database.generator;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.extension.toolkit.PackageHelper;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.InjectionConfig;
 import com.baomidou.mybatisplus.generator.config.*;
@@ -180,10 +180,6 @@ import com.baomidou.mybatisplus.generator.config.po.TableFill;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
-import vip.isass.core.entity.LogicDeleteEntity;
-import vip.isass.core.entity.TimeTracedEntity;
-import vip.isass.core.entity.UserTracedEntity;
-import vip.isass.core.entity.VersionEntity;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.TemplateHashModel;
@@ -506,7 +502,7 @@ public class MybatisPlusGenerator {
                 // return false;
                 return true;
             } else {
-                PackageHelper.mkDir(file.getParentFile());
+                FileUtil.mkdir(file.getParentFile());
                 return true;
             }
         });
