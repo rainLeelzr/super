@@ -198,18 +198,18 @@
         </dependency>
 
         <!--<dependency>-->
-            <!--<groupId>org.mybatis.spring.boot</groupId>-->
-            <!--<artifactId>mybatis-spring-boot-starter</artifactId>-->
-            <!--&lt;!&ndash;<scope>provided</scope>&ndash;&gt;-->
+        <!--<groupId>org.mybatis.spring.boot</groupId>-->
+        <!--<artifactId>mybatis-spring-boot-starter</artifactId>-->
+        <!--&lt;!&ndash;<scope>provided</scope>&ndash;&gt;-->
         <!--</dependency>-->
 
         <!--<dependency>-->
-            <!--<groupId>org.apache.rocketmq</groupId>-->
-            <!--<artifactId>rocketmq-client</artifactId>-->
+        <!--<groupId>org.apache.rocketmq</groupId>-->
+        <!--<artifactId>rocketmq-client</artifactId>-->
         <!--</dependency>-->
         <!--<dependency>-->
-            <!--<groupId>org.apache.rocketmq</groupId>-->
-            <!--<artifactId>rocketmq-common</artifactId>-->
+        <!--<groupId>org.apache.rocketmq</groupId>-->
+        <!--<artifactId>rocketmq-common</artifactId>-->
         <!--</dependency>-->
 
         <dependency>
@@ -218,4 +218,21 @@
         </dependency>
 
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>alimaven</id>
+            <name>aliyun maven</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+        </repository>
+
+        <repository>
+            <id>ssj-rdc-releases</id>
+            <url>https://repo.rdc.aliyun.com/repository/114597-release-3Z5X3y/</url>
+        </repository>
+        <repository>
+            <id>ssj-rdc-snapshots</id>
+            <url>https://repo.rdc.aliyun.com/repository/114597-snapshot-uyzwCu/</url>
+        </repository>
+    </repositories>
 </project>

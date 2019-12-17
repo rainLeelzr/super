@@ -757,13 +757,13 @@
 
     <distributionManagement>
         <repository>
-            <id>wegood-rdc-releases</id>
-            <url>https://repo.rdc.aliyun.com/repository/77285-release-X23jTn/</url>
+            <id>ssj-rdc-releases</id>
+            <url>https://repo.rdc.aliyun.com/repository/114597-release-3Z5X3y/</url>
         </repository>
 
         <snapshotRepository>
-            <id>wegood-rdc-snapshots</id>
-            <url>https://repo.rdc.aliyun.com/repository/77285-snapshot-72KTdP/</url>
+            <id>ssj-rdc-snapshots</id>
+            <url>https://repo.rdc.aliyun.com/repository/114597-snapshot-uyzwCu/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -776,13 +776,13 @@
         </repository>
 
         <repository>
-            <id>wegood-rdc-releases</id>
-            <url>https://repo.rdc.aliyun.com/repository/77285-release-X23jTn</url>
+            <id>ssj-rdc-releases</id>
+            <url>https://repo.rdc.aliyun.com/repository/114597-release-3Z5X3y/</url>
         </repository>
 
         <repository>
-            <id>wegood-rdc-snapshots</id>
-            <url>https://repo.rdc.aliyun.com/repository/77285-snapshot-72KTdP/</url>
+            <id>ssj-rdc-snapshots</id>
+            <url>https://repo.rdc.aliyun.com/repository/114597-snapshot-uyzwCu/</url>
         </repository>
 
     </repositories>
