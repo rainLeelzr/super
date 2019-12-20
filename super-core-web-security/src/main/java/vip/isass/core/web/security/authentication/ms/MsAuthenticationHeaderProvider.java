@@ -190,10 +190,10 @@ public class MsAuthenticationHeaderProvider implements AdditionalRequestHeaderPr
     @Value("${spring.application.name:unknown}")
     private String appName;
 
-    @Value("${security.ms.secret:wegood123456}")
+    @Value("${security.ms.secret:qcyAHr35IDzI9FkD}")
     private String secret;
 
-    @Value(".${security.ms.secret:wegood123456}")
+    @Value(".${security.ms.secret:qcyAHr35IDzI9FkD}")
     private String dotSecret;
 
     private String fullMsAuthenticationHeaderValue = "";

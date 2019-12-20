@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author ${author}
  */
-@FeignClient(name = "wegood-service-${cfg.moduleName}", url = "${r"$"}{feign.${cfg.moduleName}.url:}", fallback = ${entity}FeignFallBack.class)
+@FeignClient(name = "isass-service-${cfg.moduleName}", url = "${r"$"}{feign.${cfg.moduleName}.url:}", fallback = ${entity}FeignFallBack.class)
 public interface ${entity}FeignClient {
 
     // region ${cfg.prefix}_${table.name}

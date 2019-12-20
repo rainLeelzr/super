@@ -313,7 +313,7 @@ public class MybatisPlusGenerator {
         GlobalConfig config = new GlobalConfig()
             .setActiveRecord(false)
             .setEnableCache(false)
-            .setAuthor("wegood")
+            .setAuthor("isass")
             .setControllerName("%sController")
             .setServiceName("%sService")
             .setMapperName("%sMapper")

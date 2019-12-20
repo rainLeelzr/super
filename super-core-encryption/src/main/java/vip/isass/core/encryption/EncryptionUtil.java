@@ -177,7 +177,7 @@ import org.jasypt.util.text.BasicTextEncryptor;
 public class EncryptionUtil {
 
     public static void main(String[] args) {
-        String str = "wegood123456";
+        String str = "111111";
         String encryptStr = encrypt(str);
         String decryptStr = decrypt(encryptStr);
         System.out.println("原文：");

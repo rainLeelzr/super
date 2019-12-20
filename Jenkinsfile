@@ -61,7 +61,7 @@ pipeline {
             #                "url": "${BUILD_URL}console",
             #                "buttonText": "详情"
             #            }
-            #        }' https://ms.wegood.shop/message/enterprise-wechat/group-message
+            #        }' https://ms.isass.shop/message/enterprise-wechat/group-message
             #    """
             deleteDir()
         }

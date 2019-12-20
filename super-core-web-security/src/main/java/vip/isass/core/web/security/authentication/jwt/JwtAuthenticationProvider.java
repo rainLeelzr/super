@@ -203,7 +203,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
-    @Value("${security.jwt.secret:wegood123456}")
+    @Value("${security.jwt.secret:vpAMjyZ9JqW4QNsw}")
     private String secret;
 
     @Resource

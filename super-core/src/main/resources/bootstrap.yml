@@ -22,7 +22,7 @@ spring:
         - veth.*
 
 info:
-  company: wegood
+  company: isass
   name: ${spring.application.name}
 
 jasypt:

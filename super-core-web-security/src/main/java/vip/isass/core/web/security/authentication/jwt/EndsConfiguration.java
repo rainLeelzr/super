@@ -203,7 +203,7 @@ public class EndsConfiguration {
      * 互斥终端，只能其中一个在线
      */
     @Getter
-    private List<String> mutexEnds = CollUtil.newArrayList("ios-wegood", "android-wegood");
+    private List<String> mutexEnds = CollUtil.newArrayList("ios-isass", "android-isass");
 
     /**
      * 同端多登，可以多台同一终端类型同时在线的终端
