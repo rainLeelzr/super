@@ -325,7 +325,7 @@ public abstract class MybatisPlusRepository<
         if (wrapper != null && !Optional.ofNullable(wrapper.getSqlSelect()).isPresent() && wrapper instanceof QueryWrapper) {
             ((QueryWrapper<EDB>) wrapper).select(currentModelClass(), i -> !SensitiveDataProperty.PROPERTIES.contains(i.getProperty()));
         }
-        return this.list(wrapper).stream().map(DbEntity::convertToEntity).collect(Collectors.toList());
+        return this.list(wrapper).stream().map(DbEntityConvert::convertToEntity).collect(Collectors.toList());
     }
 
     @Override
@@ -345,7 +345,7 @@ public abstract class MybatisPlusRepository<
             new Page<EDB>(page.getCurrent(), page.getSize(), page.isSearchCount())
                 .setOptimizeCountSql(page.optimizeCountSql()),
             wrapper)
-            .convert(DbEntity::convertToEntity);
+            .convert(DbEntityConvert::convertToEntity);
     }
 
     @Override

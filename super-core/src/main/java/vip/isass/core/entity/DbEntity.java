@@ -175,7 +175,7 @@ package vip.isass.core.entity;
 public interface DbEntity<E extends IEntity<E>, EDB extends DbEntity<E, EDB>> extends IEntity<E> {
 
     default E convertToEntity() {
-        throw new UnsupportedOperationException();
+        return DbEntityConvert.convertToEntity((EDB) this);
     }
 
 }

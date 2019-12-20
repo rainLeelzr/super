@@ -230,7 +230,7 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         GlobalConfig.DbConfig dbConfig = new GlobalConfig.DbConfig();
         dbConfig.setLogicDeleteValue(Boolean.TRUE.toString());
         dbConfig.setLogicNotDeleteValue(Boolean.FALSE.toString());
-        dbConfig.setIdType(IdType.ID_WORKER_STR);
+        dbConfig.setIdType(IdType.ASSIGN_ID);
         GlobalConfig conf = new GlobalConfig();
         conf.setBanner(false);
         // conf.setSqlInjector(new BlueSqlInjector());
@@ -248,9 +248,9 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         sqlSessionFactory.setDataSource(dataSource);
 
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        sqlSessionFactory.setMapperLocations(resolver.getResources("classpath*:/com/wegood/**/mapper/**/*Mapper.xml"));
+        sqlSessionFactory.setMapperLocations(resolver.getResources("classpath*:/vip/isass/**/mapper/**/*Mapper.xml"));
 
-        sqlSessionFactory.setTypeEnumsPackage("vip.isass.**.api.entity");
+        sqlSessionFactory.setTypeEnumsPackage("vip.isass.api.**");
 
         MybatisConfiguration configuration = new MybatisConfiguration();
         configuration.setMapUnderscoreToCamelCase(true);

@@ -239,7 +239,7 @@ public class DbEntityConvert {
             return null;
         }
         return classes.stream()
-            .filter(c -> c.isAssignableFrom(DbEntity.class))
+            .filter(DbEntity.class::isAssignableFrom)
             .findFirst()
             .orElse(null);
     }

@@ -249,6 +249,7 @@
         <mybatis-plus.version>3.3.0</mybatis-plus.version>
         <flyway.version>5.2.4</flyway.version>
         <sharding-jdbc.version>4.0.0-RC2</sharding-jdbc.version>
+        <p6spy.version>2.1.4</p6spy.version>
         <!--<mysql-connector-java.version>5.1.47</mysql-connector-java.version>-->
 
         <!-- net -->
@@ -508,6 +509,12 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-core</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>p6spy</groupId>
+                <artifactId>p6spy</artifactId>
+                <version>${p6spy.version}</version>
             </dependency>
 
             <!-- net -->

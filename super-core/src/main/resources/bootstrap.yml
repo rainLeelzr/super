@@ -9,9 +9,9 @@ spring:
     nacos:
       discovery:
         registerEnabled: false
-        server-addr: nacos.wegood.shop:80
+        server-addr: nacos.sancaijia.net:80
       config:
-        serverAddr: nacos.wegood.shop:80
+        serverAddr: nacos.sancaijia.net:80
         fileExtension: yaml
         shared-dataids: application.yaml,application-${spring.profiles.active:}.yaml
         refreshableDataids: application.yaml,application-${spring.profiles.active:}.yaml

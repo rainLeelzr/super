@@ -224,26 +224,26 @@ public class UriPrefixProvider {
         /**
          * 活动服务
          */
-        ACTIVITY("activity", "wegood-service-activity"),
-        APIDOC("apidoc", "wegood-service-apidoc"),
-        AUTH("auth", "wegood-service-auth"),
-        BASE("base", "wegood-service-base"),
-        COUPON("coupon", "wegood-service-coupon"),
-        FINANCE("finance", "wegood-service-finance"),
-        GATEWAY("gateway", "wegood-service-gateway"),
-        GOODS("goods", "wegood-service-goods"),
-        JOB_CENTER("job-center", "wegood-service-job-center"),
-        JOB_EXECUTOR("job-executor", "wegood-service-job-executor"),
-        MESSAGE("message", "wegood-service-message"),
-        ORDER("order", "wegood-service-order"),
-        PAY("pay", "wegood-service-pay"),
-        PDD("pdd", "wegood-service-pdd"),
-        POSTER("poster", "wegood-service-poster"),
-        PUSH("push", "wegood-service-push"),
-        SEARCH("search", "wegood-service-search"),
-        TAOBAO("taobao", "wegood-service-taobao"),
-        UPLOAD("upload", "wegood-service-upload"),
-        ADVERTISING("ad", "wegood-service-advertising"),;
+        ACTIVITY("activity", "isass-service-activity"),
+        APIDOC("apidoc", "isass-service-apidoc"),
+        AUTH("auth", "isass-service-auth"),
+        BASE("base", "isass-service-base"),
+        COUPON("coupon", "isass-service-coupon"),
+        FINANCE("finance", "isass-service-finance"),
+        GATEWAY("gateway", "isass-service-gateway"),
+        GOODS("goods", "isass-service-goods"),
+        JOB_CENTER("job-center", "isass-service-job-center"),
+        JOB_EXECUTOR("job-executor", "isass-service-job-executor"),
+        MESSAGE("message", "isass-service-message"),
+        ORDER("order", "isass-service-order"),
+        PAY("pay", "isass-service-pay"),
+        PDD("pdd", "isass-service-pdd"),
+        POSTER("poster", "isass-service-poster"),
+        PUSH("push", "isass-service-push"),
+        SEARCH("search", "isass-service-search"),
+        TAOBAO("taobao", "isass-service-taobao"),
+        UPLOAD("upload", "isass-service-upload"),
+        ADVERTISING("ad", "isass-service-advertising"),;
 
         private String shortName;
 
