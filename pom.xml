@@ -769,7 +769,7 @@
         </repository>
 
         <snapshotRepository>
-            <id>ssj-rdc-snapshots</id>
+            <id>scj-rdc-snapshots</id>
             <url>https://repo.rdc.aliyun.com/repository/114597-snapshot-uyzwCu/</url>
         </snapshotRepository>
     </distributionManagement>
@@ -788,7 +788,7 @@
         </repository>
 
         <repository>
-            <id>ssj-rdc-snapshots</id>
+            <id>scj-rdc-snapshots</id>
             <url>https://repo.rdc.aliyun.com/repository/114597-snapshot-uyzwCu/</url>
         </repository>
 

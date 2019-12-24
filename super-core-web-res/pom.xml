@@ -220,7 +220,7 @@
             <url>https://repo.rdc.aliyun.com/repository/114597-release-3Z5X3y/</url>
         </repository>
         <repository>
-            <id>ssj-rdc-snapshots</id>
+            <id>scj-rdc-snapshots</id>
             <url>https://repo.rdc.aliyun.com/repository/114597-snapshot-uyzwCu/</url>
         </repository>
     </repositories>
