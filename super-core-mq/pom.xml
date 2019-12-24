@@ -227,7 +227,7 @@
         </repository>
 
         <repository>
-            <id>ssj-rdc-releases</id>
+            <id>scj-rdc-releases</id>
             <url>https://repo.rdc.aliyun.com/repository/114597-release-3Z5X3y/</url>
         </repository>
         <repository>
