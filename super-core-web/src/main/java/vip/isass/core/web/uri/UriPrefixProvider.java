@@ -176,9 +176,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Rain
@@ -196,11 +193,8 @@ public class UriPrefixProvider {
 
     @Resource
     public void setAppName(@Value("${spring.application.name:}") String applicationName) {
-        if (StrUtil.isNotBlank(applicationName)) {
-            String shortName = AppNameConvert.getShortNameByApplicationName(applicationName);
-            if (StrUtil.isNotBlank(shortName)) {
-                this.appName = "/" + shortName;
-            }
+        if (StrUtil.isBlank(applicationName)) {
+            throw new IllegalArgumentException("请配置 spring.application.name");
         }
     }
 
@@ -216,58 +210,6 @@ public class UriPrefixProvider {
             this.uriPrefix = appName + contextPath;
         }
         return uriPrefix;
-    }
-
-    @Getter
-    public enum AppNameConvert {
-
-        /**
-         * 活动服务
-         */
-        ACTIVITY("activity", "isass-service-activity"),
-        APIDOC("apidoc", "isass-service-apidoc"),
-        AUTH("auth", "isass-service-auth"),
-        BASE("base", "isass-service-base"),
-        COUPON("coupon", "isass-service-coupon"),
-        FINANCE("finance", "isass-service-finance"),
-        GATEWAY("gateway", "isass-service-gateway"),
-        GOODS("goods", "isass-service-goods"),
-        JOB_CENTER("job-center", "isass-service-job-center"),
-        JOB_EXECUTOR("job-executor", "isass-service-job-executor"),
-        MESSAGE("message", "isass-service-message"),
-        ORDER("order", "isass-service-order"),
-        PAY("pay", "isass-service-pay"),
-        PDD("pdd", "isass-service-pdd"),
-        POSTER("poster", "isass-service-poster"),
-        PUSH("push", "isass-service-push"),
-        SEARCH("search", "isass-service-search"),
-        TAOBAO("taobao", "isass-service-taobao"),
-        UPLOAD("upload", "isass-service-upload"),
-        ADVERTISING("ad", "isass-service-advertising"),;
-
-        private String shortName;
-
-        private String applicationName;
-
-        private static final Map<String, String> MAPPING;
-
-        static {
-            MAPPING = Arrays.stream(AppNameConvert.values())
-                .collect(Collectors.toMap(AppNameConvert::getApplicationName, AppNameConvert::getShortName));
-        }
-
-        AppNameConvert(String shortName, String applicationName) {
-            this.shortName = shortName;
-            this.applicationName = applicationName;
-        }
-
-        public static String getShortNameByApplicationName(String applicationName) {
-            String shortName = MAPPING.getOrDefault(applicationName, "");
-            if (StrUtil.isBlank(shortName)) {
-                log.warn("applicationName[{}]未添加AppNameConvert枚举", applicationName);
-            }
-            return shortName;
-        }
     }
 
 }
