@@ -196,6 +196,7 @@ public class UriPrefixProvider {
         if (StrUtil.isBlank(applicationName)) {
             throw new IllegalArgumentException("请配置 spring.application.name");
         }
+        this.appName = applicationName;
     }
 
     @Resource
