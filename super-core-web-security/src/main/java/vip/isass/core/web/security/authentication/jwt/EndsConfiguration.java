@@ -192,7 +192,7 @@ public class EndsConfiguration {
      * 所有终端是否可以同时在线。是则放弃所有判断，直接在线
      */
     @Getter
-    private boolean allEndsSameTimeOnline = false;
+    private boolean allEndsSameTimeOnline = true;
 
     /**
      * 直接在线终端，不需要管其他终端有没有在线的终端，如果需要同端多登，还需要配置 sameEndsOnline
