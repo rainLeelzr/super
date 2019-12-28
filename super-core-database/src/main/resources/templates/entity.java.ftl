@@ -4,14 +4,15 @@
 <#include "./segment/EntityType.ftl">
 package ${cfg.entityPackageName};
 
+import cn.hutool.core.util.RandomUtil;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 <#list table.fields as field>
 <#if field.comment!?contains(enumStart)>
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 <#break>
 </#if>
 </#list>
