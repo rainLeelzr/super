@@ -1,24 +1,25 @@
+<#include "./segment/copyright.ftl">
+
 package ${package.Controller?replace(".controller",".${cfg.prefix}.controller")};
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import ${cfg.package}.core.web.IController;
-import ${cfg.package}.core.web.Resp;
-import ${cfg.package}.${cfg.moduleName}.api.criteria.${entity}Criteria;
-import ${package.Entity}.${entity};
-import ${package.Service?replace(".service",".${cfg.prefix}.service")}.${cfg.prefix?cap_first}${table.serviceName};
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ${cfg.package}.api.model.${cfg.moduleName}.criteria.${entity}Criteria;
+import ${cfg.entityPackageName}.${entity};
+import ${package.Service?replace(".service",".${cfg.prefix}.service")}.${cfg.prefix?cap_first}${table.serviceName};
+import ${cfg.package}.core.web.IController;
+import ${cfg.package}.core.web.Resp;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
  * <p>
- * ${table.comment!}
+ * <#if table.comment??>${table.comment!} </#if>控制器
  * </p>
  *
  * @author ${author}
@@ -83,12 +84,12 @@ public class ${cfg.prefix?cap_first}${table.controllerName} implements IControll
 
     @PutMapping("/v1/${table.name?replace("${cfg.tablePrefix[0]}_","","f")?replace("_","-")}/allColumns")
     public Resp<Boolean> updateAllColumnsById(@RequestBody @Valid ${entity} entity) {
-        return Resp.bizSuccess(${cfg.prefix}${table.serviceName}.updateById(entity));
+        return Resp.bizSuccess(${cfg.prefix}${table.serviceName}.updateEntityById(entity));
     }
 
     @PutMapping("/v1/${table.name?replace("${cfg.tablePrefix[0]}_","","f")?replace("_","-")}")
     public Resp<Boolean> updateExcludeNullFieldsById(@RequestBody @Valid ${entity} entity) {
-        return Resp.bizSuccess(${cfg.prefix}${table.serviceName}.updateById(entity));
+        return Resp.bizSuccess(${cfg.prefix}${table.serviceName}.updateEntityById(entity));
     }
 
     @DeleteMapping("/v1/${table.name?replace("${cfg.tablePrefix[0]}_","","f")?replace("_","-")}/{ids}")

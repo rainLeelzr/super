@@ -1,15 +1,17 @@
+<#include "./segment/copyright.ftl">
+
 package ${package.Service};
 
-import ${cfg.package}.${cfg.moduleName}.repository.${entity}MpRepository;
-import ${cfg.package}.${cfg.moduleName}.${cfg.prefix}.repository.${cfg.prefix?capFirst}${entity}MpRepository;
-import ${cfg.package}.${cfg.moduleName}.${cfg.prefix}.service.${cfg.prefix?capFirst}${entity}Service;
 import org.springframework.stereotype.Service;
+import ${cfg.package}.${cfg.moduleName}.db.repository.${entity}MpRepository;
+import ${cfg.package}.${cfg.moduleName}.db.${cfg.prefix}.repository.${cfg.prefix?capFirst}${entity}MpRepository;
+import ${cfg.package}.${cfg.moduleName}.${cfg.prefix}.service.${cfg.prefix?capFirst}${entity}Service;
 
 import javax.annotation.Resource;
 
 /**
  * <p>
- * ${table.comment!} 服务
+ * <#if table.comment??>${table.comment!} </#if>服务
  * </p>
  *
  * @author ${author}

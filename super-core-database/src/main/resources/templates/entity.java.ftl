@@ -1,9 +1,13 @@
+<#include "./segment/copyright.ftl">
+
 <#assign enumStart = "[枚举--">
 <#include "./segment/EntityType.ftl">
-package ${package.Entity};
+package ${cfg.entityPackageName};
 
-import cn.hutool.core.util.RandomUtil;
-import com.baomidou.mybatisplus.annotation.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 <#list table.fields as field>
 <#if field.comment!?contains(enumStart)>
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -14,18 +18,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import vip.isass.core.entity.*;
 import vip.isass.core.sequence.impl.LongSequence;
 import vip.isass.core.support.JsonUtil;
+import vip.isass.core.support.LocalDateTimeUtil;
 <#list table.fields as field>
 <#if field.propertyType == "LocalDate"
 || field.propertyType == "LocalTime"
 || field.propertyType == "LocalDateTime">
-import vip.isass.core.support.LocalDateTimeUtil;
 <#break>
 </#if>
 </#list>
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
 
 import java.beans.Transient;
 <#list table.fields as field>
@@ -70,27 +70,26 @@ import java.util.Collection;
 @Getter
 @Setter
 @Accessors(chain = true)
-@TableName("${table.name}")
 public class ${entity} implements
 <#if isIdEntity>
         IdEntity<${idEntityPropertyType}, ${entity}>,
 </#if>
 <#if isChainedEntity>
-        ChainedEntity<${chainedEntityPropertyType}>,
+        ChainedEntity<${chainedEntityPropertyType}, ${entity}>,
 </#if>
 <#if isUserTracedEntity>
-        UserTracedEntity<${userTracedEntityPropertyType}>,
+        UserTracedEntity<${userTracedEntityPropertyType}, ${entity}>,
 </#if>
 <#if isTimeTracedEntity>
-        TimeTracedEntity,
+        TimeTracedEntity<${entity}>,
 </#if>
 <#if isVersionEntity>
-        VersionEntity,
+        VersionEntity<${entity}>,
 </#if>
 <#if isLogicDeleteEntity>
         LogicDeleteEntity<${entity}>,
 </#if>
-        IEntity {
+        IEntity<${entity}> {
 
 <#------------ END 定义类名 ------------>
 <#------------ BEGIN 定义公共字段 ------------>
@@ -117,28 +116,8 @@ public class ${entity} implements
      * 数据库字段名: ${field.name}
      * 数据库字段类型: ${field.type}
      */
-<#-- 主键生成策略 -->
-    <#if field.keyFlag>
-    @TableId(type = IdType.ASSIGN_ID)
-    </#if>
 <#-- 乐观锁注解 -->
-    <#if versionFieldName == field.name>
-    @Version
-    </#if>
 <#-- 逻辑删除注解 -->
-    <#if logicDeleteFieldName == field.name>
-    @TableLogic
-    </#if>
-    <#if field.propertyName == cfg.userTracedEntity.CREATE_USER_ID_PROPERTY
-    || field.propertyName == cfg.userTracedEntity.CREATE_USER_NAME_PROPERTY
-    || field.propertyName == cfg.timeTracedEntity.CREATED_TIME_PROPERTY>
-    @TableField(fill = FieldFill.INSERT)
-    </#if>
-    <#if field.propertyName == cfg.userTracedEntity.MODIFY_USER_ID_PROPERTY
-    || field.propertyName == cfg.userTracedEntity.MODIFY_USER_NAME_PROPERTY
-    || field.propertyName == cfg.timeTracedEntity.MODIFY_TIME_PROPERTY>
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    </#if>
     private <#if field.comment!?contains("${enumStart}")>${field.capitalName} <#else>${field.propertyType} </#if>${field.propertyName};
 
 </#list>
@@ -156,7 +135,6 @@ public class ${entity} implements
         ${enumArr[1]}(${enumArr[0]}, "${enumArr[2]}")<#if (enumString_index + 1) == enumStringArr?size>;<#else>,</#if>
         </#list>
 
-        @EnumValue
         private Integer code;
 
         @Getter

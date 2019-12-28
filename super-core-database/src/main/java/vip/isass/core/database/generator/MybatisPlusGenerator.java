@@ -213,7 +213,7 @@ public class MybatisPlusGenerator {
         Pattern.compile(".*V1\\w*Repository.java$"),
         Pattern.compile(".*V1\\w*Mapper.java$"),
         Pattern.compile(".*V1\\w*Mapper.xml$"),
-        Pattern.compile(".*/api/entity.*"),
+        Pattern.compile(".*/api\\wentity\\w.*"),
         Pattern.compile(".*/api/criteria.*"),
         Pattern.compile(".*V1\\w*ServiceTest.java$"),
         Pattern.compile(".*V1\\w*TestSuite.java$"),
@@ -334,7 +334,9 @@ public class MybatisPlusGenerator {
                 this.setMap(new HashMap<String, Object>(16) {{
                     put("moduleName", meta.getModuleName());
                     put("package", meta.getPackageName());
-                    put("criteriaPackageName", meta.getPackageName() + "." + meta.getModuleName() + ".api.criteria");
+                    put("criteriaPackageName", meta.getPackageName() + ".api.model." + meta.getModuleName() + ".criteria");
+                    put("entityPackageName", meta.getPackageName() + ".api.model." + meta.getModuleName() + ".entity");
+                    put("entityDbPackageName", meta.getPackageName() + ".api.model.db." + meta.getModuleName());
                     put("feignPackage", meta.getPackageName() + "." + meta.getModuleName() + ".api.feign.client");
                     put("tablePrefix", meta.getTablePrefix());
                     put("prefix", PREFIX);
@@ -367,7 +369,7 @@ public class MybatisPlusGenerator {
                     String path = config.getOutputDir() +
                         "/" + meta.getPackageName().replaceAll("\\.", "/") +
                         "/" + meta.getModuleName() +
-                        "/" + PREFIX + "/repository/";
+                        "/db/" + PREFIX + "/repository/";
                     return path + StrUtil.upperFirst(PREFIX) + tableInfo.getEntityName() + "MpRepository.java";
                 }
             }
@@ -378,7 +380,7 @@ public class MybatisPlusGenerator {
                     String path = config.getOutputDir() +
                         "/" + meta.getPackageName().replaceAll("\\.", "/") +
                         "/" + meta.getModuleName() +
-                        "/repository/";
+                        "/db/repository/";
                     return path + tableInfo.getEntityName() + "MpRepository.java";
                 }
             }, new FileOutConfig("/templates/criteria.java.ftl") {
@@ -387,8 +389,8 @@ public class MybatisPlusGenerator {
                     // 自定义输入文件名称
                     String path = config.getOutputDir() +
                         "/" + meta.getPackageName().replaceAll("\\.", "/") +
-                        "/" + meta.getModuleName() +
-                        "/api/criteria/";
+                        "/api/model/" + meta.getModuleName() +
+                        "/criteria/";
                     return path + tableInfo.getEntityName() + "Criteria.java";
                 }
             }, new FileOutConfig("/templates/" + PREFIX + "Controller.java.ftl") {
@@ -429,7 +431,7 @@ public class MybatisPlusGenerator {
                     String path = config.getOutputDir() +
                         "/" + meta.getPackageName().replaceAll("\\.", "/") +
                         "/" + meta.getModuleName() +
-                        "/" + PREFIX + "/mapper/";
+                        "/db/" + PREFIX + "/mapper/";
                     return path + StrUtil.upperFirst(PREFIX) + tableInfo.getEntityName() + "Mapper.java";
                 }
             }, new FileOutConfig("/templates/" + PREFIX + "Mapper.xml.ftl") {
@@ -439,8 +441,28 @@ public class MybatisPlusGenerator {
                     String path = config.getOutputDir() +
                         "/" + meta.getPackageName().replaceAll("\\.", "/") +
                         "/" + meta.getModuleName() +
-                        "/" + PREFIX + "/mapper/xml/";
+                        "/db/" + PREFIX + "/mapper/xml/";
                     return path + StrUtil.upperFirst(PREFIX) + tableInfo.getEntityName() + "Mapper.xml";
+                }
+            }, new FileOutConfig("/templates/entity.java.ftl") {
+                @Override
+                public String outputFile(TableInfo tableInfo) {
+                    // 自定义输入文件名称
+                    String path = config.getOutputDir() +
+                        "/" + meta.getPackageName().replaceAll("\\.", "/") +
+                        "/api/model/" + meta.getModuleName() +
+                        "/entity/";
+                    return path + tableInfo.getEntityName() + ".java";
+                }
+            }, new FileOutConfig("/templates/entityDb.java.ftl") {
+                @Override
+                public String outputFile(TableInfo tableInfo) {
+                    // 自定义输入文件名称
+                    String path = config.getOutputDir() +
+                        "/" + meta.getPackageName().replaceAll("\\.", "/") +
+                        "/api/model/db/" + meta.getModuleName() +
+                        "/";
+                    return path + tableInfo.getEntityName() + "Db.java";
                 }
                 // }, new FileOutConfig("/templates/" + PREFIX + "ServiceTest.java.vm") {
                 //     @Override
@@ -514,15 +536,16 @@ public class MybatisPlusGenerator {
             .setPackageInfo(
                 new PackageConfig()
                     .setParent(meta.getPackageName())
-                    .setMapper("mapper")
-                    .setXml("mapper.xml")
-                    .setEntity("api.entity")
+                    .setMapper("db.mapper")
+                    .setXml("db.mapper.xml")
+                    .setEntity(null)
                     .setService("service")
                     .setModuleName(meta.getModuleName())
             )
             .setTemplate(
                 new TemplateConfig()
                     .setServiceImpl(null)
+                    .setEntity(null)
             )
             .setCfg(cfg)
             .setTemplateEngine(new FreemarkerTemplateEngine())

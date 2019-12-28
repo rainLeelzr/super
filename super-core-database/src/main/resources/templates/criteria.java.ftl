@@ -1,6 +1,12 @@
+<#include "./segment/copyright.ftl">
+
 <#include "./segment/EntityType.ftl">
 package ${cfg.criteriaPackageName};
 
+import cn.hutool.core.collection.CollUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import ${cfg.entityPackageName}.${entity};
 <#if isIdEntity>
 import ${cfg.package}.core.criteria.IdCriteria;
 </#if>
@@ -10,10 +16,6 @@ import vip.isass.core.entity.Json;
 <#break>
 </#if>
 </#list>
-import ${package.Entity}.${entity};
-import cn.hutool.core.collection.CollUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
 
 <#list table.fields as field>
 <#if field.propertyType == "BigDecimal">
@@ -42,7 +44,7 @@ import java.time.LocalTime;
 import java.util.Collection;
 
 /**
- * ${table.comment!} 查询条件
+ * <#if table.comment??>${table.comment!} </#if>查询条件
  *
  * @author ${author}
  */
