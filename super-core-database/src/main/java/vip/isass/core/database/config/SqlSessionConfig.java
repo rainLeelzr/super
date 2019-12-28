@@ -208,7 +208,7 @@ import java.util.List;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan(basePackages = "vip.isass.**.mapper")
+@MapperScan(basePackages = {"vip.isass.**.mapper", "com.sancaijia.**.mapper"})
 public class SqlSessionConfig implements TransactionManagementConfigurer {
 
     @Resource
@@ -219,11 +219,6 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
 
     @Autowired(required = false)
     private List<BaseTypeHandler> baseTypeHandlers;
-
-    // @Bean
-    // public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
-    //     return new SqlSessionTemplate(sqlSessionFactory);
-    // }
 
     @Bean
     public GlobalConfig globalConfig() {
