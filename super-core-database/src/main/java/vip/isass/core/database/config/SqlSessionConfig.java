@@ -170,6 +170,7 @@
 package vip.isass.core.database.config;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
@@ -243,7 +244,10 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         sqlSessionFactory.setDataSource(dataSource);
 
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        sqlSessionFactory.setMapperLocations(resolver.getResources("classpath*:/vip/isass/**/mapper/**/*Mapper.xml,classpath*:/com/sancaijia/**/mapper/**/*Mapper.xml"));
+        sqlSessionFactory.setMapperLocations(
+            ArrayUtil.addAll(
+                resolver.getResources("classpath*:/vip/isass/**/mapper/**/*Mapper.xml"),
+                resolver.getResources("classpath*:/com/sancaijia/**/*Mapper.xml")));
 
         sqlSessionFactory.setTypeEnumsPackage("vip.isass.api.**");
 
