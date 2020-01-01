@@ -200,7 +200,7 @@ public class WebSwaggerAutoConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(apiInfo())
             .select()
-            .apis(RequestHandlerSelectors.basePackage("vip.isass", "com.sancaijia"))
+            .apis(RequestHandlerSelectors.any())
             .paths(PathSelectors.any())
             .build()
             .securityContexts(CollUtil.newArrayList(
