@@ -243,7 +243,7 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         sqlSessionFactory.setDataSource(dataSource);
 
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        sqlSessionFactory.setMapperLocations(resolver.getResources("classpath*:/vip/isass/**/mapper/**/*Mapper.xml"));
+        sqlSessionFactory.setMapperLocations(resolver.getResources("classpath*:/vip/isass/**/mapper/**/*Mapper.xml,classpath*:/com/sancaijia/**/mapper/**/*Mapper.xml"));
 
         sqlSessionFactory.setTypeEnumsPackage("vip.isass.api.**");
 
