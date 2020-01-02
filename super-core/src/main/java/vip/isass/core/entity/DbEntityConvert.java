@@ -236,6 +236,9 @@ public class DbEntityConvert {
     private static Class getDbEntityClass(Class entityClass) {
         Set<Class<?>> classes = ClassUtil.scanPackageBySuper("vip.isass", entityClass);
         if (classes.isEmpty()) {
+            classes = ClassUtil.scanPackageBySuper("com.sancaijia", entityClass);
+        }
+        if (classes.isEmpty()) {
             return null;
         }
         return classes.stream()
