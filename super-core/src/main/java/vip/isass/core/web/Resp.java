@@ -172,12 +172,15 @@ package vip.isass.core.web;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
+import vip.isass.core.support.JsonUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -203,6 +206,7 @@ public class Resp<T> {
      * 状态码
      */
     @JsonInclude
+    @JsonProperty("code")
     private int status;
 
     /**
@@ -296,19 +300,10 @@ public class Resp<T> {
         return this.getData();
     }
 
+    @SneakyThrows
     @Override
     public String toString() {
-        return new StringBuilder("{")
-            .append("\"success\":")
-            .append(success)
-            .append(",\"status\":")
-            .append(status)
-            .append(",\"message\":\"")
-            .append(message).append('\"')
-            .append(",\"data\":")
-            .append(data)
-            .append('}')
-            .toString();
+        return JsonUtil.DEFAULT_INSTANCE.writeValueAsString(this);
     }
 
 }

@@ -179,7 +179,7 @@ public enum StatusMessageEnum implements IStatusMessage {
 
     UNDEFINED(-2, "未定义错误"),
     FAIL(-1, "操作失败"),
-    SUCCESS(1, "操作成功"),
+    SUCCESS(200, "操作成功"),
 
     DB_INSERT_FAIL(10, "插入数据库失败"),
     TOO_MANY_RESULT(11, "数据重复"),
