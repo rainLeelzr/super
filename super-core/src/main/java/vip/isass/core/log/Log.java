@@ -167,7 +167,7 @@
  *
  */
 
-package vip.isass.core.web.log;
+package vip.isass.core.log;
 
 public interface Log {
 }

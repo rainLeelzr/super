@@ -169,11 +169,10 @@
 
 package vip.isass.core.web.log.model;
 
-import vip.isass.core.web.log.Log;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import vip.isass.core.web.log.Log;
+import vip.isass.core.log.Log;
 
 import java.util.Map;
 
