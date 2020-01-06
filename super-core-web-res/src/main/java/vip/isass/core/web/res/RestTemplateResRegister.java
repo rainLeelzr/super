@@ -232,7 +232,7 @@ public class RestTemplateResRegister implements ResRegister {
         }
         Resp<List<Resource>> resp = response.getBody();
 
-        return resp == null ? Collections.emptyList() :Collections.emptyList();
+        return resp == null ? Collections.emptyList() : Collections.emptyList();
         // return resp == null ? Collections.emptyList() : resp.getData();
     }
 
@@ -252,7 +252,7 @@ public class RestTemplateResRegister implements ResRegister {
                 type
             );
         } catch (Exception e) {
-            log.error("注册resource失败！");
+            log.error("注册resource失败！{}", addBatchRes);
             log.error(e.getMessage(), e);
             return;
         }
