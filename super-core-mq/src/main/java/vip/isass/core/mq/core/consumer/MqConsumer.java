@@ -170,8 +170,8 @@
 package vip.isass.core.mq.core.consumer;
 
 
-import vip.isass.core.mq.core.SubscribeModel;
 import lombok.NonNull;
+import vip.isass.core.mq.core.SubscribeModel;
 
 import java.lang.reflect.Method;
 
@@ -215,5 +215,7 @@ public interface MqConsumer {
     Method getRuntimeMethod();
 
     MqConsumer setRuntimeMethod(Method runtimeMethod);
+
+    void destroy();
 
 }

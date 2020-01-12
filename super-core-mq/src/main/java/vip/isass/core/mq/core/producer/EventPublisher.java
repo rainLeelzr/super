@@ -169,13 +169,15 @@
 
 package vip.isass.core.mq.core.producer;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import vip.isass.core.mq.MqAutoConfiguration;
-import vip.isass.core.mq.core.MqMessageContext;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import vip.isass.core.mq.MqAutoConfiguration;
+import vip.isass.core.mq.core.MqMessageContext;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -191,7 +193,7 @@ import java.util.stream.Collectors;
 @Component
 public class EventPublisher {
 
-    @Resource
+    @Autowired(required = false)
     private List<ProducerSelector> selectors;
 
     @Resource
@@ -230,6 +232,10 @@ public class EventPublisher {
 
     @PostConstruct
     public void init() {
+        if (CollUtil.isEmpty(selectors)) {
+            return;
+        }
+
         selectors.stream()
             .filter(s -> StrUtil.isBlank(s.manufacturer()))
             .findFirst()

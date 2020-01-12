@@ -169,10 +169,12 @@
 
 package vip.isass.core.mq.core.consumer;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.SmartLifecycle;
@@ -206,7 +208,7 @@ public class MqConsumerAutoConfiguration implements ApplicationContextAware, Sma
         this.applicationContext = applicationContext;
     }
 
-    @Resource
+    @Autowired(required = false)
     private List<MqConsumer> consumers;
 
     @Resource
@@ -215,6 +217,10 @@ public class MqConsumerAutoConfiguration implements ApplicationContextAware, Sma
     private Map<Method, EventListener> methods;
 
     public void onApplicationEvent() {
+        if (CollUtil.isEmpty(consumers)) {
+            return;
+        }
+
         if (methods != null) {
             return;
         }
