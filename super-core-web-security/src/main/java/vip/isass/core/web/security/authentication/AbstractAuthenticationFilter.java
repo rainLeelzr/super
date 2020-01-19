@@ -170,6 +170,7 @@
 package vip.isass.core.web.security.authentication;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -241,7 +242,7 @@ public abstract class AbstractAuthenticationFilter extends BasicAuthenticationFi
 
     @Override
     protected void onUnsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        log.debug("认证失败[{}]，正在访问 {} {}", this.getClass().getSimpleName(), request.getMethod(), request.getRequestURL());
+        log.debug("认证失败[{}], Authorization[{}]，正在访问 {} {}", this.getClass().getSimpleName(), request.getHeader(HttpHeaders.AUTHORIZATION), request.getMethod(), request.getRequestURL());
     }
 
 }
