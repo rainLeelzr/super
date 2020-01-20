@@ -169,14 +169,13 @@
 
 package vip.isass.core.web.security.authentication.jwt;
 
-import vip.isass.core.login.DefaultLoginUser;
-import vip.isass.core.web.security.authentication.AbstractAuthenticationFilter;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.AuthenticationException;
 import vip.isass.core.login.DefaultLoginUser;
+import vip.isass.core.web.security.authentication.AbstractAuthenticationFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -205,16 +204,26 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String header = request.getHeader(JwtConst.HEADER_NAME);
 
-        if (header == null || !header.startsWith(JwtUtil.PREFIX)) {
+        if (StrUtil.isEmpty(header)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String token;
+        if (header.startsWith(JwtConst.PREFIX)) {
+            token = header.replace(JwtConst.PREFIX, "");
+        } else if (header.startsWith(JwtConst.PREFIX_URL_ENCODED)) {
+            token = header.replace(JwtConst.PREFIX_URL_ENCODED, "");
+        } else {
             chain.doFilter(request, response);
             return;
         }
 
         try {
-            String token = header.replace(JwtUtil.PREFIX, "");
-            JwtAuthenticationToken authResult = (JwtAuthenticationToken) getAuthenticationManager().authenticate(new JwtAuthenticationToken(token));
+            JwtAuthenticationToken authResult = (JwtAuthenticationToken) getAuthenticationManager()
+                .authenticate(new JwtAuthenticationToken(token));
 
             JwtClaim jwtClaim = authResult.getJwtClaim();
             DefaultLoginUser defaultLoginUser = new DefaultLoginUser()

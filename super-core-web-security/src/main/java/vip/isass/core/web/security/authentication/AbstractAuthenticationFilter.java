@@ -170,7 +170,6 @@
 package vip.isass.core.web.security.authentication;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -179,6 +178,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import vip.isass.core.login.DefaultLoginUser;
 import vip.isass.core.login.LoginUser;
+import vip.isass.core.web.security.authentication.jwt.JwtAuthenticationFilter;
+import vip.isass.core.web.security.authentication.jwt.JwtConst;
+import vip.isass.core.web.security.authentication.ms.MsAuthenticationFilter;
+import vip.isass.core.web.security.authentication.ms.MsAuthenticationHeaderProvider;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -230,19 +233,31 @@ public abstract class AbstractAuthenticationFilter extends BasicAuthenticationFi
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof LoginUserTokenWrapper) {
             LoginUserTokenWrapper loginUserAuthenticationToken = (LoginUserTokenWrapper) authentication;
-            log.debug("认证成功[{}], 正在访问[{} {}], userId[{}], name[{}], 拥有角色{}",
+            log.debug("认证成功[{}], 正在访问[{} {}], userId[{}], name[{}], 拥有角色{}, 源ip[{}]",
                 this.getClass().getSimpleName(),
                 request.getMethod(),
                 request.getRequestURL(),
                 loginUserAuthenticationToken.getAllUserId(),
                 loginUserAuthenticationToken.getAllNickName(),
-                authentication.getAuthorities());
+                authentication.getAuthorities(),
+                request.getRemoteAddr());
         }
     }
 
     @Override
     protected void onUnsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        log.debug("认证失败[{}], Authorization[{}]，正在访问 {} {}", this.getClass().getSimpleName(), request.getHeader(HttpHeaders.AUTHORIZATION), request.getMethod(), request.getRequestURL());
+        String token = null;
+        if (this instanceof JwtAuthenticationFilter) {
+            token = request.getHeader(JwtConst.HEADER_NAME);
+        } else if (this instanceof MsAuthenticationFilter) {
+            token = request.getHeader(MsAuthenticationHeaderProvider.HEADER);
+        }
+        log.debug("认证失败[{}], token[{}]，正在访问 {} {}, 源ip[{}]",
+            this.getClass().getSimpleName(),
+            token,
+            request.getMethod(),
+            request.getRequestURL(),
+            request.getRemoteAddr());
     }
 
 }

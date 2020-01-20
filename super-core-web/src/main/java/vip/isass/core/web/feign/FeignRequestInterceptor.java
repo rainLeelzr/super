@@ -169,14 +169,14 @@
 
 package vip.isass.core.web.feign;
 
-import vip.isass.core.web.header.AdditionalRequestHeaderProvider;
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import vip.isass.core.web.header.AdditionalRequestHeaderProvider;
+import vip.isass.core.web.security.authentication.jwt.JwtConst;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
@@ -205,7 +205,7 @@ public class FeignRequestInterceptor {
                         String name = headerNames.nextElement();
 
                         // 透传 token
-                        if (HttpHeaders.AUTHORIZATION.equalsIgnoreCase(name)) {
+                        if (JwtConst.HEADER_NAME.equalsIgnoreCase(name)) {
                             template.header(name, request.getHeader(name));
                             break;
                         }
