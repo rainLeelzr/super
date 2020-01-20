@@ -169,6 +169,7 @@
 
 package vip.isass.core.web.security.authentication;
 
+import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -240,7 +241,7 @@ public abstract class AbstractAuthenticationFilter extends BasicAuthenticationFi
                 loginUserAuthenticationToken.getAllUserId(),
                 loginUserAuthenticationToken.getAllNickName(),
                 authentication.getAuthorities(),
-                request.getRemoteAddr());
+                ServletUtil.getClientIP(request));
         }
     }
 
@@ -257,7 +258,7 @@ public abstract class AbstractAuthenticationFilter extends BasicAuthenticationFi
             token,
             request.getMethod(),
             request.getRequestURL(),
-            request.getRemoteAddr());
+            ServletUtil.getClientIP(request));
     }
 
 }
