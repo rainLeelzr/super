@@ -183,6 +183,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import vip.isass.core.web.security.authentication.jwt.JwtConst;
 
 import java.util.List;
 
@@ -224,7 +225,7 @@ public class WebSwaggerAutoConfiguration {
     }
 
     private ApiKey apiKey() {
-        return new ApiKey("jwt", "Authorization", "header");
+        return new ApiKey("jwt", JwtConst.HEADER_NAME, "header");
     }
 
     private List<SecurityReference> authorization() {

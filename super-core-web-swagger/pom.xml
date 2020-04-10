@@ -187,6 +187,11 @@
     <dependencies>
 
         <dependency>
+            <groupId>vip.isass</groupId>
+            <artifactId>super-core-web</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
         </dependency>
@@ -206,12 +211,12 @@
         </repository>
 
         <repository>
-            <id>scj-rdc-releases</id>
-            <url>https://repo.rdc.aliyun.com/repository/114597-release-3Z5X3y/</url>
+            <id>isass-rdc-releases</id>
+            <url>https://repo.rdc.aliyun.com/repository/119151-release-MRcouB/</url>
         </repository>
         <repository>
-            <id>scj-rdc-snapshots</id>
-            <url>https://repo.rdc.aliyun.com/repository/114597-snapshot-uyzwCu/</url>
+            <id>isass-rdc-snapshots</id>
+            <url>https://repo.rdc.aliyun.com/repository/119151-snapshot-FUsqMk/</url>
         </repository>
     </repositories>
 
