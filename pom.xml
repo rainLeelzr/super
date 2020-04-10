@@ -190,8 +190,11 @@
         <module>super-core</module>
         <module>super-core-cache</module>
         <module>super-core-database</module>
-        <module>super-core-database-sharding-jdbc</module>
+        <module>super-core-database-mybatisplus</module>
+        <module>super-core-database-querydsl</module>
         <module>super-core-database-postgresql</module>
+        <module>super-core-database-mybatisplus-postgresql</module>
+        <module>super-core-database-sharding-jdbc</module>
         <module>super-core-mq</module>
         <module>super-core-mq-ons</module>
         <module>super-core-web</module>
@@ -228,7 +231,14 @@
         <core-database.version>super.1.1.0-SNAPSHOT</core-database.version>
         <core-database-sharding-jdbc.version>super.1.1.0-SNAPSHOT</core-database-sharding-jdbc.version>
         <core-database-postgresql.version>super.1.1.0-SNAPSHOT</core-database-postgresql.version>
+        <core-database-querydsl.version>super.1.1.0-SNAPSHOT</core-database-querydsl.version>
+        <core-database-mybatisplus.version>super.1.1.0-SNAPSHOT</core-database-mybatisplus.version>
+        <core-database-mybatisplus-postgresql.version>super.1.1.0-SNAPSHOT
+        </core-database-mybatisplus-postgresql.version>
+
         <core-database-listener.version>super.1.1.0-SNAPSHOT</core-database-listener.version>
+
+
         <core-mq.version>super.1.1.0-SNAPSHOT</core-mq.version>
         <core-mq-ons.version>super.1.1.0-SNAPSHOT</core-mq-ons.version>
         <core-net.version>super.1.1.0-SNAPSHOT</core-net.version>
@@ -391,6 +401,24 @@
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database</artifactId>
                 <version>${core-database.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-database-mybatisplus</artifactId>
+                <version>${core-database-mybatisplus.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-database-querydsl</artifactId>
+                <version>${core-database-querydsl.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-database-mybatisplus-postgresql</artifactId>
+                <version>${core-database-mybatisplus-postgresql.version}</version>
             </dependency>
 
             <dependency>

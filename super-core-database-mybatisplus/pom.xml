@@ -181,24 +181,40 @@
     </parent>
 
     <!-- 本项目信息 -->
-    <artifactId>super-core-database-postgresql</artifactId>
-    <version>${core-database-postgresql.version}</version>
+    <artifactId>super-core-database-mybatisplus</artifactId>
+    <version>${core-database-mybatisplus.version}</version>
 
     <dependencies>
         <dependency>
             <groupId>vip.isass</groupId>
-            <artifactId>super-core-database</artifactId>
+            <artifactId>super-core</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>p6spy</groupId>
-            <artifactId>p6spy</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-annotation</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
+        </dependency>
+
     </dependencies>
 
     <repositories>
@@ -218,4 +234,5 @@
             <url>https://repo.rdc.aliyun.com/repository/119151-snapshot-FUsqMk/</url>
         </repository>
     </repositories>
+
 </project>

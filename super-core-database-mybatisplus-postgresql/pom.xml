@@ -181,23 +181,18 @@
     </parent>
 
     <!-- 本项目信息 -->
-    <artifactId>super-core-database-postgresql</artifactId>
-    <version>${core-database-postgresql.version}</version>
+    <artifactId>super-core-database-mybatisplus-postgresql</artifactId>
+    <version>${core-database-mybatisplus-postgresql.version}</version>
 
     <dependencies>
         <dependency>
             <groupId>vip.isass</groupId>
-            <artifactId>super-core-database</artifactId>
+            <artifactId>super-core-database-mybatisplus</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>p6spy</groupId>
-            <artifactId>p6spy</artifactId>
+            <groupId>vip.isass</groupId>
+            <artifactId>super-core-database-postgresql</artifactId>
         </dependency>
     </dependencies>
 

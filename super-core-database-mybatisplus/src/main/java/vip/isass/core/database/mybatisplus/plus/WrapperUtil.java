@@ -167,172 +167,157 @@
  *
  */
 
-package vip.isass.core.database.postgresql.convert;
+package vip.isass.core.database.mybatisplus.plus;
 
-import com.baomidou.mybatisplus.generator.config.GlobalConfig;
-import com.baomidou.mybatisplus.generator.config.ITypeConvert;
-import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
-import com.baomidou.mybatisplus.generator.config.rules.IColumnType;
-import vip.isass.core.database.generator.ExtDbColumnType;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import vip.isass.core.criteria.*;
+import vip.isass.core.entity.DbEntity;
+import vip.isass.core.entity.IEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 代码生成器需要用到的类型转换
- *
  * @author Rain
  */
-public class PostgreSqlTypeConvert implements ITypeConvert {
+public class WrapperUtil {
 
-    @Override
-    public IColumnType processTypeConvert(GlobalConfig globalConfig, String fieldType) {
-        String t = fieldType.toLowerCase();
-        // 数字类型
-        if ("smallint".equals(t)) {
-            return DbColumnType.INTEGER;
-        }
-        if ("smallint[]".equals(t)) {
-            return ExtDbColumnType.INTEGER_ARRAY;
-        }
-        if ("integer".equals(t)) {
-            return DbColumnType.INTEGER;
-        }
-        if ("integer[]".equals(t)) {
-            return ExtDbColumnType.INTEGER_ARRAY;
-        }
-        if ("bigint".equals(t)) {
-            return DbColumnType.LONG;
-        }
-        if ("bigint[]".equals(t)) {
-            return ExtDbColumnType.LONG_ARRAY;
-        }
-        if (t.startsWith("numeric") && t.endsWith("[]")) {
-            return ExtDbColumnType.BIG_DECIMAL_ARRAY;
-        }
-        if (t.startsWith("numeric")) {
-            return DbColumnType.BIG_DECIMAL;
+    /**
+     * 返回 queryWrapper
+     */
+    public static <E, C extends ICriteria<E, C>> QueryWrapper<E> getQueryWrapper(ICriteria<E, C> criteria) {
+        QueryWrapper<E> wrapper = new QueryWrapper<>();
+
+        if (criteria instanceof ISelectColumnCriteria) {
+            processSelectColumnsCriteria(wrapper, (ISelectColumnCriteria) criteria);
         }
 
-        // 布尔,位
-        if ("boolean".equals(t)) {
-            return DbColumnType.BOOLEAN;
-        }
-        if ("boolean[]".equals(t)) {
-            return ExtDbColumnType.BOOLEAN_ARRAY;
-        }
-        if ("bit".equals(t)) {
-            return DbColumnType.BOOLEAN;
-        }
-        if (t.startsWith("bit varying")) {
-            return DbColumnType.BYTE_ARRAY;
+        if (criteria instanceof IWhereConditionCriteria) {
+            processWhereConditionCriteria(wrapper, (IWhereConditionCriteria) criteria);
         }
 
-        // 字符串类型
-        if (t.startsWith("character varying") && t.endsWith("[]")) {
-            return ExtDbColumnType.STRING_COLLECTION;
-        }
-        if (t.startsWith("character varying")) {
-            return DbColumnType.STRING;
-        }
-        if (t.startsWith("character") && t.endsWith("[]")) {
-            return ExtDbColumnType.STRING_COLLECTION;
-        }
-        if (t.startsWith("character")) {
-            return DbColumnType.STRING;
-        }
-        if ("text".equals(t)) {
-            return DbColumnType.STRING;
-        }
-        if ("text[]".equals(t)) {
-            return ExtDbColumnType.STRING_COLLECTION;
+        if (criteria instanceof IPageCriteria) {
+            processPageCriteria(wrapper, (IPageCriteria) criteria);
         }
 
-        // 日期时间类型
-        if ("date".equals(t)) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return DbColumnType.DATE;
-                case SQL_PACK:
-                    return DbColumnType.DATE_SQL;
-                case TIME_PACK:
-                    return DbColumnType.LOCAL_DATE;
-                default:
-                    return DbColumnType.DATE;
-            }
-        }
-        if ("date[]".equals(t)) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return ExtDbColumnType.DATE_ARRAY;
-                case SQL_PACK:
-                    return ExtDbColumnType.DATE_SQL_ARRAY;
-                case TIME_PACK:
-                    return ExtDbColumnType.LOCAL_DATE_ARRAY;
-                default:
-                    return ExtDbColumnType.DATE_ARRAY;
-            }
-        }
-        if (t.startsWith("timestamp") && t.endsWith("[]")) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return ExtDbColumnType.DATE_ARRAY;
-                case SQL_PACK:
-                    return ExtDbColumnType.TIMESTAMP_ARRAY;
-                case TIME_PACK:
-                    return ExtDbColumnType.LOCAL_DATE_TIME_ARRAY;
-                default:
-                    return ExtDbColumnType.DATE_ARRAY;
-            }
-        }
-        if (t.startsWith("timestamp")) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return DbColumnType.DATE;
-                case SQL_PACK:
-                    return DbColumnType.TIMESTAMP;
-                case TIME_PACK:
-                    return DbColumnType.LOCAL_DATE_TIME;
-                default:
-                    return DbColumnType.DATE;
-            }
-        }
-        if (t.startsWith("time") && t.endsWith("[]")) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return ExtDbColumnType.DATE_ARRAY;
-                case SQL_PACK:
-                    return ExtDbColumnType.TIME_ARRAY;
-                case TIME_PACK:
-                    return ExtDbColumnType.LOCAL_TIME_ARRAY;
-                default:
-                    return ExtDbColumnType.DATE_ARRAY;
-            }
-        }
-        if (t.startsWith("time")) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return DbColumnType.DATE;
-                case SQL_PACK:
-                    return DbColumnType.TIME;
-                case TIME_PACK:
-                    return DbColumnType.LOCAL_TIME;
-                default:
-                    return DbColumnType.DATE;
-            }
-        }
-        if ("json".equals(t)) {
-            return DbColumnType.STRING;
-        }
-        if ("json[]".equals(t)) {
-            return ExtDbColumnType.STRING_COLLECTION;
-        }
-        if ("jsonb".equals(t)) {
-            return ExtDbColumnType.JSONB;
-        }
-        if ("jsonb[]".equals(t)) {
-            return ExtDbColumnType.JSONB_ARRAY;
+        return wrapper;
+    }
+
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>, C extends ICriteria<E, C>>
+    QueryWrapper<EDB> getEdbQueryWrapper(ICriteria<E, C> criteria) {
+        return getEdbQueryWrapper(criteria, null);
+    }
+
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>, C extends ICriteria<E, C>>
+    QueryWrapper<EDB> getEdbQueryWrapper(ICriteria<E, C> criteria, Class<EDB> edbClass) {
+        QueryWrapper<EDB> wrapper = new QueryWrapper<>();
+
+        if (criteria instanceof ISelectColumnCriteria) {
+            processSelectColumnsCriteria(wrapper, (ISelectColumnCriteria) criteria);
         }
 
-        // 未适配的类型,默认为string
-        return DbColumnType.STRING;
+        if (criteria instanceof IWhereConditionCriteria) {
+            processWhereConditionCriteria(wrapper, (IWhereConditionCriteria) criteria);
+        }
+
+        if (criteria instanceof IPageCriteria) {
+            processPageCriteria(wrapper, (IPageCriteria) criteria);
+        }
+
+        return wrapper;
+    }
+
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>, C extends ICriteria<E, C>> UpdateWrapper<EDB> getEdbUpdateWrapper(ICriteria<E, C> criteria) {
+        UpdateWrapper<EDB> wrapper = new UpdateWrapper<>();
+
+        if (criteria instanceof IWhereConditionCriteria) {
+            processWhereConditionCriteria(wrapper, (IWhereConditionCriteria) criteria);
+        }
+
+        return wrapper;
+    }
+
+    public static <E, C extends ICriteria<E, C>> UpdateWrapper<E> getUpdateWrapper(ICriteria<E, C> criteria) {
+        UpdateWrapper<E> wrapper = new UpdateWrapper<>();
+
+        if (criteria instanceof IWhereConditionCriteria) {
+            processWhereConditionCriteria(wrapper, (IWhereConditionCriteria) criteria);
+        }
+
+        return wrapper;
+    }
+
+    private static void processSelectColumnsCriteria(QueryWrapper wrapper, ISelectColumnCriteria selectColumnCriteria) {
+        List<String> selectColumns = selectColumnCriteria.getSelectColumns();
+        if (CollUtil.isNotEmpty(selectColumns)) {
+            wrapper.select(CollUtil.join(selectColumns, ", "));
+        }
+    }
+
+    private static void processWhereConditionCriteria(AbstractWrapper wrapper, IWhereConditionCriteria whereConditionCriteria) {
+        List<WhereCondition> whereConditions = whereConditionCriteria.getWhereConditions();
+        if (CollUtil.isNotEmpty(whereConditions)) {
+            whereConditions.forEach(wc -> MybatisPlusWhereCondition.apply(wc, wrapper));
+        }
+    }
+
+    private static void processPageCriteria(AbstractWrapper wrapper, IPageCriteria pageCriteria) {
+        if (StrUtil.isNotBlank(pageCriteria.getOrderBy())) {
+            List<String> ascList = null;
+            List<String> descList = null;
+
+            String[] split = pageCriteria.getOrderBy().split(StrUtil.COMMA);
+            for (String s : split) {
+                if (StrUtil.isBlank(s)) {
+                    continue;
+                }
+
+                s = s.trim().replaceAll(" +", StrUtil.SPACE);
+                String[] orderByArr = parseOrderBy(s);
+                if (orderByArr == null) {
+                    continue;
+                }
+
+                if (orderByArr.length == 1) {
+                    if (ascList == null) {
+                        ascList = new ArrayList<>(split.length);
+                    }
+                    ascList.add(orderByArr[0]);
+                } else if (orderByArr.length == 2) {
+                    if (IPageCriteria.ASC.equalsIgnoreCase(orderByArr[1])) {
+                        if (ascList == null) {
+                            ascList = new ArrayList<>(split.length);
+                        }
+                        ascList.add(orderByArr[0]);
+                    } else if (IPageCriteria.DESC.equalsIgnoreCase(orderByArr[1])) {
+                        if (descList == null) {
+                            descList = new ArrayList<>(split.length);
+                        }
+                        descList.add(orderByArr[0]);
+                    }
+                }
+            }
+            wrapper.orderByAsc(ascList == null ? null : ArrayUtil.toArray(ascList, String.class));
+            wrapper.orderByDesc(descList == null ? null : ArrayUtil.toArray(descList, String.class));
+        }
+    }
+
+    private static String[] parseOrderBy(String orderBy) {
+        String[] strings = orderBy.split(StrUtil.SPACE);
+        if (strings.length == 0) {
+            return null;
+        }
+
+        if (strings.length == 1) {
+            return new String[]{strings[0]};
+        }
+
+        return new String[]{strings[0], strings[1]};
     }
 
 }

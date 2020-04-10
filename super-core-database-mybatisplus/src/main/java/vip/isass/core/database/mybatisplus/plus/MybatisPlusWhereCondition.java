@@ -167,172 +167,100 @@
  *
  */
 
-package vip.isass.core.database.postgresql.convert;
+package vip.isass.core.database.mybatisplus.plus;
 
-import com.baomidou.mybatisplus.generator.config.GlobalConfig;
-import com.baomidou.mybatisplus.generator.config.ITypeConvert;
-import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
-import com.baomidou.mybatisplus.generator.config.rules.IColumnType;
-import vip.isass.core.database.generator.ExtDbColumnType;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
+import vip.isass.core.criteria.WhereCondition;
+
+import java.util.Collection;
 
 /**
- * 代码生成器需要用到的类型转换
- *
  * @author Rain
  */
-public class PostgreSqlTypeConvert implements ITypeConvert {
+public class MybatisPlusWhereCondition {
 
-    @Override
-    public IColumnType processTypeConvert(GlobalConfig globalConfig, String fieldType) {
-        String t = fieldType.toLowerCase();
-        // 数字类型
-        if ("smallint".equals(t)) {
-            return DbColumnType.INTEGER;
-        }
-        if ("smallint[]".equals(t)) {
-            return ExtDbColumnType.INTEGER_ARRAY;
-        }
-        if ("integer".equals(t)) {
-            return DbColumnType.INTEGER;
-        }
-        if ("integer[]".equals(t)) {
-            return ExtDbColumnType.INTEGER_ARRAY;
-        }
-        if ("bigint".equals(t)) {
-            return DbColumnType.LONG;
-        }
-        if ("bigint[]".equals(t)) {
-            return ExtDbColumnType.LONG_ARRAY;
-        }
-        if (t.startsWith("numeric") && t.endsWith("[]")) {
-            return ExtDbColumnType.BIG_DECIMAL_ARRAY;
-        }
-        if (t.startsWith("numeric")) {
-            return DbColumnType.BIG_DECIMAL;
-        }
+    @SuppressWarnings("unchecked")
+    public static void apply(WhereCondition whereCondition, AbstractWrapper wrapper) {
+        switch (whereCondition.getCondition()) {
+            case OR:
+                wrapper.or();
+                break;
+            case EQUAL:
+                wrapper.eq(whereCondition.getValue() != null, whereCondition.getColumnName(), whereCondition.getValue());
+                break;
+            case NOT_EQUAL:
+                wrapper.ne(whereCondition.getValue() != null, whereCondition.getColumnName(), whereCondition.getValue());
+                break;
+            case IN:
 
-        // 布尔,位
-        if ("boolean".equals(t)) {
-            return DbColumnType.BOOLEAN;
+                if (whereCondition.getValue() == null) {
+                    break;
+                }
+                if (whereCondition.getValue() instanceof Collection) {
+                    wrapper.in(whereCondition.getColumnName(), ((Collection) whereCondition.getValue()).toArray());
+                } else {
+                    wrapper.in(whereCondition.getColumnName(), whereCondition.getValue());
+                }
+                break;
+            case NOT_IN:
+                if (whereCondition.getValue() == null) {
+                    break;
+                }
+                if (whereCondition.getValue() instanceof Collection) {
+                    wrapper.notIn(whereCondition.getColumnName(), ((Collection) whereCondition.getValue()).toArray());
+                } else {
+                    wrapper.notIn(whereCondition.getColumnName(), whereCondition.getValue());
+                }
+                break;
+            case IS_NULL:
+                if (StrUtil.isNotBlank(whereCondition.getColumnName())) {
+                    wrapper.isNull(whereCondition.getColumnName());
+                }
+                break;
+            case IS_NOT_NULL:
+                if (StrUtil.isNotBlank(whereCondition.getColumnName())) {
+                    wrapper.isNotNull(whereCondition.getColumnName());
+                }
+                break;
+            case GREATER_THAN:
+                wrapper.gt(whereCondition.getValue() != null, whereCondition.getColumnName(), whereCondition.getValue());
+                break;
+            case GREATER_THAN_EQUAL:
+                wrapper.ge(whereCondition.getValue() != null, whereCondition.getColumnName(), whereCondition.getValue());
+                break;
+            case LESS_THAN:
+                wrapper.lt(whereCondition.getValue() != null, whereCondition.getColumnName(), whereCondition.getValue());
+                break;
+            case LESS_THAN_EQUAL:
+                wrapper.le(whereCondition.getValue() != null, whereCondition.getColumnName(), whereCondition.getValue());
+                break;
+            case START_WITH:
+                wrapper.likeRight(whereCondition.getValue() != null, whereCondition.getColumnName(), whereCondition.getValue());
+                break;
+            case LIKE:
+                wrapper.like(whereCondition.getValue() != null, whereCondition.getColumnName(), whereCondition.getValue());
+                break;
+            case NOT_LIKE:
+                wrapper.notLike(whereCondition.getValue() != null, whereCondition.getColumnName(), whereCondition.getValue());
+                break;
+            case CONTAINS_ALL:
+                wrapper.apply(
+                    whereCondition.getValue() != null,
+                    StrUtil.format("{} @> '{{}}'",
+                        whereCondition.getColumnName(),
+                        CollUtil.join((Collection) whereCondition.getValue(), ",")));
+                break;
+            case CONTAINS_ANY:
+                wrapper.apply(
+                    whereCondition.getValue() != null,
+                    StrUtil.format("{} && '{{}}'",
+                        whereCondition.getColumnName(),
+                        CollUtil.join((Collection) whereCondition.getValue(), ",")));
+                break;
+            default:
+                throw new UnsupportedOperationException(StrUtil.format("不支持的[{}]条件转换成mybatis plus wrapper", whereCondition.getCondition()));
         }
-        if ("boolean[]".equals(t)) {
-            return ExtDbColumnType.BOOLEAN_ARRAY;
-        }
-        if ("bit".equals(t)) {
-            return DbColumnType.BOOLEAN;
-        }
-        if (t.startsWith("bit varying")) {
-            return DbColumnType.BYTE_ARRAY;
-        }
-
-        // 字符串类型
-        if (t.startsWith("character varying") && t.endsWith("[]")) {
-            return ExtDbColumnType.STRING_COLLECTION;
-        }
-        if (t.startsWith("character varying")) {
-            return DbColumnType.STRING;
-        }
-        if (t.startsWith("character") && t.endsWith("[]")) {
-            return ExtDbColumnType.STRING_COLLECTION;
-        }
-        if (t.startsWith("character")) {
-            return DbColumnType.STRING;
-        }
-        if ("text".equals(t)) {
-            return DbColumnType.STRING;
-        }
-        if ("text[]".equals(t)) {
-            return ExtDbColumnType.STRING_COLLECTION;
-        }
-
-        // 日期时间类型
-        if ("date".equals(t)) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return DbColumnType.DATE;
-                case SQL_PACK:
-                    return DbColumnType.DATE_SQL;
-                case TIME_PACK:
-                    return DbColumnType.LOCAL_DATE;
-                default:
-                    return DbColumnType.DATE;
-            }
-        }
-        if ("date[]".equals(t)) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return ExtDbColumnType.DATE_ARRAY;
-                case SQL_PACK:
-                    return ExtDbColumnType.DATE_SQL_ARRAY;
-                case TIME_PACK:
-                    return ExtDbColumnType.LOCAL_DATE_ARRAY;
-                default:
-                    return ExtDbColumnType.DATE_ARRAY;
-            }
-        }
-        if (t.startsWith("timestamp") && t.endsWith("[]")) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return ExtDbColumnType.DATE_ARRAY;
-                case SQL_PACK:
-                    return ExtDbColumnType.TIMESTAMP_ARRAY;
-                case TIME_PACK:
-                    return ExtDbColumnType.LOCAL_DATE_TIME_ARRAY;
-                default:
-                    return ExtDbColumnType.DATE_ARRAY;
-            }
-        }
-        if (t.startsWith("timestamp")) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return DbColumnType.DATE;
-                case SQL_PACK:
-                    return DbColumnType.TIMESTAMP;
-                case TIME_PACK:
-                    return DbColumnType.LOCAL_DATE_TIME;
-                default:
-                    return DbColumnType.DATE;
-            }
-        }
-        if (t.startsWith("time") && t.endsWith("[]")) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return ExtDbColumnType.DATE_ARRAY;
-                case SQL_PACK:
-                    return ExtDbColumnType.TIME_ARRAY;
-                case TIME_PACK:
-                    return ExtDbColumnType.LOCAL_TIME_ARRAY;
-                default:
-                    return ExtDbColumnType.DATE_ARRAY;
-            }
-        }
-        if (t.startsWith("time")) {
-            switch (globalConfig.getDateType()) {
-                case ONLY_DATE:
-                    return DbColumnType.DATE;
-                case SQL_PACK:
-                    return DbColumnType.TIME;
-                case TIME_PACK:
-                    return DbColumnType.LOCAL_TIME;
-                default:
-                    return DbColumnType.DATE;
-            }
-        }
-        if ("json".equals(t)) {
-            return DbColumnType.STRING;
-        }
-        if ("json[]".equals(t)) {
-            return ExtDbColumnType.STRING_COLLECTION;
-        }
-        if ("jsonb".equals(t)) {
-            return ExtDbColumnType.JSONB;
-        }
-        if ("jsonb[]".equals(t)) {
-            return ExtDbColumnType.JSONB_ARRAY;
-        }
-
-        // 未适配的类型,默认为string
-        return DbColumnType.STRING;
     }
-
 }

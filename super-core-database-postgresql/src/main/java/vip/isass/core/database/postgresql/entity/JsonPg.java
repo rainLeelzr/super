@@ -169,7 +169,6 @@
 
 package vip.isass.core.database.postgresql.entity;
 
-
 import vip.isass.core.entity.Json;
 import vip.isass.core.support.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -182,7 +181,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-
 
 /**
  * @author Rain
