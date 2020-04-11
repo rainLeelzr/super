@@ -170,11 +170,12 @@
 package vip.isass.core.web.swagger;
 
 import cn.hutool.core.collection.CollUtil;
-import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
+import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.google.common.collect.Lists;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -193,7 +194,7 @@ import java.util.List;
 @Configuration
 @ComponentScan
 @EnableSwagger2
-@EnableSwaggerBootstrapUI
+@EnableKnife4j
 public class WebSwaggerAutoConfiguration {
 
     @Bean
@@ -201,7 +202,8 @@ public class WebSwaggerAutoConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(apiInfo())
             .select()
-            .apis(RequestHandlerSelectors.any())
+            // .apis(RequestHandlerSelectors.any())
+            .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
             .paths(PathSelectors.any())
             .build()
             .securityContexts(CollUtil.newArrayList(
@@ -218,9 +220,9 @@ public class WebSwaggerAutoConfiguration {
         return new ApiInfoBuilder()
             .title("isass api文档")
             .description("本文档聚合各微服务的接口文档，文档内容根据代码自动生成。")
-            .termsOfServiceUrl("https://dev.ms.sancaijia.net/apidoc-service/doc.html?plus=1&cache=1&lang=zh")
+            .termsOfServiceUrl("https://dev.ms.isass.vip/apidoc-service/doc.html?plus=1&cache=1&lang=zh")
             .contact(new Contact("rain", "https://www.isass.vip", "lizhirong100@163.com"))
-            .version("1.0")
+            .version("3.0")
             .build();
     }
 

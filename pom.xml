@@ -279,8 +279,7 @@
 
         <guava.version>26.0-jre</guava.version>
 
-        <swagger.version>2.9.2</swagger.version>
-        <swagger-bootstrap-ui.version>1.9.5</swagger-bootstrap-ui.version>
+        <knife4j.version>2.0.2</knife4j.version>
 
         <jjwt.version>0.9.1</jjwt.version>
         <activiti.version>6.0.0</activiti.version>
@@ -336,6 +335,14 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-dependencies</artifactId>
+                <version>${knife4j.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -603,25 +610,6 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
-            </dependency>
-
-            <!-- swagger -->
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>swagger-bootstrap-ui</artifactId>
-                <version>${swagger-bootstrap-ui.version}</version>
             </dependency>
 
             <dependency>
