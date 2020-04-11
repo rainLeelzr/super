@@ -28,6 +28,7 @@
 |  isass-service-isass| http:20250 |
 |  isass-service-upload| http:20260 |
 |  isass-service-advertising| http:20270 |
+|  isass-service-etg| http:20280 |
 
 # 第3方服务
 |  名称 | 端口 |

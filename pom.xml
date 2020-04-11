@@ -192,6 +192,7 @@
         <module>super-core-database</module>
         <module>super-core-database-mybatisplus</module>
         <module>super-core-database-querydsl</module>
+        <module>super-core-database-mysql</module>
         <module>super-core-database-postgresql</module>
         <module>super-core-database-mybatisplus-postgresql</module>
         <module>super-core-database-sharding-jdbc</module>
@@ -201,6 +202,7 @@
         <module>super-core-web-security</module>
         <module>super-core-web-res</module>
         <module>super-core-web-swagger</module>
+        <module>super-core-web-rpc-feign</module>
         <module>super-core-net</module>
         <module>super-core-net-tcp</module>
         <module>super-core-net-websocket</module>
@@ -231,6 +233,7 @@
         <core-database.version>super.1.1.0-SNAPSHOT</core-database.version>
         <core-database-sharding-jdbc.version>super.1.1.0-SNAPSHOT</core-database-sharding-jdbc.version>
         <core-database-postgresql.version>super.1.1.0-SNAPSHOT</core-database-postgresql.version>
+        <core-database-mysql.version>super.1.1.0-SNAPSHOT</core-database-mysql.version>
         <core-database-querydsl.version>super.1.1.0-SNAPSHOT</core-database-querydsl.version>
         <core-database-mybatisplus.version>super.1.1.0-SNAPSHOT</core-database-mybatisplus.version>
         <core-database-mybatisplus-postgresql.version>super.1.1.0-SNAPSHOT
@@ -247,6 +250,7 @@
         <core-web.version>super.1.1.0-SNAPSHOT</core-web.version>
         <core-web-security.version>super.1.1.0-SNAPSHOT</core-web-security.version>
         <core-web-res.version>super.1.1.0-SNAPSHOT</core-web-res.version>
+        <core-web-rpc-feign.version>super.1.1.0-SNAPSHOT</core-web-rpc-feign.version>
         <core-web-swagger.version>super.1.1.0-SNAPSHOT</core-web-swagger.version>
         <core-log.version>super.1.1.0-SNAPSHOT</core-log.version>
         <core-elasticsearch.version>super.1.1.0-SNAPSHOT</core-elasticsearch.version>
@@ -375,6 +379,12 @@
 
             <dependency>
                 <groupId>vip.isass</groupId>
+                <artifactId>super-core-web-rpc-feign</artifactId>
+                <version>${core-web-rpc-feign.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
                 <artifactId>super-core-web-swagger</artifactId>
                 <version>${core-web-swagger.version}</version>
             </dependency>
@@ -405,6 +415,18 @@
 
             <dependency>
                 <groupId>vip.isass</groupId>
+                <artifactId>super-core-database-mysql</artifactId>
+                <version>${core-database-mysql.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-database-postgresql</artifactId>
+                <version>${core-database-postgresql.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-mybatisplus</artifactId>
                 <version>${core-database-mybatisplus.version}</version>
             </dependency>
@@ -425,12 +447,6 @@
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-sharding-jdbc</artifactId>
                 <version>${core-database-sharding-jdbc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>vip.isass</groupId>
-                <artifactId>super-core-database-postgresql</artifactId>
-                <version>${core-database-postgresql.version}</version>
             </dependency>
 
             <dependency>
