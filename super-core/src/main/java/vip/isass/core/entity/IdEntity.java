@@ -170,6 +170,8 @@
 package vip.isass.core.entity;
 
 import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import vip.isass.core.sequence.impl.LongSequence;
 import vip.isass.core.sequence.impl.UuidSequence;
 
@@ -186,6 +188,7 @@ public interface IdEntity<PK extends Serializable, E extends IdEntity<PK, E>> ex
     /**
      * 获取 id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     PK getId();
 
     /**
