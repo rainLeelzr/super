@@ -167,102 +167,54 @@
  *
  */
 
-package vip.isass.core.web.res;
+package vip.isass.core.web.rpc.feign;
 
-import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import feign.form.spring.converter.SpringManyMultipartFilesReader;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-import vip.isass.core.web.Resp;
+import org.springframework.web.multipart.MultipartFile;
+import vip.isass.core.web.WebAutoConfiguration;
+import vip.isass.core.web.interceptor.RestTemplateInterceptor;
 
-import java.util.Collection;
+import javax.annotation.Resource;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Rain
  */
-@Slf4j
-@ConditionalOnMissingBean(ResRegister.class)
-public class RestTemplateResRegister implements ResRegister {
+@Configuration
+@ComponentScan
+@EnableFeignClients(basePackages = "vip.isass")
+public class WebRpcFeignAutoConfiguration {
 
-    /**
-     * todo 如果当前环境无 restTemplate 则创建一个 bean
-     */
-    @javax.annotation.Resource
-    private RestTemplate restTemplate;
+    @Resource
+    private RestTemplateInterceptor restTemplateInterceptor;
 
-    @Value("${security.auth.url.get-all-res}")
-    private String getAllResUrl;
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+        httpRequestFactory.setConnectionRequestTimeout(WebAutoConfiguration.CONN_TIMEOUT_IN_MILLIS);
+        httpRequestFactory.setConnectTimeout(WebAutoConfiguration.CONN_TIMEOUT_IN_MILLIS);
+        httpRequestFactory.setReadTimeout(WebAutoConfiguration.READ_TIMEOUT_IN_MILLIS);
 
-    @Value("${security.auth.url.add-batch-res}")
-    private String addBatchRes;
-
-    @Override
-    public List<Resource> getAllRegisteredResource() {
-        return getAllRegisteredResourceByUrl(getAllResUrl);
+        RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
+        restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        restTemplate.setInterceptors(Collections.singletonList(restTemplateInterceptor));
+        return restTemplate;
     }
 
-    @Override
-    public List<Resource> getAllRegisteredResourceByPrefixUri(String prefixUri) {
-        return getAllRegisteredResourceByUrl(
-            getAllResUrl + (StrUtil.isBlank(prefixUri) ? "" : "?uriStartWith=" + prefixUri));
-    }
-
-    private List<Resource> getAllRegisteredResourceByUrl(String url) {
-        ParameterizedTypeReference<Resp<List<Resource>>> type = new ParameterizedTypeReference<Resp<List<Resource>>>() {
-
-        };
-
-        ResponseEntity<Resp<List<Resource>>> response;
-        try {
-            response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                null,
-                type
-            );
-        } catch (Exception e) {
-            log.error("获取已注册resource失败！");
-            log.error(e.getMessage(), e);
-            return Collections.emptyList();
-        }
-        Resp<List<Resource>> resp = response.getBody();
-
-        return resp == null ? Collections.emptyList() : Collections.emptyList();
-        // return resp == null ? Collections.emptyList() : resp.getData();
-    }
-
-    @Override
-    public void register(Collection<Resource> collect) {
-        HttpEntity<Collection<Resource>> httpEntity = new HttpEntity<>(collect);
-        ParameterizedTypeReference<Resp<Integer>> type = new ParameterizedTypeReference<Resp<Integer>>() {
-        };
-
-        ResponseEntity<Resp<Integer>> resp;
-        try {
-            resp = restTemplate.exchange(
-                addBatchRes,
-                HttpMethod.POST,
-                httpEntity,
-                type
-            );
-        } catch (Exception e) {
-            log.error("注册resource失败！{}", addBatchRes);
-            log.error(e.getMessage(), e);
-            return;
-        }
-        if (resp.getStatusCode() == HttpStatus.OK && resp.getBody() != null && resp.getBody().getSuccess()) {
-            log.info("成功注册了{}个resource", resp.getBody().getData());
-        } else {
-            log.error("保存resource错误:{}", resp.toString());
-        }
+    @Bean
+    public HttpMessageConverter<MultipartFile[]> springManyMultipartFilesReader() {
+        return new SpringManyMultipartFilesReader(4096);
     }
 
 }

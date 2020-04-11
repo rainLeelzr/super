@@ -167,102 +167,15 @@
  *
  */
 
-package vip.isass.core.web.res;
+package vip.isass.core.database.mysql;
 
-import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-import vip.isass.core.web.Resp;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Rain
  */
-@Slf4j
-@ConditionalOnMissingBean(ResRegister.class)
-public class RestTemplateResRegister implements ResRegister {
-
-    /**
-     * todo 如果当前环境无 restTemplate 则创建一个 bean
-     */
-    @javax.annotation.Resource
-    private RestTemplate restTemplate;
-
-    @Value("${security.auth.url.get-all-res}")
-    private String getAllResUrl;
-
-    @Value("${security.auth.url.add-batch-res}")
-    private String addBatchRes;
-
-    @Override
-    public List<Resource> getAllRegisteredResource() {
-        return getAllRegisteredResourceByUrl(getAllResUrl);
-    }
-
-    @Override
-    public List<Resource> getAllRegisteredResourceByPrefixUri(String prefixUri) {
-        return getAllRegisteredResourceByUrl(
-            getAllResUrl + (StrUtil.isBlank(prefixUri) ? "" : "?uriStartWith=" + prefixUri));
-    }
-
-    private List<Resource> getAllRegisteredResourceByUrl(String url) {
-        ParameterizedTypeReference<Resp<List<Resource>>> type = new ParameterizedTypeReference<Resp<List<Resource>>>() {
-
-        };
-
-        ResponseEntity<Resp<List<Resource>>> response;
-        try {
-            response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                null,
-                type
-            );
-        } catch (Exception e) {
-            log.error("获取已注册resource失败！");
-            log.error(e.getMessage(), e);
-            return Collections.emptyList();
-        }
-        Resp<List<Resource>> resp = response.getBody();
-
-        return resp == null ? Collections.emptyList() : Collections.emptyList();
-        // return resp == null ? Collections.emptyList() : resp.getData();
-    }
-
-    @Override
-    public void register(Collection<Resource> collect) {
-        HttpEntity<Collection<Resource>> httpEntity = new HttpEntity<>(collect);
-        ParameterizedTypeReference<Resp<Integer>> type = new ParameterizedTypeReference<Resp<Integer>>() {
-        };
-
-        ResponseEntity<Resp<Integer>> resp;
-        try {
-            resp = restTemplate.exchange(
-                addBatchRes,
-                HttpMethod.POST,
-                httpEntity,
-                type
-            );
-        } catch (Exception e) {
-            log.error("注册resource失败！{}", addBatchRes);
-            log.error(e.getMessage(), e);
-            return;
-        }
-        if (resp.getStatusCode() == HttpStatus.OK && resp.getBody() != null && resp.getBody().getSuccess()) {
-            log.info("成功注册了{}个resource", resp.getBody().getData());
-        } else {
-            log.error("保存resource错误:{}", resp.toString());
-        }
-    }
-
+@Configuration
+@ComponentScan
+public class DatabaseMysqlAutoConfiguration {
 }

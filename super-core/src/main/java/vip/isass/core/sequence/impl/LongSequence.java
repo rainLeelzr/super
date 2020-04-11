@@ -169,10 +169,10 @@
 
 package vip.isass.core.sequence.impl;
 
-import vip.isass.core.sequence.Sequence;
-import vip.isass.core.support.SpringContextUtil;
 import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
+import vip.isass.core.sequence.Sequence;
+import vip.isass.core.support.SpringContextUtil;
 
 /**
  * @author rain
@@ -180,7 +180,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LongSequence implements Sequence<Long> {
 
-    private static Sequence<Long> sequence;
+    private static volatile Sequence<Long> sequence;
 
     @Override
     public Long next() {

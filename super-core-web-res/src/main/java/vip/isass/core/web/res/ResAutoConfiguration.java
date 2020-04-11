@@ -183,10 +183,6 @@ import javax.annotation.Resource;
 @ComponentScan
 public class ResAutoConfiguration {
 
-    public static final int CONN_TIMEOUT_IN_MILLIS = 10_000;
-
-    public static final int READ_TIMEOUT_IN_MILLIS = 50_000;
-
     @Resource
     private RestTemplateInterceptor restTemplateInterceptor;
 
