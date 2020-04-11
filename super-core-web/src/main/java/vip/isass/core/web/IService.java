@@ -237,6 +237,12 @@ public interface IService<E, C extends ICriteria<E, C>> {
         return getMpRepository().updateByCriteria(entity, criteria);
     }
 
+    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
+        if (!getMpRepository().updateByCriteria(entity, criteria)) {
+            throw new AbsentException("更新失败，记录不存在");
+        }
+    }
+
     // ****************************** 查 start ******************************
     default E getById(Serializable id) {
         return getMpRepository().getEntityById(id);
@@ -288,6 +294,10 @@ public interface IService<E, C extends ICriteria<E, C>> {
 
     default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
         return getMpRepository().isPresentByCriteria(criteria);
+    }
+
+    default boolean isAbsentByColumn(String columnName, Object value) {
+        return !isPresentByColumn(columnName, value);
     }
 
     default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
