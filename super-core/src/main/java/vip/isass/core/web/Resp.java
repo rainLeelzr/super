@@ -172,7 +172,6 @@ package vip.isass.core.web;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -206,7 +205,7 @@ public class Resp<T> {
      * 状态码
      */
     @JsonInclude
-    @JsonProperty("code")
+    // @JsonProperty("code")
     private int status;
 
     /**
