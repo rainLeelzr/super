@@ -171,10 +171,12 @@ package vip.isass.core.web.security.authentication.jwt;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -183,6 +185,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Rain
  */
+@Slf4j
 @Service
 public class JwtCacheService {
 
@@ -199,52 +202,83 @@ public class JwtCacheService {
     /**
      * 各终端最大的 version
      */
-    private static final String END_ONLINE_MAX_VERSION_KEY = "jwt:{userId}:{end}:maxVersion";
+    private static final String TERMINAL_ONLINE_MAX_VERSION_KEY = "jwt:{userId}:{terminal}:maxVersion";
 
-    @Resource
+    @Autowired(required = false)
     private RedisTemplate<String, Integer> redisTemplate;
 
-    public Integer increaseVersionByEnd(String userId, String end) {
+    public boolean isInit() {
+        return redisTemplate != null;
+    }
+
+    public Integer increaseVersionByTerminal(String userId, String terminal) {
+        if (!isInit()) {
+            return null;
+        }
+
         String maxVersionKey = formatMaxVersionKey(userId);
 
-        int nextVersion = redisTemplate.opsForValue().increment(maxVersionKey, 1).intValue();
+        Long increment = redisTemplate.opsForValue().increment(maxVersionKey, 1);
+        int nextVersion = increment == null ? 1 : increment.intValue();
+
         redisTemplate.expire(maxVersionKey, JwtUtil.TOKEN_EFFECTIVE_MILLS, TimeUnit.MILLISECONDS);
 
-        redisTemplate.opsForValue().set(formatEndOnlineMaxVersionKey(userId, end), nextVersion, JwtUtil.TOKEN_EFFECTIVE_MILLS, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(
+            formatTerminalOnlineMaxVersionKey(userId, terminal),
+            nextVersion,
+            JwtUtil.TOKEN_EFFECTIVE_MILLS,
+            TimeUnit.MILLISECONDS);
 
         return nextVersion;
     }
 
     public Integer getMaxVersion(String userId) {
+        if (!isInit()) {
+            return null;
+        }
+
         return redisTemplate.opsForValue().get(formatMaxVersionKey(userId));
     }
 
     public Integer getForceOfflineVersion(String userId) {
+        if (!isInit()) {
+            return null;
+        }
+
         return redisTemplate.opsForValue().get(formatForceOfflineVersionKey(userId));
     }
 
-    public Integer getVersionByEnd(String userId, String end) {
+    public Integer getVersionByTerminal(String userId, String terminal) {
+        if (!isInit()) {
+            return null;
+        }
+
         Assert.notBlank(userId);
-        Assert.notBlank(end);
-        return redisTemplate.opsForValue().get(formatEndOnlineMaxVersionKey(userId, end));
+        Assert.notBlank(terminal);
+        return redisTemplate.opsForValue().get(formatTerminalOnlineMaxVersionKey(userId, terminal));
     }
 
     /**
      * 根据终端列表获取 version
      */
-    public Map<String, Integer> getVersionByEnds(String userId, List<String> ends) {
+    public Map<String, Integer> getVersionByTerminals(String userId, List<String> terminals) {
         Assert.notBlank(userId);
-        Assert.notEmpty(ends);
-        List<String> keys = new ArrayList<>(ends.size());
-        for (String end : ends) {
-            Assert.notBlank(end, "终端名称必填");
-            keys.add(formatEndOnlineMaxVersionKey(userId, end));
+        Assert.notEmpty(terminals);
+        List<String> keys = new ArrayList<>(terminals.size());
+        for (String terminal : terminals) {
+            Assert.notBlank(terminal, "终端名称必填");
+            keys.add(formatTerminalOnlineMaxVersionKey(userId, terminal));
         }
         List<Integer> version = redisTemplate.opsForValue().multiGet(keys);
 
-        Map<String, Integer> result = CollUtil.newHashMap(ends.size());
+        Map<String, Integer> result = CollUtil.newHashMap(terminals.size());
+
         for (int i = 0; i < keys.size(); i++) {
-            result.put(ends.get(i), version.get(i));
+            if (version == null) {
+                result.put(terminals.get(i), null);
+            } else {
+                result.put(terminals.get(i), version.get(i));
+            }
         }
 
         return result;
@@ -258,8 +292,15 @@ public class JwtCacheService {
         return FORCE_OFFLINE_VERSION_KEY.replace("{userId}", userId);
     }
 
-    private String formatEndOnlineMaxVersionKey(String userId, String end) {
-        return END_ONLINE_MAX_VERSION_KEY.replace("{userId}", userId).replace("{end}", end);
+    private String formatTerminalOnlineMaxVersionKey(String userId, String end) {
+        return TERMINAL_ONLINE_MAX_VERSION_KEY.replace("{userId}", userId).replace("{end}", end);
+    }
+
+    @PostConstruct
+    public void init() {
+        if (redisTemplate == null) {
+            log.warn("当前环境没有依赖 redis，所有自定义多端登录配置将失效，系统将不进行多端登录检查！");
+        }
     }
 
 }

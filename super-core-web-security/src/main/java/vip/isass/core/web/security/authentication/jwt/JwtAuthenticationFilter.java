@@ -174,6 +174,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.AuthenticationException;
+import vip.isass.core.exception.UnifiedException;
+import vip.isass.core.exception.code.StatusMessageEnum;
 import vip.isass.core.login.DefaultLoginUser;
 import vip.isass.core.web.security.authentication.AbstractAuthenticationFilter;
 
@@ -192,14 +194,14 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private JwtCacheService jwtCacheService;
 
-    private EndsConfiguration endsConfiguration;
+    private TerminalOnlineConfiguration terminalOnlineConfiguration;
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
                                    JwtCacheService jwtCacheService,
-                                   EndsConfiguration endsConfiguration) {
+                                   TerminalOnlineConfiguration terminalOnlineConfiguration) {
         super(authenticationManager);
         this.jwtCacheService = jwtCacheService;
-        this.endsConfiguration = endsConfiguration;
+        this.terminalOnlineConfiguration = terminalOnlineConfiguration;
     }
 
     @Override
@@ -234,7 +236,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
                 .setTokenFrom(JwtAuthenticationToken.class.getSimpleName());
 
             // 处理多端登录/注销账号的情况
-            if (!processEnds(defaultLoginUser)) {
+            if (!processTerminal(defaultLoginUser)) {
                 throw new CredentialsExpiredException("强制下线");
             }
 
@@ -250,7 +252,12 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         chain.doFilter(request, response);
     }
 
-    private boolean processEnds(DefaultLoginUser defaultLoginUser) {
+    private boolean processTerminal(DefaultLoginUser defaultLoginUser) {
+        // 如果 jwtCacheService 没初始化，则当前环境没有依赖 redis，则不检查多端登录
+        if (!jwtCacheService.isInit()) {
+            return true;
+        }
+
         // 是否强制下线
         Integer forceOfflineVersion = jwtCacheService.getForceOfflineVersion(defaultLoginUser.getUserId());
         if (forceOfflineVersion != null && defaultLoginUser.getVersion() <= forceOfflineVersion) {
@@ -259,23 +266,23 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         }
 
         // 检查多端登录
-        return checkEndsOnline(defaultLoginUser);
+        return checkTerminalOnline(defaultLoginUser);
     }
 
-    private boolean checkEndsOnline(DefaultLoginUser defaultLoginUser) {
+    private boolean checkTerminalOnline(DefaultLoginUser defaultLoginUser) {
         // 如果允许所有端同时在线，则跳过校验
-        if (endsConfiguration.isAllEndsSameTimeOnline()) {
+        if (terminalOnlineConfiguration.isEnableAllTerminalSameTimeOnline()) {
             return true;
         }
 
         // 是否属于直接在线终端
-        if (endsConfiguration.isDirectOnlineEnds(defaultLoginUser.getLoginFrom())) {
+        if (terminalOnlineConfiguration.isDirectOnlineTerminal(defaultLoginUser.getLoginFrom())) {
             // 是否同端多登
-            if (endsConfiguration.isSameEndsOnline(defaultLoginUser.getLoginFrom())) {
+            if (terminalOnlineConfiguration.canSameTerminalsOnlineAtSameTime(defaultLoginUser.getLoginFrom())) {
                 return true;
             } else {
                 // 如果已有同端更大的版本号已经登录，则此token无效
-                Integer maxVersionOfEnd = jwtCacheService.getVersionByEnd(defaultLoginUser.getUserId(), defaultLoginUser.getLoginFrom());
+                Integer maxVersionOfEnd = jwtCacheService.getVersionByTerminal(defaultLoginUser.getUserId(), defaultLoginUser.getLoginFrom());
                 if (maxVersionOfEnd == null) {
                     // 没有终端记录，即此 token 是启用多端验证前生成的，需重新登录
                     // throw new UnifiedException(StatusMessageEnum.TOKEN_FORCE_OFFLINE);
@@ -288,14 +295,16 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         }
 
         // 是否属于互斥终端
-        if (endsConfiguration.isMutexEnds(defaultLoginUser.getLoginFrom())) {
-            Map<String, Integer> versions = jwtCacheService.getVersionByEnds(defaultLoginUser.getUserId(), endsConfiguration.getMutexEnds());
+        if (terminalOnlineConfiguration.isMutexTerminal(defaultLoginUser.getLoginFrom())) {
+            Map<String, Integer> versions = jwtCacheService.getVersionByTerminals(
+                defaultLoginUser.getUserId(),
+                terminalOnlineConfiguration.getMutexTerminals());
             // 找出互斥终端中最高版本的终端
-            String maxEnd = null;
+            String maxTerminal = null;
             Integer maxVersion = null;
             for (Map.Entry<String, Integer> entry : versions.entrySet()) {
-                if (maxEnd == null) {
-                    maxEnd = entry.getKey();
+                if (maxTerminal == null) {
+                    maxTerminal = entry.getKey();
                     maxVersion = entry.getValue();
                     continue;
                 }
@@ -308,23 +317,23 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
                     continue;
                 }
 
-                maxEnd = entry.getKey();
+                maxTerminal = entry.getKey();
                 maxVersion = entry.getValue();
             }
-            if (maxEnd == null) {
+            if (maxTerminal == null) {
                 // 没有终端记录，即此 token 是启用多端验证前生成的，则强制下线
                 // throw new UnifiedException(StatusMessageEnum.TOKEN_FORCE_OFFLINE);
                 return false;
             }
 
             // 如果最大版本的终端，不是此次 token 的终端，则强制下线
-            if (!maxEnd.equals(defaultLoginUser.getLoginFrom())) {
+            if (!maxTerminal.equals(defaultLoginUser.getLoginFrom())) {
                 // throw new UnifiedException(StatusMessageEnum.TOKEN_FORCE_OFFLINE);
                 return false;
             }
 
             // 是否同端多登
-            if (endsConfiguration.isSameEndsOnline(defaultLoginUser.getLoginFrom())) {
+            if (terminalOnlineConfiguration.canSameTerminalsOnlineAtSameTime(defaultLoginUser.getLoginFrom())) {
                 return true;
             } else {
                 return maxVersion.equals(defaultLoginUser.getVersion());
@@ -332,10 +341,16 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
         }
 
         // 是否同端多登
-        return endsConfiguration.isSameEndsOnline(defaultLoginUser.getLoginFrom());
+        if (terminalOnlineConfiguration.canSameTerminalsOnlineAtSameTime(defaultLoginUser.getLoginFrom())) {
+            return true;
+        }
 
         // 其他没配置的终端，强制下线
-        // throw new UnifiedException(StatusMessageEnum.TOKEN_FORCE_OFFLINE);
+        if (terminalOnlineConfiguration.isEnableForceOfflineIfTerminalNotConfigured()) {
+            throw new UnifiedException(StatusMessageEnum.TOKEN_FORCE_OFFLINE);
+        }
+
+        return true;
     }
 
 }

@@ -179,11 +179,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import vip.isass.core.web.security.authentication.jwt.EndsConfiguration;
 import vip.isass.core.web.security.authentication.jwt.JwtAuthenticationFilter;
 import vip.isass.core.web.security.authentication.jwt.JwtCacheService;
+import vip.isass.core.web.security.authentication.jwt.TerminalOnlineConfiguration;
 import vip.isass.core.web.security.authentication.ms.MsAuthenticationFilter;
-import vip.isass.core.web.security.authentication.ms.MsAuthenticationHeaderProvider;
 import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
 import vip.isass.core.web.security.processor.AffirmativeBasedPostProcessor;
 import vip.isass.core.web.security.processor.FilterSecurityInterceptorSourcePostProcessor;
@@ -218,16 +217,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private UriPrefixProvider uriPrefixProvider;
 
     @Resource
-    private MsAuthenticationHeaderProvider msAuthenticationHeaderProvider;
-
-    @Resource
     private PermitUrlConfiguration permitUrlConfiguration;
 
     @Resource
     private JwtCacheService jwtCacheService;
 
     @Resource
-    private EndsConfiguration endsConfiguration;
+    private TerminalOnlineConfiguration terminalOnlineConfiguration;
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -281,7 +277,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
 
             // 验证token
-            .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtCacheService, endsConfiguration))
+            .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtCacheService, terminalOnlineConfiguration))
 
             // 验证微服务之间调用的权限
             .addFilter(new MsAuthenticationFilter(authenticationManager()))
