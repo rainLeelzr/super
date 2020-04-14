@@ -167,7 +167,7 @@
  *
  */
 
-package vip.isass.core.web.feign;
+package vip.isass.core.web.rpc.feign;
 
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;

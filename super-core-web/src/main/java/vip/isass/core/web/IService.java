@@ -223,12 +223,16 @@ public interface IService<E, C extends ICriteria<E, C>> {
     }
 
     //****************************** 改 start ******************************
+    default Boolean updateById(E entity) {
+        return updateEntityById(entity);
+    }
+
     default Boolean updateEntityById(E entity) {
         return getMpRepository().updateEntityById(entity);
     }
 
     default void updateByIdOrException(E entity) {
-        if (!getMpRepository().updateEntityById(entity)) {
+        if (!updateEntityById(entity)) {
             throw new AbsentException("更新失败，记录不存在");
         }
     }

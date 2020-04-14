@@ -192,9 +192,6 @@ import java.util.List;
 @ConditionalOnMissingBean(ResRegister.class)
 public class RestTemplateResRegister implements ResRegister {
 
-    /**
-     * todo 如果当前环境无 restTemplate 则创建一个 bean
-     */
     @javax.annotation.Resource
     private RestTemplate restTemplate;
 

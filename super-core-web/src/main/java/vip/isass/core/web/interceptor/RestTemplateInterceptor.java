@@ -190,6 +190,9 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
     @Autowired(required = false)
     private List<AdditionalRequestHeaderProvider> additionalHeaderProviders;
 
+    /**
+     * todo 如果访问的url是微服务集群内部服务，添加头信息
+     */
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         if (additionalHeaderProviders == null) {

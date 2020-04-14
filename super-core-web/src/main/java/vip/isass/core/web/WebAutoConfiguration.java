@@ -177,9 +177,12 @@ import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import vip.isass.core.web.interceptor.RestTemplateInterceptor;
 
+import javax.annotation.Resource;
 import java.awt.image.BufferedImage;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 /**
  * @author Rain
@@ -192,6 +195,9 @@ public class WebAutoConfiguration {
 
     public static final int READ_TIMEOUT_IN_MILLIS = 50_000;
 
+    @Resource
+    private RestTemplateInterceptor restTemplateInterceptor;
+
     @Bean
     public RestTemplate noBalancedRestTemplate() {
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
@@ -201,6 +207,7 @@ public class WebAutoConfiguration {
 
         RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
         restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        restTemplate.setInterceptors(Collections.singletonList(restTemplateInterceptor));
         return restTemplate;
     }
 

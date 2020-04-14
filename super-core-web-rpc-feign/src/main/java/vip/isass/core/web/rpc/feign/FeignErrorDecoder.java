@@ -167,7 +167,7 @@
  *
  */
 
-package vip.isass.core.web.feign;
+package vip.isass.core.web.rpc.feign;
 
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;

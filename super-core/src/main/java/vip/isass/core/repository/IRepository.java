@@ -182,6 +182,7 @@ import java.util.List;
 public interface IRepository<E, C extends ICriteria<E, C>> {
 
     // ****************************** 增 start ******************************
+
     default boolean add(E entity) {
         throw new UnsupportedOperationException();
     }
@@ -209,6 +210,7 @@ public interface IRepository<E, C extends ICriteria<E, C>> {
     }
 
     //****************************** 改 start ******************************
+
     default boolean updateEntityById(E entity) {
         throw new UnsupportedOperationException();
     }

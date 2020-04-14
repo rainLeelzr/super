@@ -167,7 +167,7 @@
  *
  */
 
-package vip.isass.core.web.feign;
+package vip.isass.core.web.rpc.feign;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
