@@ -271,7 +271,7 @@
         <protobuf-java-format.version>1.2</protobuf-java-format.version>
 
         <canal.client.version>1.0.25</canal.client.version>
-        <hutool.version>5.0.7</hutool.version>
+        <hutool.version>5.3.0</hutool.version>
         <rocketmq.version>4.1.0-incubating</rocketmq.version>
         <ons.version>1.8.0.Final</ons.version>
 
