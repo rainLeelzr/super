@@ -203,10 +203,10 @@ public class ResourceRegister implements SmartLifecycle {
     @javax.annotation.Resource
     private UriPrefixProvider uriPrefixProvider;
 
-    private static boolean isRunning = false;
+    private static boolean IS_RUNNING = false;
 
     public void register() {
-        isRunning = true;
+        IS_RUNNING = true;
 
         // 必须要设置了applicationName，才给注册
         if (StrUtil.isBlank(uriPrefixProvider.getUriPrefix())) {

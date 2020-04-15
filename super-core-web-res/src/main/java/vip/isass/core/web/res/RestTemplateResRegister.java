@@ -186,6 +186,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * 通过 RestTemplate 调用远程服务注册资源
+ *
  * @author Rain
  */
 @Slf4j
