@@ -172,7 +172,7 @@ package vip.isass.core.web.res;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
@@ -186,11 +186,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * url 资源注册器
+ *
  * @author Rain
  */
 @Slf4j
 @Component
-public class ResourceRegister implements InitializingBean {
+public class ResourceRegister implements SmartLifecycle {
 
     @javax.annotation.Resource
     private RequestMappingHandlerMapping handlerMapping;
@@ -201,9 +203,11 @@ public class ResourceRegister implements InitializingBean {
     @javax.annotation.Resource
     private UriPrefixProvider uriPrefixProvider;
 
-    private boolean init = false;
+    private static boolean isRunning = false;
 
     public void register() {
+        isRunning = true;
+
         // 必须要设置了applicationName，才给注册
         if (StrUtil.isBlank(uriPrefixProvider.getUriPrefix())) {
             log.info("未设置applicationName, 跳过 res 注册流程");
@@ -299,10 +303,21 @@ public class ResourceRegister implements InitializingBean {
     }
 
     @Override
-    public void afterPropertiesSet() {
-        if (!init) {
-            init = true;
-            register();
+    public void start() {
+        if (isRunning()) {
+            return;
         }
+        register();
     }
+
+    @Override
+    public void stop() {
+
+    }
+
+    @Override
+    public boolean isRunning() {
+        return false;
+    }
+
 }
