@@ -181,6 +181,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import vip.isass.core.web.Resp;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -197,11 +198,25 @@ public class RestTemplateResRegister implements ResRegister {
     @javax.annotation.Resource
     private RestTemplate restTemplate;
 
-    @Value("${security.auth.url.get-all-res}")
+    @Value("${security.auth.url.get-all-res:}")
     private String getAllResUrl;
 
-    @Value("${security.auth.url.add-batch-res}")
+    @Value("${security.auth.url.add-batch-res:}")
     private String addBatchRes;
+
+    private boolean isInited = false;
+
+    @PostConstruct
+    public void postConstruct() {
+        if (this.getAllResUrl.isEmpty()) {
+            log.warn("未配置security.auth.url.get-all-res");
+            isInited = false;
+        }
+        if (this.addBatchRes.isEmpty()) {
+            log.warn("未配置security.auth.url.add-batch-res");
+            isInited = false;
+        }
+    }
 
     @Override
     public List<Resource> getAllRegisteredResource() {
@@ -210,6 +225,11 @@ public class RestTemplateResRegister implements ResRegister {
 
     @Override
     public List<Resource> getAllRegisteredResourceByPrefixUri(String prefixUri) {
+        if (!isInited) {
+            log.warn("RestTemplateResRegister未初始化成功，getAllRegisteredResourceByPrefixUri将返回空列表");
+            return Collections.emptyList();
+        }
+
         return getAllRegisteredResourceByUrl(
             getAllResUrl + (StrUtil.isBlank(prefixUri) ? "" : "?uriStartWith=" + prefixUri));
     }
@@ -240,6 +260,11 @@ public class RestTemplateResRegister implements ResRegister {
 
     @Override
     public void register(Collection<Resource> collect) {
+        if (!isInited) {
+            log.warn("RestTemplateResRegister未初始化成功，将停止执行资源注册");
+            return;
+        }
+
         HttpEntity<Collection<Resource>> httpEntity = new HttpEntity<>(collect);
         ParameterizedTypeReference<Resp<Integer>> type = new ParameterizedTypeReference<Resp<Integer>>() {
         };

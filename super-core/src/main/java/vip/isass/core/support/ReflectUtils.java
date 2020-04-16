@@ -169,75 +169,49 @@
 
 package vip.isass.core.support;
 
-import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collection;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import cn.hutool.core.util.ReflectUtil;
+import org.springframework.aop.support.AopUtils;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Rain
  */
-@Slf4j
-public class FunctionUtil {
+public class ReflectUtils {
 
-    public static <T, R> R applyIfNotNull(T t, Function<T, R> function) {
-        if (t == null) {
-            return null;
-        }
-        return function.apply(t);
-    }
+    /**
+     * 获取实现类中实现了 含有注解 @ApiService 类的方法
+     */
+    public static List<Method> getImplementApiServiceMethods(Class<?> implementClass, Class<? extends Annotation> annotationClass) {
+        // 指定类的 public 方法
+        Method[] implementClassMethods = ReflectUtil.getPublicMethods(implementClass);
 
-    public static <T> void consumeIfNotNull(T t, Consumer<T> consumer) {
-        if (t == null) {
-            return;
-        }
-        consumer.accept(t);
-    }
+        // 去掉 default 方法
+        List<Method> implementMethods = Stream.of(implementClassMethods)
+                .filter(m -> !m.isDefault())
+                .collect(Collectors.toList());
 
-    public static <T, R> R applyIfTrue(boolean flag, T t, Function<T, R> function) {
-        if (flag) {
-            return function.apply(t);
-        }
-        return null;
-    }
+        // 找到含有指定注解的接口
+        List<Class<?>> apiServiceClass = Stream
+                .of(implementClass.getInterfaces())
+                .filter(c -> c.isAnnotationPresent(annotationClass))
+                .collect(Collectors.toList());
 
-    public static <T> T applyIfTrue(boolean flag, Supplier<T> supplier) {
-        if (flag) {
-            return supplier.get();
-        }
-        return null;
-    }
-
-    public static <T extends CharSequence, R> R applyIfNotBlank(T t, Function<T, R> function) {
-        if (StrUtil.isBlank(t)) {
-            return null;
-        }
-        return function.apply(t);
-    }
-
-    public static <T> boolean isNotNull(T t, Function<T, ?> function) {
-        return !isNull(t, function);
-    }
-
-    public static <T> boolean isNull(T t, Function<T, ?> function) {
-        try {
-            return function.apply(t) == null;
-        } catch (Exception e) {
-            return true;
-        }
-    }
-
-    public static <S, V> V getFirstNotNullValueFromCollection(Collection<S> services, Function<S, V> function) {
-        for (S service : services) {
-            V value = function.apply(service);
-            if (value != null) {
-                return value;
-            }
-        }
-        return null;
+        // ApiService 类的所有方法
+        return implementMethods.stream()
+                .filter(m -> {
+                    for (Class<?> serviceClass : apiServiceClass) {
+                        Method mostSpecificMethod = AopUtils.getMostSpecificMethod(m, serviceClass);
+                        return m != mostSpecificMethod;
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
     }
 
 }

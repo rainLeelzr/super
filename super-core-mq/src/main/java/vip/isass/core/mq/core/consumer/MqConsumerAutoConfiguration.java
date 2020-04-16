@@ -172,6 +172,7 @@ package vip.isass.core.mq.core.consumer;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,6 +199,7 @@ import java.util.stream.Stream;
  *
  * @author Rain
  */
+@Slf4j
 @Component
 public class MqConsumerAutoConfiguration implements ApplicationContextAware, SmartLifecycle {
 
@@ -272,9 +274,19 @@ public class MqConsumerAutoConfiguration implements ApplicationContextAware, Sma
             }
 
             String manufacturer = StrUtil.blankToDefault(l.manufacturer(), mqAutoConfiguration.getDefaultManufacturer());
+            if (StrUtil.isBlank(manufacturer)) {
+                log.warn("消息订阅方法[{}]没有解析到 MqConsumer 实现厂商, 执行订阅失败", m.toString(), manufacturer);
+                return;
+            }
+
             MqConsumer xConsumer = consumers.stream().filter(c -> c.getManufacturer().equals(manufacturer))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException(StrUtil.format("厂商[{}]没有实现consumer")));
+                .orElse(null);
+
+            if (xConsumer == null) {
+                log.warn("厂商[{}]没有实现 MqConsumer, [{}]方法执行订阅失败", manufacturer, m.toString());
+                return;
+            }
 
             try {
                 // 获取一个新的消费者bean

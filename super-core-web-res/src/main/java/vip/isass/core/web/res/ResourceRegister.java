@@ -317,7 +317,7 @@ public class ResourceRegister implements SmartLifecycle {
 
     @Override
     public boolean isRunning() {
-        return false;
+        return IS_RUNNING;
     }
 
 }
