@@ -169,6 +169,7 @@
 
 package vip.isass.core.web.security.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -179,8 +180,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import vip.isass.core.web.security.IJwtService;
 import vip.isass.core.web.security.authentication.jwt.JwtAuthenticationFilter;
-import vip.isass.core.web.security.authentication.jwt.JwtCacheService;
 import vip.isass.core.web.security.authentication.jwt.TerminalOnlineConfiguration;
 import vip.isass.core.web.security.authentication.ms.MsAuthenticationFilter;
 import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
@@ -219,8 +220,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private PermitUrlConfiguration permitUrlConfiguration;
 
-    @Resource
-    private JwtCacheService jwtCacheService;
+    @Autowired(required = false)
+    private IJwtService jwtService;
 
     @Resource
     private TerminalOnlineConfiguration terminalOnlineConfiguration;
@@ -277,7 +278,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
 
             // 验证token
-            .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtCacheService, terminalOnlineConfiguration))
+            .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtService, terminalOnlineConfiguration))
 
             // 验证微服务之间调用的权限
             .addFilter(new MsAuthenticationFilter(authenticationManager()))

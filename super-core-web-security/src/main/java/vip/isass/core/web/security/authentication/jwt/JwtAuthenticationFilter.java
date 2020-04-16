@@ -177,6 +177,7 @@ import org.springframework.security.core.AuthenticationException;
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
 import vip.isass.core.login.DefaultLoginUser;
+import vip.isass.core.web.security.IJwtService;
 import vip.isass.core.web.security.authentication.AbstractAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -192,15 +193,15 @@ import java.util.Map;
 @Slf4j
 public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
-    private JwtCacheService jwtCacheService;
+    private IJwtService jwtService;
 
     private TerminalOnlineConfiguration terminalOnlineConfiguration;
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
-                                   JwtCacheService jwtCacheService,
+                                   IJwtService jwtService,
                                    TerminalOnlineConfiguration terminalOnlineConfiguration) {
         super(authenticationManager);
-        this.jwtCacheService = jwtCacheService;
+        this.jwtService = jwtService;
         this.terminalOnlineConfiguration = terminalOnlineConfiguration;
     }
 
@@ -253,13 +254,13 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
     }
 
     private boolean processTerminal(DefaultLoginUser defaultLoginUser) {
-        // 如果 jwtCacheService 没初始化，则当前环境没有依赖 redis，则不检查多端登录
-        if (!jwtCacheService.isInit()) {
+        // 如果 jwtCacheService 没初始化，则当前环境没有依赖 isass-api-cache，则不检查多端登录
+        if (jwtService == null) {
             return true;
         }
 
         // 是否强制下线
-        Integer forceOfflineVersion = jwtCacheService.getForceOfflineVersion(defaultLoginUser.getUserId());
+        Integer forceOfflineVersion = jwtService.getForceOfflineVersion(defaultLoginUser.getUserId());
         if (forceOfflineVersion != null && defaultLoginUser.getVersion() <= forceOfflineVersion) {
             // throw new UnifiedException(StatusMessageEnum.TOKEN_FORCE_OFFLINE);
             return false;
@@ -282,7 +283,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
                 return true;
             } else {
                 // 如果已有同端更大的版本号已经登录，则此token无效
-                Integer maxVersionOfEnd = jwtCacheService.getVersionByTerminal(defaultLoginUser.getUserId(), defaultLoginUser.getLoginFrom());
+                Integer maxVersionOfEnd = jwtService.getVersionByTerminal(defaultLoginUser.getUserId(), defaultLoginUser.getLoginFrom());
                 if (maxVersionOfEnd == null) {
                     // 没有终端记录，即此 token 是启用多端验证前生成的，需重新登录
                     // throw new UnifiedException(StatusMessageEnum.TOKEN_FORCE_OFFLINE);
@@ -296,7 +297,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
 
         // 是否属于互斥终端
         if (terminalOnlineConfiguration.isMutexTerminal(defaultLoginUser.getLoginFrom())) {
-            Map<String, Integer> versions = jwtCacheService.getVersionByTerminals(
+            Map<String, Integer> versions = jwtService.getVersionByTerminals(
                 defaultLoginUser.getUserId(),
                 terminalOnlineConfiguration.getMutexTerminals());
             // 找出互斥终端中最高版本的终端

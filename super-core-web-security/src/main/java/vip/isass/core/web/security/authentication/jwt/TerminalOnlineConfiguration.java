@@ -169,6 +169,7 @@
 
 package vip.isass.core.web.security.authentication.jwt;
 
+import cn.hutool.core.util.ObjectUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
@@ -217,7 +218,7 @@ public class TerminalOnlineConfiguration {
         if (terminalPropertiesLoader == null) {
             terminalOnlineProperties = new TerminalOnlineProperties();
         } else {
-            terminalOnlineProperties = terminalPropertiesLoader.load();
+            terminalOnlineProperties = ObjectUtil.defaultIfNull(terminalPropertiesLoader.load(), new TerminalOnlineProperties());
         }
     }
 
