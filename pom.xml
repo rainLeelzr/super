@@ -177,7 +177,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.6.RELEASE</version>
+        <version>2.2.5.RELEASE</version>
     </parent>
 
     <!-- 本项目信息 -->
@@ -220,10 +220,10 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <!-- spring -->
-        <spring-boot.version>2.1.6.RELEASE</spring-boot.version>
-        <spring.cloud.version>Greenwich.SR3</spring.cloud.version>
+        <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
+        <spring.cloud.version>Hoxton.SR3</spring.cloud.version>
 
-        <alibaba-nacos.version>2.1.0.RELEASE</alibaba-nacos.version>
+        <alibaba-nacos.version>2.2.1.RELEASE</alibaba-nacos.version>
         <!--<netty.version>4.1.15.Final</netty.version>-->
         <netty.version>4.1.36.Final</netty.version>
 
