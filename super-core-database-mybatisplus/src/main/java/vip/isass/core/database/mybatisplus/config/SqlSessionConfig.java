@@ -178,6 +178,7 @@ import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
+import org.apache.ibatis.logging.nologging.NoLoggingImpl;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.AutoMappingUnknownColumnBehavior;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -264,6 +265,9 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         configuration.setDefaultScriptingLanguage(MybatisXmlLanguageDriver.class);
         configuration.setJdbcTypeForNull(JdbcType.NULL);
         configuration.setDefaultEnumTypeHandler(DefaultEnumTypeHandler.class);
+
+        // 关闭 mybatis 日志。由 p6spy 实现日志打印
+        configuration.setLogImpl(NoLoggingImpl.class);
 
         if (CollUtil.isNotEmpty(baseTypeHandlers)) {
             TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
