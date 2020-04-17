@@ -296,7 +296,7 @@
         <poi-ooxml.version>4.1.0</poi-ooxml.version>
         <xerces.version>2.12.0</xerces.version>
 
-        <klock.version>1.3-RELEASE</klock.version>
+        <klock.version>1.4-RELEASE</klock.version>
 
         <alipay.version>4.7.12.ALL</alipay.version>
 
