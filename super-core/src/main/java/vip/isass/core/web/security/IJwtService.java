@@ -183,4 +183,6 @@ public interface IJwtService {
 
     Map<String, Integer> getVersionByTerminals(String userId, List<String> terminals);
 
+    Integer increaseVersionByTerminal(String id, String from);
+
 }
