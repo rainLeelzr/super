@@ -172,6 +172,8 @@ package vip.isass.core.web.swagger;
 import cn.hutool.core.collection.CollUtil;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.google.common.collect.Lists;
+import org.springframework.boot.logging.LogLevel;
+import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -183,9 +185,11 @@ import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import vip.isass.core.web.security.authentication.jwt.JwtConst;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -197,8 +201,13 @@ import java.util.List;
 @EnableKnife4j
 public class WebSwaggerAutoConfiguration {
 
+    @Resource
+    private LoggingSystem loggingSystem;
+
     @Bean
     public Docket swaggerApi() {
+        loggingSystem.setLogLevel(CachingOperationNameGenerator.class.getName(), LogLevel.WARN);
+
         return new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(apiInfo())
             .select()
