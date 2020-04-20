@@ -1,12 +1,12 @@
 <#include "./segment/copyright.ftl">
 
-package ${package.Controller};
+package ${cfg.controllerPackageName};
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 import ${cfg.entityPackageName}.${entity};
-import ${package.Service}.${table.serviceName};
-import ${package.Service?replace(".service",".${cfg.prefix}.service")}.${cfg.prefix?capFirst}${table.serviceName};
+import ${cfg.servicePackageName}.${table.serviceName};
+import ${cfg.servicePackageName?replace(".service",".${cfg.prefix}.service")}.${cfg.prefix?capFirst}${table.serviceName};
 import ${cfg.package}.core.web.IController;
 
 import javax.annotation.Resource;

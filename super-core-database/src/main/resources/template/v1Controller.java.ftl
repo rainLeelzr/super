@@ -5,7 +5,7 @@ package ${package.Controller?replace(".controller",".${cfg.prefix}.controller")}
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ${cfg.package}.api.model.${cfg.moduleName}.criteria.${entity}Criteria;
+import ${cfg.criteriaPackageName}.${entity}Criteria;
 import ${cfg.entityPackageName}.${entity};
 import ${package.Service?replace(".service",".${cfg.prefix}.service")}.${cfg.prefix?cap_first}${table.serviceName};
 import ${cfg.package}.core.web.IController;

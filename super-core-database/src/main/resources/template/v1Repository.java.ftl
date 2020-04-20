@@ -3,11 +3,11 @@
 package ${cfg.package}.${cfg.moduleName}.db.${cfg.prefix}.repository;
 
 import org.springframework.stereotype.Repository;
-import ${cfg.package}.api.model.${cfg.moduleName}.criteria.${entity}Criteria;
+import ${cfg.criteriaPackageName}.${entity}Criteria;
 import ${cfg.entityPackageName}.${entity};
 import ${cfg.entityDbPackageName}.${entity}Db;
 import ${cfg.package}.${cfg.moduleName}.db.${cfg.prefix}.mapper.${cfg.prefix?cap_first}${entity}Mapper;
-import ${cfg.package}.core.database.mybatis.plus.MybatisPlusRepository;
+import ${cfg.package}.core.database.mybatisplus.plus.MybatisPlusRepository;
 
 /**
  * <p>

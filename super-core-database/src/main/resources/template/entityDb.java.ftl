@@ -12,7 +12,8 @@ import ${cfg.entityPackageName}.${entity};
 import vip.isass.core.entity.DbEntity;
 
 <#list table.fields as field>
-<#if field.propertyType == "BigDecimal">
+<#include "./segment/isBuildinProperty.ftl">
+<#if field.propertyType == "BigDecimal" && isBuildinProperty>
 import java.math.BigDecimal;
 <#break>
 </#if>

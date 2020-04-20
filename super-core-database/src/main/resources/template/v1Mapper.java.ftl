@@ -3,7 +3,7 @@
 package ${package.Mapper?replace(".mapper",".${cfg.prefix}.mapper")};
 
 import ${cfg.entityDbPackageName}.${entity}Db;
-import ${cfg.package}.core.database.mapper.IMapper;
+import ${cfg.package}.core.database.mybatisplus.mapper.IMapper;
 
 /**
  * <p>

@@ -4,7 +4,7 @@ package ${package.Service?replace(".service",".${cfg.prefix}.service")};
 
 import lombok.Getter;
 import org.springframework.stereotype.Service;
-import ${cfg.package}.api.model.${cfg.moduleName}.criteria.${entity}Criteria;
+import ${cfg.criteriaPackageName}.${entity}Criteria;
 import ${cfg.entityPackageName}.${entity};
 import ${cfg.package}.${cfg.moduleName}.db.${cfg.prefix}.repository.${cfg.prefix?cap_first}${entity}MpRepository;
 import ${cfg.package}.core.web.IService;

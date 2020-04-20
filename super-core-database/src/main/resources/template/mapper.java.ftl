@@ -1,9 +1,9 @@
 <#include "./segment/copyright.ftl">
 
-package ${package.Mapper};
+package ${cfg.mapperPackageName};
 
 import ${cfg.entityDbPackageName}.${entity}Db;
-import ${cfg.package}.core.database.mapper.IMapper;
+import ${cfg.package}.core.database.mybatisplus.mapper.IMapper;
 
 /**
  * <p>

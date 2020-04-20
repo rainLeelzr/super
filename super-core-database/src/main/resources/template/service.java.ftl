@@ -1,6 +1,6 @@
 <#include "./segment/copyright.ftl">
 
-package ${package.Service};
+package ${cfg.servicePackageName};
 
 import org.springframework.stereotype.Service;
 import ${cfg.package}.${cfg.moduleName}.db.repository.${entity}MpRepository;

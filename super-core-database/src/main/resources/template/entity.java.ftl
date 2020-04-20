@@ -4,26 +4,28 @@
 <#include "./segment/EntityType.ftl">
 package ${cfg.entityPackageName};
 
+<#list table.fields as field>
+<#if field.comment!?contains(enumStart)>
 import cn.hutool.core.util.RandomUtil;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+<#break>
+</#if>
+</#list>
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
-<#list table.fields as field>
-<#if field.comment!?contains(enumStart)>
-<#break>
-</#if>
-</#list>
 import vip.isass.core.entity.*;
 import vip.isass.core.sequence.impl.LongSequence;
 import vip.isass.core.support.JsonUtil;
-import vip.isass.core.support.LocalDateTimeUtil;
 <#list table.fields as field>
-<#if field.propertyType == "LocalDate"
+<#if (field.propertyType == "LocalDate"
 || field.propertyType == "LocalTime"
-|| field.propertyType == "LocalDateTime">
+|| field.propertyType == "LocalDateTime")
+&& field.name != cfg.timeTracedEntity.CREATED_TIME
+&& field.name != cfg.timeTracedEntity.MODIFY_TIME>
+import vip.isass.core.support.LocalDateTimeUtil;
 <#break>
 </#if>
 </#list>
