@@ -197,7 +197,7 @@ import java.util.Map;
  */
 @Controller
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
-public class BlueErrorController implements ErrorController {
+public class IsassErrorController implements ErrorController {
 
     private static final String PATH = "/error";
 
@@ -207,7 +207,7 @@ public class BlueErrorController implements ErrorController {
     private List<IStatusMapping> statusMappings;
 
     @Autowired
-    public BlueErrorController(ErrorAttributes errorAttributes) {
+    public IsassErrorController(ErrorAttributes errorAttributes) {
         Assert.notNull(errorAttributes, "ErrorAttributes must not be null");
         this.errorAttributes = errorAttributes;
     }

@@ -169,8 +169,6 @@
 
 package vip.isass.core.database.postgresql.entity;
 
-import vip.isass.core.entity.Json;
-import vip.isass.core.support.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -179,6 +177,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PGobject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import vip.isass.core.entity.Json;
+import vip.isass.core.support.JsonUtil;
 
 import java.io.IOException;
 
@@ -272,6 +272,11 @@ public class JsonPg extends PGobject implements Json {
     @JsonValue
     public JsonNode getJsonNode() {
         return jsonNode;
+    }
+
+    @Override
+    public String getStringValue() {
+        return getValue();
     }
 
 }

@@ -169,7 +169,10 @@
 
 package vip.isass.core.entity;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.SneakyThrows;
+import vip.isass.core.support.JsonUtil;
 
 /**
  * @author Rain
@@ -185,5 +188,17 @@ public interface Json {
     Json fromJsonNode(JsonNode jsonNode);
 
     Json fromJson(Json json);
+
+    String getStringValue();
+
+    @SneakyThrows
+    default <T> T parse(Class<T> clazz) {
+        return JsonUtil.DEFAULT_INSTANCE.readValue(getStringValue(), clazz);
+    }
+
+    @SneakyThrows
+    default <T> T parse(TypeReference<T> typeReference) {
+        return JsonUtil.DEFAULT_INSTANCE.readValue(getStringValue(), typeReference);
+    }
 
 }

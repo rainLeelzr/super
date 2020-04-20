@@ -302,7 +302,7 @@ public class Resp<T> {
     @SneakyThrows
     @Override
     public String toString() {
-        return JsonUtil.DEFAULT_INSTANCE.writeValueAsString(this);
+        return JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(this);
     }
 
 }

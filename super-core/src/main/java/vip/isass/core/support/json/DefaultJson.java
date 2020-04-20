@@ -173,10 +173,10 @@ package vip.isass.core.support.json;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import vip.isass.core.entity.Json;
-import vip.isass.core.support.JsonUtil;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import vip.isass.core.entity.Json;
+import vip.isass.core.support.JsonUtil;
 
 import java.io.IOException;
 
@@ -266,6 +266,11 @@ public class DefaultJson implements Json {
     @JsonValue
     public JsonNode getJsonNode() {
         return jsonNode;
+    }
+
+    @Override
+    public String getStringValue() {
+        return value;
     }
 
 }

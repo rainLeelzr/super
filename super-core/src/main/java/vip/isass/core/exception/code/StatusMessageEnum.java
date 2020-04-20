@@ -192,6 +192,7 @@ public enum StatusMessageEnum implements IStatusMessage {
     FEIGN_ERROR(18, "feign请求异常"),
     TOKEN_FORCE_OFFLINE(19, "强制下线"),
     VERIFICATION_CODE_ALREADY_SEND(20, "请勿重复发送验证码"),
+    BAD_SQL_GRAMMAR(21, "sql错误"),
 
     ACCESS_DENIED_403(403, "权限不足"),
     NOT_FOUND_404(404, "链接不存在"),
