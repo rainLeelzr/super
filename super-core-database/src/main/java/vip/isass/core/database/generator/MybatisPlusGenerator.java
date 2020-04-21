@@ -333,6 +333,7 @@ public class MybatisPlusGenerator {
             public void initMap() {
                 this.setMap(new HashMap<String, Object>(16) {{
                     put("moduleName", meta.getModuleName());
+                    put("controllerPrefix", meta.getControllerPrefix());
                     put("package", meta.getPackageName());
                     put("entityPackageName", meta.getPackageName() + "." + meta.getModuleName() + ".api.model.entity");
                     put("entityDbPackageName", meta.getPackageName() + "." + meta.getModuleName() + ".db.model");

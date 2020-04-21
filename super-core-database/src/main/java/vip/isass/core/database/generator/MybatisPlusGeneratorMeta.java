@@ -203,4 +203,6 @@ public class MybatisPlusGeneratorMeta {
 
     private String[] excludeTables;
 
+    private String controllerPrefix;
+
 }
