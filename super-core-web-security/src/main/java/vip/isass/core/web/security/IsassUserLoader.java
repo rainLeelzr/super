@@ -167,42 +167,21 @@
  *
  */
 
-package vip.isass.core.net.packet;
+package vip.isass.core.web.security;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 /**
- * 数据包
- *
  * @author Rain
  */
-@Getter
-@Setter
-@Accessors(chain = true)
-public class BluePacket implements Packet {
-
-    Integer fullLength;
-
-    Integer type;
-
-    Integer serializeMode;
-
-    Object content;
+@Component
+public class IsassUserLoader implements UserLoader {
 
     @Override
-    public String toString() {
-        return new StringBuilder("{")
-                .append("\"fullLength\":")
-                .append(fullLength)
-                .append(",\"type\":")
-                .append(type)
-                .append(",\"serializeMode\":")
-                .append(serializeMode)
-                .append(",\"content\":")
-                .append(content)
-                .append('}')
-                .toString();
+    public UserDetails load(String userId) {
+        return null;
+        // return new User(userId, "{noop}123456", AuthorityUtils.createAuthorityList("admin"));
     }
+
 }

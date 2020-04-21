@@ -173,7 +173,7 @@ import vip.isass.core.net.channel.ChannelEventHandler;
 import vip.isass.core.net.channel.ChannelInitializerHandler;
 import vip.isass.core.net.packet.Decoder;
 import vip.isass.core.net.packet.Encoder;
-import vip.isass.core.net.packet.impl.coder.BlueBinaryPacketDecoder;
+import vip.isass.core.net.packet.impl.coder.IsassBinaryPacketDecoder;
 import vip.isass.core.support.SpringContextUtil;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -213,7 +213,7 @@ public class TcpChannelInitializerHandler extends ChannelInitializerHandler<Sock
                 new IdleStateHandler(0, 0, timeout, TimeUnit.MILLISECONDS));
 
         // 添加解码器
-        Decoder decoder = SpringContextUtil.isInitialized() ? SpringContextUtil.getBean(Decoder.class) : new BlueBinaryPacketDecoder();
+        Decoder decoder = SpringContextUtil.isInitialized() ? SpringContextUtil.getBean(Decoder.class) : new IsassBinaryPacketDecoder();
         pipeline.addLast("decoder", decoder);
 
         // 添加事件的处理方法

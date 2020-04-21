@@ -171,14 +171,13 @@ package vip.isass.core.net.request.worker.sequential;
 
 import vip.isass.core.net.request.Request;
 import vip.isass.core.net.request.worker.WorkerPool;
-import vip.isass.core.net.session.BlueSession;
+import vip.isass.core.net.session.IsassSession;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import vip.isass.core.net.session.BlueSession;
 
 import java.util.concurrent.*;
 
@@ -334,7 +333,7 @@ public class SequentialWorkerPool implements WorkerPool {
                             i + "",
                             // new BlueBinaryPacket(),
                             null,
-                            new BlueSession(null),
+                            new IsassSession(null),
                             null)
             );
         }

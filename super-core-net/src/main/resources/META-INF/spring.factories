@@ -1,7 +1,7 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-vip.isass.core.net.packet.impl.coder.BlueBinaryPacketEncoder,\
-vip.isass.core.net.packet.impl.coder.BlueBinaryPacketDecoder,\
+vip.isass.core.net.packet.impl.coder.IsassBinaryPacketEncoder,\
+vip.isass.core.net.packet.impl.coder.IsassBinaryPacketDecoder,\
 vip.isass.core.net.request.worker.normal.DefaultWorkerPool,\
 vip.isass.core.net.request.worker.normal.DefaultWorker,\
 vip.isass.core.net.request.RequestManager,\

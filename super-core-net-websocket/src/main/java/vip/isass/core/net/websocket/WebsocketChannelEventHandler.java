@@ -181,7 +181,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import vip.isass.core.net.channel.ChannelEventHandler;
-import vip.isass.core.net.packet.BluePacket;
+import vip.isass.core.net.packet.IsassPacket;
 import vip.isass.core.net.packet.Packet;
 import vip.isass.core.net.request.Request;
 import vip.isass.core.net.request.RequestManager;
@@ -267,7 +267,7 @@ public class WebsocketChannelEventHandler extends SimpleChannelInboundHandler<Ob
             String request = ((TextWebSocketFrame) frame).text();
             log.debug("接收到文本请求：{}", request);
 
-            Packet packet = JsonUtil.DEFAULT_INSTANCE.readValue(request, BluePacket.class);
+            Packet packet = JsonUtil.DEFAULT_INSTANCE.readValue(request, IsassPacket.class);
             channelRead1(ctx, packet, Request.Protocol.WEBSOCKET);
         }
     }

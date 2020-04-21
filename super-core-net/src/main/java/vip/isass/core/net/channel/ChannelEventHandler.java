@@ -172,7 +172,7 @@ package vip.isass.core.net.channel;
 import vip.isass.core.net.packet.Packet;
 import vip.isass.core.net.request.Request;
 import vip.isass.core.net.request.RequestManager;
-import vip.isass.core.net.session.BlueSession;
+import vip.isass.core.net.session.IsassSession;
 import vip.isass.core.net.session.Session;
 import vip.isass.core.net.session.SessionManager;
 import vip.isass.core.support.JsonUtil;
@@ -184,11 +184,6 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
-import vip.isass.core.net.request.Request;
-import vip.isass.core.net.request.RequestManager;
-import vip.isass.core.net.session.BlueSession;
-import vip.isass.core.net.session.Session;
-import vip.isass.core.net.session.SessionManager;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -207,7 +202,7 @@ public interface ChannelEventHandler extends ChannelInboundHandler {
         // 新的channel激活时，绑定channel与session的关系
         Channel channel = ctx.channel();
 
-        Session session = new BlueSession(channel);
+        Session session = new IsassSession(channel);
         getSessionManager().addSession(session);
 
         getLogger().debug("服务器接收到客户端的连接，客户端ip：{}", channel.remoteAddress());

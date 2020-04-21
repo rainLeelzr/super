@@ -178,7 +178,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "ipas")
+@ConfigurationProperties(prefix = "isass")
 public class NetProperties {
 
     private int restTemplateTimeOut = 20_000;

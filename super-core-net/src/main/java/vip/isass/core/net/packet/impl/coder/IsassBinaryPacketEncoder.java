@@ -169,99 +169,69 @@
 
 package vip.isass.core.net.packet.impl.coder;
 
-import vip.isass.core.net.packet.Decoder;
+import vip.isass.core.net.packet.Encoder;
 import vip.isass.core.net.packet.Packet;
-import vip.isass.core.net.packet.BluePacket;
-import cn.hutool.core.util.StrUtil;
+import vip.isass.core.serialization.SerializeMode;
+import vip.isass.core.support.JsonUtil;
+import com.google.protobuf.GeneratedMessage;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.internal.EmptyArrays;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Scope;
 
-import java.util.List;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * 收到客户端的数据后，执行此类进行数据解码
+ * 发送数据给客户端的时，执行此类进行编码
  *
  * @author Rain
  */
 @Slf4j
-@ConditionalOnMissingBean(Decoder.class)
-@Scope("prototype")
-public class BlueBinaryPacketDecoder extends Decoder {
+@ChannelHandler.Sharable
+@ConditionalOnMissingBean(Encoder.class)
+public class IsassBinaryPacketEncoder extends Encoder<Packet> {
 
-    private static final int MAX_READABLE_BYTES = 50 * 1024 * 1024;
-
-    @Value("${spring.application.name}")
-    private String appName;
-
-    /**
-     * tcp数据包的报文结构
-     * ┌╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌╌╌╌╌╌┐
-     * ╎ fullLength ╎    type    ╎ serializeMode ╎   content  ╎
-     * ├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
-     * ╎     4B     ╎     4B     ╎       4B      ╎    ≈50M    ╎
-     * ├╌╌╌╌╌╌╌╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌╌╌╌┤
-     * ╎                        50M                           ╎
-     * └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘
-     */
     @Override
-    public void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        int readableBytes = in.readableBytes();
-
-        log.debug("收到网络包，长度：{} 字节", readableBytes);
-
-        if (readableBytes > MAX_READABLE_BYTES) {
-            throw new IllegalArgumentException(StrUtil.format(
-                    "网络包的可读数据长度大于一个网络包(50m)长度：{}", readableBytes));
-        }
-
-        // 获取网络包的前4个字节，作为一个完整报文包的数据长度
-        if (readableBytes < Integer.BYTES) {
-            return;
-        }
-
-        in.markReaderIndex();
-
-        // 整个包的长度（字节）
-        int fullLength = in.readInt();
-        if (fullLength < 0) {
-            log.error("tcp数据包的length值为负数[{}], 将强制关闭此tcp链接！{}", fullLength, ctx);
-            ctx.close();
-            return;
-        }
-
-        // 可读字节数小于整包的长度，说明数据未完全接收。返回，等待下次读取
-        if (readableBytes < fullLength) {
-            in.resetReaderIndex();
-            return;
-        }
-
-        Packet packet = createPackage(ctx, in, fullLength);
-        out.add(packet);
-
-        log.debug("已拆包长度：{}", readableBytes - in.readableBytes());
+    protected void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf out) {
+        out.writeBytes(encode(packet));
     }
 
     @SneakyThrows
-    private Packet createPackage(ChannelHandlerContext ctx, ByteBuf in, int fullLength) {
-        Packet packet = new BluePacket()
-                .setFullLength(fullLength)
-                .setType(in.readInt())
-                .setSerializeMode(in.readInt());
-
-        int contentLength = fullLength - 12;
-        if (contentLength == 0) {
-            return packet;
+    public static ByteBuf encode(Packet packet) {
+        byte[] contentBytes;
+        Object contentObj = packet.getContent();
+        if (contentObj == null) {
+            contentBytes = EmptyArrays.EMPTY_BYTES;
+        } else if (contentObj instanceof byte[]) {
+            contentBytes = (byte[]) packet.getContent();
+        } else if (SerializeMode.JSON.getCode().equals(packet.getSerializeMode())) {
+            if (contentObj instanceof String) {
+                contentBytes = (((String) contentObj).getBytes(UTF_8));
+            } else {
+                contentBytes = JsonUtil.DEFAULT_INSTANCE.writeValueAsBytes(contentObj);
+            }
+        } else if (SerializeMode.PROTOBUF2.getCode().equals(packet.getSerializeMode())) {
+            if (contentObj instanceof GeneratedMessage) {
+                contentBytes = ((GeneratedMessage) contentObj).toByteArray();
+            } else {
+                throw new IllegalArgumentException("序列化模式是pb, 但content不是GeneratedMessage");
+            }
+        } else {
+            throw new UnsupportedOperationException("编码器不支持的序列化类型:" + packet.getSerializeMode());
         }
 
-        byte[] bytes = new byte[contentLength];
-        in.readBytes(bytes);
-        packet.setContent(bytes);
-        return packet;
+        packet.setFullLength(12 + contentBytes.length);
+        ByteBuf byteBuf = Unpooled.buffer()
+            .writeInt(packet.getFullLength())
+            .writeInt(packet.getType())
+            .writeInt(packet.getSerializeMode() == null ? SerializeMode.JSON.getCode() : packet.getSerializeMode())
+            .writeBytes(contentBytes);
+        log.debug("编码后字节大小:{} 字节", byteBuf.readableBytes());
+        return byteBuf;
     }
 
 }
