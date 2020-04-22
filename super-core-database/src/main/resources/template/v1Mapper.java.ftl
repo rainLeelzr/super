@@ -1,6 +1,6 @@
 <#include "./segment/copyright.ftl">
 
-package ${package.Mapper?replace(".mapper",".${cfg.prefix}.mapper")};
+package ${cfg.mapperPackageName?replace(".mapper",".${cfg.prefix}.mapper")};
 
 import ${cfg.entityDbPackageName}.${entity}Db;
 import ${cfg.package}.core.database.mybatisplus.mapper.IMapper;

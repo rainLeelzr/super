@@ -1,6 +1,6 @@
 <#include "./segment/copyright.ftl">
 
-package ${package.Service?replace(".service",".${cfg.prefix}.service")};
+package ${cfg.servicePackageName?replace(".service",".${cfg.prefix}.service")};
 
 import lombok.Getter;
 import org.springframework.stereotype.Service;
