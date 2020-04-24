@@ -169,18 +169,19 @@
 
 package vip.isass.core.web.rpc.feign;
 
-import vip.isass.core.exception.UnifiedException;
-import vip.isass.core.exception.code.StatusMessageEnum;
-import vip.isass.core.support.JsonUtil;
-import vip.isass.core.web.Resp;
 import cn.hutool.core.io.IoUtil;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import vip.isass.core.exception.UnifiedException;
+import vip.isass.core.exception.code.StatusMessageEnum;
+import vip.isass.core.support.JsonUtil;
+import vip.isass.core.web.Resp;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Rain
@@ -191,10 +192,10 @@ public class FeignErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String methodKey, Response response) {
-        try (Reader reader = response.body().asReader()) {
+        try (Reader reader = response.body().asReader(StandardCharsets.UTF_8)) {
             String read = IoUtil.read(reader);
             log.error("feign请求异常：{}, {}", methodKey, read);
-            Resp resp = JsonUtil.DEFAULT_INSTANCE.readValue(read, Resp.class);
+            Resp<?> resp = JsonUtil.DEFAULT_INSTANCE.readValue(read, Resp.class);
             if (resp.getSuccess() == null
                 && resp.getMessage() == null
                 && resp.getData() == null) {

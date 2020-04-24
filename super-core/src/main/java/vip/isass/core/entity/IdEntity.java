@@ -209,6 +209,7 @@ public interface IdEntity<PK extends Serializable, E extends IdEntity<PK, E>> ex
     /**
      * 如果 id 为 null, 则生成一个随机 id，并返回 id
      */
+    @SuppressWarnings("unchecked")
     default E computeIdIfAbsent() {
         if (StrUtil.isBlankIfStr(getId()) || getId() == null) {
             randomId();

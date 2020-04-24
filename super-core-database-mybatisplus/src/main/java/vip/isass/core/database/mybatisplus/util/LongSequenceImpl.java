@@ -189,7 +189,7 @@ public class LongSequenceImpl implements Sequence<Long> {
     }
 
     @Override
-    public boolean support(Class clazz) {
+    public boolean support(Class<?> clazz) {
         return clazz == Long.class;
     }
 

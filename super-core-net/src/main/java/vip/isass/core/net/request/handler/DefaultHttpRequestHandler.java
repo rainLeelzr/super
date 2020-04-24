@@ -393,7 +393,7 @@ public class DefaultHttpRequestHandler implements RequestHandler {
 
     private HttpHeaders getHttpHeaders(HttpContent httpContent) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON.toString());
         Map<String, String> httpHeaders = httpContent.getHttpHeaders();
         if (MapUtil.isNotEmpty(httpHeaders)) {

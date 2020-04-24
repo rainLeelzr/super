@@ -179,7 +179,8 @@ import java.util.List;
  *
  * @author Rain
  */
-public interface IWhereConditionCriteria<E, C extends IWhereConditionCriteria<E, C>> extends ICriteria<E, C> {
+public interface IWhereConditionCriteria<E, C extends IWhereConditionCriteria<E, C>>
+    extends ICriteria<E, C> {
 
     /**
      * whereConditions 相关方法
@@ -300,12 +301,14 @@ public interface IWhereConditionCriteria<E, C extends IWhereConditionCriteria<E,
         getWhereConditions().add(new WhereCondition(column, Condition.START_WITH, value));
     }
 
+    @SuppressWarnings("unchecked")
     default C isNull(String column) {
         Assert.notBlank(column, "column不能为空");
         getWhereConditions().add(new WhereCondition(column, Condition.IS_NULL, null));
         return (C) this;
     }
 
+    @SuppressWarnings("unchecked")
     default C isNotNull(String column) {
         Assert.notBlank(column, "column不能为空");
         getWhereConditions().add(new WhereCondition(column, Condition.IS_NOT_NULL, null));

@@ -187,6 +187,7 @@ public class LongSequence implements Sequence<Long> {
         return get();
     }
 
+    @SuppressWarnings("unchecked")
     public static Long get() {
         if (sequence == null) {
             synchronized (LongSequence.class) {
@@ -203,7 +204,7 @@ public class LongSequence implements Sequence<Long> {
     }
 
     @Override
-    public boolean support(Class clazz) {
+    public boolean support(Class<?> clazz) {
         return clazz == Long.class;
     }
 

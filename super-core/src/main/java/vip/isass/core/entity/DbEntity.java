@@ -174,6 +174,7 @@ package vip.isass.core.entity;
  */
 public interface DbEntity<E extends IEntity<E>, EDB extends DbEntity<E, EDB>> extends IEntity<E> {
 
+    @SuppressWarnings("unchecked")
     default E convertToEntity() {
         return DbEntityConvert.convertToEntity((EDB) this);
     }

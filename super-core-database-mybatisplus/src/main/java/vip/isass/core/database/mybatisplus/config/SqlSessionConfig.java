@@ -179,7 +179,6 @@ import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.logging.nologging.NoLoggingImpl;
-import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.AutoMappingUnknownColumnBehavior;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.BaseTypeHandler;
@@ -199,8 +198,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 import vip.isass.core.database.mybatisplus.driver.MybatisXmlLanguageDriver;
 import vip.isass.core.database.mybatisplus.plus.handler.MybatisPlusMetaObjectHandler;
+import vip.isass.core.database.mybatisplus.typehandler.DefaultEnumTypeHandler;
 import vip.isass.core.page.PageConst;
-import vip.isass.core.support.enums.DefaultEnumTypeHandler;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -221,7 +220,7 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
     private String profiles;
 
     @Autowired(required = false)
-    private List<BaseTypeHandler> baseTypeHandlers;
+    private List<BaseTypeHandler<?>> baseTypeHandlers;
 
     @Autowired(required = false)
     private ISqlInjector sqlInjector;
@@ -286,10 +285,9 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         sqlSessionFactory.setConfiguration(configuration);
 
         // 配置插件
-        sqlSessionFactory.setPlugins(new Interceptor[]{
+        sqlSessionFactory.setPlugins(
             new PaginationInterceptor().setLimit(PageConst.MAX_PAGE_SIZE),
-            new OptimisticLockerInterceptor()
-        });
+            new OptimisticLockerInterceptor());
         sqlSessionFactory.setGlobalConfig(globalConfig);
         return sqlSessionFactory.getObject();
     }

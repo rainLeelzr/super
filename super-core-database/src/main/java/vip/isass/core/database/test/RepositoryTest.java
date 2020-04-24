@@ -234,6 +234,7 @@ public interface RepositoryTest<C extends ICriteria<E, C>, E extends IEntity<E>,
 
     //****************************** 改 start ******************************
 
+    @SuppressWarnings("unchecked")
     default void testUpdateById() {
         E entity = genEntity();
         if (entity instanceof LogicDeleteEntity) {
@@ -247,6 +248,7 @@ public interface RepositoryTest<C extends ICriteria<E, C>, E extends IEntity<E>,
         getRepository().updateEntityById(entity);
     }
 
+    @SuppressWarnings("unchecked")
     default void testUpdateByCriteria() {
         E entity = genEntity();
         if (entity instanceof LogicDeleteEntity) {
@@ -275,6 +277,7 @@ public interface RepositoryTest<C extends ICriteria<E, C>, E extends IEntity<E>,
 
     // ****************************** 查 start ******************************
 
+    @SuppressWarnings("unchecked")
     default void testGetById() {
         E entity = genEntity();
         if (!(entity instanceof IdEntity)) {
@@ -292,6 +295,7 @@ public interface RepositoryTest<C extends ICriteria<E, C>, E extends IEntity<E>,
         Assert.notNull(getRepository().getEntityById(e.getId()));
     }
 
+    @SuppressWarnings("unchecked")
     default void testGetAnyOneByCriteria() {
         E entity = genEntity();
         Assert.isTrue(getRepository().add(entity));
@@ -305,6 +309,7 @@ public interface RepositoryTest<C extends ICriteria<E, C>, E extends IEntity<E>,
         Assert.notNull(getRepository().getByCriteria(criteria));
     }
 
+    @SuppressWarnings("unchecked")
     default void testFindByCriteria() {
         E entity = genEntity();
         if (entity instanceof LogicDeleteEntity) {
@@ -320,6 +325,5 @@ public interface RepositoryTest<C extends ICriteria<E, C>, E extends IEntity<E>,
         }
         Assert.isTrue(getRepository().findByCriteria(criteria).size() == 1);
     }
-
 
 }

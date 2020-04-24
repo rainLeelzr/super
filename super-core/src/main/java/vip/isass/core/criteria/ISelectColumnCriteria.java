@@ -179,7 +179,8 @@ import java.util.List;
 /**
  * @author Rain
  */
-public interface ISelectColumnCriteria<E, C extends ISelectColumnCriteria<E, C>> extends ICriteria<E, C> {
+public interface ISelectColumnCriteria<E, C extends ISelectColumnCriteria<E, C>>
+    extends ICriteria<E, C> {
 
     String DISTINCT = "DISTINCT ";
 

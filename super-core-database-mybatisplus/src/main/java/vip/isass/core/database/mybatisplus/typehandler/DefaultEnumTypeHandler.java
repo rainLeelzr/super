@@ -166,7 +166,7 @@
  * Library.
  *
  */
-package vip.isass.core.support.enums;
+package vip.isass.core.database.mybatisplus.typehandler;
 
 import com.baomidou.mybatisplus.core.toolkit.EnumUtils;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;

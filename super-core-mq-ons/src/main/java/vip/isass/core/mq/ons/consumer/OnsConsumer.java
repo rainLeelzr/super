@@ -339,7 +339,7 @@ public class OnsConsumer implements MqConsumer {
                 } else if (JacksonSerializable.class.isAssignableFrom(declaringParameter)) {
                     Field field = ReflectUtil.getField(declaringParameter, "TYPE_REFERENCE");
                     Assert.notNull(field, "[{}]是JacksonSerializable的实现，但没有TYPE_REFERENCE方法", declaringParameter);
-                    TypeReference typeReference = (TypeReference) field.get(null);
+                    TypeReference<?> typeReference = (TypeReference<?>) field.get(null);
                     Object obj = JsonUtil.DEFAULT_INSTANCE.readValue(message.getBody(), typeReference);
                     realParameterData[i] = obj;
                 } else {

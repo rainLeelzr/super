@@ -190,7 +190,10 @@ public class WrapperUtil {
     /**
      * 返回 queryWrapper
      */
-    public static <E, C extends ICriteria<E, C>> QueryWrapper<E> getQueryWrapper(ICriteria<E, C> criteria) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <
+        E,
+        C extends ICriteria<E, C>> QueryWrapper<E> getQueryWrapper(ICriteria<E, C> criteria) {
         QueryWrapper<E> wrapper = new QueryWrapper<>();
 
         if (criteria instanceof ISelectColumnCriteria) {
@@ -208,31 +211,26 @@ public class WrapperUtil {
         return wrapper;
     }
 
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>, C extends ICriteria<E, C>>
-    QueryWrapper<EDB> getEdbQueryWrapper(ICriteria<E, C> criteria) {
+    public static <
+        E extends IEntity<E>,
+        EDB extends DbEntity<E, EDB>,
+        C extends ICriteria<E, C>> QueryWrapper<EDB> getEdbQueryWrapper(ICriteria<E, C> criteria) {
         return getEdbQueryWrapper(criteria, null);
     }
 
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>, C extends ICriteria<E, C>>
-    QueryWrapper<EDB> getEdbQueryWrapper(ICriteria<E, C> criteria, Class<EDB> edbClass) {
-        QueryWrapper<EDB> wrapper = new QueryWrapper<>();
-
-        if (criteria instanceof ISelectColumnCriteria) {
-            processSelectColumnsCriteria(wrapper, (ISelectColumnCriteria) criteria);
-        }
-
-        if (criteria instanceof IWhereConditionCriteria) {
-            processWhereConditionCriteria(wrapper, (IWhereConditionCriteria) criteria);
-        }
-
-        if (criteria instanceof IPageCriteria) {
-            processPageCriteria(wrapper, (IPageCriteria) criteria);
-        }
-
-        return wrapper;
+    @SuppressWarnings("unchecked")
+    public static <
+        E extends IEntity<E>,
+        EDB extends DbEntity<E, EDB>,
+        C extends ICriteria<E, C>> QueryWrapper<EDB> getEdbQueryWrapper(ICriteria<E, C> criteria, Class<EDB> edbClass) {
+        return (QueryWrapper<EDB>) getQueryWrapper(criteria);
     }
 
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>, C extends ICriteria<E, C>> UpdateWrapper<EDB> getEdbUpdateWrapper(ICriteria<E, C> criteria) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <
+        E extends IEntity<E>,
+        EDB extends DbEntity<E, EDB>,
+        C extends ICriteria<E, C>> UpdateWrapper<EDB> getEdbUpdateWrapper(ICriteria<E, C> criteria) {
         UpdateWrapper<EDB> wrapper = new UpdateWrapper<>();
 
         if (criteria instanceof IWhereConditionCriteria) {
@@ -242,6 +240,7 @@ public class WrapperUtil {
         return wrapper;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <E, C extends ICriteria<E, C>> UpdateWrapper<E> getUpdateWrapper(ICriteria<E, C> criteria) {
         UpdateWrapper<E> wrapper = new UpdateWrapper<>();
 
@@ -252,21 +251,30 @@ public class WrapperUtil {
         return wrapper;
     }
 
-    private static void processSelectColumnsCriteria(QueryWrapper wrapper, ISelectColumnCriteria selectColumnCriteria) {
+    private static <
+        E,
+        C extends ISelectColumnCriteria<E, C>>
+    void processSelectColumnsCriteria(QueryWrapper<E> wrapper, ISelectColumnCriteria<E, C> selectColumnCriteria) {
         List<String> selectColumns = selectColumnCriteria.getSelectColumns();
         if (CollUtil.isNotEmpty(selectColumns)) {
             wrapper.select(CollUtil.join(selectColumns, ", "));
         }
     }
 
-    private static void processWhereConditionCriteria(AbstractWrapper wrapper, IWhereConditionCriteria whereConditionCriteria) {
+    private static <
+        E,
+        C extends IWhereConditionCriteria<E, C>>
+    void processWhereConditionCriteria(AbstractWrapper<E, String, ?> wrapper, IWhereConditionCriteria<E, C> whereConditionCriteria) {
         List<WhereCondition> whereConditions = whereConditionCriteria.getWhereConditions();
         if (CollUtil.isNotEmpty(whereConditions)) {
             whereConditions.forEach(wc -> MybatisPlusWhereCondition.apply(wc, wrapper));
         }
     }
 
-    private static void processPageCriteria(AbstractWrapper wrapper, IPageCriteria pageCriteria) {
+    private static <
+        E,
+        C extends IPageCriteria<E, C>>
+    void processPageCriteria(AbstractWrapper<E, String, ?> wrapper, IPageCriteria<E, C> pageCriteria) {
         if (StrUtil.isNotBlank(pageCriteria.getOrderBy())) {
             List<String> ascList = null;
             List<String> descList = null;

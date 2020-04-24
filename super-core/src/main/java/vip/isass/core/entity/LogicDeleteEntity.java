@@ -193,6 +193,7 @@ public interface LogicDeleteEntity<E extends LogicDeleteEntity<E>> extends IEnti
     /**
      * 如果删除标识为 null, 则设置删除标识为 false，并返回删除标识
      */
+    @SuppressWarnings("unchecked")
     default E computeDefaultDeleteFlagIfAbsent() {
         if (getDeleteFlag() == null) {
             setDeleteFlag(Boolean.FALSE);
@@ -201,6 +202,7 @@ public interface LogicDeleteEntity<E extends LogicDeleteEntity<E>> extends IEnti
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     default E randomEntity() {
         setDeleteFlag(randomBoolean());
         return (E) this;

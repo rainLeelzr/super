@@ -169,7 +169,6 @@
 
 package vip.isass.core.sequence.impl;
 
-
 import vip.isass.core.sequence.Sequence;
 
 import java.util.UUID;
@@ -195,7 +194,7 @@ public class UuidSequence implements Sequence<String> {
     }
 
     @Override
-    public boolean support(Class clazz) {
+    public boolean support(Class<?> clazz) {
         return clazz == String.class;
     }
 
