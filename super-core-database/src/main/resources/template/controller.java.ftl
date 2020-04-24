@@ -20,6 +20,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
+@RequestMapping("/${cfg.moduleName}-service")
 public class ${table.controllerName} implements IController<${entity}> {
 
     @Resource

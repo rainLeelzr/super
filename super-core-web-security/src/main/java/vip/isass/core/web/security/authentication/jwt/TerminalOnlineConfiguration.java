@@ -171,9 +171,9 @@ package vip.isass.core.web.security.authentication.jwt;
 
 import cn.hutool.core.util.ObjectUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 /**
@@ -182,7 +182,7 @@ import java.util.List;
  * @author Rain
  */
 @Configuration
-public class TerminalOnlineConfiguration {
+public class TerminalOnlineConfiguration implements SmartLifecycle {
 
     @Autowired(required = false)
     private TerminalPropertiesLoader terminalPropertiesLoader;
@@ -213,7 +213,6 @@ public class TerminalOnlineConfiguration {
         return this.terminalOnlineProperties.getMutexTerminals();
     }
 
-    @PostConstruct
     public void init() {
         if (terminalPropertiesLoader == null) {
             terminalOnlineProperties = new TerminalOnlineProperties();
@@ -222,4 +221,18 @@ public class TerminalOnlineConfiguration {
         }
     }
 
+    @Override
+    public void start() {
+        init();
+    }
+
+    @Override
+    public void stop() {
+
+    }
+
+    @Override
+    public boolean isRunning() {
+        return terminalOnlineProperties != null;
+    }
 }

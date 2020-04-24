@@ -26,6 +26,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
+@RequestMapping("/${cfg.moduleName}-service")
 public class ${cfg.prefix?cap_first}${table.controllerName} implements IController<${entity}> {
 
     @Resource
