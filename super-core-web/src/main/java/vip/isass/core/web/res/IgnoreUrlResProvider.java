@@ -167,51 +167,17 @@
  *
  */
 
-package vip.isass.core.web.uri;
+package vip.isass.core.web.res;
 
-import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
+import java.util.Collection;
 
 /**
+ * 忽略注册的资源
+ *
  * @author Rain
  */
-@Slf4j
-@Getter
-@Component
-public class UriPrefixProvider {
+public interface IgnoreUrlResProvider {
 
-    private String appName = "";
-
-    private String contextPath = "";
-
-    private String uriPrefix;
-
-    @Resource
-    public void setAppName(@Value("${spring.application.name:}") String applicationName) {
-        if (StrUtil.isBlank(applicationName)) {
-            throw new IllegalArgumentException("请配置 spring.application.name");
-        }
-        log.info("applicationName:{}", applicationName);
-        this.appName = "/" + applicationName;
-    }
-
-    @Resource
-    public void setContextPath(@Value("${server.servlet.context-path:}") String contextPath) {
-        if (StrUtil.isNotBlank(contextPath)) {
-            this.contextPath = "/" + contextPath;
-        }
-    }
-
-    /**
-     * isass v3.0 的微服务前缀，已改到具体接口的 url 定义上，故直接返回空字符串
-     */
-    public String getUriPrefix() {
-        return "";
-    }
+    Collection<String> getUrls();
 
 }

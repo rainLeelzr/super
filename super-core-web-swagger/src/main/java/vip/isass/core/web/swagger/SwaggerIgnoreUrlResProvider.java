@@ -167,51 +167,23 @@
  *
  */
 
-package vip.isass.core.web.uri;
+package vip.isass.core.web.swagger;
 
-import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import vip.isass.core.web.res.IgnoreUrlResProvider;
 
-import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Rain
  */
-@Slf4j
-@Getter
 @Component
-public class UriPrefixProvider {
+public class SwaggerIgnoreUrlResProvider implements IgnoreUrlResProvider {
 
-    private String appName = "";
-
-    private String contextPath = "";
-
-    private String uriPrefix;
-
-    @Resource
-    public void setAppName(@Value("${spring.application.name:}") String applicationName) {
-        if (StrUtil.isBlank(applicationName)) {
-            throw new IllegalArgumentException("请配置 spring.application.name");
-        }
-        log.info("applicationName:{}", applicationName);
-        this.appName = "/" + applicationName;
-    }
-
-    @Resource
-    public void setContextPath(@Value("${server.servlet.context-path:}") String contextPath) {
-        if (StrUtil.isNotBlank(contextPath)) {
-            this.contextPath = "/" + contextPath;
-        }
-    }
-
-    /**
-     * isass v3.0 的微服务前缀，已改到具体接口的 url 定义上，故直接返回空字符串
-     */
-    public String getUriPrefix() {
-        return "";
+    @Override
+    public Collection<String> getUrls() {
+        return Collections.singletonList("/v2/api-docs-ext");
     }
 
 }

@@ -172,6 +172,7 @@ package vip.isass.core.web.res;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -203,16 +204,15 @@ public class ResourceRegister implements SmartLifecycle {
     @javax.annotation.Resource
     private UriPrefixProvider uriPrefixProvider;
 
+    @Autowired(required = false)
+    private IgnoreUrlResProvider ignoreUrlResProvider;
+
     private static boolean IS_RUNNING = false;
 
     public void register() {
         IS_RUNNING = true;
 
-        // 必须要设置了applicationName，才给注册
-        if (StrUtil.isBlank(uriPrefixProvider.getUriPrefix())) {
-            log.info("未设置applicationName, 跳过 res 注册流程");
-            return;
-        }
+        Collection<String> ignoreUrls = Optional.ofNullable(ignoreUrlResProvider).map(IgnoreUrlResProvider::getUrls).orElse(Collections.emptyList());
 
         Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
         List<Resource> collect = handlerMethods
@@ -227,6 +227,9 @@ public class ResourceRegister implements SmartLifecycle {
                     Set<Resource> resources = new HashSet<>(4);
                     for (RequestMethod requestMethod : methodsCondition.getMethods()) {
                         for (String uri : patternsCondition.getPatterns()) {
+                            if (ignoreUrls.contains(uri)) {
+                                continue;
+                            }
                             resources.add(new Resource()
                                 .setHttpMethod(requestMethod.name())
                                 .setTransportProtocol(Resource.TransportProtocol.HTTP)
