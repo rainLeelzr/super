@@ -275,7 +275,7 @@ public class MqConsumerAutoConfiguration implements ApplicationContextAware, Sma
 
             String manufacturer = StrUtil.blankToDefault(l.manufacturer(), mqAutoConfiguration.getDefaultManufacturer());
             if (StrUtil.isBlank(manufacturer)) {
-                log.warn("消息订阅方法[{}]没有解析到 MqConsumer 实现厂商, 执行订阅失败", m.toString(), manufacturer);
+                log.warn("消息订阅方法[{}]没有解析到 MqConsumer 实现厂商, 执行订阅失败", m.toString());
                 return;
             }
 
