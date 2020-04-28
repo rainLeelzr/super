@@ -181,6 +181,8 @@ public interface ProducerSelector {
     /**
      * 提供实现的厂商
      * 例如：阿里云rocketmq、kafaka、rabbitmq
+     *
+     * @return manufacturer name
      */
     String manufacturer();
 

@@ -184,7 +184,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * 处理字段类型为 Collection<String> 的数据库映射关系
+ * 处理字段类型为 {@code Collection<java.lang.String>} 的数据库映射关系
  *
  * @author Rain
  */

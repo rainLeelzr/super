@@ -207,6 +207,8 @@ public class EventPublisher {
 
     /**
      * 发布事件
+     *
+     * @param mqMessageContext the mq message context
      */
     public static void send(@NonNull MqMessageContext mqMessageContext) {
         Assert.notNull(selectorMap, "EventPublisher未初始化，mq发送失败");
