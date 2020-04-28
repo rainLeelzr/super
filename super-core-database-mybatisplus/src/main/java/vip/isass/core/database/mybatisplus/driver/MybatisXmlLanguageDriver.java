@@ -176,8 +176,8 @@ import org.apache.ibatis.scripting.xmltags.XMLLanguageDriver;
 import vip.isass.core.database.mybatisplus.plus.handler.MybatisPlusParameterHandler;
 
 /**
- * @author hone 2018/4/28
- * @since
+ * @author hone
+ * @since 2018/4/28
  */
 public class MybatisXmlLanguageDriver extends XMLLanguageDriver {
 

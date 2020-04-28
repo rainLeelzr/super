@@ -186,6 +186,10 @@ public class ReflectUtils {
 
     /**
      * 获取实现类中实现了 含有注解 @ApiService 类的方法
+     *
+     * @param implementClass  implement class
+     * @param annotationClass annotation class
+     * @return implement api service methods
      */
     public static List<Method> getImplementApiServiceMethods(Class<?> implementClass, Class<? extends Annotation> annotationClass) {
         // 指定类的 public 方法
@@ -193,25 +197,25 @@ public class ReflectUtils {
 
         // 去掉 default 方法
         List<Method> implementMethods = Stream.of(implementClassMethods)
-                .filter(m -> !m.isDefault())
-                .collect(Collectors.toList());
+            .filter(m -> !m.isDefault())
+            .collect(Collectors.toList());
 
         // 找到含有指定注解的接口
         List<Class<?>> apiServiceClass = Stream
-                .of(implementClass.getInterfaces())
-                .filter(c -> c.isAnnotationPresent(annotationClass))
-                .collect(Collectors.toList());
+            .of(implementClass.getInterfaces())
+            .filter(c -> c.isAnnotationPresent(annotationClass))
+            .collect(Collectors.toList());
 
         // ApiService 类的所有方法
         return implementMethods.stream()
-                .filter(m -> {
-                    for (Class<?> serviceClass : apiServiceClass) {
-                        Method mostSpecificMethod = AopUtils.getMostSpecificMethod(m, serviceClass);
-                        return m != mostSpecificMethod;
-                    }
-                    return false;
-                })
-                .collect(Collectors.toList());
+            .filter(m -> {
+                for (Class<?> serviceClass : apiServiceClass) {
+                    Method mostSpecificMethod = AopUtils.getMostSpecificMethod(m, serviceClass);
+                    return m != mostSpecificMethod;
+                }
+                return false;
+            })
+            .collect(Collectors.toList());
     }
 
 }

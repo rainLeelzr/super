@@ -196,18 +196,23 @@ public class SessionManager {
 
     /**
      * 添加一个 session
+     *
+     * @param session session
      */
     public void addSession(@Validated @NotNull Session session) {
         sessionMapOfChannel.putIfAbsent(session.getChannel(), session);
         if (StrUtil.isNotBlank(session.getUserId())) {
             sessionMapOfUserId
-                    .computeIfAbsent(session.getUserId(), k -> new ArrayList<>(1))
-                    .add(session);
+                .computeIfAbsent(session.getUserId(), k -> new ArrayList<>(1))
+                .add(session);
         }
     }
 
     /**
      * 根据 channel 删除一个 session
+     *
+     * @param o channel
+     * @return session
      */
     public Session removeSession(Channel o) {
         Session remove = sessionMapOfChannel.remove(o);
@@ -271,6 +276,8 @@ public class SessionManager {
     /**
      * 获取一个 session
      * 测试专用
+     *
+     * @return session
      */
     public Session getOneSession() {
         Set<Map.Entry<Channel, Session>> entries = sessionMapOfChannel.entrySet();
@@ -283,14 +290,18 @@ public class SessionManager {
 
     /**
      * 根据远程终端的ip和端口获取 session
+     *
+     * @param ip   ip
+     * @param port port
+     * @return session
      */
     public Session getSessionByIpAndPort(@NonNull String ip, int port) {
         final String address = String.format("/%s:%s", ip, port);
         return sessionMapOfChannel.entrySet().parallelStream()
-                .filter(e -> address.equals(e.getValue().getRemoteIP()))
-                .findFirst()
-                .map(Map.Entry::getValue)
-                .orElse(null);
+            .filter(e -> address.equals(e.getValue().getRemoteIP()))
+            .findFirst()
+            .map(Map.Entry::getValue)
+            .orElse(null);
     }
 
     public void sendMessageByUserId(Packet packet, String userId) {
@@ -300,6 +311,9 @@ public class SessionManager {
 
     /**
      * 设置userId
+     *
+     * @param session session
+     * @param userId  user id
      */
     public void setUserId(@NonNull Session session, String userId) {
         if (StrUtil.isBlank(userId)) {
@@ -324,8 +338,9 @@ public class SessionManager {
         // 添加新的userId mapping
         session.setUserId(userId);
         sessionMapOfUserId
-                .computeIfAbsent(userId, k -> new ArrayList<>(1))
-                .add(session);
+            .computeIfAbsent(userId, k -> new ArrayList<>(1))Session
+            .add(session);
         log.debug("设置了通道的userId：{}", session);
     }
+
 }

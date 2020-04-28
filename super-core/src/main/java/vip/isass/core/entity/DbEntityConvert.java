@@ -187,6 +187,11 @@ public class DbEntityConvert {
 
     /**
      * todo 改成 MapStruct 提高性能
+     *
+     * @param <E>    entity
+     * @param <EDB>  db entity
+     * @param entity entity
+     * @return db entity
      */
     @SneakyThrows
     @SuppressWarnings("unchecked")

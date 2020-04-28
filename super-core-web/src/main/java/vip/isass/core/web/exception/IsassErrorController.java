@@ -219,6 +219,10 @@ public class IsassErrorController implements ErrorController {
 
     /**
      * 处理还没进入 controller 就抛出的异常
+     *
+     * @param request  request
+     * @param response response
+     * @return resp
      */
     @RequestMapping(value = PATH)
     @ResponseBody

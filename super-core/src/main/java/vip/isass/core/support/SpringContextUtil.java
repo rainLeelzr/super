@@ -201,7 +201,7 @@ public class SpringContextUtil implements ApplicationContextAware {
     }
 
     /**
-     * 是否已经初始化 spring 环境
+     * @return 是否已经初始化 spring 环境
      */
     public static boolean isInitialized() {
         return applicationContext != null;
@@ -209,6 +209,9 @@ public class SpringContextUtil implements ApplicationContextAware {
 
     /**
      * 创建一个java对象，并添加到spring，让spring管理
+     *
+     * @param beanClass class to new instance
+     * @return spring bean
      */
     public static <T> T addBeanToSpringContext(Class<T> beanClass) {
         //获取BeanFactory
@@ -228,6 +231,9 @@ public class SpringContextUtil implements ApplicationContextAware {
 
     /**
      * 根据name获取bean
+     *
+     * @param name bean name
+     * @return bean
      */
     public static Object getBean(String name) throws BeansException {
         return applicationContext.getBean(name);
@@ -235,6 +241,10 @@ public class SpringContextUtil implements ApplicationContextAware {
 
     /**
      * 根据name获取bean
+     *
+     * @param name         name
+     * @param requiredType required type
+     * @return bean
      */
     public static <T> T getBean(String name, Class<T> requiredType) {
         return applicationContext.getBean(name, requiredType);
@@ -242,6 +252,9 @@ public class SpringContextUtil implements ApplicationContextAware {
 
     /**
      * 根据bean类型获取bean
+     *
+     * @param requiredType required type
+     * @return bean
      */
     public static <T> T getBean(Class<T> requiredType) {
         return applicationContext.getBean(requiredType);
@@ -302,6 +315,10 @@ public class SpringContextUtil implements ApplicationContextAware {
 
     /**
      * 根据bean类型，构造器参数获取bean
+     *
+     * @param requiredType required type
+     * @param objects      objects
+     * @return bean
      */
     public static <T> T getBean(Class<T> requiredType, Object... objects) {
         return applicationContext.getBean(requiredType, objects);
@@ -309,6 +326,9 @@ public class SpringContextUtil implements ApplicationContextAware {
 
     /**
      * 根据类名获取bean
+     *
+     * @param beanClass bean class
+     * @return bean
      */
     public static <T> T getBeanByNameOfBeanType(Class<T> beanClass) {
         String beanName = getBeanNameByBeanType(beanClass);
@@ -319,6 +339,9 @@ public class SpringContextUtil implements ApplicationContextAware {
 
     /**
      * 根据非限定类名获取bean的名称，即将类名的首字母小写
+     *
+     * @param beanClass bean class
+     * @return bean name
      */
     public static String getBeanNameByBeanType(Class beanClass) {
         String beanName = beanClass.getSimpleName();

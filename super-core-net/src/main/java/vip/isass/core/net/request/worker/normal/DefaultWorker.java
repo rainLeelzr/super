@@ -169,14 +169,13 @@
 
 package vip.isass.core.net.request.worker.normal;
 
-import vip.isass.core.net.request.Request;
-import vip.isass.core.net.request.handler.RequestHandler;
-import vip.isass.core.net.request.worker.Worker;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Scope;
+import vip.isass.core.net.request.Request;
 import vip.isass.core.net.request.handler.RequestHandler;
+import vip.isass.core.net.request.worker.Worker;
 
 import javax.annotation.Resource;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -215,6 +214,8 @@ public class DefaultWorker extends Worker {
 
     /**
      * 接收一个事件请求，放入队列中
+     *
+     * @param request request
      */
     public final void acceptRequest(Request request) {
         boolean ok = this.blockingQueue.offer(request);

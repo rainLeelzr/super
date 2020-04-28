@@ -182,7 +182,9 @@ public class OnsConfigUtil {
      * 2：配置默认的地域
      * 3：配置排第一的地域
      *
-     * @param region 用户传参的地域
+     * @param onsConfiguration ons configuration
+     * @param region           用户传参的地域
+     * @return region configuration
      */
     public static RegionConfiguration selectRegion(OnsConfiguration onsConfiguration, String region) {
         RegionConfiguration regionConfiguration = null;
@@ -224,7 +226,9 @@ public class OnsConfigUtil {
      * 2：配置默认的实例
      * 3：配置排第一的实例
      *
-     * @param instance 用户传参的实例
+     * @param regionConfiguration region configuration
+     * @param instance            用户传参的实例
+     * @return instance configuration
      */
     public static InstanceConfiguration selectInstance(RegionConfiguration regionConfiguration, String instance) {
         InstanceConfiguration instanceConfiguration = null;

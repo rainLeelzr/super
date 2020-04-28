@@ -187,6 +187,11 @@ public class CostUtil {
      * 每组执行n次计算逻辑，一共执行m组。总计执行 n * m 次计算逻辑
      * 每组的执行结果，去掉最大值和最小值后取平均数
      * 得到每个组的平均数后，再去掉最大值和最小值后取平均数，得出计算逻辑的耗时
+     *
+     * @param timeOfEachGroup time of each group
+     * @param group           how many group
+     * @param predicate       predicate
+     * @param timeUnit        time unit
      */
     public static void compute(int timeOfEachGroup, int group, Predicate<Boolean> predicate, TimeUnit timeUnit) {
         if (timeOfEachGroup < 3) {
@@ -237,6 +242,9 @@ public class CostUtil {
 
     /**
      * 计算每组的平均值
+     *
+     * @param mGroupRecords m group records
+     * @return avg cost
      */
     private static long[] avg(long[][] mGroupRecords) {
         long[] avgs = new long[mGroupRecords.length];
@@ -278,6 +286,10 @@ public class CostUtil {
 
     /**
      * 去掉一组中的最大值和最小值
+     *
+     * @param min          min
+     * @param max          max
+     * @param groupRecords group records
      */
     private static void killMaxAndMin(long min, long max, long[] groupRecords) {
         // 去掉最大值最小值

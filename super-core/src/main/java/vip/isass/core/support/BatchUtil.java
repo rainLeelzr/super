@@ -191,6 +191,15 @@ public class BatchUtil {
 
     /**
      * 分页查找所有数据
+     *
+     * @param <C>             critreia
+     * @param <E>             entity
+     * @param <R>             type in return list
+     * @param countCriteria   total records count criteria
+     * @param countFunction   total records count function
+     * @param fetchCriteria   page fetch criteria
+     * @param fetchFunction   page fetch function
+     * @param consumeFunction consume function of page records
      */
     public static <R, E, C extends IPageCriteria<E, C>> List<R> findAllByBatchPage(IPageCriteria<E, C> countCriteria,
                                                                                    Function<ICriteria<E, C>, Integer> countFunction,
@@ -271,6 +280,13 @@ public class BatchUtil {
 
     /**
      * 分批处理任务
+     *
+     * @param <T>        type in list
+     * @param <R>        type in return list
+     * @param batchSize  batch size
+     * @param collection collection
+     * @param function   function
+     * @return result list of applied function
      */
     public static <T, R> List<R> batchFunction(Integer batchSize, Collection<T> collection, Function<List<T>, List<R>> function) {
         if (CollUtil.isEmpty(collection)) {
@@ -288,6 +304,11 @@ public class BatchUtil {
 
     /**
      * 分批处理任务
+     *
+     * @param <T>        type in list
+     * @param batchSize  batch size
+     * @param collection collection
+     * @param consumer   consumer
      */
     public static <T> void batchConsumer(Integer batchSize, Collection<T> collection, Consumer<List<T>> consumer) {
         if (CollUtil.isEmpty(collection)) {

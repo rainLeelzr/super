@@ -190,41 +190,59 @@ public interface UserTracedEntity<FK extends Serializable, E extends UserTracedE
 
     /**
      * 获取创建用户的 id
+     *
+     * @return create user id
      */
     FK getCreateUserId();
 
     /**
      * 设置创建用户的 id
+     *
+     * @param createUserId create user id
+     * @return this object
      */
     E setCreateUserId(FK createUserId);
 
     /**
-     * 获取创建用户的用户名
+     * @return 创建用户的用户名
      */
     String getCreateUserName();
 
     /**
      * 设置创建用户的用户名
+     *
+     * @param createUserName create user name
+     * @return this object
      */
     E setCreateUserName(String createUserName);
 
     /**
      * 获取修改用户的 id
+     *
+     * @return modify user id
      */
     FK getModifyUserId();
 
     /**
      * 设置修改用户的 id
+     *
+     * @param modifyUserId modify user id
+     * @return this object
      */
     E setModifyUserId(FK modifyUserId);
 
     /**
      * 获取修改用户的用户名
+     *
+     * @return modify user name
      */
     String getModifyUserName();
 
     /**
      * 设置修改用户的用户名
+     *
+     * @param modifyUserName modify user name
+     * @return this object
      */
     E setModifyUserName(String modifyUserName);
 

@@ -186,16 +186,21 @@ public interface VersionEntity<E extends VersionEntity<E>> extends IEntity<E> {
 
     /**
      * 获取版本号
+     *
+     * @return version
      */
     Integer getVersion();
 
     /**
      * 设置版本号
+     *
+     * @param version version
+     * @return this object
      */
-    E setVersion(Integer id);
+    E setVersion(Integer version);
 
     /**
-     * 如果版本号为 null, 则设置版本号为1，并返回版本号
+     * @return 如果版本号为 null, 则设置版本号为1，并返回版本号
      */
     @SuppressWarnings("unchecked")
     default E computeVersionAsOneIfAbsent() {

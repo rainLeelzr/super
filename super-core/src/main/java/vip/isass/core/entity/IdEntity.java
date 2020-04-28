@@ -186,13 +186,16 @@ public interface IdEntity<PK extends Serializable, E extends IdEntity<PK, E>> ex
     String ID_COLUMN_NAME = "id";
 
     /**
-     * 获取 id
+     * @return id
      */
     @JsonSerialize(using = ToStringSerializer.class)
     PK getId();
 
     /**
      * 设置 id
+     *
+     * @param id id
+     * @return this object
      */
     E setId(PK id);
 
@@ -203,11 +206,15 @@ public interface IdEntity<PK extends Serializable, E extends IdEntity<PK, E>> ex
 
     /**
      * 生成一个随机id
+     *
+     * @return this object
      */
     E randomId();
 
     /**
      * 如果 id 为 null, 则生成一个随机 id，并返回 id
+     *
+     * @return this object
      */
     @SuppressWarnings("unchecked")
     default E computeIdIfAbsent() {

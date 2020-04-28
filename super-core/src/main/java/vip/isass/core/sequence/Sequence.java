@@ -180,7 +180,7 @@ import vip.isass.core.support.Support;
 public interface Sequence<T> extends Support {
 
     /**
-     * 获取序列
+     * @return 序列
      */
     T next();
 

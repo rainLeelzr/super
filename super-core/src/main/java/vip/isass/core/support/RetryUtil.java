@@ -203,7 +203,8 @@ public class RetryUtil {
     }
 
     /**
-     * @param count 重试次数
+     * @param supplier supplier
+     * @param count    重试次数
      */
     public static void retry(Supplier<?> supplier, int count) {
         LongAdder adder = new LongAdder();

@@ -186,6 +186,8 @@ public interface ISelectColumnCriteria<E, C extends ISelectColumnCriteria<E, C>>
 
     /**
      * selectColumns 相关方法
+     *
+     * @return select column list
      */
     List<String> getSelectColumns();
 

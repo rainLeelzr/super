@@ -177,12 +177,15 @@ import java.util.Collection;
 public interface SecurityMetadataSourceProvider {
 
     /**
-     * 获取指定用户拥有的角色
+     * @param userId user id
+     * @return 指定用户拥有的角色
      */
     Collection<String> findRoleCodesByUserId(String userId);
 
     /**
-     * 获取访问指定 uri 需要的角色
+     * @param uri    uri
+     * @param method method
+     * @return 访问指定 uri 需要的角色
      */
     Collection<String> findRoleCodesByUri(String uri, String method);
 

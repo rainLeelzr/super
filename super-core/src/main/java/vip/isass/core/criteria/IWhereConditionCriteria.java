@@ -184,6 +184,8 @@ public interface IWhereConditionCriteria<E, C extends IWhereConditionCriteria<E,
 
     /**
      * whereConditions 相关方法
+     *
+     * @return where condition list
      */
     List<WhereCondition> getWhereConditions();
 
@@ -191,6 +193,9 @@ public interface IWhereConditionCriteria<E, C extends IWhereConditionCriteria<E,
 
     /**
      * 添加查询条件
+     *
+     * @param column column
+     * @param value  value
      */
     default void equals(String column, Object value) {
         getWhereConditions().add(new WhereCondition(column, Condition.EQUAL, value));

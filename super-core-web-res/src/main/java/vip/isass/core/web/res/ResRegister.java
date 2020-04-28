@@ -180,6 +180,8 @@ public interface ResRegister {
     /**
      * 获取已经注册过的资源
      * <p>从数据库中获取全部资源</p>
+     *
+     * @return all register resource
      */
     List<Resource> getAllRegisteredResource();
 
@@ -188,7 +190,9 @@ public interface ResRegister {
     /**
      * 将一个集合的资源全部进行注册
      * <p>记录入数据库</p>
+     *SessionManager
+     * @param resources resources
      */
-    void register(Collection<Resource> collect);
+    void register(Collection<Resource> resources);
 
 }

@@ -179,6 +179,9 @@ public interface Converter<T> {
     /**
      * 默认返回 false
      * 若需要使用本方法，请实现类复写此方法。
+     *
+     * @param o the object if support or not
+     * @return support if true
      */
     default boolean supports(Object o) {
         return false;
@@ -187,11 +190,18 @@ public interface Converter<T> {
     /**
      * 转换方法
      * 将类型为 S 的对象转换为 类型为 T 的对象
+     *
+     * @param source source
+     * @return converted object
      */
     T convert(Object source);
 
     /**
      * 将 S 转换为 T ,若转换过程抛出异常，则返回默认值
+     *
+     * @param source       source object
+     * @param defaultValue the default value to be return when convert source object throw an exception
+     * @return converted object
      */
     default T defaultIfException(Object source, T defaultValue) {
         try {
@@ -207,6 +217,10 @@ public interface Converter<T> {
      * 1: 转换过程抛出异常
      * 2: 入参 source 为空
      * 3: 转换逻辑结果为空
+     *
+     * @param source       source
+     * @param defaultValue default value
+     * @return return converted object
      */
     default T defaultIfNull(Object source, T defaultValue) {
         if (source == null) {

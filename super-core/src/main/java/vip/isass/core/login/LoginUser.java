@@ -175,12 +175,12 @@ package vip.isass.core.login;
 public interface LoginUser {
 
     /**
-     * 获取 auth_user 的用户id
+     * @return auth_user 的用户id
      */
     String getUserId();
 
     /**
-     * 用户 id, 包括微服务 msToken
+     * @return 用户 id, 包括微服务 msToken
      */
     String getAllUserId();
 
@@ -188,11 +188,15 @@ public interface LoginUser {
 
     /**
      * 用户昵称
+     *
+     * @return nick name
      */
     String getNickName();
 
     /**
      * 登录产品，从什么产品登录
+     *
+     * @return login from
      */
     String getLoginFrom();
 

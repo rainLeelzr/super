@@ -181,17 +181,22 @@ public interface ChainedEntity<PK extends Serializable, E extends ChainedEntity<
     String TOP_ID_VALUE = "";
 
     /**
-     * 获取父 id
+     * @return 父 id
      */
     PK getParentId();
 
     /**
      * 设置父 id
+     *
+     * @param parentId parent id
+     * @return this object
      */
     E setParentId(PK parentId);
 
     /**
      * 标记为顶级实体
+     *
+     * @return this object
      */
     E markAsTopEntity();
 

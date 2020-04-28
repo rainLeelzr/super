@@ -171,10 +171,6 @@ package vip.isass.core.web.security.metadata;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import vip.isass.core.exception.UnifiedException;
-import vip.isass.core.exception.code.StatusMessageEnum;
-import vip.isass.core.web.security.SecurityConst;
-import vip.isass.core.web.uri.UriPrefixProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
@@ -187,6 +183,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
+import vip.isass.core.web.security.SecurityConst;
 import vip.isass.core.web.uri.UriPrefixProvider;
 
 import javax.servlet.http.HttpServletRequest;
@@ -216,6 +213,12 @@ public class SecurityMetadataSource implements FilterInvocationSecurityMetadataS
      * Sets the internal request map from the supplied map. The key elements should be of
      * type {@link RequestMatcher}, which. The contextPath stored in the key will depend on the
      * type of the supplied UrlMatcher.
+     *
+     * @param requestMappingHandlerMapping           request mapping handler mapping
+     * @param filterInvocationSecurityMetadataSource filter invocation security meta datasource
+     * @param securityMetadataSourceProviderManager  security meta datasource provider manager
+     * @param uriPrefixProvider                      uri prefix provider
+     * @param permitUrls                             permit urls
      */
     public SecurityMetadataSource(RequestMappingHandlerMapping requestMappingHandlerMapping,
                                   FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource,

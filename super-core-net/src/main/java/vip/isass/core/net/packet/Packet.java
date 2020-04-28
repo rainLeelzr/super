@@ -185,6 +185,7 @@ public interface Packet {
     /**
      * 包类型
      *
+     * @return type
      * @see Type
      */
     Integer getType();
@@ -194,6 +195,7 @@ public interface Packet {
     /**
      * body 的序列化方式
      *
+     * @return serialize mode
      * @see vip.isass.core.serialization.SerializeMode
      */
     Integer getSerializeMode();
@@ -241,4 +243,5 @@ public interface Packet {
             throw new IllegalArgumentException("不支持的参数值：code=" + code);
         }
     }
+
 }

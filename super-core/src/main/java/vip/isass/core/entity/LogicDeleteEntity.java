@@ -182,16 +182,23 @@ public interface LogicDeleteEntity<E extends LogicDeleteEntity<E>> extends IEnti
 
     /**
      * 获取删除标识
+     *
+     * @return delete flag
      */
     Boolean getDeleteFlag();
 
     /**
      * 设置删除标识
+     *
+     * @param deleteFlag delete flag
+     * @return this object
      */
     E setDeleteFlag(Boolean deleteFlag);
 
     /**
      * 如果删除标识为 null, 则设置删除标识为 false，并返回删除标识
+     *
+     * @return this object
      */
     @SuppressWarnings("unchecked")
     default E computeDefaultDeleteFlagIfAbsent() {

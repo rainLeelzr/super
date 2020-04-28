@@ -209,6 +209,8 @@ public class UriPrefixProvider {
 
     /**
      * isass v3.0 的微服务前缀，已改到具体接口的 url 定义上，故直接返回空字符串
+     *
+     * @return uri prefix
      */
     public String getUriPrefix() {
         return "";

@@ -194,21 +194,31 @@ public interface TimeTracedEntity<E extends TimeTracedEntity<E>> extends IEntity
 
     /**
      * 获取创建记录的时间
+     *
+     * @return create time
      */
     LocalDateTime getCreateTime();
 
     /**
      * 设置创建记录的时间
+     *
+     * @param createTime create time
+     * @return this object
      */
     E setCreateTime(LocalDateTime createTime);
 
     /**
      * 获取修改记录的时间
+     *
+     * @return modify time
      */
     LocalDateTime getModifyTime();
 
     /**
      * 设置修改记录的时间
+     *
+     * @param modifyTime modify time
+     * @return this object
      */
     E setModifyTime(LocalDateTime modifyTime);
 

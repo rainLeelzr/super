@@ -189,6 +189,11 @@ public class WrapperUtil {
 
     /**
      * 返回 queryWrapper
+     *
+     * @param <C>      criteria
+     * @param <E>      entity
+     * @param criteria criteria
+     * @return query wrapper
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <

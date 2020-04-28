@@ -182,9 +182,6 @@ import java.util.Collection;
 @Mapper
 public interface IMapper<EDB> extends BaseMapper<EDB> {
 
-    /**
-     * 批量插入所有列
-     */
     // Integer batchInsertAllColumn(@Param("coll") Collection<T> entityList);
 
     Integer insertBatchSomeColumn(@Param("list") Collection<EDB> entityList);
