@@ -182,7 +182,7 @@
 
     <!-- 本项目信息 -->
     <artifactId>super-core-mq</artifactId>
-    <version>${core-mq.version}</version>
+    <version>super.3.0.0-SNAPSHOT</version>
 
     <dependencies>
 

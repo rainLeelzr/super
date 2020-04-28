@@ -182,7 +182,7 @@
 
     <!-- 本项目信息 -->
     <artifactId>super-core-web-security</artifactId>
-    <version>${core-web-security.version}</version>
+    <version>super.3.0.0-SNAPSHOT</version>
 
     <dependencies>
 
