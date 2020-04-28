@@ -338,7 +338,7 @@ public class SessionManager {
         // 添加新的userId mapping
         session.setUserId(userId);
         sessionMapOfUserId
-            .computeIfAbsent(userId, k -> new ArrayList<>(1))Session
+            .computeIfAbsent(userId, k -> new ArrayList<>(1))
             .add(session);
         log.debug("设置了通道的userId：{}", session);
     }

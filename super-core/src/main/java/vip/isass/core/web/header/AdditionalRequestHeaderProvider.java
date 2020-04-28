@@ -180,6 +180,8 @@ public interface AdditionalRequestHeaderProvider {
 
     /**
      * 当已存在同名的请求头时，是否覆盖旧的值
+     *
+     * @return is override
      */
     boolean override();
 
