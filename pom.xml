@@ -181,7 +181,7 @@
     <!-- 本项目信息 -->
     <groupId>vip.isass</groupId>
     <artifactId>super</artifactId>
-    <version>super.3.0.0-RELEASE</version>
+    <version>super.3.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -219,29 +219,29 @@
 
         <!-- start isass-core -->
 
-        <super-core.version>super.3.0.0-RELEASE</super-core.version>
-        <core-cache.version>super.3.0.0-RELEASE</core-cache.version>
-        <core-database.version>super.3.0.0-RELEASE</core-database.version>
-        <core-database-mybatisplus.version>super.3.0.0-RELEASE</core-database-mybatisplus.version>
-        <core-database-mybatisplus-postgresql.version>super.3.0.0-RELEASE
+        <super-core.version>super.3.0.1-SNAPSHOT</super-core.version>
+        <core-cache.version>super.3.0.1-SNAPSHOT</core-cache.version>
+        <core-database.version>super.3.0.1-SNAPSHOT</core-database.version>
+        <core-database-mybatisplus.version>super.3.0.1-SNAPSHOT</core-database-mybatisplus.version>
+        <core-database-mybatisplus-postgresql.version>super.3.0.1-SNAPSHOT
         </core-database-mybatisplus-postgresql.version>
-        <core-database-mysql.version>super.3.0.0-RELEASE</core-database-mysql.version>
-        <core-database-postgresql.version>super.3.0.0-RELEASE</core-database-postgresql.version>
-        <core-database-querydsl.version>super.3.0.0-RELEASE</core-database-querydsl.version>
-        <core-database-sharding-jdbc.version>super.3.0.0-RELEASE</core-database-sharding-jdbc.version>
-        <core-elasticsearch.version>super.3.0.0-RELEASE</core-elasticsearch.version>
-        <core-encryption.version>super.3.0.0-RELEASE</core-encryption.version>
-        <core-mq.version>super.3.0.0-RELEASE</core-mq.version>
-        <core-mq-ons.version>super.3.0.0-RELEASE</core-mq-ons.version>
-        <core-net.version>super.3.0.0-RELEASE</core-net.version>
-        <core-net-tcp.version>super.3.0.0-RELEASE</core-net-tcp.version>
-        <core-net-websocket.version>super.3.0.0-RELEASE</core-net-websocket.version>
-        <core-protobuf.version>super.3.0.0-RELEASE</core-protobuf.version>
-        <core-web.version>super.3.0.0-RELEASE</core-web.version>
-        <core-web-res.version>super.3.0.0-RELEASE</core-web-res.version>
-        <core-web-rpc-feign.version>super.3.0.0-RELEASE</core-web-rpc-feign.version>
-        <core-web-security.version>super.3.0.0-RELEASE</core-web-security.version>
-        <core-web-swagger.version>super.3.0.0-RELEASE</core-web-swagger.version>
+        <core-database-mysql.version>super.3.0.1-SNAPSHOT</core-database-mysql.version>
+        <core-database-postgresql.version>super.3.0.1-SNAPSHOT</core-database-postgresql.version>
+        <core-database-querydsl.version>super.3.0.1-SNAPSHOT</core-database-querydsl.version>
+        <core-database-sharding-jdbc.version>super.3.0.1-SNAPSHOT</core-database-sharding-jdbc.version>
+        <core-elasticsearch.version>super.3.0.1-SNAPSHOT</core-elasticsearch.version>
+        <core-encryption.version>super.3.0.1-SNAPSHOT</core-encryption.version>
+        <core-mq.version>super.3.0.1-SNAPSHOT</core-mq.version>
+        <core-mq-ons.version>super.3.0.1-SNAPSHOT</core-mq-ons.version>
+        <core-net.version>super.3.0.1-SNAPSHOT</core-net.version>
+        <core-net-tcp.version>super.3.0.1-SNAPSHOT</core-net-tcp.version>
+        <core-net-websocket.version>super.3.0.1-SNAPSHOT</core-net-websocket.version>
+        <core-protobuf.version>super.3.0.1-SNAPSHOT</core-protobuf.version>
+        <core-web.version>super.3.0.1-SNAPSHOT</core-web.version>
+        <core-web-res.version>super.3.0.1-SNAPSHOT</core-web-res.version>
+        <core-web-rpc-feign.version>super.3.0.1-SNAPSHOT</core-web-rpc-feign.version>
+        <core-web-security.version>super.3.0.1-SNAPSHOT</core-web-security.version>
+        <core-web-swagger.version>super.3.0.1-SNAPSHOT</core-web-swagger.version>
         <core-mongobd.version>super.3.0.0-SNAPSHOT</core-mongobd.version>
         <core-database-listener.version>super.3.0.0-SNAPSHOT</core-database-listener.version>
 
@@ -996,7 +996,7 @@
     </licenses>
 
     <scm>
-        <tag>super.3.0.0-RELEASE</tag>
+        <tag>master</tag>
         <url>https://gitee.com/isass/super</url>
         <connection>scm:git:git@gitee.com:isass/super.git</connection>
         <developerConnection>scm:git:git@gitee.com:isass/super.git</developerConnection>
