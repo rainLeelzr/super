@@ -219,6 +219,9 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
     @Value("${spring.profiles:default}")
     private String profiles;
 
+    @Value("${mybatis-plus.mapper-locations:}")
+    private List<String> mapperLocations;
+
     @Autowired(required = false)
     private List<BaseTypeHandler<?>> baseTypeHandlers;
 
@@ -247,15 +250,17 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
 
     @Bean
     public SqlSessionFactory sqlSessionFactory(GlobalConfig globalConfig) throws Exception {
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        List<org.springframework.core.io.Resource> mapperResources =
+            CollUtil.toList(resolver.getResources("classpath*:/vip/isass/**/mapper/**/*Mapper.xml"));
+        for (String mapperLocation : mapperLocations) {
+            org.springframework.core.io.Resource[] resources = resolver.getResources(mapperLocation);
+            mapperResources.addAll(CollUtil.toList(resources));
+        }
+
         MybatisSqlSessionFactoryBean sqlSessionFactory = new MybatisSqlSessionFactoryBean();
         sqlSessionFactory.setDataSource(dataSource);
-
-        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        sqlSessionFactory.setMapperLocations(
-            ArrayUtil.addAll(
-                resolver.getResources("classpath*:/vip/isass/**/mapper/**/*Mapper.xml"),
-                resolver.getResources("classpath*:/com/sancaijia/**/*Mapper.xml")));
-
+        sqlSessionFactory.setMapperLocations(ArrayUtil.toArray(mapperResources, org.springframework.core.io.Resource.class));
         sqlSessionFactory.setTypeEnumsPackage("vip.isass.api.**");
 
         MybatisConfiguration configuration = new MybatisConfiguration();
