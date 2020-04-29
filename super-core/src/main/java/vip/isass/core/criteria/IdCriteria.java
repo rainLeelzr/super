@@ -219,6 +219,10 @@ public class IdCriteria<
 
     /************************************************** id setter **************************************************/
 
+    /**
+     * @param id id
+     * @return this object
+     */
     @SuppressWarnings("unchecked")
     public C setId(PK id) {
         this.id = id;

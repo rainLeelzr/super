@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import ${cfg.criteriaPackageName}.${entity}Criteria;
 import ${cfg.entityPackageName}.${entity};
 import ${cfg.package}.${cfg.moduleName}.db.${cfg.prefix}.repository.${cfg.prefix?cap_first}${entity}MpRepository;
-import ${cfg.package}.core.web.IService;
+import vip.isass.core.web.IService;
 
 import javax.annotation.Resource;
 

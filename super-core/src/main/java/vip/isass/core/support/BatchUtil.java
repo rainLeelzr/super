@@ -200,6 +200,7 @@ public class BatchUtil {
      * @param fetchCriteria   page fetch criteria
      * @param fetchFunction   page fetch function
      * @param consumeFunction consume function of page records
+     * @return records
      */
     public static <R, E, C extends IPageCriteria<E, C>> List<R> findAllByBatchPage(IPageCriteria<E, C> countCriteria,
                                                                                    Function<ICriteria<E, C>, Integer> countFunction,

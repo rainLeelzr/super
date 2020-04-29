@@ -414,7 +414,7 @@ public class MybatisPlusGenerator {
                         "/" + PREFIX + "/controller/";
                     return path + StrUtil.upperFirst(PREFIX) + tableInfo.getEntityName() + "Controller.java";
                 }
-            }, new FileOutConfig("/template/Controller.java.ftl") {
+            }, new FileOutConfig("/template/controller.java.ftl") {
                 @Override
                 public String outputFile(TableInfo tableInfo) {
                     // 自定义输入文件名称
@@ -445,7 +445,7 @@ public class MybatisPlusGenerator {
                         "/" + PREFIX + "/service/";
                     return path + StrUtil.upperFirst(PREFIX) + tableInfo.getEntityName() + "Service.java";
                 }
-            }, new FileOutConfig("/template/Service.java.ftl") {
+            }, new FileOutConfig("/template/service.java.ftl") {
                 @Override
                 public String outputFile(TableInfo tableInfo) {
                     // 自定义输入文件名称
@@ -465,7 +465,7 @@ public class MybatisPlusGenerator {
                         "/db/" + PREFIX + "/mapper/";
                     return path + StrUtil.upperFirst(PREFIX) + tableInfo.getEntityName() + "Mapper.java";
                 }
-            }, new FileOutConfig("/template/Mapper.java.ftl") {
+            }, new FileOutConfig("/template/mapper.java.ftl") {
                 @Override
                 public String outputFile(TableInfo tableInfo) {
                     // 自定义输入文件名称
@@ -485,7 +485,7 @@ public class MybatisPlusGenerator {
                         "/db/" + PREFIX + "/mapper/xml/";
                     return path + StrUtil.upperFirst(PREFIX) + tableInfo.getEntityName() + "Mapper.xml";
                 }
-            }, new FileOutConfig("/template/Mapper.xml.ftl") {
+            }, new FileOutConfig("/template/mapper.xml.ftl") {
                 @Override
                 public String outputFile(TableInfo tableInfo) {
                     // 自定义输入文件名称

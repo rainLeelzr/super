@@ -170,7 +170,6 @@
 package vip.isass.core.database.criteria;
 
 import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.criteria.ICriteria;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -180,7 +179,7 @@ import java.util.Set;
  */
 public interface TimeTracedCriteria<E, C extends ICriteria<E, C>> extends ICriteria<E, C> {
 
-    /************************************************** createTime **************************************************/
+    //************************************************** createTime **************************************************//
 
     C setCreateTime(LocalDateTime createTime);
 
@@ -222,7 +221,7 @@ public interface TimeTracedCriteria<E, C extends ICriteria<E, C>> extends ICrite
 
     C setOrCreateTimeGreaterThanEqual(LocalDateTime orCreateTimeGreaterThanEqual);
 
-    /************************************************** modifyTime **************************************************/
+    //************************************************** modifyTime **************************************************//
 
     C setModifyTime(LocalDateTime modifyTime);
 
@@ -264,7 +263,7 @@ public interface TimeTracedCriteria<E, C extends ICriteria<E, C>> extends ICrite
 
     C setOrModifyTimeGreaterThanEqual(LocalDateTime orModifyTimeGreaterThanEqual);
 
-    /************************************************** createTime **************************************************/
+    //************************************************** createTime **************************************************//
 
     LocalDateTime getCreateTime(LocalDateTime createTime);
 
@@ -306,7 +305,7 @@ public interface TimeTracedCriteria<E, C extends ICriteria<E, C>> extends ICrite
 
     LocalDateTime getOrCreateTimeGreaterThanEqual(LocalDateTime orCreateTimeGreaterThanEqual);
 
-    /************************************************** modifyTime **************************************************/
+    //************************************************** modifyTime **************************************************//
 
     LocalDateTime getModifyTime(LocalDateTime modifyTime);
 

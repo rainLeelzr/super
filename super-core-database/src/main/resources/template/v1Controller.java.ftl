@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import ${cfg.criteriaPackageName}.${entity}Criteria;
 import ${cfg.entityPackageName}.${entity};
 import ${cfg.servicePackageName?replace(".service",".${cfg.prefix}.service")}.${cfg.prefix?cap_first}${table.serviceName};
-import ${cfg.package}.core.web.IController;
-import ${cfg.package}.core.web.Resp;
+import vip.isass.core.web.IController;
+import vip.isass.core.web.Resp;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;

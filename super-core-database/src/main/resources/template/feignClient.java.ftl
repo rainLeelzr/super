@@ -1,8 +1,8 @@
 package ${cfg.feignPackage};
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import ${cfg.package}.core.web.Resp;
-import ${cfg.package}.core.web.feign.FeignEncoder;
+import vip.isass.core.web.Resp;
+import vip.isass.core.web.feign.FeignEncoder;
 import ${cfg.criteriaPackageName}.*;
 import ${package.Entity}.*
 import org.springframework.cloud.openfeign.FeignClient;

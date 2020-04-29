@@ -186,7 +186,7 @@ public interface Session {
     /**
      * 此方法应该只给sessionManager调用，不能给业务调到
      *
-     * @param user id
+     * @param userId user id
      * @return session
      */
     Session setUserId(String userId);

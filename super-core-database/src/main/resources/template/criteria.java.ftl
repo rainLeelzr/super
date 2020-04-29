@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import ${cfg.entityPackageName}.${entity};
 <#if isIdEntity>
-import ${cfg.package}.core.criteria.IdCriteria;
+import vip.isass.core.criteria.IdCriteria;
 </#if>
 <#list table.fields as field>
 <#if field.propertyType == "Json">

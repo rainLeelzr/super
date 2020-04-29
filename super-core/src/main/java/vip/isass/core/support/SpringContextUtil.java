@@ -210,6 +210,7 @@ public class SpringContextUtil implements ApplicationContextAware {
     /**
      * 创建一个java对象，并添加到spring，让spring管理
      *
+     * @param <T>       bean class
      * @param beanClass class to new instance
      * @return spring bean
      */
@@ -242,6 +243,7 @@ public class SpringContextUtil implements ApplicationContextAware {
     /**
      * 根据name获取bean
      *
+     * @param <T>          require type
      * @param name         name
      * @param requiredType required type
      * @return bean
@@ -253,6 +255,7 @@ public class SpringContextUtil implements ApplicationContextAware {
     /**
      * 根据bean类型获取bean
      *
+     * @param <T>          require type
      * @param requiredType required type
      * @return bean
      */
@@ -316,6 +319,7 @@ public class SpringContextUtil implements ApplicationContextAware {
     /**
      * 根据bean类型，构造器参数获取bean
      *
+     * @param <T>          require type
      * @param requiredType required type
      * @param objects      objects
      * @return bean
@@ -327,6 +331,7 @@ public class SpringContextUtil implements ApplicationContextAware {
     /**
      * 根据类名获取bean
      *
+     * @param <T>       require type
      * @param beanClass bean class
      * @return bean
      */

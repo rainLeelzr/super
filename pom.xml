@@ -182,7 +182,7 @@
     <!-- 本项目信息 -->
     <groupId>vip.isass</groupId>
     <artifactId>super</artifactId>
-    <version>super.3.0.0-RELEASE</version>
+    <version>super.3.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -220,31 +220,31 @@
 
         <!-- start isass-core -->
 
-        <super-core.version>super.3.0.0-RELEASE</super-core.version>
-        <core-cache.version>super.3.0.0-RELEASE</core-cache.version>
-        <core-database.version>super.3.0.0-RELEASE</core-database.version>
-        <core-database-mybatisplus.version>super.3.0.0-RELEASE</core-database-mybatisplus.version>
-        <core-database-mybatisplus-postgresql.version>super.3.0.0-RELEASE
+        <super-core.version>super.3.0.0-SNAPSHOT</super-core.version>
+        <core-cache.version>super.3.0.0-SNAPSHOT</core-cache.version>
+        <core-database.version>super.3.0.0-SNAPSHOT</core-database.version>
+        <core-database-mybatisplus.version>super.3.0.0-SNAPSHOT</core-database-mybatisplus.version>
+        <core-database-mybatisplus-postgresql.version>super.3.0.0-SNAPSHOT
         </core-database-mybatisplus-postgresql.version>
-        <core-database-mysql.version>super.3.0.0-RELEASE</core-database-mysql.version>
-        <core-database-postgresql.version>super.3.0.0-RELEASE</core-database-postgresql.version>
-        <core-database-querydsl.version>super.3.0.0-RELEASE</core-database-querydsl.version>
-        <core-database-sharding-jdbc.version>super.3.0.0-RELEASE</core-database-sharding-jdbc.version>
-        <core-elasticsearch.version>super.3.0.0-RELEASE</core-elasticsearch.version>
-        <core-encryption.version>super.3.0.0-RELEASE</core-encryption.version>
-        <core-mq.version>super.3.0.0-RELEASE</core-mq.version>
-        <core-mq-ons.version>super.3.0.0-RELEASE</core-mq-ons.version>
-        <core-net.version>super.3.0.0-RELEASE</core-net.version>
-        <core-net-tcp.version>super.3.0.0-RELEASE</core-net-tcp.version>
-        <core-net-websocket.version>super.3.0.0-RELEASE</core-net-websocket.version>
-        <core-protobuf.version>super.3.0.0-RELEASE</core-protobuf.version>
-        <core-web.version>super.3.0.0-RELEASE</core-web.version>
-        <core-web-res.version>super.3.0.0-RELEASE</core-web-res.version>
-        <core-web-rpc-feign.version>super.3.0.0-RELEASE</core-web-rpc-feign.version>
-        <core-web-security.version>super.3.0.0-RELEASE</core-web-security.version>
-        <core-web-swagger.version>super.3.0.0-RELEASE</core-web-swagger.version>
-        <core-mongobd.version>super.3.0.0-RELEASE</core-mongobd.version>
-        <core-database-listener.version>super.3.0.0-RELEASE</core-database-listener.version>
+        <core-database-mysql.version>super.3.0.0-SNAPSHOT</core-database-mysql.version>
+        <core-database-postgresql.version>super.3.0.0-SNAPSHOT</core-database-postgresql.version>
+        <core-database-querydsl.version>super.3.0.0-SNAPSHOT</core-database-querydsl.version>
+        <core-database-sharding-jdbc.version>super.3.0.0-SNAPSHOT</core-database-sharding-jdbc.version>
+        <core-elasticsearch.version>super.3.0.0-SNAPSHOT</core-elasticsearch.version>
+        <core-encryption.version>super.3.0.0-SNAPSHOT</core-encryption.version>
+        <core-mq.version>super.3.0.0-SNAPSHOT</core-mq.version>
+        <core-mq-ons.version>super.3.0.0-SNAPSHOT</core-mq-ons.version>
+        <core-net.version>super.3.0.0-SNAPSHOT</core-net.version>
+        <core-net-tcp.version>super.3.0.0-SNAPSHOT</core-net-tcp.version>
+        <core-net-websocket.version>super.3.0.0-SNAPSHOT</core-net-websocket.version>
+        <core-protobuf.version>super.3.0.0-SNAPSHOT</core-protobuf.version>
+        <core-web.version>super.3.0.0-SNAPSHOT</core-web.version>
+        <core-web-res.version>super.3.0.0-SNAPSHOT</core-web-res.version>
+        <core-web-rpc-feign.version>super.3.0.0-SNAPSHOT</core-web-rpc-feign.version>
+        <core-web-security.version>super.3.0.0-SNAPSHOT</core-web-security.version>
+        <core-web-swagger.version>super.3.0.0-SNAPSHOT</core-web-swagger.version>
+        <core-mongobd.version>super.3.0.0-SNAPSHOT</core-mongobd.version>
+        <core-database-listener.version>super.3.0.0-SNAPSHOT</core-database-listener.version>
 
         <!-- end isass-core -->
 
@@ -805,77 +805,6 @@
         </resources>
 
         <plugins>
-            <!--生成 Source jar 文件-->
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                <artifactId>maven-source-plugin</artifactId>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <id>attach-sources</id>-->
-            <!--                        <phase>compile</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>jar-no-fork</goal>-->
-            <!--                        </goals>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
-
-            <!--生成Javadoc，关闭doclint,避免注解检查不通过-->
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                <artifactId>maven-javadoc-plugin</artifactId>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <id>attach-javadocs</id>-->
-            <!--                        <goals>-->
-            <!--                            <goal>jar</goal>-->
-            <!--                        </goals>-->
-            <!--                        <configuration>-->
-            <!--                            <additionalparam>-Xdoclint:none</additionalparam>-->
-            <!--                        </configuration>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
-
-            <!--Maven GPG插件用于使用以下配置对组件进行签名-->
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                <artifactId>maven-gpg-plugin</artifactId>-->
-            <!--                <version>1.6</version>-->
-            <!--                <configuration>-->
-            <!--                    <skip>true</skip>-->
-            <!--                </configuration>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <id>sign-artifacts</id>-->
-            <!--                        <phase>verify</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>sign</goal>-->
-            <!--                        </goals>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
-
-            <!--Nexus Staging Maven插件是将组件部署到OSSRH并将其发布到Central Repository的推荐方法-->
-            <!--            <plugin>-->
-            <!--                <groupId>org.sonatype.plugins</groupId>-->
-            <!--                <artifactId>nexus-staging-maven-plugin</artifactId>-->
-            <!--                <version>1.6.8</version>-->
-            <!--                <extensions>true</extensions>-->
-            <!--                <configuration>-->
-            <!--                    <serverId>ossrh</serverId>-->
-            <!--                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
-            <!--                    <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
-            <!--                </configuration>-->
-            <!--            </plugin>-->
-
-            <!-- release plugin,用于发布到release仓库部署插件 -->
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                <artifactId>maven-release-plugin</artifactId>-->
-            <!--                &lt;!&ndash;                <version>2.5.3</version>&ndash;&gt;-->
-            <!--            </plugin>-->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -909,7 +838,7 @@
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
-                                <phase>deploy</phase>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>jar-no-fork</goal>
                                 </goals>
@@ -967,14 +896,14 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-release-plugin</artifactId>
-                        <configuration>
-                            <tagNameFormat>@{project.version}</tagNameFormat>
-                            <autoVersionSubmodules>true</autoVersionSubmodules>
-                            <releaseProfiles>isass-deploy</releaseProfiles>
-                            <useReleaseProfile>true</useReleaseProfile>
-                            <arguments>-DskipTests</arguments>
-                            <goals>deploy</goals>
-                        </configuration>
+                        <!--                        <configuration>-->
+                        <!--                            <tagNameFormat>@{project.version}</tagNameFormat>-->
+                        <!--                            <autoVersionSubmodules>true</autoVersionSubmodules>-->
+                        <!--                            <releaseProfiles>isass-deploy</releaseProfiles>-->
+                        <!--                            <useReleaseProfile>true</useReleaseProfile>-->
+                        <!--                            <arguments>-DskipTests</arguments>-->
+                        <!--                            <goals>deploy</goals>-->
+                        <!--                        </configuration>-->
                     </plugin>
                 </plugins>
             </build>
@@ -1005,25 +934,25 @@
     </developers>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
+        <!--        <snapshotRepository>-->
+        <!--            <id>ossrh</id>-->
+        <!--            <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+        <!--        </snapshotRepository>-->
 
         <!--        <repository>-->
-        <!--            <id>isass-rdc-releases</id>-->
-        <!--            <url>https://repo.rdc.aliyun.com/repository/119151-release-MRcouB/</url>-->
+        <!--            <id>ossrh</id>-->
+        <!--            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>-->
         <!--        </repository>-->
 
-        <!--        <snapshotRepository>-->
-        <!--            <id>isass-rdc-snapshots</id>-->
-        <!--            <url>https://repo.rdc.aliyun.com/repository/119151-snapshot-FUsqMk/</url>-->
-        <!--        </snapshotRepository>-->
+        <repository>
+            <id>isass-rdc-releases</id>
+            <url>https://repo.rdc.aliyun.com/repository/119151-release-MRcouB/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>isass-rdc-snapshots</id>
+            <url>https://repo.rdc.aliyun.com/repository/119151-snapshot-FUsqMk/</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <repositories>
@@ -1034,15 +963,15 @@
             <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
         </repository>
 
-<!--        <repository>-->
-<!--            <id>isass-rdc-releases</id>-->
-<!--            <url>https://repo.rdc.aliyun.com/repository/119151-release-MRcouB/</url>-->
-<!--        </repository>-->
+        <repository>
+            <id>isass-rdc-releases</id>
+            <url>https://repo.rdc.aliyun.com/repository/119151-release-MRcouB/</url>
+        </repository>
 
-<!--        <repository>-->
-<!--            <id>isass-rdc-snapshots</id>-->
-<!--            <url>https://repo.rdc.aliyun.com/repository/119151-snapshot-FUsqMk/</url>-->
-<!--        </repository>-->
+        <repository>
+            <id>isass-rdc-snapshots</id>
+            <url>https://repo.rdc.aliyun.com/repository/119151-snapshot-FUsqMk/</url>
+        </repository>
 
     </repositories>
 

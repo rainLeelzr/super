@@ -173,12 +173,9 @@ package vip.isass.core.net.request.worker;
  * @author Rain
  */
 
-import vip.isass.core.net.request.Request;
-import vip.isass.core.net.request.worker.event.WorkCompletedEvent;
-import vip.isass.core.net.request.worker.event.WorkExceptionEvent;
-import vip.isass.core.net.request.worker.event.WorkStartEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import vip.isass.core.net.request.Request;
 import vip.isass.core.net.request.worker.event.WorkCompletedEvent;
 import vip.isass.core.net.request.worker.event.WorkExceptionEvent;
 import vip.isass.core.net.request.worker.event.WorkStartEvent;
@@ -207,6 +204,9 @@ public abstract class Worker extends Thread {
 
     /**
      * 选择一个网络请求
+     *
+     * @return requrst
+     * @throws UnsupportedOperationException unsupported operation
      */
     protected Request pick() {
         throw new UnsupportedOperationException("请实现此方法");
@@ -214,6 +214,9 @@ public abstract class Worker extends Thread {
 
     /**
      * 执行业务流程
+     *
+     * @param request request
+     * @throws Exception exception
      */
     protected abstract void doWork(Request request) throws Exception;
 

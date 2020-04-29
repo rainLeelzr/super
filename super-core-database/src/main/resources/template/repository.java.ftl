@@ -7,7 +7,7 @@ import ${cfg.criteriaPackageName}.${entity}Criteria;
 import ${cfg.entityPackageName}.${entity};
 import ${cfg.mapperPackageName}.${entity}Mapper;
 import ${cfg.entityDbPackageName}.${entity}Db;
-import ${cfg.package}.core.database.mybatisplus.plus.MybatisPlusRepository;
+import vip.isass.core.database.mybatisplus.plus.MybatisPlusRepository;
 
 /**
  * <p>
