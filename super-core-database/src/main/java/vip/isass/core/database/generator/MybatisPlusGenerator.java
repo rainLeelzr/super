@@ -225,20 +225,14 @@ public class MybatisPlusGenerator {
 
     @SneakyThrows
     public static void generate(MybatisPlusGeneratorMeta meta) {
-        ITypeConvert typeConvert = null;
-        try {
-            typeConvert = (ITypeConvert) Class.forName("vip.isass.core.database.postgresql.convert.PostgreSqlTypeConvert").newInstance();
-        } catch (Exception e) {
-            log.warn("找不到vip.isass.core.database.postgresql.convert.PostgreSqlTypeConvert");
-        }
+
 
         // 数据源配置
         DataSourceConfig dataSourceConfig = new DataSourceConfig()
             .setDbType(meta.getDbType())
             .setUrl(meta.getDataSourceUrl())
             .setUsername(meta.getDataSourceUserName())
-            .setPassword(meta.getDataSourcePassword())
-            .setTypeConvert(typeConvert);
+            .setPassword(meta.getDataSourcePassword());
         switch (meta.getDbType()) {
             case MYSQL:
                 dataSourceConfig.setDriverName("com.mysql.jdbc.Driver");
@@ -257,6 +251,14 @@ public class MybatisPlusGenerator {
                 break;
             case POSTGRE_SQL:
                 dataSourceConfig.setDriverName("org.postgresql.Driver");
+
+                ITypeConvert typeConvert;
+                try {
+                    typeConvert = (ITypeConvert) Class.forName("vip.isass.core.database.postgresql.convert.PostgreSqlTypeConvert").newInstance();
+                    dataSourceConfig.setTypeConvert(typeConvert);
+                } catch (Exception e) {
+                    log.warn("找不到vip.isass.core.database.postgresql.convert.PostgreSqlTypeConvert");
+                }
                 break;
             case SQL_SERVER2005:
                 break;
