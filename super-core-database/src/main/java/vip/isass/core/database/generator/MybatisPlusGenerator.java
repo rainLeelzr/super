@@ -176,6 +176,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.InjectionConfig;
 import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
 import com.baomidou.mybatisplus.generator.config.po.TableFill;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
@@ -236,6 +237,7 @@ public class MybatisPlusGenerator {
         switch (meta.getDbType()) {
             case MYSQL:
                 dataSourceConfig.setDriverName("com.mysql.jdbc.Driver");
+                dataSourceConfig.setTypeConvert(new MySqlTypeConvert());
                 break;
             case MARIADB:
                 break;

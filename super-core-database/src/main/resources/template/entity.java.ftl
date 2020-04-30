@@ -185,12 +185,12 @@ public class ${entity} implements
 <#-- 当主键字段名与默认主键字段名不一致时，添加默认主键字段名的get、set方法 -->
 <#if idEntityColumnName != cfg.idEntity.ID_COLUMN_NAME>
     @Override
-    public String getId() {
+    public ${idEntityPropertyType} getId() {
         return this.${idEntityPropertyName};
     }
 
     @Override
-    public ${entity} setId(String id) {
+    public ${entity} setId(${idEntityPropertyType} id) {
         this.${idEntityPropertyName} = id;
         return this;
     }
@@ -204,7 +204,7 @@ public class ${entity} implements
 
     @Override
     public ${entity} randomId() {
-        setId(LongSequence.get()<#if idEntityPropertyType == "String">.toString()</#if>);
+        setId(LongSequence.get()<#if idEntityPropertyType == "String">.toString()<#elseif idEntityPropertyType == "Integer">.intValue()</#if>);
         return this;
     }
 

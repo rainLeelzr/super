@@ -9,6 +9,8 @@ import lombok.Getter;
 import ${cfg.entityPackageName}.${entity};
 <#if isIdEntity>
 import vip.isass.core.criteria.IdCriteria;
+<#else>
+import vip.isass.core.criteria.AbstractCriteria;
 </#if>
 <#list table.fields as field>
 <#if field.propertyType == "Json">
@@ -49,7 +51,7 @@ import java.util.Collection;
  * @author ${author}
  */
 @Getter
-public class ${entity}Criteria extends <#if isIdEntity>IdCriteria<${entity}Criteria, ${entity}, ${idEntityPropertyType}></#if> {
+public class ${entity}Criteria extends <#if isIdEntity>IdCriteria<${entity}Criteria, ${entity}, ${idEntityPropertyType}><#else>AbstractCriteria<${entity}Criteria, ${entity}></#if> {
 
 <#---------- BEGIN 添加成员变量 ------------>
 <#list table.fields as field>

@@ -182,7 +182,7 @@
     <!-- 本项目信息 -->
     <groupId>vip.isass</groupId>
     <artifactId>super</artifactId>
-    <version>super.3.0.0-release</version>
+    <version>super.3.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -220,31 +220,31 @@
 
         <!-- start isass-core -->
 
-        <super-core.version>super.3.0.0-release</super-core.version>
-        <core-cache.version>super.3.0.0-release</core-cache.version>
-        <core-database.version>super.3.0.0-release</core-database.version>
-        <core-database-mybatisplus.version>super.3.0.0-release</core-database-mybatisplus.version>
-        <core-database-mybatisplus-postgresql.version>super.3.0.0-release
+        <super-core.version>super.3.0.2-SNAPSHOT</super-core.version>
+        <core-cache.version>super.3.0.2-SNAPSHOT</core-cache.version>
+        <core-database.version>super.3.0.2-SNAPSHOT</core-database.version>
+        <core-database-mybatisplus.version>super.3.0.2-SNAPSHOT</core-database-mybatisplus.version>
+        <core-database-mybatisplus-postgresql.version>super.3.0.2-SNAPSHOT
         </core-database-mybatisplus-postgresql.version>
-        <core-database-mysql.version>super.3.0.0-release</core-database-mysql.version>
-        <core-database-postgresql.version>super.3.0.0-release</core-database-postgresql.version>
-        <core-database-querydsl.version>super.3.0.0-release</core-database-querydsl.version>
-        <core-database-sharding-jdbc.version>super.3.0.0-release</core-database-sharding-jdbc.version>
-        <core-elasticsearch.version>super.3.0.0-release</core-elasticsearch.version>
-        <core-encryption.version>super.3.0.0-release</core-encryption.version>
-        <core-mq.version>super.3.0.0-release</core-mq.version>
-        <core-mq-ons.version>super.3.0.0-release</core-mq-ons.version>
-        <core-net.version>super.3.0.0-release</core-net.version>
-        <core-net-tcp.version>super.3.0.0-release</core-net-tcp.version>
-        <core-net-websocket.version>super.3.0.0-release</core-net-websocket.version>
-        <core-protobuf.version>super.3.0.0-release</core-protobuf.version>
-        <core-web.version>super.3.0.0-release</core-web.version>
-        <core-web-res.version>super.3.0.0-release</core-web-res.version>
-        <core-web-rpc-feign.version>super.3.0.0-release</core-web-rpc-feign.version>
-        <core-web-security.version>super.3.0.0-release</core-web-security.version>
-        <core-web-swagger.version>super.3.0.0-release</core-web-swagger.version>
-        <core-mongobd.version>super.3.0.0-release</core-mongobd.version>
-        <core-database-listener.version>super.3.0.0-release</core-database-listener.version>
+        <core-database-mysql.version>super.3.0.2-SNAPSHOT</core-database-mysql.version>
+        <core-database-postgresql.version>super.3.0.2-SNAPSHOT</core-database-postgresql.version>
+        <core-database-querydsl.version>super.3.0.2-SNAPSHOT</core-database-querydsl.version>
+        <core-database-sharding-jdbc.version>super.3.0.2-SNAPSHOT</core-database-sharding-jdbc.version>
+        <core-elasticsearch.version>super.3.0.2-SNAPSHOT</core-elasticsearch.version>
+        <core-encryption.version>super.3.0.2-SNAPSHOT</core-encryption.version>
+        <core-mq.version>super.3.0.2-SNAPSHOT</core-mq.version>
+        <core-mq-ons.version>super.3.0.2-SNAPSHOT</core-mq-ons.version>
+        <core-net.version>super.3.0.2-SNAPSHOT</core-net.version>
+        <core-net-tcp.version>super.3.0.2-SNAPSHOT</core-net-tcp.version>
+        <core-net-websocket.version>super.3.0.2-SNAPSHOT</core-net-websocket.version>
+        <core-protobuf.version>super.3.0.2-SNAPSHOT</core-protobuf.version>
+        <core-web.version>super.3.0.2-SNAPSHOT</core-web.version>
+        <core-web-res.version>super.3.0.2-SNAPSHOT</core-web-res.version>
+        <core-web-rpc-feign.version>super.3.0.2-SNAPSHOT</core-web-rpc-feign.version>
+        <core-web-security.version>super.3.0.2-SNAPSHOT</core-web-security.version>
+        <core-web-swagger.version>super.3.0.2-SNAPSHOT</core-web-swagger.version>
+        <core-mongobd.version>super.3.0.2-SNAPSHOT</core-mongobd.version>
+        <core-database-listener.version>super.3.0.2-SNAPSHOT</core-database-listener.version>
 
         <!-- end isass-core -->
 
@@ -888,7 +888,7 @@
                         <configuration>
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
 
