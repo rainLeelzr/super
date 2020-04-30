@@ -191,7 +191,7 @@ public class IdCriteria<
     PK extends Serializable>
     extends AbstractCriteria<E, C> {
 
-    /************************************************** id **************************************************/
+    //************************************************** id **************************************************//
 
     private PK id;
 
@@ -217,12 +217,8 @@ public class IdCriteria<
 
     private String orIdStartWith;
 
-    /************************************************** id setter **************************************************/
+    //************************************************** id setter **************************************************//
 
-    /**
-     * @param id id
-     * @return this object
-     */
     @SuppressWarnings("unchecked")
     public C setId(PK id) {
         this.id = id;
