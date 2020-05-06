@@ -167,14 +167,49 @@
  *
  */
 
-package vip.isass.core.support;
+package vip.isass.core.support.api;
 
-public interface ApiOrder {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    int CACHE_SERVICE = 10;
+import java.util.Collection;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-    int LOCAL_SERVICE = 20;
+/**
+ * @author isass
+ */
+public interface ApiService {
 
-    int FEIGN_SERVICE = 30;
+    Logger LOGGER = LoggerFactory.getLogger(ApiService.class);
+
+    default <S, V> V apply(Collection<S> services, Function<S, V> function) {
+        if (services == null) {
+            throw new UnsupportedOperationException("当前环境没有" + this.getClass().getSimpleName());
+        }
+
+        for (S service : services) {
+            V value = function.apply(service);
+            if (value != null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    default <S, V> void consume(Collection<S> services, Consumer<S> consumer) {
+        if (services == null) {
+            throw new UnsupportedOperationException();
+        }
+
+        for (S service : services) {
+            try {
+                consumer.accept(service);
+                return;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+        }
+    }
 
 }
