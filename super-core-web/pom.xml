@@ -183,8 +183,11 @@
     <artifactId>super-core-web</artifactId>
     <version>super.3.0.2-SNAPSHOT</version>
 
-    <dependencies>
+    <properties>
+        <deploy.skip>true</deploy.skip>
+    </properties>
 
+    <dependencies>
         <dependency>
             <groupId>vip.isass</groupId>
             <artifactId>super-core</artifactId>
@@ -221,8 +224,19 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
-
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>${deploy.skip}</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <repositories>
         <repository>

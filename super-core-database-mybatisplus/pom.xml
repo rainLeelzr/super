@@ -183,6 +183,10 @@
     <artifactId>super-core-database-mybatisplus</artifactId>
     <version>super.3.0.2-SNAPSHOT</version>
 
+    <properties>
+        <deploy.skip>true</deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>vip.isass</groupId>
@@ -213,8 +217,19 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
         </dependency>
-
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>${deploy.skip}</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <repositories>
         <repository>

@@ -183,6 +183,10 @@
     <artifactId>super-core</artifactId>
     <version>super.3.0.2-SNAPSHOT</version>
 
+    <properties>
+        <deploy.skip>false</deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -208,7 +212,6 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-core</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -218,6 +221,14 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>${deploy.skip}</skip>
                 </configuration>
             </plugin>
         </plugins>
