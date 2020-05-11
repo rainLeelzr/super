@@ -176,9 +176,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import vip.isass.core.entity.Json;
 import vip.isass.core.support.json.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -196,7 +198,8 @@ public class JsonUtil {
         .addSerializer(LocalTime.class, new StdDelegatingSerializer(new LocalTimeToLongConvert()))
         .addDeserializer(LocalTime.class, new StdDelegatingDeserializer<>(new LongToLocalTimeConvert()))
         .addDeserializer(Json.class, new StdDelegatingDeserializer<>(new ObjectToJsonConvert()))
-        .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new StringToLocalDateTimeConvert()));
+        .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new StringToLocalDateTimeConvert()))
+        .addSerializer(BigDecimal.class, ToStringSerializer.instance);
 
     public static final ObjectMapper DEFAULT_INSTANCE = new ObjectMapper()
         // 当实体类中不含有 json 字符串的某些字段时，不抛出异常
