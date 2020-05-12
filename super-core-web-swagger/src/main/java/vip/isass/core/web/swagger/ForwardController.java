@@ -183,9 +183,39 @@ public class ForwardController {
         return "forward:/swagger-resources";
     }
 
+    @GetMapping("/${spring.application.name}/swagger-resources/configuration/ui")
+    public String forwardSwaggerResourcesConfigurationUi() {
+        return "forward:/swagger-resources/configuration/ui";
+    }
+
+    @GetMapping("/${spring.application.name}/v2/api-docs")
+    public String forwardV2ApiDocs() {
+        return "forward:/v2/api-docs";
+    }
+
     @GetMapping("/${spring.application.name}/v2/api-docs-ext")
     public String forwardV2ApiDocsExt() {
         return "forward:/v2/api-docs-ext";
+    }
+
+    @GetMapping("/${spring.application.name}/doc.html")
+    public String forwardDocHtml() {
+        return "forward:/doc.html";
+    }
+
+    @GetMapping("/${spring.application.name}/webjars/css/app.3167b4c3.css")
+    public String forwardWebjarsCssApp() {
+        return "forward:/webjars/css/app.3167b4c3.css";
+    }
+
+    @GetMapping("/${spring.application.name}/webjars/js/app.e4826b43.js")
+    public String forwardWebjarsJsApp() {
+        return "forward:/webjars/js/app.e4826b43.js";
+    }
+
+    @GetMapping("/${spring.application.name}/webjars/js/chunk-vendors.86544bae.js")
+    public String forwardWebjarsJsChunkVendors() {
+        return "forward:/webjars/js/chunk-vendors.86544bae.js";
     }
 
 }
