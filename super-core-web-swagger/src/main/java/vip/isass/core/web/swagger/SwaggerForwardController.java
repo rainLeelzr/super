@@ -176,7 +176,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @author Rain
  */
 @Controller
-public class ForwardController {
+public class SwaggerForwardController {
 
     @GetMapping("/${spring.application.name}/swagger-resources")
     public String forwardSwaggerResources() {
