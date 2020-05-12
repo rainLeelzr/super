@@ -177,7 +177,6 @@ import org.springframework.security.core.AuthenticationException;
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
 import vip.isass.core.login.DefaultLoginUser;
-import vip.isass.core.web.security.IJwtService;
 import vip.isass.core.web.security.authentication.AbstractAuthenticationFilter;
 
 import javax.servlet.FilterChain;

@@ -167,7 +167,7 @@
  *
  */
 
-package vip.isass.core.web.security;
+package vip.isass.core.web.security.authentication.jwt;
 
 import java.util.List;
 import java.util.Map;

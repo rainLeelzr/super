@@ -180,7 +180,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import vip.isass.core.web.security.IJwtService;
+import vip.isass.core.web.security.authentication.jwt.IJwtService;
 import vip.isass.core.web.security.authentication.jwt.JwtAuthenticationFilter;
 import vip.isass.core.web.security.authentication.jwt.TerminalOnlineConfiguration;
 import vip.isass.core.web.security.authentication.ms.MsAuthenticationFilter;

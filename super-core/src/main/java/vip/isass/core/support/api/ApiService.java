@@ -199,7 +199,7 @@ public interface ApiService {
 
     default <S, V> void consume(Collection<S> services, Consumer<S> consumer) {
         if (services == null) {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("当前环境没有" + this.getClass().getSimpleName());
         }
 
         for (S service : services) {
