@@ -226,8 +226,6 @@ public class MybatisPlusGenerator {
 
     @SneakyThrows
     public static void generate(MybatisPlusGeneratorMeta meta) {
-
-
         // 数据源配置
         DataSourceConfig dataSourceConfig = new DataSourceConfig()
             .setDbType(meta.getDbType())
@@ -236,7 +234,7 @@ public class MybatisPlusGenerator {
             .setPassword(meta.getDataSourcePassword());
         switch (meta.getDbType()) {
             case MYSQL:
-                dataSourceConfig.setDriverName("com.mysql.jdbc.Driver");
+                dataSourceConfig.setDriverName("com.mysql.cj.jdbc.Driver");
                 dataSourceConfig.setTypeConvert(new MySqlTypeConvert());
                 break;
             case MARIADB:
