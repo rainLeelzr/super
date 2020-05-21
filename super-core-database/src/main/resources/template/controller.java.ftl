@@ -23,7 +23,7 @@ import javax.annotation.Resource;
 public class ${table.controllerName} implements IController<${entity}> {
 
     @Resource
-    private ${cfg.prefix?capFirst}${entity}Service ${cfg.prefix}${entity}Service;
+    private ${cfg.prefix?capFirst}${table.serviceName} ${cfg.prefix}${table.serviceName};
 
     @Resource
     private ${table.serviceName} ${table.serviceName?uncapFirst};
