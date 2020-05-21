@@ -169,6 +169,7 @@
 
 package vip.isass.core.web.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import vip.isass.core.exception.IExceptionMapping;
@@ -186,6 +187,7 @@ import java.util.List;
  *
  * @author Rain
  */
+@Slf4j
 @RestControllerAdvice
 public class ExceptionAdvice {
 
@@ -197,12 +199,13 @@ public class ExceptionAdvice {
      */
     @ExceptionHandler(Exception.class)
     private Resp<?> exceptionHandler(Exception e) {
+        log.error(e.getMessage(), e);
         if (e instanceof UnifiedException) {
             UnifiedException exception = (UnifiedException) e;
             return new Resp<>()
-                    .setSuccess(false)
-                    .setStatus(exception.getStatus())
-                    .setMessage(exception.getMsg());
+                .setSuccess(false)
+                .setStatus(exception.getStatus())
+                .setMessage(exception.getMsg());
         }
 
         Class<? extends Exception> aClass = e.getClass();
@@ -210,16 +213,16 @@ public class ExceptionAdvice {
             IStatusMessage statusMessage = exceptionMapping.getStatusCode(aClass);
             if (statusMessage != null) {
                 return new Resp<>()
-                        .setSuccess(false)
-                        .setStatus(statusMessage.getStatus())
-                        .setMessage(statusMessage.getMsg() + ((e.getMessage() == null) ? "" : (": " + e.getMessage())));
+                    .setSuccess(false)
+                    .setStatus(statusMessage.getStatus())
+                    .setMessage(statusMessage.getMsg() + ((e.getMessage() == null) ? "" : (": " + e.getMessage())));
             }
         }
 
         return new Resp<>()
-                .setSuccess(false)
-                .setStatus(StatusMessageEnum.UNDEFINED.getStatus())
-                .setMessage(e.getClass().getSimpleName() + ((e.getMessage() == null) ? "" : (": " + e.getMessage())));
+            .setSuccess(false)
+            .setStatus(StatusMessageEnum.UNDEFINED.getStatus())
+            .setMessage(e.getClass().getSimpleName() + ((e.getMessage() == null) ? "" : (": " + e.getMessage())));
     }
 
 }
