@@ -173,17 +173,29 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
  * @author Rain
  */
+@Component
 public class DbEntityConvert {
+
+    private static String packageName;
+
+    @Resource
+    public void setPackageName(@Value("${info.package:}") String packageName) {
+        DbEntityConvert.packageName = packageName;
+    }
+
+    // key: entity; value: dbEntity
+    private static final Map<Class<?>, Class<?>> DB_ENTITY_MAP = new ConcurrentHashMap<>();
 
     /**
      * todo 改成 MapStruct 提高性能
@@ -200,7 +212,7 @@ public class DbEntityConvert {
             return (EDB) entity;
         }
 
-        Class<EDB> dbEntityClass = getDbEntityClass(entity.getClass());
+        Class<EDB> dbEntityClass = (Class<EDB>) getDbEntityClass(entity.getClass());
         if (dbEntityClass == null) {
             throw new UnsupportedOperationException(StrUtil.format("entity[{}]没有DbEntity的子类实现", entity.getClass().getName()));
         }
@@ -238,18 +250,22 @@ public class DbEntityConvert {
             .collect(Collectors.toList());
     }
 
-    private static Class getDbEntityClass(Class entityClass) {
-        Set<Class<?>> classes = ClassUtil.scanPackageBySuper("vip.isass", entityClass);
-        if (classes.isEmpty()) {
-            // classes = ClassUtil.scanPackageBySuper("com.sancaijia", entityClass);
-        }
-        if (classes.isEmpty()) {
-            return null;
-        }
-        return classes.stream()
-            .filter(DbEntity.class::isAssignableFrom)
-            .findFirst()
-            .orElse(null);
+    @SuppressWarnings("unchecked")
+    private static Class<?> getDbEntityClass(Class<?> entityClass) {
+        Class<?> aClass = DB_ENTITY_MAP.computeIfAbsent(entityClass, (k) -> {
+            Set<Class<?>> classes = ClassUtil.scanPackageBySuper("vip.isass", entityClass);
+            if (classes.isEmpty()) {
+                if (StrUtil.isNotBlank(packageName) && !"vip.isass".equals(packageName)) {
+                    classes = ClassUtil.scanPackageBySuper(packageName, entityClass);
+                }
+            }
+            return (Class<DbEntity<?, ?>>) classes.stream()
+                .filter(DbEntity.class::isAssignableFrom)
+                .findFirst()
+                .orElse(null);
+        });
+
+        return aClass;
     }
 
 }
