@@ -569,11 +569,11 @@ public class MybatisPlusGenerator {
             if (exist && configBuilder.getGlobalConfig().isFileOverride()) {
                 for (Pattern pattern : FILE_OVERRIDE_PATTERNS) {
                     if (pattern.matcher(filePath).matches()) {
-                        log.info(filePath + " --> {}", true);
+                        log.info(new File(filePath).getAbsolutePath() + " --> {}", true);
                         return true;
                     }
                 }
-                log.info(filePath + " --> {}", false);
+                log.info(new File(filePath).getAbsolutePath() + " --> {}", false);
                 // return false;
                 return true;
             } else {
