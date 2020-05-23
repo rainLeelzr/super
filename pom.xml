@@ -722,7 +722,7 @@
                 <artifactId>annotations</artifactId>
                 <version>${findbugs.version}</version>
             </dependency>
-    </dependencies>
+        </dependencies>
     </dependencyManagement>
 
     <dependencies>
@@ -949,16 +949,6 @@
             <name>aliyun maven</name>
             <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
         </repository>
-
-<!--        <repository>-->
-<!--            <id>isass-rdc-releases</id>-->
-<!--            <url>https://repo.rdc.aliyun.com/repository/119151-release-MRcouB/</url>-->
-<!--        </repository>-->
-
-<!--        <repository>-->
-<!--            <id>isass-rdc-snapshots</id>-->
-<!--            <url>https://repo.rdc.aliyun.com/repository/119151-snapshot-FUsqMk/</url>-->
-<!--        </repository>-->
 
         <repository>
             <id>center-snapshots</id>

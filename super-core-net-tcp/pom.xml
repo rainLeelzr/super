@@ -214,16 +214,6 @@
         </repository>
 
         <repository>
-            <id>isass-rdc-releases</id>
-            <url>https://repo.rdc.aliyun.com/repository/119151-release-MRcouB/</url>
-        </repository>
-
-        <repository>
-            <id>isass-rdc-snapshots</id>
-            <url>https://repo.rdc.aliyun.com/repository/119151-snapshot-FUsqMk/</url>
-        </repository>
-
-        <repository>
             <id>center-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
