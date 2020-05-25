@@ -176,6 +176,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import vip.isass.core.exception.code.IStatusMessage;
 import vip.isass.core.exception.code.StatusMessageEnum;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -191,6 +192,7 @@ public class BuildInCoreExceptionMapping implements IExceptionMapping {
         .put(UnsupportedOperationException.class, StatusMessageEnum.UN_SUPPORT_OPERATION)
         .put(MethodArgumentNotValidException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
         .put(ValidateException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
+        .put(IOException.class, StatusMessageEnum.IO_ERROR)
         .build();
 
     @Override

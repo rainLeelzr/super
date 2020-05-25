@@ -193,6 +193,7 @@ public enum StatusMessageEnum implements IStatusMessage {
     TOKEN_FORCE_OFFLINE(19, "强制下线"),
     VERIFICATION_CODE_ALREADY_SEND(20, "请勿重复发送验证码"),
     BAD_SQL_GRAMMAR(21, "sql错误"),
+    IO_ERROR(22, "io异常"),
 
     ACCESS_DENIED_403(403, "权限不足"),
     NOT_FOUND_404(404, "链接不存在"),
