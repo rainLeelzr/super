@@ -183,6 +183,15 @@ public class UnifiedException extends RuntimeException implements IStatusMessage
 
     private Integer status;
 
+    public UnifiedException(Throwable cause) {
+        super(cause);
+    }
+
+    public UnifiedException(Throwable cause, Integer status) {
+        super(cause);
+        this.status = status;
+    }
+
     public UnifiedException(IStatusMessage statusCode) {
         this(statusCode.getStatus(), statusCode.getMsg());
     }
