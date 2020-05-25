@@ -207,8 +207,8 @@ public class MybatisPlusMetaObjectHandler implements MetaObjectHandler {
         setFieldValByName(
             UserTracedEntity.CREATE_USER_NAME_PROPERTY,
             loginUser == null
-                ? StrUtil.subPre(Thread.currentThread().getName(), 16)
-                : StrUtil.nullToEmpty(StrUtil.subPre(loginUser.getNickName(), 16)),
+                ? StrUtil.subPre(Thread.currentThread().getName(), 32)
+                : StrUtil.nullToEmpty(StrUtil.subPre(loginUser.getNickName(), 32)),
             metaObject);
 
         // modifyUserId
@@ -221,8 +221,8 @@ public class MybatisPlusMetaObjectHandler implements MetaObjectHandler {
         // modifyUserName
         setFieldValByName(UserTracedEntity.MODIFY_USER_NAME_PROPERTY,
             loginUser == null
-                ? StrUtil.subPre(Thread.currentThread().getName(), 16)
-                : StrUtil.nullToEmpty(StrUtil.subPre(loginUser.getNickName(), 16)),
+                ? StrUtil.subPre(Thread.currentThread().getName(), 32)
+                : StrUtil.nullToEmpty(StrUtil.subPre(loginUser.getNickName(), 32)),
             metaObject);
 
         // createTime
