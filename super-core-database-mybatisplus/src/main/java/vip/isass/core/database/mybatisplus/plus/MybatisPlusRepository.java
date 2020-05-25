@@ -209,7 +209,12 @@ public abstract class MybatisPlusRepository<
     // ****************************** 增 start ******************************
     @Override
     public boolean add(E entity) {
-        return super.save(DbEntityConvert.convertToDbEntity(entity));
+        EDB edb = DbEntityConvert.convertToDbEntity(entity);
+        super.save(edb);
+        if (entity instanceof IdEntity) {
+            ((IdEntity) entity).setId(((IdEntity) edb).getId());
+        }
+        return true;
     }
 
     @Override
