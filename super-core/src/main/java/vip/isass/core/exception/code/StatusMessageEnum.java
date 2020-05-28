@@ -194,6 +194,7 @@ public enum StatusMessageEnum implements IStatusMessage {
     VERIFICATION_CODE_ALREADY_SEND(20, "请勿重复发送验证码"),
     BAD_SQL_GRAMMAR(21, "sql错误"),
     IO_ERROR(22, "io异常"),
+    FILE_NOT_FOUND(23, "文件不存在"),
 
     ACCESS_DENIED_403(403, "权限不足"),
     NOT_FOUND_404(404, "链接不存在"),

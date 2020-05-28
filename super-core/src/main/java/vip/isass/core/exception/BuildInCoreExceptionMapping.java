@@ -176,6 +176,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import vip.isass.core.exception.code.IStatusMessage;
 import vip.isass.core.exception.code.StatusMessageEnum;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -193,6 +194,7 @@ public class BuildInCoreExceptionMapping implements IExceptionMapping {
         .put(MethodArgumentNotValidException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
         .put(ValidateException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
         .put(IOException.class, StatusMessageEnum.IO_ERROR)
+        .put(FileNotFoundException.class, StatusMessageEnum.FILE_NOT_FOUND)
         .build();
 
     @Override
