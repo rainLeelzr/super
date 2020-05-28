@@ -191,7 +191,9 @@ public class UriMappingInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String mapping = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        response.addHeader(UriRequestMapping.MAPPING_KEY, uriPrefixProvider.getUriPrefix() + mapping);
+        response.addHeader(
+            UriRequestMapping.MAPPING_KEY,
+            request.getMethod().toUpperCase() + " " + uriPrefixProvider.getUriPrefix() + mapping);
         return true;
     }
 
