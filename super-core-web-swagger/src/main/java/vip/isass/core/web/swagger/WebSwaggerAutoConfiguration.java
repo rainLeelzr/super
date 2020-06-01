@@ -211,6 +211,9 @@ public class WebSwaggerAutoConfiguration {
     @Value("${info.service-name-cn:}")
     private String serviceNameCn;
 
+    @Value("${info.version:1.0.0}")
+    private String version;
+
     @Bean
     public Docket swaggerApi() {
         loggingSystem.setLogLevel(CachingOperationNameGenerator.class.getName(), LogLevel.WARN);
@@ -238,7 +241,7 @@ public class WebSwaggerAutoConfiguration {
             .description(serviceName + " | " + serviceNameCn + " | api接口文档，文档内容根据代码自动生成。")
             .termsOfServiceUrl("https://dev.ms.isass.vip/apidoc-service/doc.html?plus=1&cache=1&lang=zh")
             .contact(new Contact("rain", "https://www.isass.vip", "lizhirong100@163.com"))
-            .version("3.0")
+            .version(version)
             .build();
     }
 
