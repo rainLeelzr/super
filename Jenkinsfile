@@ -35,18 +35,6 @@ pipeline {
 
     post {
         always {
-            #sh """
-            #    curl -H "Content-Type:application/json" -X POST -d '{
-            #            "groupId": "sysmonitorgroup",
-            #            "type": 2,
-            #            "textCard": {
-            #                "title": "[${JOB_NAME}]部署${RESULT}",
-            #                "description": "作者：${AUTHORS}<br/>内容：${COMMIT_LOGS}",
-            #                "url": "${BUILD_URL}console",
-            #                "buttonText": "详情"
-            #            }
-            #        }' https://ms.isass.shop/message/enterprise-wechat/group-message
-            #    """
             deleteDir()
         }
     }
