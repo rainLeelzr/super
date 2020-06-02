@@ -173,6 +173,7 @@ import cn.hutool.core.io.IoUtil;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
@@ -192,19 +193,26 @@ public class FeignErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String methodKey, Response response) {
-        try (Reader reader = response.body().asReader(StandardCharsets.UTF_8)) {
-            String read = IoUtil.read(reader);
-            log.error("feign请求异常：{}, {}", methodKey, read);
-            Resp<?> resp = JsonUtil.DEFAULT_INSTANCE.readValue(read, Resp.class);
-            if (resp.getSuccess() == null
-                && resp.getMessage() == null
-                && resp.getData() == null) {
-                return new UnifiedException(StatusMessageEnum.FAIL, read);
+        HttpStatus httpStatus = HttpStatus.resolve(response.status());
+        if (httpStatus == HttpStatus.NOT_FOUND) {
+            throw new UnifiedException(StatusMessageEnum.NOT_FOUND_404);
+        } else if (httpStatus.is2xxSuccessful()) {
+            try (Reader reader = response.body().asReader(StandardCharsets.UTF_8)) {
+                String read = IoUtil.read(reader);
+                log.error("feign请求异常：{}, {}", methodKey, read);
+                Resp<?> resp = JsonUtil.DEFAULT_INSTANCE.readValue(read, Resp.class);
+                if (resp.getSuccess() == null
+                    && resp.getMessage() == null
+                    && resp.getData() == null) {
+                    return new UnifiedException(StatusMessageEnum.FAIL, read);
+                }
+                return new UnifiedException(resp.getStatus(), resp.getMessage());
+            } catch (IOException e) {
+                return new UnifiedException(StatusMessageEnum.FEIGN_ERROR, StatusMessageEnum.FEIGN_ERROR.getMsg() + " " + methodKey + " " + e.getMessage());
             }
-            return new UnifiedException(resp.getStatus(), resp.getMessage());
-        } catch (IOException e) {
-            return new UnifiedException(StatusMessageEnum.FEIGN_ERROR, StatusMessageEnum.FEIGN_ERROR.getMsg() + " " + methodKey + " " + e.getMessage());
         }
+
+        return new UnifiedException(StatusMessageEnum.FEIGN_ERROR, StatusMessageEnum.FEIGN_ERROR.getMsg() + " " + methodKey + " 被调用方返回状态码：" + httpStatus);
     }
 
 }
