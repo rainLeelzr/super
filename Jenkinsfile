@@ -10,20 +10,9 @@ pipeline {
     }
 
     stages {
-        stage('获取代码') {
-            when {
-                anyOf {
-                    branch 'master'
-                    branch 'dev'
-                    branch 'test'
-                    branch 'uat'
-                    branch 'pre'
-                    branch 'prod'
-                }
-            }
+        stage('重置环境') {
             steps {
-                deleteDir()
-                git([url: "${GIT_REPO}", branch: "${BRANCH_NAME}"])
+                sh "git checkout . && git clean -xdf"
             }
         }
 
@@ -40,11 +29,6 @@ pipeline {
             }
             steps {
                 sh "mvn -U -am clean deploy -DskipTests"
-            }
-            post {
-                failure {
-                    environment name: 'RESULT', value: "失败"
-                }
             }
         }
     }
