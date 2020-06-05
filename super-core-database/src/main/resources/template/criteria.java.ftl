@@ -55,7 +55,7 @@ public class ${entity}Criteria extends <#if isIdEntity>IdCriteria<${entity}Crite
 
 <#---------- BEGIN 添加成员变量 ------------>
 <#list table.fields as field>
-<#if field.name?lower_case == "id">
+<#if field.name?lower_case == cfg.idEntity.ID_COLUMN_NAME?lower_case>
 <#continue>
 </#if>
     //************************************************** ${field.propertyName} **************************************************//
