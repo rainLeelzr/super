@@ -101,7 +101,7 @@ public class ${entity} implements
 <#------------ END 定义公共字段 ------------>
 <#------------ BEGIN 定义数据库字段名 ------------>
 <#list table.fields as field>
-<#if field.keyFlag && idEntityColumnName != cfg.idEntity.ID_COLUMN_NAME>
+<#if field.keyFlag && idEntityColumnName?lower_case != cfg.idEntity.ID_COLUMN_NAME?lower_case>
     public transient static final String ID = "${idEntityColumnName}";
 
 </#if>
