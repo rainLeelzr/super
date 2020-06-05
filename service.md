@@ -38,11 +38,12 @@
 # 第3方服务
 |  名称 | 端口 |
 |  --- | --- |
+|  jenkins | 30001 |
 |  elasticsearch | 30010 |
-|  nacos | 30040 |
 |  redis | 30020 |
 |  mysql | 30030 |
-|  postgresql | 5432 |
-|  jenkins | 30001 |
+|  nacos | 30040 |
+|  rancher | http30050,https30051 |
+|  postgresql | 30060 |
 |  oap | 11800 |
 |  oapui | 8080 |
