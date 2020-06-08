@@ -34,6 +34,7 @@
 |  isass-service-demo| http:20310 |
 |  isass-service-attachment| http:20320 |
 |  isass-service-log| http:20330 |
+|  isass-doc| http:20340 |
 
 # 第3方服务
 |  名称 | 端口 |
