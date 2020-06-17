@@ -35,6 +35,7 @@
 |  isass-service-attachment| http:20320 |
 |  isass-service-log| http:20330 |
 |  isass-doc| http:20340 |
+|  isass-service-tag| http:20350 |
 
 # 第3方服务
 |  名称 | 端口 |
