@@ -170,13 +170,15 @@
 package vip.isass.core.support;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.NumberSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import vip.isass.core.entity.Json;
 import vip.isass.core.support.json.*;
 
@@ -190,6 +192,7 @@ import java.time.LocalTime;
  */
 public class JsonUtil {
 
+    @SuppressWarnings("unchecked")
     public static SimpleModule simpleModule = new SimpleModule()
         .addSerializer(LocalDateTime.class, new StdDelegatingSerializer(new LocalDateTimeToLongConvert()))
         .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new LongToLocalDateTimeConvert()))
@@ -199,7 +202,7 @@ public class JsonUtil {
         .addDeserializer(LocalTime.class, new StdDelegatingDeserializer<>(new LongToLocalTimeConvert()))
         .addDeserializer(Json.class, new StdDelegatingDeserializer<>(new ObjectToJsonConvert()))
         .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new StringToLocalDateTimeConvert()))
-        .addSerializer(BigDecimal.class, ToStringSerializer.instance);
+        .addSerializer(BigDecimal.class, (JsonSerializer<BigDecimal>) NumberSerializer.bigDecimalAsStringSerializer());
 
     public static final ObjectMapper DEFAULT_INSTANCE = new ObjectMapper()
         // 当实体类中不含有 json 字符串的某些字段时，不抛出异常
@@ -210,6 +213,9 @@ public class JsonUtil {
 
         // BigDecimal 精度
         .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
+
+        // 禁用科学计数法
+        .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
 
         .registerModule(simpleModule);
 
@@ -222,6 +228,9 @@ public class JsonUtil {
 
         // BigDecimal 精度
         .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
+
+        // 禁用科学计数法
+        .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
 
         // 只输出非 null 字段
         .setSerializationInclusion(JsonInclude.Include.NON_NULL)
