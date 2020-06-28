@@ -121,7 +121,7 @@ public class ${entity} implements
      */
 <#-- 乐观锁注解 -->
 <#-- 逻辑删除注解 -->
-    private <#if field.comment!?contains("${enumStart}")>${field.capitalName} <#else>${field.propertyType} </#if>${field.propertyName};
+    private <#if field.comment!?contains("${enumStart}")>${field.propertyName?cap_first} <#else>${field.propertyType} </#if>${field.propertyName};
 
 </#list>
 <#---------- END 定义字段 ---------->
@@ -131,7 +131,7 @@ public class ${entity} implements
         <#assign start = field.comment?index_of("${enumStart}") + 5>
         <#assign end = field.comment?index_of("]", start)>
         <#assign enumStringArr = field.comment?substring(start, end)?split(";")>
-    public enum ${field.capitalName} {
+    public enum ${field.propertyName?cap_first} {
 
 <#list enumStringArr as enumString>
 <#assign enumArr = enumString?split(":")>
@@ -143,7 +143,7 @@ public class ${entity} implements
         @Getter
         private String desc;
 
-        ${field.capitalName}(Integer code, String desc) {
+        ${field.propertyName?cap_first}(Integer code, String desc) {
             this.code = code;
             this.desc = desc;
         }
@@ -154,8 +154,8 @@ public class ${entity} implements
         }
 
         @JsonCreator
-        public static ${field.capitalName} parseFromCode(Integer code) {
-            for (${field.capitalName} ${field.propertyName} : ${field.capitalName}.values()) {
+        public static ${field.propertyName?cap_first} parseFromCode(Integer code) {
+            for (${field.propertyName?cap_first} ${field.propertyName} : ${field.propertyName?cap_first}.values()) {
                 if (${field.propertyName}.code.equals(code)) {
                     return ${field.propertyName};
                 }
@@ -163,16 +163,16 @@ public class ${entity} implements
             return null;
         }
 
-        public static ${field.capitalName} parseFromCodeOrException(Integer code) {
-            ${field.capitalName} ${field.propertyName} = parseFromCode(code);
+        public static ${field.propertyName?cap_first} parseFromCodeOrException(Integer code) {
+            ${field.propertyName?cap_first} ${field.propertyName} = parseFromCode(code);
             if (${field.propertyName} == null) {
-                throw new IllegalArgumentException("不支持的参数：${field.capitalName}.code: " + code);
+                throw new IllegalArgumentException("不支持的参数：${field.propertyName?cap_first}.code: " + code);
             }
             return ${field.propertyName};
         }
 
-        public static ${field.capitalName} random() {
-            return values()[RandomUtil.randomInt(${field.capitalName}.values().length)];
+        public static ${field.propertyName?cap_first} random() {
+            return values()[RandomUtil.randomInt(${field.propertyName?cap_first}.values().length)];
         }
 
     }
@@ -259,18 +259,18 @@ public class ${entity} implements
     <#if field.propertyType == "Collection<String>"><#continue></#if>
     <#if buildInColumns?seq_contains(field.name)><#continue></#if>
     <#if field.propertyType == "LocalTime">
-        set${field.capitalName}(LocalDateTimeUtil.nowLocalTime());
+        set${field.propertyName?cap_first}(LocalDateTimeUtil.nowLocalTime());
         <#continue>
     </#if>
     <#if field.propertyType == "LocalDate">
-        set${field.capitalName}(LocalDateTimeUtil.nowLocalDate());
+        set${field.propertyName?cap_first}(LocalDateTimeUtil.nowLocalDate());
         <#continue>
     </#if>
     <#if field.propertyType == "LocalDateTime">
-        set${field.capitalName}(LocalDateTimeUtil.now());
+        set${field.propertyName?cap_first}(LocalDateTimeUtil.now());
         <#continue>
     </#if>
-        set${field.capitalName}(<#if field.comment!?contains("${enumStart}")>${field.capitalName}.random()<#else>random${field.propertyType}()</#if>);
+        set${field.propertyName?cap_first}(<#if field.comment!?contains("${enumStart}")>${field.propertyName?cap_first}.random()<#else>random${field.propertyType}()</#if>);
 </#list>
         return this;
     }

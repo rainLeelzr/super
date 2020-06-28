@@ -79,7 +79,7 @@ public class ${entity}Db extends ${entity} implements DbEntity<${entity}, ${enti
     || field.propertyName == cfg.timeTracedEntity.MODIFY_TIME_PROPERTY><#assign isOrmProperty = true>
     @TableField(fill = FieldFill.INSERT_UPDATE)
     </#if><#if isOrmProperty>
-    private <#if field.comment!?contains("${enumStart}")>${field.capitalName} <#else>${field.propertyType} </#if>${field.propertyName};
+    private <#if field.comment!?contains("${enumStart}")>${field.propertyName?cap_first} <#else>${field.propertyType} </#if>${field.propertyName};
 
 </#if>
 </#list>

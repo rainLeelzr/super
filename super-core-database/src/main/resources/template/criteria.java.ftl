@@ -51,7 +51,7 @@ import java.util.Collection;
  * @author ${author}
  */
 @Getter
-public class ${entity}Criteria extends <#if isIdEntity>IdCriteria<${entity}Criteria, ${entity}, ${idEntityPropertyType}><#else>AbstractCriteria<${entity}Criteria, ${entity}></#if> {
+public class ${entity}Criteria extends <#if isIdEntity>IdCriteria<${entity}Criteria, ${entity}, ${idEntityPropertyType}><#else>AbstractCriteria<${entity}, ${entity}Criteria></#if> {
 
 <#---------- BEGIN 添加成员变量 ------------>
 <#list table.fields as field>
