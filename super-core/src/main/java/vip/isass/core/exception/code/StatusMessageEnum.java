@@ -213,7 +213,7 @@ public enum StatusMessageEnum implements IStatusMessage {
 
     private Integer status;
 
-    private String msg;
+    private final String msg;
 
     StatusMessageEnum(Integer status, String msg) {
         this.status = status;

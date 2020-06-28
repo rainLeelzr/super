@@ -169,9 +169,11 @@
 
 package vip.isass.core.web.exception;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import vip.isass.core.exception.BuildInCoreExceptionMapping;
 import vip.isass.core.exception.IExceptionMapping;
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.IStatusMessage;
@@ -179,6 +181,7 @@ import vip.isass.core.exception.code.StatusMessageEnum;
 import vip.isass.core.web.Resp;
 
 import javax.annotation.Resource;
+import java.sql.Struct;
 import java.util.List;
 
 
@@ -208,15 +211,20 @@ public class ExceptionAdvice {
                 .setMessage(exception.getMsg());
         }
 
-        Class<? extends Exception> aClass = e.getClass();
         for (IExceptionMapping exceptionMapping : exceptionMappings) {
-            IStatusMessage statusMessage = exceptionMapping.getStatusCode(aClass);
-            if (statusMessage != null) {
-                return new Resp<>()
-                    .setSuccess(false)
-                    .setStatus(statusMessage.getStatus())
-                    .setMessage(statusMessage.getMsg() + ((e.getMessage() == null) ? "" : (": " + e.getMessage())));
+            IStatusMessage statusMessage = exceptionMapping.getStatusCode(e);
+            if (statusMessage == null) {
+                continue;
             }
+
+            String message = exceptionMapping.parseMessage(e);
+            return new Resp<>()
+                .setSuccess(false)
+                .setStatus(statusMessage.getStatus())
+                .setMessage(StrUtil.nullToDefault(
+                    message,
+                    statusMessage.getMsg() + ((e.getMessage() == null) ? "" : (": " + e.getMessage()))
+                ));
         }
 
         return new Resp<>()

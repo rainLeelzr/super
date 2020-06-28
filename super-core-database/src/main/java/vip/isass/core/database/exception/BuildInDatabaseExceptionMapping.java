@@ -193,7 +193,13 @@ public class BuildInDatabaseExceptionMapping implements IExceptionMapping {
         .build();
 
     @Override
-    public IStatusMessage getStatusCode(Class<? extends Exception> exception) {
-        return exceptionMapping.get(exception);
+    public IStatusMessage getStatusCode(Exception exception) {
+        return exceptionMapping.get(exception.getClass());
     }
+
+    @Override
+    public String parseMessage(Throwable e) {
+        return null;
+    }
+
 }

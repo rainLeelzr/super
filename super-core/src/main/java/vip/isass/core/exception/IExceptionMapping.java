@@ -169,6 +169,7 @@
 
 package vip.isass.core.exception;
 
+import ch.qos.logback.core.encoder.EchoEncoder;
 import vip.isass.core.exception.code.IStatusMessage;
 
 /**
@@ -176,6 +177,8 @@ import vip.isass.core.exception.code.IStatusMessage;
  */
 public interface IExceptionMapping {
 
-    IStatusMessage getStatusCode(Class<? extends Exception> exception);
+    IStatusMessage getStatusCode(Exception exception);
+
+    String parseMessage(Throwable e);
 
 }

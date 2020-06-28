@@ -171,14 +171,19 @@ package vip.isass.core.exception;
 
 import cn.hutool.core.exceptions.ValidateException;
 import cn.hutool.core.map.MapUtil;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import vip.isass.core.exception.code.IStatusMessage;
 import vip.isass.core.exception.code.StatusMessageEnum;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Rain
@@ -186,7 +191,7 @@ import java.util.Map;
 @Component
 public class BuildInCoreExceptionMapping implements IExceptionMapping {
 
-    private static Map<Class<? extends Exception>, IStatusMessage> exceptionMapping = MapUtil.<Class<? extends Exception>, IStatusMessage>builder()
+    private static final Map<Class<? extends Exception>, IStatusMessage> EXCEPTION_MAPPING = MapUtil.<Class<? extends Exception>, IStatusMessage>builder()
         .put(IllegalArgumentException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
         .put(AlreadyPresentException.class, StatusMessageEnum.ALREADY_PRESENT)
         .put(AbsentException.class, StatusMessageEnum.ABSENT)
@@ -195,10 +200,65 @@ public class BuildInCoreExceptionMapping implements IExceptionMapping {
         .put(ValidateException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
         .put(IOException.class, StatusMessageEnum.IO_ERROR)
         .put(FileNotFoundException.class, StatusMessageEnum.FILE_NOT_FOUND)
+        .put(BindException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
         .build();
 
     @Override
-    public IStatusMessage getStatusCode(Class<? extends Exception> exception) {
-        return exceptionMapping.get(exception);
+    public IStatusMessage getStatusCode(Exception exception) {
+        if (exception instanceof UndeclaredThrowableException) {
+            Throwable undeclaredThrowable = ((UndeclaredThrowableException) exception).getUndeclaredThrowable();
+            IStatusMessage iStatusMessage = EXCEPTION_MAPPING.get(undeclaredThrowable.getClass());
+            if (iStatusMessage != null) {
+                return iStatusMessage;
+            }
+        }
+
+        return EXCEPTION_MAPPING.get(exception.getClass());
     }
+
+    public String parseMessage(Throwable e) {
+        String message = null;
+        if (e instanceof BindException) {
+            message = parseMessage((BindException) e);
+        } else if (e instanceof UndeclaredThrowableException) {
+            message = parseMessage((UndeclaredThrowableException) e);
+        } else if (e instanceof IOException) {
+            message = parseMessage((IOException) e);
+        }
+        return message;
+    }
+
+    private String parseMessage(IOException e) {
+        return e.getMessage();
+    }
+
+    private String parseMessage(UndeclaredThrowableException e) {
+        Throwable undeclaredThrowable = e.getUndeclaredThrowable();
+        return parseMessage(undeclaredThrowable);
+    }
+
+    private String parseMessage(BindException e) {
+        return e.getAllErrors()
+            .stream()
+            .map(error -> {
+                StringBuilder sb = new StringBuilder();
+
+                sb.append(error.getObjectName());
+                sb.append("[");
+
+                Object[] args = error.getArguments();
+                if (args != null) {
+                    sb.append(Stream.of(args)
+                        .map(a -> (DefaultMessageSourceResolvable) a)
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                        .collect(Collectors.joining(", ")));
+                }
+
+                sb.append("]");
+                sb.append(error.getDefaultMessage());
+                return sb.toString();
+            })
+            .collect(Collectors.joining(", "));
+    }
+
 }
