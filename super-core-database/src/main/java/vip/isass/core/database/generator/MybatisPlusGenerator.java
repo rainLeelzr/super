@@ -234,7 +234,7 @@ public class MybatisPlusGenerator {
                 dataSourceConfig.setDriverName("com.mysql.cj.jdbc.Driver");
                 try {
                     dataSourceConfig.setTypeConvert(
-                        (ITypeConvert) Class.forName("vip.isass.core.database.mysql.IsassMysqlTypeConvert").newInstance());
+                        (ITypeConvert) Class.forName("vip.isass.core.database.mysql.IsassMySqlTypeConvert").newInstance());
                 } catch (Exception e) {
                     log.warn("找不到vip.isass.core.database.mysql.IsassMysqlTypeConvert");
                 }
