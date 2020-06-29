@@ -194,6 +194,7 @@
         <module>super-core-database-mysql</module>
         <module>super-core-database-postgresql</module>
         <module>super-core-database-mybatisplus-postgresql</module>
+        <module>super-core-database-mybatisplus-mysql</module>
         <module>super-core-database-sharding-jdbc</module>
         <module>super-core-mq</module>
         <module>super-core-mq-ons</module>
@@ -227,6 +228,8 @@
         <core-database-mybatisplus.version>super.3.0.2-SNAPSHOT</core-database-mybatisplus.version>
         <core-database-mybatisplus-postgresql.version>super.3.0.2-SNAPSHOT
         </core-database-mybatisplus-postgresql.version>
+        <core-database-mybatisplus-mysql.version>super.3.0.2-SNAPSHOT
+        </core-database-mybatisplus-mysql.version>
         <core-database-mysql.version>super.3.0.2-SNAPSHOT</core-database-mysql.version>
         <core-database-postgresql.version>super.3.0.2-SNAPSHOT</core-database-postgresql.version>
         <core-database-querydsl.version>super.3.0.2-SNAPSHOT</core-database-querydsl.version>
@@ -454,6 +457,12 @@
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-mybatisplus-postgresql</artifactId>
                 <version>${core-database-mybatisplus-postgresql.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-database-mybatisplus-mysql</artifactId>
+                <version>${core-database-mybatisplus-mysql.version}</version>
             </dependency>
 
             <dependency>

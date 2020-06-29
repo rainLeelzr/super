@@ -236,7 +236,7 @@ public class MybatisPlusGenerator {
                     dataSourceConfig.setTypeConvert(
                         (ITypeConvert) Class.forName("vip.isass.core.database.mysql.IsassMySqlTypeConvert").newInstance());
                 } catch (Exception e) {
-                    log.warn("找不到vip.isass.core.database.mysql.IsassMysqlTypeConvert");
+                    log.warn(e.getMessage(), e);
                 }
                 break;
             case MARIADB:
