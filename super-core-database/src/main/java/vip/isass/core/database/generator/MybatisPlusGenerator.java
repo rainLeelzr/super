@@ -176,7 +176,6 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.InjectionConfig;
 import com.baomidou.mybatisplus.generator.config.*;
-import com.baomidou.mybatisplus.generator.config.converts.MySqlTypeConvert;
 import com.baomidou.mybatisplus.generator.config.po.TableFill;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
@@ -221,9 +220,6 @@ public class MybatisPlusGenerator {
         Pattern.compile(".*/initDb.sql$")
     };
 
-    public static void main(String[] args) {
-    }
-
     @SneakyThrows
     public static void generate(MybatisPlusGeneratorMeta meta) {
         // 数据源配置
@@ -232,10 +228,16 @@ public class MybatisPlusGenerator {
             .setUrl(meta.getDataSourceUrl())
             .setUsername(meta.getDataSourceUserName())
             .setPassword(meta.getDataSourcePassword());
+
         switch (meta.getDbType()) {
             case MYSQL:
                 dataSourceConfig.setDriverName("com.mysql.cj.jdbc.Driver");
-                dataSourceConfig.setTypeConvert(new MySqlTypeConvert());
+                try {
+                    dataSourceConfig.setTypeConvert(
+                        (ITypeConvert) Class.forName("vip.isass.core.database.mysql.IsassMysqlTypeConvert").newInstance());
+                } catch (Exception e) {
+                    log.warn("找不到vip.isass.core.database.mysql.IsassMysqlTypeConvert");
+                }
                 break;
             case MARIADB:
                 break;
@@ -251,11 +253,9 @@ public class MybatisPlusGenerator {
                 break;
             case POSTGRE_SQL:
                 dataSourceConfig.setDriverName("org.postgresql.Driver");
-
-                ITypeConvert typeConvert;
                 try {
-                    typeConvert = (ITypeConvert) Class.forName("vip.isass.core.database.postgresql.convert.PostgreSqlTypeConvert").newInstance();
-                    dataSourceConfig.setTypeConvert(typeConvert);
+                    dataSourceConfig.setTypeConvert(
+                        (ITypeConvert) Class.forName("vip.isass.core.database.postgresql.convert.PostgreSqlTypeConvert").newInstance());
                 } catch (Exception e) {
                     log.warn("找不到vip.isass.core.database.postgresql.convert.PostgreSqlTypeConvert");
                 }
