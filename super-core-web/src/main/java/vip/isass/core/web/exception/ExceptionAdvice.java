@@ -169,6 +169,7 @@
 
 package vip.isass.core.web.exception;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -224,7 +225,7 @@ public class ExceptionAdvice {
         return new Resp<>()
             .setSuccess(false)
             .setStatus(StatusMessageEnum.UNDEFINED.getStatus())
-            .setMessage(defaultMessage(e));
+            .setMessage(defaultMessage(ExceptionUtil.unwrap(e)));
     }
 
     /**

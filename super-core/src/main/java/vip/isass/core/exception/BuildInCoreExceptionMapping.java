@@ -207,15 +207,8 @@ public class BuildInCoreExceptionMapping implements IExceptionMapping {
 
     @Override
     public IStatusMessage getStatusCode(Exception exception) {
-        if (exception instanceof UndeclaredThrowableException) {
-            Throwable undeclaredThrowable = ((UndeclaredThrowableException) exception).getUndeclaredThrowable();
-            IStatusMessage iStatusMessage = EXCEPTION_MAPPING.get(undeclaredThrowable.getClass());
-            if (iStatusMessage != null) {
-                return iStatusMessage;
-            }
-        }
-
-        return EXCEPTION_MAPPING.get(exception.getClass());
+        Throwable unwrap = ExceptionUtil.unwrap(exception);
+        return EXCEPTION_MAPPING.get(unwrap.getClass());
     }
 
     public String parseExceptionMessage(Throwable e) {
