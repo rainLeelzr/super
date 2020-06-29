@@ -169,7 +169,7 @@
 
 package vip.isass.core.exception;
 
-import ch.qos.logback.core.encoder.EchoEncoder;
+import cn.hutool.core.util.StrUtil;
 import vip.isass.core.exception.code.IStatusMessage;
 
 /**
@@ -179,6 +179,28 @@ public interface IExceptionMapping {
 
     IStatusMessage getStatusCode(Exception exception);
 
-    String parseMessage(Throwable e);
+    /**
+     * 从异常中格式化消息
+     *
+     * @param e 被抛出的异常
+     * @return 格式化后的消息
+     */
+    String parseExceptionMessage(Throwable e);
+
+    /**
+     * 格式化消息，此信息将被终端显示
+     *
+     * @param e 被抛出的异常
+     * @return 格式化后的消息
+     */
+    default String parseMessage(Throwable t, IStatusMessage statusMessage) {
+        if (StrUtil.isBlank(statusMessage.getMsg())) {
+            return this.parseExceptionMessage(t);
+        }
+
+        return statusMessage.getMsg().contains("{}")
+            ? StrUtil.format(statusMessage.getMsg(), StrUtil.nullToEmpty(this.parseExceptionMessage(t)))
+            : statusMessage.getMsg() + ((StrUtil.isBlank(t.getMessage())) ? "" : (": " + t.getMessage()));
+    }
 
 }

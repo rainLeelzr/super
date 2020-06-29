@@ -173,7 +173,6 @@ import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import vip.isass.core.exception.BuildInCoreExceptionMapping;
 import vip.isass.core.exception.IExceptionMapping;
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.IStatusMessage;
@@ -181,7 +180,6 @@ import vip.isass.core.exception.code.StatusMessageEnum;
 import vip.isass.core.web.Resp;
 
 import javax.annotation.Resource;
-import java.sql.Struct;
 import java.util.List;
 
 
@@ -217,20 +215,26 @@ public class ExceptionAdvice {
                 continue;
             }
 
-            String message = exceptionMapping.parseMessage(e);
             return new Resp<>()
                 .setSuccess(false)
                 .setStatus(statusMessage.getStatus())
-                .setMessage(StrUtil.nullToDefault(
-                    message,
-                    statusMessage.getMsg() + ((e.getMessage() == null) ? "" : (": " + e.getMessage()))
-                ));
+                .setMessage(exceptionMapping.parseMessage(e, statusMessage));
         }
 
         return new Resp<>()
             .setSuccess(false)
             .setStatus(StatusMessageEnum.UNDEFINED.getStatus())
-            .setMessage(e.getClass().getSimpleName() + ((e.getMessage() == null) ? "" : (": " + e.getMessage())));
+            .setMessage(defaultMessage(e));
+    }
+
+    /**
+     * 当没有 IExceptionMapping 时，从异常本身记录信息进行消息格式化
+     *
+     * @param t 被抛出的异常
+     * @return 格式化后的消息
+     */
+    private String defaultMessage(Throwable t) {
+        return t.getClass().getSimpleName() + ((t.getMessage() == null) ? "" : (": " + t.getMessage()));
     }
 
 }

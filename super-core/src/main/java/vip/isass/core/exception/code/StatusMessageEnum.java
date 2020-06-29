@@ -185,7 +185,7 @@ public enum StatusMessageEnum implements IStatusMessage {
     TOO_MANY_RESULT(11, "数据重复"),
     ALREADY_PRESENT(12, "数据已存在"),
     ABSENT(13, "数据不存在"),
-    UN_SUPPORT_OPERATION(14, "不支持该操作"),
+    UN_SUPPORT_OPERATION(14, "暂不支持该操作:{}"),
     JWT_TOKEN_ERROR(15, "token错误或过期"),
     UN_LOGIN(16, "未登录系统"),
     DUPLICATE_KEY(17, "key重复或冲突"),
@@ -203,7 +203,7 @@ public enum StatusMessageEnum implements IStatusMessage {
 
     // 用户名密码错误,
     USERNAME_PASSWORD_ERROR(1001, "用户名或密码错误"),
-    ILLEGAL_ARGUMENT_ERROR(1002, "参数错误"),
+    ILLEGAL_ARGUMENT_ERROR(1002, "参数错误:{}"),
     MOBILE_ABSENT(1003, "手机未注册"),
 
     URI_PARSE_ERROR(1003, "uri解析错误"),

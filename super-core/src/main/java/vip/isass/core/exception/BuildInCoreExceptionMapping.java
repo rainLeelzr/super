@@ -169,8 +169,10 @@
 
 package vip.isass.core.exception;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.exceptions.ValidateException;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindException;
@@ -216,25 +218,15 @@ public class BuildInCoreExceptionMapping implements IExceptionMapping {
         return EXCEPTION_MAPPING.get(exception.getClass());
     }
 
-    public String parseMessage(Throwable e) {
-        String message = null;
-        if (e instanceof BindException) {
+    public String parseExceptionMessage(Throwable e) {
+        String message;
+        Throwable unwrap = ExceptionUtil.unwrap(e);
+        if (unwrap instanceof BindException) {
             message = parseMessage((BindException) e);
-        } else if (e instanceof UndeclaredThrowableException) {
-            message = parseMessage((UndeclaredThrowableException) e);
-        } else if (e instanceof IOException) {
-            message = parseMessage((IOException) e);
+        } else {
+            message = e.getMessage();
         }
         return message;
-    }
-
-    private String parseMessage(IOException e) {
-        return e.getMessage();
-    }
-
-    private String parseMessage(UndeclaredThrowableException e) {
-        Throwable undeclaredThrowable = e.getUndeclaredThrowable();
-        return parseMessage(undeclaredThrowable);
     }
 
     private String parseMessage(BindException e) {
@@ -242,7 +234,6 @@ public class BuildInCoreExceptionMapping implements IExceptionMapping {
             .stream()
             .map(error -> {
                 StringBuilder sb = new StringBuilder();
-
                 sb.append(error.getObjectName());
                 sb.append("[");
 
@@ -256,6 +247,11 @@ public class BuildInCoreExceptionMapping implements IExceptionMapping {
 
                 sb.append("]");
                 sb.append(error.getDefaultMessage());
+
+                IStatusMessage statusCode = getStatusCode(e);
+                if (statusCode != null) {
+                    return StrUtil.format(statusCode.getMsg(), sb.toString());
+                }
                 return sb.toString();
             })
             .collect(Collectors.joining(", "));

@@ -198,7 +198,7 @@ public class BuildInDatabaseExceptionMapping implements IExceptionMapping {
     }
 
     @Override
-    public String parseMessage(Throwable e) {
+    public String parseExceptionMessage(Throwable e) {
         return null;
     }
 
