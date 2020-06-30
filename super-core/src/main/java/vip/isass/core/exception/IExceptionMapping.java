@@ -198,9 +198,10 @@ public interface IExceptionMapping {
             return this.parseExceptionMessage(t);
         }
 
+        String exceptionMessage = StrUtil.nullToEmpty(this.parseExceptionMessage(t));
         return statusMessage.getMsg().contains("{}")
-            ? StrUtil.format(statusMessage.getMsg(), StrUtil.nullToEmpty(this.parseExceptionMessage(t)))
-            : statusMessage.getMsg() + ((StrUtil.isBlank(t.getMessage())) ? "" : (": " + t.getMessage()));
+            ? StrUtil.format(statusMessage.getMsg(), exceptionMessage)
+            : statusMessage.getMsg() + StrUtil.prependIfMissing(exceptionMessage, ": ");
     }
 
 }
