@@ -169,6 +169,7 @@
 
 package vip.isass.core.database.exception;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.springframework.dao.DuplicateKeyException;
@@ -199,7 +200,8 @@ public class BuildInDatabaseExceptionMapping implements IExceptionMapping {
 
     @Override
     public String parseExceptionMessage(Throwable e) {
-        return null;
+        Throwable unwrap = ExceptionUtil.unwrap(e);
+        return unwrap.getMessage();
     }
 
 }

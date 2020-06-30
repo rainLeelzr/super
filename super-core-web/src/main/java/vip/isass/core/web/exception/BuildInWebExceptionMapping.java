@@ -169,10 +169,12 @@
 
 package vip.isass.core.web.exception;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import vip.isass.core.exception.IExceptionMapping;
 import vip.isass.core.exception.code.IStatusMessage;
 import vip.isass.core.exception.code.StatusMessageEnum;
@@ -188,6 +190,7 @@ public class BuildInWebExceptionMapping implements IExceptionMapping {
     private static Map<Class<? extends Exception>, IStatusMessage> exceptionMapping = MapUtil.<Class<? extends Exception>, IStatusMessage>builder()
         .put(HttpRequestMethodNotSupportedException.class, StatusMessageEnum.METHOD_NOT_ALLOWED_405)
         .put(HttpMessageNotReadableException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
+        .put(MissingServletRequestParameterException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
         .build();
 
     @Override
@@ -197,7 +200,8 @@ public class BuildInWebExceptionMapping implements IExceptionMapping {
 
     @Override
     public String parseExceptionMessage(Throwable e) {
-        return null;
+        Throwable unwrap = ExceptionUtil.unwrap(e);
+        return unwrap.getMessage();
     }
 
 }
