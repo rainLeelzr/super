@@ -171,6 +171,8 @@ package vip.isass.core.database.exception;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.StrUtil;
 import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -179,6 +181,7 @@ import vip.isass.core.exception.IExceptionMapping;
 import vip.isass.core.exception.code.IStatusMessage;
 import vip.isass.core.exception.code.StatusMessageEnum;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Map;
 
 /**
@@ -201,6 +204,17 @@ public class BuildInDatabaseExceptionMapping implements IExceptionMapping {
     @Override
     public String parseExceptionMessage(Throwable e) {
         Throwable unwrap = ExceptionUtil.unwrap(e);
+
+        if (unwrap instanceof DuplicateKeyException) {
+            DuplicateKeyException unwrap1 = (DuplicateKeyException) unwrap;
+            SQLIntegrityConstraintViolationException cause = (SQLIntegrityConstraintViolationException) unwrap1.getCause();
+            String message = cause.getMessage();
+            String msg = ReUtil.get("Duplicate entry '(.*)' for key '.*'", message, 1);
+            if (StrUtil.isNotBlank(msg)) {
+                return msg;
+            }
+        }
+
         return unwrap.getMessage();
     }
 

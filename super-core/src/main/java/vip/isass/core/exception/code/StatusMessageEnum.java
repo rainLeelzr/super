@@ -188,7 +188,7 @@ public enum StatusMessageEnum implements IStatusMessage {
     UN_SUPPORT_OPERATION(14, "暂不支持该操作:{}"),
     JWT_TOKEN_ERROR(15, "token错误或过期"),
     UN_LOGIN(16, "未登录系统"),
-    DUPLICATE_KEY(17, "key重复或冲突"),
+    DUPLICATE_KEY(17, "数据已存在"),
     FEIGN_ERROR(18, "feign请求异常"),
     TOKEN_FORCE_OFFLINE(19, "强制下线"),
     VERIFICATION_CODE_ALREADY_SEND(20, "请勿重复发送验证码"),
