@@ -195,6 +195,7 @@ public enum StatusMessageEnum implements IStatusMessage {
     BAD_SQL_GRAMMAR(21, "sql错误"),
     IO_ERROR(22, "io异常"),
     FILE_NOT_FOUND(23, "文件不存在"),
+    DATASOURCE_CONNECT_FAIL(24, "数据源连接失败"),
 
     ACCESS_DENIED_403(403, "权限不足"),
     NOT_FOUND_404(404, "链接不存在"),
