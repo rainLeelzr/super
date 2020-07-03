@@ -167,84 +167,20 @@
  *
  */
 
-package vip.isass.core.support;
+package vip.isass.core.support.json.serializer;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.NumberSerializer;
-import com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer;
-import vip.isass.core.entity.Json;
-import vip.isass.core.support.json.*;
-import vip.isass.core.support.json.serializer.DoubleSerializer;
-import vip.isass.core.support.json.serializer.FloatSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
-/**
- * @author Rain
- */
-public class JsonUtil {
+public class DoubleSerializer extends JsonSerializer<Double> {
 
-    @SuppressWarnings("unchecked")
-    public static SimpleModule simpleModule = new SimpleModule()
-        .addSerializer(LocalDateTime.class, new StdDelegatingSerializer(new LocalDateTimeToLongConvert()))
-        .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new LongToLocalDateTimeConvert()))
-        .addSerializer(LocalDate.class, new StdDelegatingSerializer(new LocalDateToLongConvert()))
-        .addDeserializer(LocalDate.class, new StdDelegatingDeserializer<>(new LongToLocalDateConvert()))
-        .addSerializer(LocalTime.class, new StdDelegatingSerializer(new LocalTimeToLongConvert()))
-        .addDeserializer(LocalTime.class, new StdDelegatingDeserializer<>(new LongToLocalTimeConvert()))
-        .addDeserializer(Json.class, new StdDelegatingDeserializer<>(new ObjectToJsonConvert()))
-        .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new StringToLocalDateTimeConvert()))
-        .addSerializer(BigDecimal.class, (JsonSerializer<BigDecimal>) NumberSerializer.bigDecimalAsStringSerializer())
-        .addSerializer(Double.class, new DoubleSerializer())
-        .addSerializer(double.class, new DoubleSerializer())
-        .addSerializer(Float.class, new FloatSerializer())
-        .addSerializer(float.class, new FloatSerializer());
-
-    public static final ObjectMapper DEFAULT_INSTANCE = new ObjectMapper()
-        // 当实体类中不含有 json 字符串的某些字段时，不抛出异常
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-
-        // 非 bean 对象不抛异常
-        .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-
-        // BigDecimal 精度
-        .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
-
-        // 禁用科学计数法
-        .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
-
-        .registerModule(simpleModule);
-
-    public static final ObjectMapper NOT_NULL_INSTANCE = new ObjectMapper()
-        // 当实体类中不含有 json 字符串的某些字段时，不抛出异常
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-
-        // 非 bean 对象不抛异常
-        .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-
-        // BigDecimal 精度
-        .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
-
-        // 禁用科学计数法
-        .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
-
-        // 只输出非 null 字段
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-
-        .registerModule(simpleModule);
-
-    public static Json fromObject(Object object) {
-        return new DefaultJson().fromObject(object);
+    @Override
+    public void serialize(Double value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        gen.writeNumber(new BigDecimal(value.toString()).toString());
     }
 
 }
