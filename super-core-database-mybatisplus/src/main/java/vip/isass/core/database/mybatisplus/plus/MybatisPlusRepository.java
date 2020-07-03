@@ -315,7 +315,10 @@ public abstract class MybatisPlusRepository<
     public E getByWrapperOrException(Wrapper<EDB> wrapper) {
         E entity = getByWrapper(wrapper);
         if (entity == null) {
-            throw new AbsentException(wrapper.getSqlSegment());
+            String values = wrapper == null
+                ? ""
+                : CollUtil.join(((QueryWrapper<EDB>) wrapper).getParamNameValuePairs().values(), ",");
+            throw new AbsentException(values);
         }
         return entity;
     }
@@ -406,7 +409,10 @@ public abstract class MybatisPlusRepository<
 
     public void exceptionIfPresentByWrapper(Wrapper<EDB> wrapper) {
         if (isPresentByWrapper(wrapper)) {
-            throw new AlreadyPresentException();
+            String values = wrapper == null
+                ? ""
+                : CollUtil.join(((QueryWrapper<EDB>) wrapper).getParamNameValuePairs().values(), ",");
+            throw new AlreadyPresentException(values);
         }
     }
 
@@ -417,7 +423,10 @@ public abstract class MybatisPlusRepository<
 
     public void exceptionIfAbsentByWrapper(Wrapper<EDB> wrapper) {
         if (!isPresentByWrapper(wrapper)) {
-            throw new AbsentException();
+            String values = wrapper == null
+                ? ""
+                : CollUtil.join(((QueryWrapper<EDB>) wrapper).getParamNameValuePairs().values(), ",");
+            throw new AbsentException(values);
         }
     }
 
