@@ -174,10 +174,10 @@ import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.core.Ordered;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 import vip.isass.core.exception.IStatusMapping;
 import vip.isass.core.exception.UnifiedException;
@@ -195,7 +195,7 @@ import java.util.Map;
 /**
  * @author Rain
  */
-@Controller
+@RestController
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 public class IsassErrorController implements ErrorController {
 
@@ -224,8 +224,7 @@ public class IsassErrorController implements ErrorController {
      * @param response response
      * @return resp
      */
-    @RequestMapping(value = PATH)
-    @ResponseBody
+    @RequestMapping(value = PATH, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Resp<?> errorJson(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> errorAttributes = getErrorAttributes(request, true);
         Object exception = errorAttributes.get(RequestDispatcher.ERROR_EXCEPTION);
