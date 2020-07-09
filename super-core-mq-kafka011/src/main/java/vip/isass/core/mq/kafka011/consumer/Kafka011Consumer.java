@@ -219,7 +219,7 @@ import java.util.concurrent.Executors;
 @Component
 public class Kafka011Consumer implements MqConsumer {
 
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(3);
 
     private EventListener eventListener;
 
