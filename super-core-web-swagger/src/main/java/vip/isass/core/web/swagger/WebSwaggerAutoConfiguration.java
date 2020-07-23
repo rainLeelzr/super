@@ -171,6 +171,7 @@ package vip.isass.core.web.swagger;
 
 import cn.hutool.core.collection.CollUtil;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.logging.LogLevel;
@@ -178,6 +179,7 @@ import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -217,12 +219,13 @@ public class WebSwaggerAutoConfiguration {
     @Bean
     public Docket swaggerApi() {
         loggingSystem.setLogLevel(CachingOperationNameGenerator.class.getName(), LogLevel.WARN);
-
         return new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(apiInfo())
             .select()
             // .apis(RequestHandlerSelectors.any())
-            .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
+            .apis(Predicates.or(
+                RequestHandlerSelectors.withClassAnnotation(RestController.class),
+                RequestHandlerSelectors.withClassAnnotation(Controller.class)))
             .paths(PathSelectors.any())
             .build()
             .securityContexts(CollUtil.newArrayList(
