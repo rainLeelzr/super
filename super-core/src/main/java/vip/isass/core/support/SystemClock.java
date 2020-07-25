@@ -179,7 +179,7 @@ import java.util.Date;
 @Slf4j
 public class SystemClock {
 
-    private static ISystemClock iSystemClock;
+    private volatile static ISystemClock iSystemClock;
 
     public static long now() {
         loadSystemClockImpl();
