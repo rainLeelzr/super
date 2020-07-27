@@ -167,106 +167,10 @@
  *
  */
 
-package vip.isass.core.entity;
+package vip.isass.core.support;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.StrUtil;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import vip.isass.core.support.IsassConfig;
+public interface IsassConfig {
 
-import javax.annotation.Resource;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-/**
- * @author Rain
- */
-@Component
-public class DbEntityConvert {
-
-    private static String packageName;
-
-    @Resource
-    public void setPackageName(@Value("${info.package:}") String packageName) {
-        DbEntityConvert.packageName = packageName;
-    }
-
-    // key: entity; value: dbEntity
-    private static final Map<Class<?>, Class<?>> DB_ENTITY_MAP = new ConcurrentHashMap<>();
-
-    /**
-     * todo 改成 MapStruct 提高性能
-     *
-     * @param <E>    entity
-     * @param <EDB>  db entity
-     * @param entity entity
-     * @return db entity
-     */
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> EDB convertToDbEntity(E entity) {
-        if (entity == null || entity instanceof DbEntity) {
-            return (EDB) entity;
-        }
-
-        Class<EDB> dbEntityClass = (Class<EDB>) getDbEntityClass(entity.getClass());
-        if (dbEntityClass == null) {
-            throw new UnsupportedOperationException(StrUtil.format("entity[{}]没有DbEntity的子类实现", entity.getClass().getName()));
-        }
-
-        EDB edb = dbEntityClass.newInstance();
-        BeanUtil.copyProperties(entity, edb);
-        return edb;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> E convertToEntity(EDB entity) {
-        return (E) entity;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<EDB> convertToEdbEntitys(Collection<E> entitys) {
-        List<EDB> edbEntitys = new ArrayList<>(entitys.size());
-        for (E entity : entitys) {
-            if (entity instanceof DbEntity) {
-                edbEntitys.add((EDB) entity);
-            } else {
-                edbEntitys.add(convertToDbEntity(entity));
-            }
-        }
-        return edbEntitys;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<E> convertToEntitys(Collection<EDB> entitys) {
-        if (entitys == null) {
-            return null;
-        }
-        return entitys.stream()
-            .map(DbEntityConvert::convertToEntity)
-            .collect(Collectors.toList());
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Class<?> getDbEntityClass(Class<?> entityClass) {
-        Class<?> aClass = DB_ENTITY_MAP.computeIfAbsent(entityClass, (k) -> {
-            Set<Class<?>> classes = ClassUtil.scanPackageBySuper(IsassConfig.PACKAGE_NAME, entityClass);
-            if (classes.isEmpty()) {
-                if (StrUtil.isNotBlank(packageName) && !IsassConfig.PACKAGE_NAME.equals(packageName)) {
-                    classes = ClassUtil.scanPackageBySuper(packageName, entityClass);
-                }
-            }
-            return classes.stream()
-                .filter(DbEntity.class::isAssignableFrom)
-                .findFirst()
-                .orElse(null);
-        });
-
-        return aClass;
-    }
+    String PACKAGE_NAME = "vip.isass";
 
 }
