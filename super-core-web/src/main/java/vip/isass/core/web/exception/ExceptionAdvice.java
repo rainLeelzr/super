@@ -170,7 +170,7 @@
 package vip.isass.core.web.exception;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -202,14 +202,44 @@ public class ExceptionAdvice {
     @ExceptionHandler(Exception.class)
     private Resp<?> exceptionHandler(Exception e) {
         log.error(e.getMessage(), e);
+
+        Resp<?> resp = null;
         if (e instanceof UnifiedException) {
             UnifiedException exception = (UnifiedException) e;
-            return new Resp<>()
+
+            Exception cause = (Exception) exception.getCause();
+            if (exception.getStatus() == null && cause != null) {
+                resp = parseRespByExcetption(cause);
+            }
+
+            return resp == null
+                ? new Resp<>()
                 .setSuccess(false)
-                .setStatus(exception.getStatus())
-                .setMessage(exception.getMsg());
+                .setStatus(ObjectUtil.defaultIfNull(exception.getStatus(), StatusMessageEnum.UNDEFINED.getStatus()))
+                .setMessage(exception.getMsg())
+                : resp;
         }
 
+        resp = parseRespByExcetption(e);
+        return resp == null
+            ? new Resp<>()
+            .setSuccess(Boolean.FALSE)
+            .setStatus(StatusMessageEnum.UNDEFINED.getStatus())
+            .setMessage(defaultMessage(ExceptionUtil.unwrap(e)))
+            : resp;
+    }
+
+    /**
+     * 当没有 IExceptionMapping 时，从异常本身记录信息进行消息格式化
+     *
+     * @param t 被抛出的异常
+     * @return 格式化后的消息
+     */
+    private String defaultMessage(Throwable t) {
+        return t.getClass().getSimpleName() + ((t.getMessage() == null) ? "" : (": " + t.getMessage()));
+    }
+
+    private Resp parseRespByExcetption(Exception e) {
         for (IExceptionMapping exceptionMapping : exceptionMappings) {
             IStatusMessage statusMessage = exceptionMapping.getStatusCode(e);
             if (statusMessage == null) {
@@ -221,21 +251,7 @@ public class ExceptionAdvice {
                 .setStatus(statusMessage.getStatus())
                 .setMessage(exceptionMapping.parseMessage(e, statusMessage));
         }
-
-        return new Resp<>()
-            .setSuccess(false)
-            .setStatus(StatusMessageEnum.UNDEFINED.getStatus())
-            .setMessage(defaultMessage(ExceptionUtil.unwrap(e)));
-    }
-
-    /**
-     * 当没有 IExceptionMapping 时，从异常本身记录信息进行消息格式化
-     *
-     * @param t 被抛出的异常
-     * @return 格式化后的消息
-     */
-    private String defaultMessage(Throwable t) {
-        return t.getClass().getSimpleName() + ((t.getMessage() == null) ? "" : (": " + t.getMessage()));
+        return null;
     }
 
 }
