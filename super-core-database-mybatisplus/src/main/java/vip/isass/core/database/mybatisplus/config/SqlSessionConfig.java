@@ -171,6 +171,7 @@ package vip.isass.core.database.mybatisplus.config;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
@@ -225,6 +226,9 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
     @Value("${mybatis-plus.global-config.db-config.capital-mode:false}")
     private boolean capitalMode;
 
+    @Value("${mybatis-plus.global-config.db-config.columnFormat:}")
+    private String columnFormat;
+
     @Autowired(required = false)
     private List<BaseTypeHandler<?>> baseTypeHandlers;
 
@@ -238,6 +242,9 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         dbConfig.setLogicNotDeleteValue(Boolean.FALSE.toString());
         dbConfig.setIdType(IdType.ASSIGN_ID);
         dbConfig.setCapitalMode(capitalMode);
+        if (StrUtil.isNotBlank(columnFormat)) {
+            dbConfig.setColumnFormat(columnFormat);
+        }
 
         GlobalConfig conf = new GlobalConfig();
         conf.setBanner(false);
