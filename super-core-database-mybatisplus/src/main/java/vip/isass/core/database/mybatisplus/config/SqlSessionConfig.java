@@ -222,6 +222,9 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
     @Value("${mybatis-plus.mapper-locations:}")
     private List<String> mapperLocations;
 
+    @Value("${mybatis-plus.global-config.db-config.capital-mode:false}")
+    private boolean capitalMode;
+
     @Autowired(required = false)
     private List<BaseTypeHandler<?>> baseTypeHandlers;
 
@@ -234,6 +237,8 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         dbConfig.setLogicDeleteValue(Boolean.TRUE.toString());
         dbConfig.setLogicNotDeleteValue(Boolean.FALSE.toString());
         dbConfig.setIdType(IdType.ASSIGN_ID);
+        dbConfig.setCapitalMode(capitalMode);
+
         GlobalConfig conf = new GlobalConfig();
         conf.setBanner(false);
         conf.setDbConfig(dbConfig);
