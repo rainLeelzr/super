@@ -61,7 +61,7 @@ public class ${entity}Db extends ${entity} implements DbEntity<${entity}, ${enti
 <#list table.fields as field>
 <#assign isOrmProperty = false>
     <#if field.keyFlag><#assign isOrmProperty = true>
-    @TableId(value = "\"${field.name}\"", type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.ASSIGN_ID)
     </#if>
     <#if versionFieldName == field.name><#assign isOrmProperty = true>
     @Version
@@ -72,12 +72,12 @@ public class ${entity}Db extends ${entity} implements DbEntity<${entity}, ${enti
     <#if field.propertyName == cfg.userTracedEntity.CREATE_USER_ID_PROPERTY
     || field.propertyName == cfg.userTracedEntity.CREATE_USER_NAME_PROPERTY
     || field.propertyName == cfg.timeTracedEntity.CREATED_TIME_PROPERTY><#assign isOrmProperty = true>
-    @TableField(value = "\"${field.name}\"", fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)
     </#if>
     <#if field.propertyName == cfg.userTracedEntity.MODIFY_USER_ID_PROPERTY
     || field.propertyName == cfg.userTracedEntity.MODIFY_USER_NAME_PROPERTY
     || field.propertyName == cfg.timeTracedEntity.MODIFY_TIME_PROPERTY><#assign isOrmProperty = true>
-    @TableField(value = "\"${field.name}\"", fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     </#if><#if isOrmProperty>
     private <#if field.comment!?contains("${enumStart}")>${field.propertyName?cap_first} <#else>${field.propertyType} </#if>${field.propertyName};
 
