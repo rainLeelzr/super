@@ -61,7 +61,7 @@ public class ${entity}Db extends ${entity} implements DbEntity<${entity}, ${enti
 <#list table.fields as field>
 <#assign isOrmProperty = false>
     <#if field.keyFlag><#assign isOrmProperty = true>
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(value = "\"${field.name}\"", type = IdType.ASSIGN_ID)
     </#if>
     <#if versionFieldName == field.name><#assign isOrmProperty = true>
     @Version

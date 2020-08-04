@@ -226,7 +226,7 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
     @Value("${mybatis-plus.global-config.db-config.capital-mode:false}")
     private boolean capitalMode;
 
-    @Value("${mybatis-plus.global-config.db-config.columnFormat:}")
+    @Value("${mybatisPlus.globalConfig.dbConfig.columnFormat:}")
     private String columnFormat;
 
     @Autowired(required = false)
