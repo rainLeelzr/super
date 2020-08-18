@@ -238,6 +238,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        List<String> permitUrls = permitUrlConfiguration.getPermitUrls();
+
         http
             // 跨域
             .cors()
@@ -260,8 +262,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // 配置请求授权
             .authorizeRequests()
             // 允许以下请求
-            .antMatchers(permitUrlConfiguration.getPermitUrls()
-                .toArray(new String[permitUrlConfiguration.getPermitUrls().size()]))
+            .antMatchers(permitUrls.toArray(new String[]{}))
             .permitAll()
 
             // 不能写这个，写了就代表只要登录了，就可以访问
@@ -272,7 +273,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 requestMappingHandlerMapping,
                 securityMetadataSourceProviderManager,
                 uriPrefixProvider,
-                permitUrlConfiguration.getPermitUrls()))
+                permitUrls))
             .withObjectPostProcessor(new AffirmativeBasedPostProcessor())
 
             .and()

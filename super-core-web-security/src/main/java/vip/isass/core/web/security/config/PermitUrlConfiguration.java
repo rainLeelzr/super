@@ -179,7 +179,11 @@ import org.springframework.context.annotation.Configuration;
 import vip.isass.core.web.uri.UriPrefixProvider;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Rain
@@ -192,9 +196,43 @@ import java.util.List;
 @ConfigurationProperties("security.auth")
 public class PermitUrlConfiguration {
 
-    private static String HEALTH_CHECK_URI = "/actuator/health";
+    /**
+     * 获取需要添加微服务名前缀的urls
+     *
+     * @return urls
+     */
+    private HashSet<String> getNeedPrefixDefaultPermitUrls() {
+        return CollUtil.newHashSet(
+            "/actuator/health",
+            "/doc.html",
+            "/swagger-resources",
+            "/swagger-resources/configuration/ui",
+            "/v2/api-docs",
+            "/v2/api-docs-ext",
+            "/webjars/css/app.3167b4c3.css",
+            "/webjars/js/app.e4826b43.js",
+            "/webjars/js/chunk-vendors.86544bae.js"
+        );
+    }
 
-    private static String ERROR_URI = "/error";
+    /**
+     * 获取不需要添加微服务名前缀的urls
+     *
+     * @return urls
+     */
+    private HashSet<String> getNoNeedPrefixDefaultPermitUrls() {
+        return CollUtil.newHashSet(
+            "/error",
+            "/doc.html",
+            "/swagger-resources",
+            "/swagger-resources/configuration/ui",
+            "/v2/api-docs",
+            "/v2/api-docs-ext",
+            "/webjars/css/app.3167b4c3.css",
+            "/webjars/js/app.e4826b43.js",
+            "/webjars/js/chunk-vendors.86544bae.js"
+        );
+    }
 
     @Resource
     private UriPrefixProvider uriPrefixProvider;
@@ -202,18 +240,17 @@ public class PermitUrlConfiguration {
     private List<String> permitUrls;
 
     public List<String> getPermitUrls() {
-        if (permitUrls == null) {
-            return CollUtil.newArrayList(
-                uriPrefixProvider.getContextPath() + HEALTH_CHECK_URI,
-                uriPrefixProvider.getUriPrefix() + ERROR_URI);
+        Set<String> needPrefixDefaultPermitUrls = getNeedPrefixDefaultPermitUrls()
+            .stream()
+            .map(u -> uriPrefixProvider.getAppName() + u)
+            .collect(Collectors.toSet());
+
+        needPrefixDefaultPermitUrls.addAll(getNoNeedPrefixDefaultPermitUrls());
+
+        if (CollUtil.isNotEmpty(permitUrls)) {
+            needPrefixDefaultPermitUrls.addAll(permitUrls);
         }
-        if (!permitUrls.contains(uriPrefixProvider.getContextPath() + HEALTH_CHECK_URI)) {
-            permitUrls.add(uriPrefixProvider.getContextPath() + HEALTH_CHECK_URI);
-        }
-        if (!permitUrls.contains(uriPrefixProvider.getContextPath() + ERROR_URI)) {
-            permitUrls.add(uriPrefixProvider.getContextPath() + ERROR_URI);
-        }
-        return permitUrls;
+        return new ArrayList<>(needPrefixDefaultPermitUrls);
     }
 
 }
