@@ -36,6 +36,7 @@
 |  isass-service-log| http:20330 |
 |  isass-doc| http:20340 |
 |  isass-service-tag| http:20350 |
+|  isass-service-uom| http:20360 |
 
 # 第3方服务
 |  名称 | 端口 |
