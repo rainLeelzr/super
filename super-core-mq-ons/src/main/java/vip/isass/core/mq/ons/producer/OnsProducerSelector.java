@@ -170,14 +170,15 @@
 package vip.isass.core.mq.ons.producer;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import org.springframework.stereotype.Component;
 import vip.isass.core.mq.MessageType;
 import vip.isass.core.mq.core.MqMessageContext;
 import vip.isass.core.mq.core.producer.MqProducer;
 import vip.isass.core.mq.core.producer.ProducerSelector;
 import vip.isass.core.mq.ons.OnsConst;
 import vip.isass.core.mq.ons.config.*;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -202,6 +203,8 @@ public class OnsProducerSelector implements ProducerSelector {
 
     @Override
     public MqProducer selectProducer(final MqMessageContext mqMessageContext) {
+        Assert.notEmpty(onsConfiguration.getRegions(), "没有配置ons regions");
+
         final RegionConfiguration regionConfiguration = OnsConfigUtil.selectRegion(
             onsConfiguration, mqMessageContext.getRegion());
         mqMessageContext.setRegion(regionConfiguration.getRegionName());
