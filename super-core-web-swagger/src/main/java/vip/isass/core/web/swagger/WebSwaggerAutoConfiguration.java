@@ -226,6 +226,8 @@ public class WebSwaggerAutoConfiguration {
             .apis(Predicates.or(
                 RequestHandlerSelectors.withClassAnnotation(RestController.class),
                 RequestHandlerSelectors.withClassAnnotation(Controller.class)))
+            .apis(Predicates.not(RequestHandlerSelectors.basePackage("vip.isass.core.web.exception")))
+            .apis(Predicates.not(RequestHandlerSelectors.basePackage("vip.isass.core.web.swagger")))
             .paths(PathSelectors.any())
             .build()
             .securityContexts(CollUtil.newArrayList(

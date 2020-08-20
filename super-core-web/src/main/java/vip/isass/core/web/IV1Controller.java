@@ -169,154 +169,106 @@
 
 package vip.isass.core.web;
 
-import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.*;
 import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.exception.AbsentException;
-import vip.isass.core.repository.IRepository;
+import vip.isass.core.entity.IdEntity;
 
+import javax.validation.Valid;
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author rain
  */
-public interface IService<E, C extends ICriteria<E, C>> {
+public interface IV1Controller<
+    E,
+    C extends ICriteria<E, C>,
+    S extends IService<E, C>> {
 
-    IRepository<E, C> getMpRepository();
+    S getService();
 
-    // ****************************** 增 start ******************************
-    default E add(E entity) {
-        getMpRepository().add(entity);
-        return entity;
+    @GetMapping("/{id}")
+    @ApiOperation(value = "查询-根据id查询单个实体", position = 1)
+    default Resp<E> getById(@PathVariable("id") Serializable id) {
+        return Resp.bizSuccess(getService().getById(id));
     }
 
-    default Collection<E> addBatch(Collection<E> entities) {
-        getMpRepository().addBatch(entities);
-        return entities;
+    @GetMapping("/1")
+    @ApiOperation(value = "查询-根据条件查询单个实体", position = 2)
+    default Resp<E> getByCriteria(@ModelAttribute C criteria) {
+        return Resp.bizSuccess(getService().getByCriteria(criteria));
     }
 
-    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        getMpRepository().addBatch(entities, batchSize);
-        return entities;
+    @GetMapping("/page")
+    @ApiOperation(value = "查询-根据条件查询分页列表", position = 3)
+    default Resp<IPage<E>> findPageByCriteria(@ModelAttribute C criteria) {
+        return Resp.bizSuccess(getService().findPageByCriteria(criteria));
     }
 
-    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
-        if (this.isAbsentByCriteria(criteria)) {
-            return this.add(entity);
-        }
-        return null;
+    @GetMapping("")
+    @ApiOperation(value = "查询-根据条件查询列表", position = 4)
+    default Resp<List<E>> findByCriteria(@ModelAttribute C criteria) {
+        return Resp.bizSuccess(getService().findByCriteria(criteria));
     }
 
-    // ****************************** 删 start ******************************
-
-    default Boolean deleteById(Serializable id) {
-        return getMpRepository().deleteById(id);
+    @GetMapping("/count")
+    @ApiOperation(value = "查询-根据条件统计实体数量", position = 5)
+    default Resp<Integer> countByCriteria(@ModelAttribute C criteria) {
+        return Resp.bizSuccess(getService().countByCriteria(criteria));
     }
 
-    default Boolean deleteByIds(Collection<? extends Serializable> ids) {
-        return getMpRepository().deleteByIds(ids);
+    @GetMapping("/count/all")
+    @ApiOperation(value = "查询-统计全部实体数量", position = 6)
+    default Resp<Integer> countAll() {
+        return Resp.bizSuccess(getService().countAll());
     }
 
-    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        return getMpRepository().deleteByCriteria(criteria);
+    @GetMapping("/present/{id}")
+    @ApiOperation(value = "查询-根据id查询实体是否存在", position = 7)
+    default Resp<Boolean> isPresentById(@PathVariable("id") String id) {
+        return Resp.bizSuccess(getService().isPresentById(id));
     }
 
-    //****************************** 改 start ******************************
-    default Boolean updateById(E entity) {
-        return updateEntityById(entity);
+    @GetMapping("/present")
+    @ApiOperation(value = "查询-根据条件查询实体是否存在", position = 8)
+    default Resp<Boolean> isPresentByCriteria(@ModelAttribute C criteria) {
+        return Resp.bizSuccess(getService().isPresentByCriteria(criteria));
     }
 
-    default Boolean updateEntityById(E entity) {
-        return getMpRepository().updateEntityById(entity);
+    @SuppressWarnings("rawtypes")
+    @PostMapping("")
+    @ApiOperation(value = "增加-增加单个实体", position = 9)
+    default Resp<String> add(@RequestBody @Valid E entity) {
+        getService().add(entity);
+        return Resp.bizSuccess(entity instanceof IdEntity ? ((IdEntity) entity).getId().toString() : "");
     }
 
-    default void updateByIdOrException(E entity) {
-        if (!updateEntityById(entity)) {
-            throw new AbsentException("更新失败，记录不存在");
-        }
+    @PostMapping("/batch")
+    @ApiOperation(value = "增加-增加批量实体", position = 10)
+    default Resp<Integer> batchAdd(@RequestBody ArrayList<E> entities) {
+        return Resp.bizSuccess(getService().addBatch(entities).size());
     }
 
-    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        return getMpRepository().updateByCriteria(entity, criteria);
+    @PutMapping("/allColumns")
+    @ApiOperation(value = "修改-根据id更新全部字段", position = 11)
+    default Resp<Boolean> updateAllColumnsById(@RequestBody @Valid E entity) {
+        return Resp.bizSuccess(getService().updateEntityById(entity));
     }
 
-    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
-        if (!getMpRepository().updateByCriteria(entity, criteria)) {
-            throw new AbsentException("更新失败，记录不存在");
-        }
+    @PutMapping("")
+    @ApiOperation(value = "修改-根据id更新非空字段", position = 12)
+    default Resp<Boolean> updateExcludeNullFieldsById(@RequestBody @Valid E entity) {
+        return Resp.bizSuccess(getService().updateEntityById(entity));
     }
 
-    // ****************************** 查 start ******************************
-    default E getById(Serializable id) {
-        Assert.notNull(id, "id");
-        return getMpRepository().getEntityById(id);
-    }
-
-    default E getByIdOrException(Serializable id) {
-        Assert.notNull(id, "id");
-        return getMpRepository().getByIdOrException(id);
-    }
-
-    default E getByCriteria(ICriteria<E, C> criteria) {
-        return getMpRepository().getByCriteria(criteria);
-    }
-
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        return getMpRepository().getByCriteriaOrWarn(criteria);
-    }
-
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        return getMpRepository().getByCriteriaOrException(criteria);
-    }
-
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        return getMpRepository().findByCriteria(criteria);
-    }
-
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        return getMpRepository().findPageByCriteria(criteria);
-    }
-
-    default List<E> findAll() {
-        return getMpRepository().findAll();
-    }
-
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
-        return getMpRepository().countByCriteria(criteria);
-    }
-
-    default Integer countAll() {
-        return getMpRepository().countAll();
-    }
-
-    default boolean isPresentById(Serializable id) {
-        return getMpRepository().isPresentById(id);
-    }
-
-    default boolean isPresentByColumn(String columnName, Object value) {
-        return getMpRepository().isPresentByColumn(columnName, value);
-    }
-
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        return getMpRepository().isPresentByCriteria(criteria);
-    }
-
-    default boolean isAbsentByColumn(String columnName, Object value) {
-        return !isPresentByColumn(columnName, value);
-    }
-
-    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
-        return !isPresentByCriteria(criteria);
-    }
-
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
-        getMpRepository().exceptionIfPresentByCriteria(criteria);
-    }
-
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
-        getMpRepository().exceptionIfAbsentByCriteria(criteria);
+    @DeleteMapping("/{ids}")
+    @ApiOperation(value = "删除-根据id列表批量删除", position = 13)
+    default Resp<Boolean> deleteByIds(@PathVariable("ids") @ApiParam(value = "ids,用英文逗号,隔开") List<String> ids) {
+        return Resp.bizSuccess(getService().deleteByIds(ids));
     }
 
 }
