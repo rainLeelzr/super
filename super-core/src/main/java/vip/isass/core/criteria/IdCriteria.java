@@ -171,9 +171,10 @@ package vip.isass.core.criteria;
 
 import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import vip.isass.core.entity.IdEntity;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import vip.isass.core.entity.IdEntity;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -193,28 +194,46 @@ public class IdCriteria<
 
     //************************************************** id **************************************************//
 
+    @ApiModelProperty("id等于")
     private PK id;
 
+    @ApiModelProperty("或者id等于")
     private PK orId;
 
+    @ApiModelProperty("id不等于")
+    private PK idNotEqual;
+
+    @ApiModelProperty("或者id不等于")
+    private PK orIdNotEqual;
+
+    @ApiModelProperty("id所在范围")
     private Collection<PK> idIn;
 
+    @ApiModelProperty("或者id所在范围")
     private Collection<PK> orIdIn;
 
+    @ApiModelProperty("id不在范围")
     private Collection<PK> idNotIn;
 
+    @ApiModelProperty("或者id不在范围")
     private Collection<PK> orIdNotIn;
 
+    @ApiModelProperty("id包含字符")
     private String idLike;
 
+    @ApiModelProperty("或者id包含字符")
     private String orIdLike;
 
+    @ApiModelProperty("id不包含字符")
     private String idNotLike;
 
+    @ApiModelProperty("或者id不包含字符")
     private String orIdNotLike;
 
+    @ApiModelProperty("id开始以")
     private String idStartWith;
 
+    @ApiModelProperty("或者id开始以")
     private String orIdStartWith;
 
     //************************************************** id setter **************************************************//
@@ -230,6 +249,20 @@ public class IdCriteria<
     public C setOrId(PK id) {
         this.orId = id;
         orEquals(IdEntity.ID_COLUMN_NAME, this.orId);
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public C setIdNotEqual(PK id) {
+        this.id = id;
+        notEquals(IdEntity.ID_COLUMN_NAME, this.id);
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public C setOrNotEqual(PK id) {
+        this.orId = id;
+        orNotEquals(IdEntity.ID_COLUMN_NAME, this.orId);
         return (C) this;
     }
 

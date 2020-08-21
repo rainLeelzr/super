@@ -330,7 +330,8 @@ public class MybatisPlusGenerator {
             .setBaseResultMap(true)
             .setOutputDir(meta.getOutputDir() + "/src/main/java")
             .setOpen(false)
-            .setFileOverride(true);
+            .setFileOverride(true)
+            .setSwagger2(true);
 
         BeansWrapper wrapper = new BeansWrapperBuilder(new Version("2.3.28")).build();
         TemplateHashModel staticModels = wrapper.getStaticModels();
