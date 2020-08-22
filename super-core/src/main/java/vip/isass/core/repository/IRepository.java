@@ -169,17 +169,42 @@
 
 package vip.isass.core.repository;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vip.isass.core.criteria.ICriteria;
+import vip.isass.core.entity.IdEntity;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Rain
  */
 public interface IRepository<E, C extends ICriteria<E, C>> {
+
+    Logger LOGGER = LoggerFactory.getLogger(IRepository.class);
+
+    Map<Class<?>, String> ID_COLUMN_NAMES = new ConcurrentHashMap<>(64);
+
+    default String getColumnName(Class<?> clazz) {
+        return ID_COLUMN_NAMES.computeIfAbsent(clazz, c -> {
+            if (IdEntity.class.isAssignableFrom(c)) {
+                IdEntity entity = null;
+                try {
+                    entity = (IdEntity) c.newInstance();
+                } catch (Exception e) {
+                    LOGGER.error("{}", e.getMessage(), e);
+                }
+                return StrUtil.nullToEmpty(entity.getIdColumnName());
+            }
+            return "";
+        });
+    }
 
     // ****************************** 增 start ******************************
 

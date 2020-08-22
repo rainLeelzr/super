@@ -172,37 +172,29 @@ package vip.isass.core.entity;
 import java.io.Serializable;
 
 /**
+ * 租户实体
+ *
  * @author Rain
  */
-public interface ChainedEntity<PK extends Serializable, E extends ChainedEntity<PK, E>> extends IEntity<E> {
+public interface TenantEntity<PK extends Serializable, E extends TenantEntity<PK, E>> extends IEntity<E> {
 
-    String PARENT_ID_COLUMN_NAME = "parent_id";
-
-    String TOP_ID_VALUE = "0";
+    String PARENT_ID_COLUMN_NAME = "tenant_id";
 
     /**
-     * @return 父 id
+     * @return 租户 id
      */
-    PK getParentId();
+    PK getTenantId();
 
     /**
-     * 设置父 id
+     * 设置租户 id
      *
      * @param parentId parent id
      * @return this object
      */
-    E setParentId(PK parentId);
+    E setTenantId(PK parentId);
 
-    /**
-     * 标记为顶级实体
-     *
-     * @return this object
-     */
-    E markAsTopEntity();
+    String getTenantName();
 
-    @Override
-    default E randomEntity() {
-        return markAsTopEntity();
-    }
+    E setTenantName(String name);
 
 }

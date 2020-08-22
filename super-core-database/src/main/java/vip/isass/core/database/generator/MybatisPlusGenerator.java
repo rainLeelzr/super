@@ -384,7 +384,7 @@ public class MybatisPlusGenerator {
                         "/" + meta.getPackageName().replaceAll("\\.", "/") +
                         "/" + meta.getModuleName() +
                         "/db/" + PREFIX + "/repository/";
-                    return path + StrUtil.upperFirst(PREFIX) + tableInfo.getEntityName() + "MpRepository.java";
+                    return path + StrUtil.upperFirst(PREFIX) + tableInfo.getEntityName() + "Repository.java";
                 }
             }
             , new FileOutConfig("/template/repository.java.ftl") {
@@ -395,7 +395,7 @@ public class MybatisPlusGenerator {
                         "/" + meta.getPackageName().replaceAll("\\.", "/") +
                         "/" + meta.getModuleName() +
                         "/db/repository/";
-                    return path + tableInfo.getEntityName() + "MpRepository.java";
+                    return path + tableInfo.getEntityName() + "Repository.java";
                 }
             }, new FileOutConfig("/template/criteria.java.ftl") {
                 @Override

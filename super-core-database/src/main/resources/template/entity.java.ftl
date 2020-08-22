@@ -231,7 +231,7 @@ public class ${entity} implements
 <#if isChainedEntity>
     @Override
     public ${entity} markAsTopEntity() {
-        setParentId(Long.valueOf(-1)<#if chainedEntityPropertyType == "String">.toString()</#if>);
+        setParentId(Long.valueOf(TOP_ID_VALUE)<#if chainedEntityPropertyType == "String">.toString()</#if>);
         return this;
     }
 

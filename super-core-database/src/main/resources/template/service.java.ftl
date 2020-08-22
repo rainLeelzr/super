@@ -3,8 +3,8 @@
 package ${cfg.servicePackageName};
 
 import org.springframework.stereotype.Service;
-import ${cfg.package}.${cfg.moduleName}.db.repository.${entity}MpRepository;
-import ${cfg.package}.${cfg.moduleName}.db.${cfg.prefix}.repository.${cfg.prefix?capFirst}${entity}MpRepository;
+import ${cfg.package}.${cfg.moduleName}.db.repository.${entity}Repository;
+import ${cfg.package}.${cfg.moduleName}.db.${cfg.prefix}.repository.${cfg.prefix?capFirst}${entity}Repository;
 import ${cfg.package}.${cfg.moduleName}.${cfg.prefix}.service.${cfg.prefix?capFirst}${entity}Service;
 
 import javax.annotation.Resource;
@@ -23,9 +23,9 @@ public class ${table.serviceName} {
     private ${cfg.prefix?capFirst}${entity}Service ${cfg.prefix}${entity}Service;
 
     @Resource
-    private ${cfg.prefix?capFirst}${entity}MpRepository ${cfg.prefix}MpRepository;
+    private ${cfg.prefix?capFirst}${entity}Repository ${cfg.prefix}Repository;
 
     @Resource
-    private ${entity}MpRepository mpRepository;
+    private ${entity}Repository repository;
 
 }

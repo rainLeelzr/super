@@ -4,10 +4,10 @@ package ${cfg.servicePackageName?replace(".service",".${cfg.prefix}.service")};
 
 import lombok.Getter;
 import org.springframework.stereotype.Service;
+import vip.isass.core.web.IV1Service;
 import ${cfg.criteriaPackageName}.${entity}Criteria;
 import ${cfg.entityPackageName}.${entity};
-import ${cfg.package}.${cfg.moduleName}.db.${cfg.prefix}.repository.${cfg.prefix?cap_first}${entity}MpRepository;
-import vip.isass.core.web.IService;
+import ${cfg.package}.${cfg.moduleName}.db.${cfg.prefix}.repository.${cfg.prefix?cap_first}${entity}Repository;
 
 import javax.annotation.Resource;
 
@@ -19,10 +19,10 @@ import javax.annotation.Resource;
  * @author ${author}
  */
 @Service
-public class ${cfg.prefix?cap_first}${table.serviceName} implements IService<${entity}, ${entity}Criteria> {
+public class ${cfg.prefix?cap_first}${table.serviceName} implements IV1Service<${entity}, ${entity}Criteria> {
 
     @Getter
     @Resource
-    private ${cfg.prefix?cap_first}${entity}MpRepository mpRepository;
+    private ${cfg.prefix?cap_first}${entity}Repository v1Repository;
 
 }

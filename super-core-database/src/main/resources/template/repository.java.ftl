@@ -17,6 +17,6 @@ import vip.isass.core.database.mybatisplus.plus.MybatisPlusRepository;
  * @author ${author}
  */
 @Repository
-public class ${entity}MpRepository extends MybatisPlusRepository<${entity}, ${entity}Db, ${entity}Criteria, ${entity}Mapper> {
+public class ${entity}Repository extends MybatisPlusRepository<${entity}, ${entity}Db, ${entity}Criteria, ${entity}Mapper> {
 
 }

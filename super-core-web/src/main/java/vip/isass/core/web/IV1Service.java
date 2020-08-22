@@ -167,42 +167,156 @@
  *
  */
 
-package vip.isass.core.entity;
+package vip.isass.core.web;
+
+import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import vip.isass.core.criteria.ICriteria;
+import vip.isass.core.exception.AbsentException;
+import vip.isass.core.repository.IRepository;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * @author Rain
+ * @author rain
  */
-public interface ChainedEntity<PK extends Serializable, E extends ChainedEntity<PK, E>> extends IEntity<E> {
+public interface IV1Service<E, C extends ICriteria<E, C>> {
 
-    String PARENT_ID_COLUMN_NAME = "parent_id";
+    IRepository<E, C> getV1Repository();
 
-    String TOP_ID_VALUE = "0";
+    // ****************************** 增 start ******************************
+    default E add(E entity) {
+        getV1Repository().add(entity);
+        return entity;
+    }
 
-    /**
-     * @return 父 id
-     */
-    PK getParentId();
+    default Collection<E> addBatch(Collection<E> entities) {
+        getV1Repository().addBatch(entities);
+        return entities;
+    }
 
-    /**
-     * 设置父 id
-     *
-     * @param parentId parent id
-     * @return this object
-     */
-    E setParentId(PK parentId);
+    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
+        getV1Repository().addBatch(entities, batchSize);
+        return entities;
+    }
 
-    /**
-     * 标记为顶级实体
-     *
-     * @return this object
-     */
-    E markAsTopEntity();
+    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
+        if (this.isAbsentByCriteria(criteria)) {
+            return this.add(entity);
+        }
+        return null;
+    }
 
-    @Override
-    default E randomEntity() {
-        return markAsTopEntity();
+    // ****************************** 删 start ******************************
+
+    default Boolean deleteById(Serializable id) {
+        return getV1Repository().deleteById(id);
+    }
+
+    default Boolean deleteByIds(Collection<? extends Serializable> ids) {
+        return getV1Repository().deleteByIds(ids);
+    }
+
+    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
+        return getV1Repository().deleteByCriteria(criteria);
+    }
+
+    //****************************** 改 start ******************************
+    default Boolean updateById(E entity) {
+        return updateEntityById(entity);
+    }
+
+    default Boolean updateEntityById(E entity) {
+        return getV1Repository().updateEntityById(entity);
+    }
+
+    default void updateByIdOrException(E entity) {
+        if (!updateEntityById(entity)) {
+            throw new AbsentException("更新失败，记录不存在");
+        }
+    }
+
+    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
+        return getV1Repository().updateByCriteria(entity, criteria);
+    }
+
+    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
+        if (!getV1Repository().updateByCriteria(entity, criteria)) {
+            throw new AbsentException("更新失败，记录不存在");
+        }
+    }
+
+    // ****************************** 查 start ******************************
+    default E getById(Serializable id) {
+        Assert.notNull(id, "id");
+        return getV1Repository().getEntityById(id);
+    }
+
+    default E getByIdOrException(Serializable id) {
+        Assert.notNull(id, "id");
+        return getV1Repository().getByIdOrException(id);
+    }
+
+    default E getByCriteria(ICriteria<E, C> criteria) {
+        return getV1Repository().getByCriteria(criteria);
+    }
+
+    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
+        return getV1Repository().getByCriteriaOrWarn(criteria);
+    }
+
+    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
+        return getV1Repository().getByCriteriaOrException(criteria);
+    }
+
+    default List<E> findByCriteria(ICriteria<E, C> criteria) {
+        return getV1Repository().findByCriteria(criteria);
+    }
+
+    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
+        return getV1Repository().findPageByCriteria(criteria);
+    }
+
+    default List<E> findAll() {
+        return getV1Repository().findAll();
+    }
+
+    default Integer countByCriteria(ICriteria<E, C> criteria) {
+        return getV1Repository().countByCriteria(criteria);
+    }
+
+    default Integer countAll() {
+        return getV1Repository().countAll();
+    }
+
+    default boolean isPresentById(Serializable id) {
+        return getV1Repository().isPresentById(id);
+    }
+
+    default boolean isPresentByColumn(String columnName, Object value) {
+        return getV1Repository().isPresentByColumn(columnName, value);
+    }
+
+    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
+        return getV1Repository().isPresentByCriteria(criteria);
+    }
+
+    default boolean isAbsentByColumn(String columnName, Object value) {
+        return !isPresentByColumn(columnName, value);
+    }
+
+    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
+        return !isPresentByCriteria(criteria);
+    }
+
+    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
+        getV1Repository().exceptionIfPresentByCriteria(criteria);
+    }
+
+    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
+        getV1Repository().exceptionIfAbsentByCriteria(criteria);
     }
 
 }

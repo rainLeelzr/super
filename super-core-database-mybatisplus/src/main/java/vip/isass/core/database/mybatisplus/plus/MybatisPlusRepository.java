@@ -171,6 +171,7 @@ package vip.isass.core.database.mybatisplus.plus;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -276,6 +277,13 @@ public abstract class MybatisPlusRepository<
 
     @Override
     public E getEntityById(Serializable id) {
+        Class<EDB> edbClass = currentModelClass();
+        if (IdEntity.class.isAssignableFrom(edbClass)) {
+            String columnName = getColumnName(edbClass);
+            if (StrUtil.isNotBlank(columnName)) {
+                return getByWrapper(new QueryWrapper<EDB>().eq(columnName, id));
+            }
+        }
         EDB edb = super.getById(id);
         return edb == null ? null : edb.convertToEntity();
     }

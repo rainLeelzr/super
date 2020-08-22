@@ -187,7 +187,7 @@ import java.util.List;
 public interface IV1Controller<
     E,
     C extends ICriteria<E, C>,
-    S extends IService<E, C>> {
+    S extends IV1Service<E, C>> {
 
     S getService();
 
