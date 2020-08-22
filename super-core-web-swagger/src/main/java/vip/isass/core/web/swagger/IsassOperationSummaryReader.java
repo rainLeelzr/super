@@ -167,111 +167,58 @@
  *
  */
 
-package vip.isass.core.web;
+package vip.isass.core.web.swagger;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import com.google.common.base.Optional;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.*;
-import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IdEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.OperationBuilderPlugin;
+import springfox.documentation.spi.service.contexts.OperationContext;
+import springfox.documentation.spring.web.DescriptionResolver;
+import springfox.documentation.swagger.common.SwaggerPluginSupport;
 
-import javax.validation.Valid;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+@Component
+@Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER + 1)
+public class IsassOperationSummaryReader implements OperationBuilderPlugin {
+    private final DescriptionResolver descriptions;
 
-/**
- * 通用controller
- *
- * @author rain
- * <code>@ApiOperation</code> 的 value 的横杠前面需要2个字符，例如查-，增-
- */
-public interface IV1Controller<
-    E,
-    C extends ICriteria<E, C>,
-    S extends IV1Service<E, C>> {
-
-    S getService();
-
-    @GetMapping("/{id}")
-    @ApiOperation(value = "查-根据id-单实体", position = 1)
-    default Resp<E> getById(@PathVariable("id") Serializable id) {
-        return Resp.bizSuccess(getService().getById(id));
+    @Autowired
+    public IsassOperationSummaryReader(DescriptionResolver descriptions) {
+        this.descriptions = descriptions;
     }
 
-    @GetMapping("/1")
-    @ApiOperation(value = "查-根据条件-单实体", position = 2)
-    default Resp<E> getByCriteria(@ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().getByCriteria(criteria));
+    @Override
+    public void apply(OperationContext context) {
+        Optional<Api> apiAnnotation = context.findControllerAnnotation(Api.class);
+        if (!apiAnnotation.isPresent()) {
+            return;
+        }
+        Api api = apiAnnotation.get();
+        String[] tags = api.tags();
+        if (ArrayUtil.isEmpty(tags) || StrUtil.isBlank(tags[0]) || !tags[0].startsWith("v1")) {
+            return;
+        }
+
+        String summary = "";
+        Optional<ApiOperation> apiOperationAnnotation = context.findAnnotation(ApiOperation.class);
+        if (apiOperationAnnotation.isPresent() && StringUtils.hasText(apiOperationAnnotation.get().value())) {
+            summary = descriptions.resolve(apiOperationAnnotation.get().value());
+        }
+
+
+        summary = new StringBuilder(summary).insert(1, "-" + tags[0].substring(2)).toString();
+        context.operationBuilder().summary(descriptions.resolve(summary));
     }
 
-    @GetMapping("/page")
-    @ApiOperation(value = "查-根据条件-分页列表", position = 3)
-    default Resp<IPage<E>> findPageByCriteria(@ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().findPageByCriteria(criteria));
+    @Override
+    public boolean supports(DocumentationType delimiter) {
+        return SwaggerPluginSupport.pluginDoesApply(delimiter);
     }
-
-    @GetMapping("")
-    @ApiOperation(value = "查-根据条件-列表", position = 4)
-    default Resp<List<E>> findByCriteria(@ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().findByCriteria(criteria));
-    }
-
-    @GetMapping("/count")
-    @ApiOperation(value = "查-根据条件-实体数量", position = 5)
-    default Resp<Integer> countByCriteria(@ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().countByCriteria(criteria));
-    }
-
-    @GetMapping("/count/all")
-    @ApiOperation(value = "查-全部实体数量", position = 6)
-    default Resp<Integer> countAll() {
-        return Resp.bizSuccess(getService().countAll());
-    }
-
-    @GetMapping("/present/{id}")
-    @ApiOperation(value = "查-根据id-实体是否存在", position = 7)
-    default Resp<Boolean> isPresentById(@PathVariable("id") String id) {
-        return Resp.bizSuccess(getService().isPresentById(id));
-    }
-
-    @GetMapping("/present")
-    @ApiOperation(value = "查-根据条件-实体是否存在", position = 8)
-    default Resp<Boolean> isPresentByCriteria(@ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().isPresentByCriteria(criteria));
-    }
-
-    @SuppressWarnings("rawtypes")
-    @PostMapping("")
-    @ApiOperation(value = "增-单个实体", position = 9)
-    default Resp<String> add(@RequestBody @Valid E entity) {
-        getService().add(entity);
-        return Resp.bizSuccess(entity instanceof IdEntity ? ((IdEntity) entity).getId().toString() : "");
-    }
-
-    @PostMapping("/batch")
-    @ApiOperation(value = "增-批量实体", position = 10)
-    default Resp<Integer> batchAdd(@RequestBody ArrayList<E> entities) {
-        return Resp.bizSuccess(getService().addBatch(entities).size());
-    }
-
-    @PutMapping("/allColumns")
-    @ApiOperation(value = "改-根据id-全部字段", position = 11)
-    default Resp<Boolean> updateAllColumnsById(@RequestBody @Valid E entity) {
-        return Resp.bizSuccess(getService().updateEntityById(entity));
-    }
-
-    @PutMapping("")
-    @ApiOperation(value = "改-根据id-非空字段", position = 12)
-    default Resp<Boolean> updateExcludeNullFieldsById(@RequestBody @Valid E entity) {
-        return Resp.bizSuccess(getService().updateEntityById(entity));
-    }
-
-    @DeleteMapping("/{ids}")
-    @ApiOperation(value = "删-根据批量id", position = 13)
-    default Resp<Boolean> deleteByIds(@PathVariable("ids") @ApiParam(value = "ids,用英文逗号,隔开") List<String> ids) {
-        return Resp.bizSuccess(getService().deleteByIds(ids));
-    }
-
 }
