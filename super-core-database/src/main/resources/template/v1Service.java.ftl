@@ -25,4 +25,8 @@ public class ${cfg.prefix?cap_first}${table.serviceName} implements IV1Service<$
     @Resource
     private ${cfg.prefix?cap_first}${entity}Repository v1Repository;
 
+    @Getter
+    @Autowired(required = false)
+    private V1ServiceInterceptor<${entity}, ${entity}Criteria> v1ServiceInterceptor;
+
 }

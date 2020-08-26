@@ -169,109 +169,222 @@
 
 package vip.isass.core.web;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.*;
 import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IdEntity;
 
-import javax.validation.Valid;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
- * 通用controller
+ * v1 service interceptor
+ * all method prefix by 'before': return true to make the target method continue running
+ * all method prefix by 'after': invoke while the target method finish without throwing exception
  *
- * @author rain
- * <code>@ApiOperation</code> 的 value 的横杠前面需要1个字符，例如查-，增-
+ * @param <E> entity
+ * @param <C> criteria
  */
-public interface IV1Controller<
-    E,
-    C extends ICriteria<E, C>,
-    S extends IV1Service<E, C>> {
+public interface V1ServiceInterceptor<E, C extends ICriteria<E, C>> {
 
-    S getService();
-
-    @GetMapping("/{id}")
-    @ApiOperation(value = "查-根据id-单实体", position = 1)
-    default Resp<E> getById(@PathVariable("id") Serializable id) {
-        return Resp.bizSuccess(getService().getById(id));
+    default boolean beforeAdd(E entity) {
+        return true;
     }
 
-    @GetMapping("/1")
-    @ApiOperation(value = "查-根据条件-单实体", position = 2)
-    default Resp<E> getByCriteria(@ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().getByCriteria(criteria));
+    default void afterAdd(E entity) {
     }
 
-    @GetMapping("/page")
-    @ApiOperation(value = "查-根据条件-分页列表", position = 3)
-    default Resp<IPage<E>> findPageByCriteria(@ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().findPageByCriteria(criteria));
+    default boolean beforeAddBatch(Collection<E> entities) {
+        return true;
     }
 
-    @GetMapping("")
-    @ApiOperation(value = "查-根据条件-列表", position = 4)
-    default Resp<List<E>> findByCriteria(@ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().findByCriteria(criteria));
+    default void afterAddBatch(Collection<E> entities) {
     }
 
-    @GetMapping("/count")
-    @ApiOperation(value = "查-根据条件-实体数量", position = 5)
-    default Resp<Integer> countByCriteria(@ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().countByCriteria(criteria));
+    default boolean beforeAddBatch(Collection<E> entities, int batchSize) {
+        return true;
     }
 
-    @GetMapping("/count/all")
-    @ApiOperation(value = "查-全部实体数量", position = 6)
-    default Resp<Integer> countAll() {
-        return Resp.bizSuccess(getService().countAll());
+    default void afterAddBatch(Collection<E> entities, int batchSize) {
     }
 
-    @GetMapping("/present/{id}")
-    @ApiOperation(value = "查-根据id-实体是否存在", position = 7)
-    default Resp<Boolean> isPresentById(@PathVariable("id") String id) {
-        return Resp.bizSuccess(getService().isPresentById(id));
+    default boolean beforeAddIfAbsent(E entity, ICriteria<E, C> criteria) {
+        return true;
     }
 
-    @GetMapping("/present")
-    @ApiOperation(value = "查-根据条件-实体是否存在", position = 8)
-    default Resp<Boolean> isPresentByCriteria(@ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().isPresentByCriteria(criteria));
+    default void afterAddIfAbsent(E entity, ICriteria<E, C> criteria) {
     }
 
-    @SuppressWarnings("rawtypes")
-    @PostMapping("")
-    @ApiOperation(value = "增-单个实体", position = 9)
-    default Resp<String> add(@RequestBody @Valid E entity) {
-        getService().add(entity);
-        return Resp.bizSuccess(entity instanceof IdEntity ? ((IdEntity) entity).getId().toString() : "");
+    default boolean beforeDeleteById(Serializable id) {
+        return true;
     }
 
-    @PostMapping("/batch")
-    @ApiOperation(value = "增-批量实体", position = 10)
-    default Resp<Integer> batchAdd(@RequestBody ArrayList<E> entities) {
-        return Resp.bizSuccess(getService().addBatch(entities).size());
+    default void afterDeleteById(Serializable id) {
     }
 
-    @PutMapping("/allColumns")
-    @ApiOperation(value = "改-根据id-全部字段", position = 11)
-    default Resp<Boolean> updateAllColumnsById(@RequestBody @Valid E entity) {
-        return Resp.bizSuccess(getService().updateEntityById(entity));
+    default boolean beforeDeleteByIds(Collection<? extends Serializable> ids) {
+        return true;
     }
 
-    @PutMapping("")
-    @ApiOperation(value = "改-根据id-非空字段", position = 12)
-    default Resp<Boolean> updateExcludeNullFieldsById(@RequestBody @Valid E entity) {
-        return Resp.bizSuccess(getService().updateEntityById(entity));
+    default void afterDeleteByIds(Collection<? extends Serializable> ids) {
     }
 
-    @DeleteMapping("/{ids}")
-    @ApiOperation(value = "删-根据批量id", position = 13)
-    default Resp<Boolean> deleteByIds(@PathVariable("ids") @ApiParam(value = "ids,用英文逗号,隔开") List<String> ids) {
-        return Resp.bizSuccess(getService().deleteByIds(ids));
+    default boolean beforeDeleteByCriteria(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterDeleteByCriteria(ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeUpdateById(E entity) {
+        return true;
+    }
+
+    default void afterUpdateById(E entity) {
+    }
+
+    default boolean beforeUpdateEntityById(E entity) {
+        return true;
+    }
+
+    default void afterUpdateEntityById(E entity) {
+    }
+
+    default boolean beforeUpdateByIdOrException(E entity) {
+        return true;
+    }
+
+    default void afterUpdateByIdOrException(E entity) {
+    }
+
+    default boolean beforeUpdateByCriteria(E entity, ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterUpdateByCriteria(E entity, ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeUpdateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterUpdateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeGetById(Serializable id) {
+        return true;
+    }
+
+    default void afterGetById(Serializable id) {
+    }
+
+    default boolean beforeGetByIdOrException(Serializable id) {
+        return true;
+    }
+
+    default void afterGetByIdOrException(Serializable id) {
+    }
+
+    default boolean beforeGetByCriteria(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterGetByCriteria(ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeGetByCriteriaOrWarn(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterGetByCriteriaOrWarn(ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeGetByCriteriaOrException(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterGetByCriteriaOrException(ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeFindByCriteria(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterFindByCriteria(ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeFindPageByCriteria(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterFindPageByCriteria(ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeFindAll() {
+        return true;
+    }
+
+    default void afterFindAll() {
+    }
+
+    default boolean beforeCountByCriteria(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterCountByCriteria(ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeCountAll() {
+        return true;
+    }
+
+    default void afterCountAll() {
+    }
+
+    default boolean beforeIsPresentById(Serializable id) {
+        return true;
+    }
+
+    default void afterIsPresentById(Serializable id) {
+    }
+
+    default boolean beforeIsPresentByColumn(String columnName, Object value) {
+        return true;
+    }
+
+    default void afterIsPresentByColumn(String columnName, Object value) {
+    }
+
+    default boolean beforeIsPresentByCriteria(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterIsPresentByCriteria(ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeIsAbsentByColumn(String columnName, Object value) {
+        return true;
+    }
+
+    default void afterIsAbsentByColumn(String columnName, Object value) {
+    }
+
+    default boolean beforeIsAbsentByCriteria(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterIsAbsentByCriteria(ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeExceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterExceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
+    }
+
+    default boolean beforeExceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
+        return true;
+    }
+
+    default void afterExceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
     }
 
 }

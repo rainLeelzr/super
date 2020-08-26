@@ -177,6 +177,7 @@ import vip.isass.core.repository.IRepository;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -186,137 +187,337 @@ public interface IV1Service<E, C extends ICriteria<E, C>> {
 
     IRepository<E, C> getV1Repository();
 
+    V1ServiceInterceptor<E, C> getV1ServiceInterceptor();
+
     // ****************************** 增 start ******************************
+
     default E add(E entity) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeAdd(entity)) {
+            return entity;
+        }
         getV1Repository().add(entity);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterAdd(entity);
+        }
         return entity;
     }
 
     default Collection<E> addBatch(Collection<E> entities) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeAddBatch(entities)) {
+            return entities;
+        }
         getV1Repository().addBatch(entities);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterAddBatch(entities);
+        }
         return entities;
     }
 
     default Collection<E> addBatch(Collection<E> entities, int batchSize) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeAddBatch(entities, batchSize)) {
+            return entities;
+        }
         getV1Repository().addBatch(entities, batchSize);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterAddBatch(entities, batchSize);
+        }
         return entities;
     }
 
     default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
-        if (this.isAbsentByCriteria(criteria)) {
-            return this.add(entity);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeAddIfAbsent(entity, criteria)) {
+            return entity;
         }
-        return null;
+        if (!getV1Repository().isPresentByCriteria(criteria)) {
+            getV1Repository().add(entity);
+        }
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterAddIfAbsent(entity, criteria);
+        }
+        return entity;
     }
 
     // ****************************** 删 start ******************************
 
-    default Boolean deleteById(Serializable id) {
-        return getV1Repository().deleteById(id);
+    default boolean deleteById(Serializable id) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeDeleteById(id)) {
+            return false;
+        }
+        boolean b = getV1Repository().deleteById(id);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterDeleteById(id);
+        }
+        return b;
     }
 
-    default Boolean deleteByIds(Collection<? extends Serializable> ids) {
-        return getV1Repository().deleteByIds(ids);
+    default boolean deleteByIds(Collection<? extends Serializable> ids) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeDeleteByIds(ids)) {
+            return false;
+        }
+        boolean b = getV1Repository().deleteByIds(ids);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterDeleteByIds(ids);
+        }
+        return b;
     }
 
-    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        return getV1Repository().deleteByCriteria(criteria);
+    default boolean deleteByCriteria(ICriteria<E, C> criteria) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeDeleteByCriteria(criteria)) {
+            return false;
+        }
+        boolean b = getV1Repository().deleteByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterDeleteByCriteria(criteria);
+        }
+        return b;
     }
 
     //****************************** 改 start ******************************
-    default Boolean updateById(E entity) {
-        return updateEntityById(entity);
+
+    default boolean updateById(E entity) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeUpdateById(entity)) {
+            return false;
+        }
+        boolean b = getV1Repository().updateEntityById(entity);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterUpdateById(entity);
+        }
+        return b;
     }
 
-    default Boolean updateEntityById(E entity) {
-        return getV1Repository().updateEntityById(entity);
+    default boolean updateEntityById(E entity) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeUpdateEntityById(entity)) {
+            return false;
+        }
+        boolean b = getV1Repository().updateEntityById(entity);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterUpdateEntityById(entity);
+        }
+        return b;
     }
 
     default void updateByIdOrException(E entity) {
-        if (!updateEntityById(entity)) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeUpdateByIdOrException(entity)) {
+            return;
+        }
+        if (!getV1Repository().updateEntityById(entity)) {
             throw new AbsentException("更新失败，记录不存在");
+        }
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterUpdateByIdOrException(entity);
         }
     }
 
-    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        return getV1Repository().updateByCriteria(entity, criteria);
+    default boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeUpdateByCriteria(entity, criteria)) {
+            return false;
+        }
+        boolean b = getV1Repository().updateByCriteria(entity, criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterUpdateByCriteria(entity, criteria);
+        }
+        return b;
     }
 
     default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeUpdateByCriteriaOrException(entity, criteria)) {
+            return;
+        }
         if (!getV1Repository().updateByCriteria(entity, criteria)) {
             throw new AbsentException("更新失败，记录不存在");
+        }
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterUpdateByCriteriaOrException(entity, criteria);
         }
     }
 
     // ****************************** 查 start ******************************
+
     default E getById(Serializable id) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeGetById(id)) {
+            return null;
+        }
         Assert.notNull(id, "id");
-        return getV1Repository().getEntityById(id);
+        E e = getV1Repository().getEntityById(id);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterGetById(id);
+        }
+        return e;
     }
 
     default E getByIdOrException(Serializable id) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeGetByIdOrException(id)) {
+            return null;
+        }
         Assert.notNull(id, "id");
-        return getV1Repository().getByIdOrException(id);
+        E e = getV1Repository().getByIdOrException(id);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterGetByIdOrException(id);
+        }
+        return e;
     }
 
     default E getByCriteria(ICriteria<E, C> criteria) {
-        return getV1Repository().getByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeGetByCriteria(criteria)) {
+            return null;
+        }
+        E e = getV1Repository().getByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterGetByCriteria(criteria);
+        }
+        return e;
     }
 
     default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        return getV1Repository().getByCriteriaOrWarn(criteria);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeGetByCriteriaOrWarn(criteria)) {
+            return null;
+        }
+        E e = getV1Repository().getByCriteriaOrWarn(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterGetByCriteriaOrWarn(criteria);
+        }
+        return e;
     }
 
     default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        return getV1Repository().getByCriteriaOrException(criteria);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeGetByCriteriaOrException(criteria)) {
+            return null;
+        }
+        E e = getV1Repository().getByCriteriaOrException(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterGetByCriteriaOrException(criteria);
+        }
+        return e;
     }
 
     default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        return getV1Repository().findByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeFindByCriteria(criteria)) {
+            return Collections.emptyList();
+        }
+        List<E> eList = getV1Repository().findByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterFindByCriteria(criteria);
+        }
+        return eList;
     }
 
     default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        return getV1Repository().findPageByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeFindPageByCriteria(criteria)) {
+            return null;
+        }
+        IPage<E> page = getV1Repository().findPageByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterFindPageByCriteria(criteria);
+        }
+        return page;
     }
 
     default List<E> findAll() {
-        return getV1Repository().findAll();
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeFindAll()) {
+            return Collections.emptyList();
+        }
+        List<E> eList = getV1Repository().findAll();
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterFindAll();
+        }
+        return eList;
     }
 
     default Integer countByCriteria(ICriteria<E, C> criteria) {
-        return getV1Repository().countByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeCountByCriteria(criteria)) {
+            return 0;
+        }
+        Integer count = getV1Repository().countByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterCountByCriteria(criteria);
+        }
+        return count;
     }
 
     default Integer countAll() {
-        return getV1Repository().countAll();
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeCountAll()) {
+            return 0;
+        }
+        Integer count = getV1Repository().countAll();
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterCountAll();
+        }
+        return count;
     }
 
     default boolean isPresentById(Serializable id) {
-        return getV1Repository().isPresentById(id);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeIsPresentById(id)) {
+            return false;
+        }
+        boolean b = getV1Repository().isPresentById(id);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterIsPresentById(id);
+        }
+        return b;
     }
 
     default boolean isPresentByColumn(String columnName, Object value) {
-        return getV1Repository().isPresentByColumn(columnName, value);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeIsPresentByColumn(columnName, value)) {
+            return false;
+        }
+        boolean b = getV1Repository().isPresentByColumn(columnName, value);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterIsPresentByColumn(columnName, value);
+        }
+        return b;
     }
 
     default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        return getV1Repository().isPresentByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeIsPresentByCriteria(criteria)) {
+            return false;
+        }
+        boolean b = getV1Repository().isPresentByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterIsPresentByCriteria(criteria);
+        }
+        return b;
     }
 
     default boolean isAbsentByColumn(String columnName, Object value) {
-        return !isPresentByColumn(columnName, value);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeIsAbsentByColumn(columnName, value)) {
+            return false;
+        }
+        boolean b = !getV1Repository().isPresentByColumn(columnName, value);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterIsAbsentByColumn(columnName, value);
+        }
+        return b;
     }
 
     default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
-        return !isPresentByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeIsAbsentByCriteria(criteria)) {
+            return false;
+        }
+        boolean b = !getV1Repository().isPresentByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterIsAbsentByCriteria(criteria);
+        }
+        return b;
     }
 
     default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeExceptionIfPresentByCriteria(criteria)) {
+            return;
+        }
         getV1Repository().exceptionIfPresentByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterExceptionIfPresentByCriteria(criteria);
+        }
     }
 
     default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
+        if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeExceptionIfAbsentByCriteria(criteria)) {
+            return;
+        }
         getV1Repository().exceptionIfAbsentByCriteria(criteria);
+        if (getV1ServiceInterceptor() != null) {
+            getV1ServiceInterceptor().afterExceptionIfAbsentByCriteria(criteria);
+        }
     }
 
 }
