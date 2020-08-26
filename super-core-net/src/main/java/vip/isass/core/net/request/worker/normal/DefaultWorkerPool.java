@@ -169,14 +169,12 @@
 
 package vip.isass.core.net.request.worker.normal;
 
-import vip.isass.core.net.request.Request;
-import vip.isass.core.net.request.worker.WorkerPool;
-import vip.isass.core.support.SpringContextUtil;
 import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-
-import javax.annotation.Resource;
+import vip.isass.core.net.request.Request;
+import vip.isass.core.net.request.worker.WorkerPool;
+import vip.isass.core.support.SpringContextUtil;
 
 /**
  * 管理业务逻辑工人线程线程池
@@ -187,9 +185,6 @@ import javax.annotation.Resource;
 @Slf4j
 @ConditionalOnMissingBean(WorkerPool.class)
 public class DefaultWorkerPool implements WorkerPool {
-
-    @Resource
-    private SpringContextUtil ipasSpringContextUtil;
 
     /**
      * 最少的工人队列

@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * @author ipas
+ * @author isass
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

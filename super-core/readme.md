@@ -2,8 +2,6 @@
 -Xms64M -Xmx512M -XX:MetaspaceSize=64M -XX:MaxMetaspaceSize=512M -Dspring.profiles.active=dev-rain1
 ```
 
-蓝色（ipas）在汉英语言中都是天空和海洋的颜色，并且给人以高远、宁静、博大、深邃、宽容的感觉。
-
 首先我们看bigint, MySQL的整型类型有这样几种：
 类型      占用字节
 tinyint        1
