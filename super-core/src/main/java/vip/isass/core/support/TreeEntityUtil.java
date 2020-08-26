@@ -181,37 +181,40 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * 列表转树结构工具
+ */
 public class TreeEntityUtil {
 
-    private static <PK, R extends ChildrenEntity<R>> List<R> parseTree(List<Tree<PK>> treeNodes, Function<Tree<PK>, R> function) {
+    private static <PK, R extends ChildrenEntity<R>> List<R> convertToTree(List<Tree<PK>> treeNodes, Function<Tree<PK>, R> function) {
         if (CollUtil.isEmpty(treeNodes)) {
             return Collections.emptyList();
         }
         List<R> list = new ArrayList<>(treeNodes.size());
         for (Tree<PK> treeNode : treeNodes) {
             R r = function.apply(treeNode);
-            r.setChildren(parseTree(treeNode.getChildren(), function));
+            r.setChildren(convertToTree(treeNode.getChildren(), function));
             list.add(r);
         }
         return list;
     }
 
-    public static <PK, E, R extends ChildrenEntity<R>> List<R> parseTree(List<E> entities,
-                                                                         PK parentId,
-                                                                         TreeNodeConfig treeNodeConfig,
-                                                                         NodeParser<E, PK> entityToTreeNode,
-                                                                         Function<Tree<PK>, R> treeNodeToChildrenEntity) {
+    public static <PK, E, R extends ChildrenEntity<R>> List<R> convertToTree(List<E> entities,
+                                                                             PK parentId,
+                                                                             TreeNodeConfig treeNodeConfig,
+                                                                             NodeParser<E, PK> entityToTreeNode,
+                                                                             Function<Tree<PK>, R> treeNodeToChildrenEntity) {
 
         List<Tree<PK>> trees = TreeUtil.build(entities, parentId, treeNodeConfig, entityToTreeNode);
-        return parseTree(trees, treeNodeToChildrenEntity);
+        return convertToTree(trees, treeNodeToChildrenEntity);
     }
 
-    public static <PK, E, R extends ChildrenEntity<R>> List<R> parseTree(List<E> entities,
-                                                                         PK parentId,
-                                                                         NodeParser<E, PK> entityToTreeNode,
-                                                                         Function<Tree<PK>, R> treeNodeToChildrenEntity) {
+    public static <PK, E, R extends ChildrenEntity<R>> List<R> convertToTree(List<E> entities,
+                                                                             PK parentId,
+                                                                             NodeParser<E, PK> entityToTreeNode,
+                                                                             Function<Tree<PK>, R> treeNodeToChildrenEntity) {
 
-        return parseTree(entities, parentId, TreeNodeConfig.DEFAULT_CONFIG, entityToTreeNode, treeNodeToChildrenEntity);
+        return convertToTree(entities, parentId, TreeNodeConfig.DEFAULT_CONFIG, entityToTreeNode, treeNodeToChildrenEntity);
     }
 
 }
