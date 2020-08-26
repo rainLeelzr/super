@@ -8,6 +8,7 @@ import vip.isass.core.web.IV1Service;
 import ${cfg.criteriaPackageName}.${entity}Criteria;
 import ${cfg.entityPackageName}.${entity};
 import ${cfg.package}.${cfg.moduleName}.db.${cfg.prefix}.repository.${cfg.prefix?cap_first}${entity}Repository;
+import vip.isass.core.web.V1ServiceInterceptor;
 
 import javax.annotation.Resource;
 
