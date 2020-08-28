@@ -174,12 +174,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import vip.isass.core.web.Resp;
+import vip.isass.core.web.security.authentication.ms.MsAuthenticationHeaderProvider;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
@@ -198,6 +196,9 @@ public class RestTemplateResRegister implements ResRegister {
     @javax.annotation.Resource
     private RestTemplate restTemplate;
 
+    @javax.annotation.Resource
+    private MsAuthenticationHeaderProvider msAuthenticationHeaderProvider;
+
     @Value("${security.auth.url.get-all-res:}")
     private String getAllResUrl;
 
@@ -211,40 +212,39 @@ public class RestTemplateResRegister implements ResRegister {
         if (this.getAllResUrl.isEmpty()) {
             log.warn("未配置security.auth.url.get-all-res");
             isInited = false;
+            return;
         }
         if (this.addBatchRes.isEmpty()) {
             log.warn("未配置security.auth.url.add-batch-res");
             isInited = false;
+            return;
         }
+        isInited = true;
     }
 
     @Override
-    public List<Resource> getAllRegisteredResource() {
-        return getAllRegisteredResourceByUrl(getAllResUrl);
-    }
-
-    @Override
-    public List<Resource> getAllRegisteredResourceByPrefixUri(String prefixUri) {
+    public List<Resource> getAllRegisteredResourceByAppId(String appId) {
         if (!isInited) {
             log.warn("RestTemplateResRegister未初始化成功，getAllRegisteredResourceByPrefixUri将返回空列表");
             return Collections.emptyList();
         }
 
         return getAllRegisteredResourceByUrl(
-            getAllResUrl + (StrUtil.isBlank(prefixUri) ? "" : "?uriStartWith=" + prefixUri));
+            getAllResUrl + (StrUtil.isBlank(appId) ? "" : "?appId=" + appId));
     }
 
     private List<Resource> getAllRegisteredResourceByUrl(String url) {
         ParameterizedTypeReference<Resp<List<Resource>>> type = new ParameterizedTypeReference<Resp<List<Resource>>>() {
 
         };
-
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(msAuthenticationHeaderProvider.getHeaderName(), msAuthenticationHeaderProvider.getValue());
         ResponseEntity<Resp<List<Resource>>> response;
         try {
             response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
-                null,
+                new HttpEntity<>(httpHeaders),
                 type
             );
         } catch (Exception e) {
@@ -253,9 +253,7 @@ public class RestTemplateResRegister implements ResRegister {
             return Collections.emptyList();
         }
         Resp<List<Resource>> resp = response.getBody();
-
-        return resp == null ? Collections.emptyList() : Collections.emptyList();
-        // return resp == null ? Collections.emptyList() : resp.getData();
+        return resp == null ? Collections.emptyList() : resp.getData();
     }
 
     @Override

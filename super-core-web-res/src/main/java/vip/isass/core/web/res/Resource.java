@@ -197,6 +197,17 @@ public class Resource {
     @Setter
     private String httpMethod;
 
+    @Getter
+    @Setter
+    private String appId;
+
+    /**
+     * 名称
+     */
+    @Getter
+    @Setter
+    private String name;
+
     /**
      * 资源标识
      */

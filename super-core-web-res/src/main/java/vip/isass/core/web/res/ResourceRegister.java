@@ -170,9 +170,13 @@
 package vip.isass.core.web.res;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -207,22 +211,44 @@ public class ResourceRegister implements SmartLifecycle {
     @Autowired(required = false)
     private IgnoreUrlResProvider ignoreUrlResProvider;
 
+    @Value("isass-${spring.application.name:unknow}")
+    private String appId;
+
     private static boolean IS_RUNNING = false;
 
     public void register() {
         IS_RUNNING = true;
 
-        Collection<String> ignoreUrls = Optional.ofNullable(ignoreUrlResProvider).map(IgnoreUrlResProvider::getUrls).orElse(Collections.emptyList());
+        Collection<String> ignoreUrls = Optional.ofNullable(ignoreUrlResProvider)
+            .map(IgnoreUrlResProvider::getUrls)
+            .orElse(Collections.emptyList());
 
         Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
         List<Resource> collect = handlerMethods
             .entrySet()
             .parallelStream()
             .map(h -> {
-                    RequestMappingInfo mappingInfo = h.getKey();
+                    String tag;
+                    Api annotation = h.getValue().getBeanType().getAnnotation(Api.class);
+                    if (annotation == null) {
+                        tag = h.getValue().getBeanType().getSimpleName();
+                    } else {
+                        String[] tags = annotation.tags();
+                        tag = ArrayUtil.isEmpty(tags) || StrUtil.isBlank(tags[0])
+                            ? h.getValue().getBeanType().getSimpleName()
+                            : tags[0];
+                    }
 
-                    RequestMethodsRequestCondition methodsCondition = mappingInfo.getMethodsCondition();
-                    PatternsRequestCondition patternsCondition = mappingInfo.getPatternsCondition();
+                    String name = tag;
+                    ApiOperation apiOperation = h.getValue().getMethodAnnotation(ApiOperation.class);
+                    if (apiOperation == null || StrUtil.isBlank(apiOperation.value())) {
+                        name = tag + "-" + h.getValue().getMethod().getName();
+                    } else {
+                        name = tag + "-" + apiOperation.value();
+                    }
+
+                    RequestMethodsRequestCondition methodsCondition = h.getKey().getMethodsCondition();
+                    PatternsRequestCondition patternsCondition = h.getKey().getPatternsCondition();
 
                     Set<Resource> resources = new HashSet<>(4);
                     for (RequestMethod requestMethod : methodsCondition.getMethods()) {
@@ -230,10 +256,13 @@ public class ResourceRegister implements SmartLifecycle {
                             if (ignoreUrls.contains(uri)) {
                                 continue;
                             }
-                            resources.add(new Resource()
+                            Resource resource = new Resource()
                                 .setHttpMethod(requestMethod.name())
                                 .setTransportProtocol(Resource.TransportProtocol.HTTP)
-                                .setUri(uriPrefixProvider.getUriPrefix() + uri.trim()));
+                                .setAppId(appId)
+                                .setUri(uriPrefixProvider.getUriPrefix() + uri.trim());
+                            resource.setName(StrUtil.nullToDefault(name, StrUtil.subPre(resource.getUri(), 32)));
+                            resources.add(resource);
                         }
                     }
                     return resources;
@@ -247,7 +276,7 @@ public class ResourceRegister implements SmartLifecycle {
         }
 
         try {
-            List<Resource> allRegisteredResource = resRegister.getAllRegisteredResourceByPrefixUri(uriPrefixProvider.getUriPrefix());
+            List<Resource> allRegisteredResource = resRegister.getAllRegisteredResourceByAppId(appId);
             if (CollUtil.isNotEmpty(allRegisteredResource)) {
                 collect = collect.stream()
                     .filter(r -> !this.isExist(r, allRegisteredResource))
@@ -261,7 +290,6 @@ public class ResourceRegister implements SmartLifecycle {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-
     }
 
     /**
@@ -275,6 +303,17 @@ public class ResourceRegister implements SmartLifecycle {
         for (Resource temp : resources) {
             // 如果传输协议不相同，则执行下一次循环
             if (resource.getTransportProtocol() != temp.getTransportProtocol()) {
+                continue;
+            }
+
+            // 判断 appId
+            if (!(StrUtil.isNotBlank(resource.getAppId()) && StrUtil.isNotBlank(temp.getAppId()))) {
+                continue;
+            }
+            if (resource.getAppId() == null) {
+                continue;
+            }
+            if (!resource.getAppId().equals(temp.getAppId())) {
                 continue;
             }
 
