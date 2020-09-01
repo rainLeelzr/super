@@ -193,22 +193,6 @@
             <groupId>vip.isass</groupId>
             <artifactId>super-core-web</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>vip.isass</groupId>
-            <artifactId>super-core-web-security</artifactId>
-        </dependency>
-
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter</artifactId>-->
-        <!--<scope>provided</scope>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-web</artifactId>-->
-        <!--</dependency>-->
     </dependencies>
 
     <build>
