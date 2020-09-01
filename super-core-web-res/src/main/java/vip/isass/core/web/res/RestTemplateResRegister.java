@@ -281,7 +281,7 @@ public class RestTemplateResRegister implements ResRegister {
             return;
         }
         if (resp.getStatusCode() == HttpStatus.OK && resp.getBody() != null && resp.getBody().getSuccess()) {
-            log.info("成功注册了{}个resource", resp.getBody().getData());
+            log.info("成功注册了{}个resource", collect.size());
         } else {
             log.error("保存resource错误:{}", resp.toString());
         }
