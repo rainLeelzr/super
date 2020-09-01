@@ -203,6 +203,17 @@ public interface ApiService {
         }
 
         for (S service : services) {
+            consumer.accept(service);
+            return;
+        }
+    }
+
+    default <S, V> void consumeWithoutException(Collection<S> services, Consumer<S> consumer) {
+        if (services == null) {
+            throw new UnsupportedOperationException("当前环境没有" + this.getClass().getSimpleName());
+        }
+
+        for (S service : services) {
             try {
                 consumer.accept(service);
                 return;

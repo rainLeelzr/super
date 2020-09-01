@@ -183,6 +183,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
+import vip.isass.core.web.security.RoleVo;
 import vip.isass.core.web.security.SecurityConst;
 import vip.isass.core.web.uri.UriPrefixProvider;
 
@@ -258,15 +259,15 @@ public class SecurityMetadataSource implements FilterInvocationSecurityMetadataS
 
         HandlerMethod handlerMethod = requestMappingInfoAndHandlerMethodEntry.getValue();
 
-        Collection<String> roleCodes = securityMetadataSourceProviderManager.findRolesByUri(
+        Collection<RoleVo> roleVos = securityMetadataSourceProviderManager.findRolesByUri(
             uriPrefixProvider.getUriPrefix() + mappingUri,
             httpMethod);
 
-        if (CollUtil.isNotEmpty(roleCodes)) {
-            attributes = roleCodes.stream()
+        if (CollUtil.isNotEmpty(roleVos)) {
+            attributes = roleVos.stream()
                 .filter(Objects::nonNull)
-                .filter(StrUtil::isNotBlank)
-                .map(SecurityConfig::new)
+                .filter(r -> StrUtil.isNotBlank(r.getCode()))
+                .map(r -> new SecurityConfig(r.getCode()))
                 .collect(Collectors.toList());
         }
 

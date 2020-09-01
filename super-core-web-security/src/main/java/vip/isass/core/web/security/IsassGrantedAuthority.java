@@ -167,97 +167,47 @@
  *
  */
 
-package vip.isass.core.web.security.authentication;
+package vip.isass.core.web.security;
 
-import cn.hutool.extra.servlet.ServletUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import cn.hutool.core.lang.Assert;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import vip.isass.core.login.DefaultLoginUser;
-import vip.isass.core.login.LoginUser;
-import vip.isass.core.web.security.authentication.jwt.JwtAuthenticationFilter;
-import vip.isass.core.web.security.authentication.jwt.JwtConst;
-import vip.isass.core.web.security.authentication.ms.MsAuthenticationFilter;
-import vip.isass.core.web.security.authentication.ms.MsAuthenticationHeaderProvider;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Objects;
 
-/**
- * @author Rain
- */
-@Slf4j
-public abstract class AbstractAuthenticationFilter extends BasicAuthenticationFilter {
+public class IsassGrantedAuthority implements GrantedAuthority {
 
-    public AbstractAuthenticationFilter(AuthenticationManager authenticationManager) {
-        super(authenticationManager);
-    }
+    private final String roleId;
 
-    protected void saveAuthentication(DefaultLoginUser defaultLoginUser, Collection<GrantedAuthority> authorities) {
-        // 已有授权信息
-        LoginUserTokenWrapper tokenWrapper = (LoginUserTokenWrapper) SecurityContextHolder.getContext().getAuthentication();
+    private final String roleCode;
 
-        if (tokenWrapper == null) {
-            tokenWrapper = new LoginUserTokenWrapper(defaultLoginUser, authorities);
-        } else {
-            // loginUsers
-            List<LoginUser> loginUsers = tokenWrapper.getLoginUsers();
-            loginUsers.add(defaultLoginUser);
-
-            // newAuthorities
-            Collection<GrantedAuthority> newAuthorities;
-            if (tokenWrapper.getAuthorities().isEmpty()) {
-                newAuthorities = authorities;
-            } else {
-                newAuthorities = new ArrayList<>(tokenWrapper.getAuthorities().size() + authorities.size());
-                newAuthorities.addAll(tokenWrapper.getAuthorities());
-                newAuthorities.addAll(authorities);
-            }
-
-            // token
-            tokenWrapper = new LoginUserTokenWrapper(loginUsers, newAuthorities);
-        }
-
-        SecurityContextHolder.getContext().setAuthentication(tokenWrapper);
+    public IsassGrantedAuthority(String roleId, String roleCode) {
+        Assert.notBlank(roleCode, "roleCode");
+        this.roleId = roleId;
+        this.roleCode = roleCode;
     }
 
     @Override
-    protected void onSuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authResult) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof LoginUserTokenWrapper) {
-            LoginUserTokenWrapper loginUserAuthenticationToken = (LoginUserTokenWrapper) authentication;
-            log.debug("认证成功[{}], 正在访问[{} {}], userId[{}], name[{}], 拥有角色{}, 源ip[{}]",
-                this.getClass().getSimpleName(),
-                request.getMethod(),
-                request.getRequestURL(),
-                loginUserAuthenticationToken.getAllUserId(),
-                loginUserAuthenticationToken.getAllNickName(),
-                authentication.getAuthorities(),
-                ServletUtil.getClientIP(request));
-        }
+    public String getAuthority() {
+        return roleCode;
     }
 
     @Override
-    protected void onUnsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        String token = null;
-        if (this instanceof JwtAuthenticationFilter) {
-            token = request.getHeader(JwtConst.HEADER_NAME);
-        } else if (this instanceof MsAuthenticationFilter) {
-            token = request.getHeader(MsAuthenticationHeaderProvider.HEADER);
-        }
-        log.debug("认证失败[{}], token[{}]，正在访问 {} {}, 源ip[{}]",
-            this.getClass().getSimpleName(),
-            token,
-            request.getMethod(),
-            request.getRequestURL(),
-            ServletUtil.getClientIP(request));
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IsassGrantedAuthority that = (IsassGrantedAuthority) o;
+        return Objects.equals(roleId, that.roleId) &&
+            Objects.equals(roleCode, that.roleCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(roleId, roleCode);
+    }
+
+    @Override
+    public String toString() {
+        return roleCode;
     }
 
 }

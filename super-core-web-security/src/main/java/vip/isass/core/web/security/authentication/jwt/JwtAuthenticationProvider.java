@@ -172,8 +172,6 @@ package vip.isass.core.web.security.authentication.jwt;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import vip.isass.core.support.LocalDateTimeUtil;
-import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -185,9 +183,11 @@ import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import vip.isass.core.support.LocalDateTimeUtil;
+import vip.isass.core.web.security.IsassGrantedAuthority;
+import vip.isass.core.web.security.RoleVo;
+import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -232,18 +232,17 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
         // 判断用户id是否存在
 
-
         JwtClaim jwtClaim = new JwtClaim();
         BeanUtil.copyProperties(claims, jwtClaim);
 
         // 获取用户拥有的角色
         Collection<GrantedAuthority> configAttributes = Collections.emptyList();
-        Collection<String> roles = securityMetadataSourceProviderManager.findRolesByUserId(jwtClaim.getUid());
+        Collection<RoleVo> roles = securityMetadataSourceProviderManager.findRolesByUserId(jwtClaim.getUid());
         if (!CollUtil.isEmpty(roles)) {
             configAttributes = roles.stream()
                 .filter(Objects::nonNull)
-                .filter(StrUtil::isNotBlank)
-                .map(SimpleGrantedAuthority::new)
+                .filter(r -> StrUtil.isNotBlank(r.getCode()))
+                .map(r -> new IsassGrantedAuthority(r.getId(), r.getCode()))
                 .collect(Collectors.toList());
         }
 

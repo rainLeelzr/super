@@ -170,6 +170,7 @@
 package vip.isass.core.web;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import vip.isass.core.criteria.ICriteria;
 import vip.isass.core.exception.AbsentException;
@@ -240,6 +241,9 @@ public interface IV1Service<E, C extends ICriteria<E, C>> {
     // ****************************** 删 start ******************************
 
     default boolean deleteById(Serializable id) {
+        if (!StrUtil.isBlankIfStr(id)) {
+            throw new IllegalArgumentException("id必填");
+        }
         if (getV1ServiceInterceptor() != null && !getV1ServiceInterceptor().beforeDeleteById(id)) {
             return false;
         }

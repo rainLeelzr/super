@@ -169,6 +169,8 @@
 
 package vip.isass.core.web.security.metadata;
 
+import vip.isass.core.web.security.RoleVo;
+
 import java.util.Collection;
 
 /**
@@ -180,13 +182,13 @@ public interface SecurityMetadataSourceProvider {
      * @param userId user id
      * @return 指定用户拥有的角色
      */
-    Collection<String> findRoleCodesByUserId(String userId);
+    Collection<RoleVo> findRolesByUserId(String userId);
 
     /**
      * @param uri    uri
      * @param method method
      * @return 访问指定 uri 需要的角色
      */
-    Collection<String> findRoleCodesByUri(String uri, String method);
+    Collection<RoleVo> findRoleVosByUri(String uri, String method);
 
 }
