@@ -1,18 +1,18 @@
 # 微服务列表
 | 名称 | 端口 |
 | --- | --- |
-| isass-service-gateway | 20000 |
-| isass-service-config | 20010 |
-| isass-service-gateway-http | 20020 |
+| isass-service-gateway | http:20000 |
+| isass-service-config | http:20010 |
+| isass-service-gateway-http | http:20020 |
 | isass-service-gateway-tcp | 20030,20031 |
-| isass-service-auth | 20040 |
-| isass-service-message | 20050 |
-| isass-service-test-tcp | 20060 |
+| isass-service-auth | http:20040 |
+| isass-service-message | http:20050 |
+| isass-service-test-tcp | http:20060 |
 | isass-service-gateway-websocket | 20070,20071 |
-| isass-service-base | 20080 |
-| isass-service-goods | 20090 |
-| isass-service-order | 20100 |
-| isass-service-job-center| 20110 |
+| isass-service-base | http:20080 |
+| isass-service-goods | http:20090 |
+| isass-service-order | http:20100 |
+| isass-service-job-center| http:20110 |
 | isass-service-job-executor| http:20120 tcp:20170 |
 | isass-service-search| http:20130 |
 | isass-service-finance| http:20140 |
@@ -35,8 +35,8 @@
 | isass-service-attachment| http:20320 |
 | isass-service-log| http:20330 |
 | isass-doc| http:20340 |
-| isass-service-tag| http:20350 |
-| isass-service-uom| http:20360 |
+| isass-service-tag | http:20350 |
+| isass-service-uom | http:20360 |
 
 # 第3方服务
 | 名称 | 端口 |

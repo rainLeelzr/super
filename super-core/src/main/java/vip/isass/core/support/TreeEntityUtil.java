@@ -186,7 +186,8 @@ import java.util.function.Function;
  */
 public class TreeEntityUtil {
 
-    private static <PK, R extends ChildrenEntity<R>> List<R> convertToTree(List<Tree<PK>> treeNodes, Function<Tree<PK>, R> function) {
+    private static <PK, R extends ChildrenEntity<R>> List<R> convertToTree(List<Tree<PK>> treeNodes,
+                                                                           Function<Tree<PK>, R> function) {
         if (CollUtil.isEmpty(treeNodes)) {
             return Collections.emptyList();
         }

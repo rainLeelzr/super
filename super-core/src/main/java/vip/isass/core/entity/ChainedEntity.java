@@ -178,7 +178,7 @@ public interface ChainedEntity<PK extends Serializable, E extends ChainedEntity<
 
     String PARENT_ID_COLUMN_NAME = "parent_id";
 
-    String TOP_ID_VALUE = "0";
+    String TOP_ID_VALUE = "";
 
     /**
      * @return 父 id

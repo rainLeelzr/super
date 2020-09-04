@@ -218,8 +218,7 @@ public class FeignEncoder implements Encoder {
 
             @Override
             public String convert(Object collection) {
-                String s = collection.toString();
-                return s.substring(1, s.length() - 1);
+                return CollUtil.join((Collection) collection, ",");
             }
         }, new Converter<String>() {
             @Override
