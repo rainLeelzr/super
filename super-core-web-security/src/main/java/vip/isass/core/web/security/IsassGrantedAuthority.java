@@ -170,12 +170,14 @@
 package vip.isass.core.web.security;
 
 import cn.hutool.core.lang.Assert;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Objects;
 
 public class IsassGrantedAuthority implements GrantedAuthority {
 
+    @Getter
     private final String roleId;
 
     private final String roleCode;
