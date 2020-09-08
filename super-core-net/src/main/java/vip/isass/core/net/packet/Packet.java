@@ -225,7 +225,10 @@ public interface Packet {
         PUSH(5),
 
         // 请求错误，或者服务器抛出异常，websocket文本通道：异常信息写在content里
-        ERROR(6);
+        ERROR(6),
+
+        // 客户端请求
+        CLIENT_REQUEST(7);
 
         @Getter
         private Integer code;
@@ -235,6 +238,15 @@ public interface Packet {
         }
 
         public static Type parseByCode(Integer code) {
+            for (Type type : Type.values()) {
+                if (type.code.equals(code)) {
+                    return type;
+                }
+            }
+            return null;
+        }
+
+        public static Type parseByCodeOrException(Integer code) {
             for (Type type : Type.values()) {
                 if (type.code.equals(code)) {
                     return type;

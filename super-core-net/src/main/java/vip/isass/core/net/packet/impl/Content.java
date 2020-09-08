@@ -167,43 +167,19 @@
  *
  */
 
-package vip.isass.core.entity;
+package vip.isass.core.net.packet.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import lombok.SneakyThrows;
-import vip.isass.core.support.JsonUtil;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-/**
- * @author Rain
- */
-public interface Json {
+@Getter
+@Setter
+@Accessors(chain = true)
+public class Content {
 
-    JsonNode getJsonNode();
+    private String cmd;
 
-    Json fromString(String string);
-
-    Json fromObject(Object object);
-
-    Json fromJsonNode(JsonNode jsonNode);
-
-    Json fromJson(Json json);
-
-    String getStringValue();
-
-    @SneakyThrows
-    default <T> T parse(Class<T> clazz) {
-        return JsonUtil.DEFAULT_INSTANCE.readValue(getStringValue(), clazz);
-    }
-
-    @SneakyThrows
-    default <T> T toObject(Class<T> clazz) {
-        return JsonUtil.DEFAULT_INSTANCE.treeToValue(getJsonNode(), clazz);
-    }
-
-    @SneakyThrows
-    default <T> T parse(TypeReference<T> typeReference) {
-        return JsonUtil.DEFAULT_INSTANCE.readValue(getStringValue(), typeReference);
-    }
+    private Object body;
 
 }
