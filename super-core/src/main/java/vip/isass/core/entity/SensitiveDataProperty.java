@@ -183,8 +183,8 @@ public interface SensitiveDataProperty {
 
     HashSet<String> PROPERTIES = CollUtil.newHashSet(
         LogicDeleteEntity.DELETE_FLAG_PROPERTY,
-        TimeTracedEntity.CREATED_TIME_PROPERTY,
-        TimeTracedEntity.MODIFY_TIME_PROPERTY,
+//        TimeTracedEntity.CREATED_TIME_PROPERTY,
+//        TimeTracedEntity.MODIFY_TIME_PROPERTY,
         UserTracedEntity.CREATE_USER_ID_PROPERTY,
         UserTracedEntity.CREATE_USER_NAME_PROPERTY,
         UserTracedEntity.MODIFY_USER_ID_PROPERTY,

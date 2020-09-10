@@ -215,6 +215,36 @@ public abstract class MybatisPlusRepository<
         if (entity instanceof IdEntity) {
             ((IdEntity) entity).setId(((IdEntity) edb).getId());
         }
+        if (entity instanceof TimeTracedEntity) {
+            TimeTracedEntity timeTracedEntity = (TimeTracedEntity) entity;
+            TimeTracedEntity timeTracedDbEntity = (TimeTracedEntity) edb;
+            timeTracedEntity.setCreateTime(timeTracedDbEntity.getCreateTime())
+                .setModifyTime(timeTracedDbEntity.getModifyTime());
+        }
+        if (entity instanceof UserTracedEntity) {
+            UserTracedEntity userTracedEntity = (UserTracedEntity) entity;
+            UserTracedEntity userTracedDbEntity = (UserTracedEntity) edb;
+            userTracedEntity.setCreateUserId(userTracedDbEntity.getCreateUserId())
+                .setCreateUserName(userTracedDbEntity.getCreateUserName())
+                .setModifyUserId(userTracedDbEntity.getModifyUserId())
+                .setModifyUserName(userTracedDbEntity.getModifyUserName());
+        }
+        if (entity instanceof ChainedEntity) {
+            ChainedEntity chainedEntity = (ChainedEntity) entity;
+            ChainedEntity chainedDbEntity = (ChainedEntity) edb;
+            chainedEntity.setParentId(chainedDbEntity.getParentId());
+        }
+        if (entity instanceof LogicDeleteEntity) {
+            LogicDeleteEntity logicDeleteEntity = (LogicDeleteEntity) entity;
+            LogicDeleteEntity logicDeleteDbEntity = (LogicDeleteEntity) edb;
+            logicDeleteEntity.setDeleteFlag(logicDeleteDbEntity.getDeleteFlag());
+        }
+        if (entity instanceof VersionEntity) {
+            VersionEntity versionEntity = (VersionEntity) entity;
+            VersionEntity versionDbEntity = (VersionEntity) edb;
+            versionEntity.setVersion(versionDbEntity.getVersion());
+        }
+
         return true;
     }
 
@@ -261,11 +291,25 @@ public abstract class MybatisPlusRepository<
         if (id instanceof String) {
             Assert.notBlank((String) id, "id 不能为空");
         }
-        return super.updateById(DbEntityConvert.convertToDbEntity(entity));
+        EDB edb = DbEntityConvert.convertToDbEntity(entity);
+        boolean b = super.updateById(edb);
+        if (entity instanceof VersionEntity) {
+            VersionEntity versionEntity = (VersionEntity) entity;
+            VersionEntity versionDbEntity = (VersionEntity) edb;
+            versionEntity.setVersion(versionDbEntity.getVersion());
+        }
+        return b;
     }
 
     public boolean updateByWrapper(E entity, Wrapper<EDB> wrapper) {
-        return this.update(DbEntityConvert.convertToDbEntity(entity), wrapper);
+        EDB edb = DbEntityConvert.convertToDbEntity(entity);
+        boolean b = this.update(edb, wrapper);
+        if (entity instanceof VersionEntity) {
+            VersionEntity versionEntity = (VersionEntity) entity;
+            VersionEntity versionDbEntity = (VersionEntity) edb;
+            versionEntity.setVersion(versionDbEntity.getVersion());
+        }
+        return b;
     }
 
     @Override
