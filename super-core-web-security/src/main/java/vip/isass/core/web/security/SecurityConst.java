@@ -195,6 +195,7 @@ public interface SecurityConst {
      */
     String ROLE_ANONYMOUS = "ROLE_ANONYMOUS";
 
+    // 所有uri资源都添加的角色
     Collection<ConfigAttribute> CONFIG_ATTRIBUTES = CollUtil.newArrayList(
         new SecurityConfig(ROLE_SUPER_DEV),
         new SecurityConfig(ROLE_MS));

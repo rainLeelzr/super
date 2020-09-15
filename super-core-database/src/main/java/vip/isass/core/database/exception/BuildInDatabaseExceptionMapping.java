@@ -190,7 +190,7 @@ import java.util.Map;
 @Component
 public class BuildInDatabaseExceptionMapping implements IExceptionMapping {
 
-    private static Map<Class<? extends Exception>, IStatusMessage> exceptionMapping = MapUtil.<Class<? extends Exception>, IStatusMessage>builder()
+    private static Map<Class<? extends Exception>, IStatusMessage> EXCEPTION_MAPPING = MapUtil.<Class<? extends Exception>, IStatusMessage>builder()
         .put(DuplicateKeyException.class, StatusMessageEnum.DUPLICATE_KEY)
         .put(TooManyResultsException.class, StatusMessageEnum.TOO_MANY_RESULT)
         .put(BadSqlGrammarException.class, StatusMessageEnum.BAD_SQL_GRAMMAR)
@@ -198,7 +198,7 @@ public class BuildInDatabaseExceptionMapping implements IExceptionMapping {
 
     @Override
     public IStatusMessage getStatusCode(Exception exception) {
-        return exceptionMapping.get(exception.getClass());
+        return EXCEPTION_MAPPING.get(exception.getClass());
     }
 
     @Override

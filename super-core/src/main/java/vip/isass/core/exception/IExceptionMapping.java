@@ -190,7 +190,8 @@ public interface IExceptionMapping {
     /**
      * 格式化消息，此信息将被终端显示
      *
-     * @param e 被抛出的异常
+     * @param t             被抛出的异常
+     * @param statusMessage 状态消息
      * @return 格式化后的消息
      */
     default String parseMessage(Throwable t, IStatusMessage statusMessage) {
