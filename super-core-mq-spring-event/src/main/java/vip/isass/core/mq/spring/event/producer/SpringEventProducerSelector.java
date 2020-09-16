@@ -167,169 +167,46 @@
  *
  */
 
-package vip.isass.core.mq.core.consumer;
+package vip.isass.core.mq.spring.event.producer;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.SmartLifecycle;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
-import vip.isass.core.mq.MqAutoConfiguration;
-import vip.isass.core.support.ExceptionCatcher;
-import vip.isass.core.support.SpringContextUtil;
+import vip.isass.core.mq.core.MqMessageContext;
+import vip.isass.core.mq.core.producer.MqProducer;
+import vip.isass.core.mq.core.producer.ProducerSelector;
+import vip.isass.core.mq.spring.event.SpringEventConfiguration;
+import vip.isass.core.mq.spring.event.SpringEventConst;
 
-import javax.annotation.PreDestroy;
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
- * 查找所有订阅者，进行订阅
- *
  * @author Rain
  */
-@Slf4j
 @Component
-public class MqConsumerAutoConfiguration implements ApplicationContextAware, SmartLifecycle {
-
-    private ApplicationContext applicationContext;
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
-
-    @Autowired(required = false)
-    private List<MqConsumer> consumers;
+public class SpringEventProducerSelector implements ProducerSelector {
 
     @Resource
-    private MqAutoConfiguration mqAutoConfiguration;
+    private ApplicationEventPublisher applicationEventPublisher;
 
-    private Map<Method, EventListener> methods;
+    @Resource
+    private SpringEventConfiguration springEventConfiguration;
 
-    @Override
-    public void start() {
-        if (CollUtil.isEmpty(consumers)) {
-            return;
-        }
+    private SpringEventProducer springEventProducer;
 
-        if (methods != null) {
-            return;
-        }
-
-        // 查找所有含有 XSuperEventListener 注解的方法
-        methods = new HashMap<>(16);
-        final Map<Method, Object> targetBeans = new HashMap<>(16);
-
-        // 获取有可能出现EventListener注解的bean
-        Map<String, Object> beans = getBeans();
-        for (Map.Entry<String, Object> entry : beans.entrySet()) {
-            Object bean = entry.getValue();
-            Class<?> targetClass = AopUtils.getTargetClass(bean);
-            Method[] declaredMethods = targetClass.getDeclaredMethods();
-            if (ArrayUtil.isEmpty(declaredMethods)) {
-                continue;
-            }
-            // 收集类中所有含有 EventListener 注解的方法
-            final Collection<Method> matchMethods = Stream.of(declaredMethods)
-                .filter(Objects::nonNull)
-                .filter(m -> m.getAnnotation(EventListener.class) != null)
-                .collect(Collectors.toList());
-
-            if (matchMethods.isEmpty()) {
-                continue;
-            }
-
-            // 过滤掉父类的方法，将过滤得到的结果放到methods和targetBeans
-            matchMethods.stream()
-                .map(m -> AopUtils.getMostSpecificMethod(m, targetClass))
-                .distinct()
-                .forEach(m -> {
-                    EventListener annotation = m.getAnnotation(EventListener.class);
-                    methods.put(m, annotation);
-                    targetBeans.put(m, bean);
-                });
-        }
-
-        if (methods.isEmpty()) {
-            methods = null;
-            return;
-        }
-
-
-        // 遍历订阅方法，找到实现厂商进行实现
-        methods.forEach((m, l) -> {
-            if (mqAutoConfiguration.getDisable().contains(l.consumerId())) {
-                return;
-            }
-
-            String manufacturer = StrUtil.blankToDefault(l.manufacturer(), mqAutoConfiguration.getDefaultManufacturer());
-            if (StrUtil.isBlank(manufacturer)) {
-                log.warn("消息订阅方法[{}]没有解析到 MqConsumer 实现厂商, 执行订阅失败", m.toString());
-                return;
-            }
-
-            MqConsumer mqConsumer = consumers.stream().filter(c -> c.getManufacturer().equals(manufacturer))
-                .findAny()
-                .orElse(null);
-
-            if (mqConsumer == null) {
-                log.warn("厂商[{}]没有实现 MqConsumer, [{}]方法执行订阅失败", manufacturer, m.toString());
-                return;
-            }
-
-            try {
-                // 获取一个新的消费者bean
-                mqConsumer = SpringContextUtil.getBean(mqConsumer.getClass());
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-
-            // 执行订阅
-            mqConsumer.setRuntimeBean(targetBeans.get(m))
-                .setEventListener(l)
-                .setRuntimeMethod(m)
-                .setSubscribeModel(l.subscribeModel())
-                .setConsumerId(l.consumerId())
-                .setTopic(l.topic())
-                .setTag(l.tag())
-                .setConsumeThreadNumber(l.consumeThreadNumber())
-                .subscribe();
-        });
-    }
-
-    private Map<String, Object> getBeans() {
-        Map<String, Object> beansMap = new HashMap<>(100);
-        beansMap.putAll(ExceptionCatcher.supplierOrDefault(() -> applicationContext.getBeansWithAnnotation(Controller.class), Collections.emptyMap()));
-        beansMap.putAll(ExceptionCatcher.supplierOrDefault(() -> applicationContext.getBeansWithAnnotation(RestController.class), Collections.emptyMap()));
-        beansMap.putAll(ExceptionCatcher.supplierOrDefault(() -> applicationContext.getBeansWithAnnotation(Service.class), Collections.emptyMap()));
-        beansMap.putAll(ExceptionCatcher.supplierOrDefault(() -> applicationContext.getBeansWithAnnotation(Component.class), Collections.emptyMap()));
-        return beansMap;
-    }
-
-    @PreDestroy
-    public void destroy() {
-        methods = null;
+    @PostConstruct
+    public void init() {
+        springEventProducer = new SpringEventProducer(applicationEventPublisher, springEventConfiguration);
     }
 
     @Override
-    public void stop() {
-        destroy();
+    public MqProducer selectProducer(final MqMessageContext mqMessageContext) {
+        return springEventProducer;
     }
 
     @Override
-    public boolean isRunning() {
-        return methods != null;
+    public String manufacturer() {
+        return SpringEventConst.MANUFACTURER;
     }
+
 }

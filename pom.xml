@@ -199,6 +199,7 @@
         <module>super-core-mq</module>
         <module>super-core-mq-ons</module>
         <module>super-core-mq-kafka011</module>
+        <module>super-core-mq-spring-event</module>
         <module>super-core-web</module>
         <module>super-core-web-security</module>
         <module>super-core-web-res</module>
@@ -238,6 +239,7 @@
         <core-encryption.version>super.3.0.2-SNAPSHOT</core-encryption.version>
         <core-mq.version>super.3.0.2-SNAPSHOT</core-mq.version>
         <core-mq-ons.version>super.3.0.2-SNAPSHOT</core-mq-ons.version>
+        <core-mq-spring-event.version>super.3.0.2-SNAPSHOT</core-mq-spring-event.version>
         <core-mq-kafka011.version>super.3.0.2-SNAPSHOT</core-mq-kafka011.version>
         <core-net.version>super.3.0.2-SNAPSHOT</core-net.version>
         <core-net-tcp.version>super.3.0.2-SNAPSHOT</core-net-tcp.version>
@@ -481,6 +483,12 @@
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-mq-ons</artifactId>
                 <version>${core-mq-ons.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-mq-spring-event</artifactId>
+                <version>${core-mq-spring-event.version}</version>
             </dependency>
 
             <dependency>
