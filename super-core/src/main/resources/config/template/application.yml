@@ -76,6 +76,7 @@ spring:
 #  leaseTime: 60
 
 security:
+  enable: true
   jwt:
     secret: FtvTa6nt4vfDFVST
   ms:
