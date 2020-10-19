@@ -403,8 +403,7 @@ public class MybatisPlusGenerator {
                     // 自定义输入文件名称
                     String path = config.getOutputDir() +
                         "/" + meta.getPackageName().replaceAll("\\.", "/") +
-                        "/" + meta.getModuleName() + "/api/model/" +
-                        "/criteria/";
+                        "/" + meta.getModuleName() + "/api/model/criteria/";
                     return path + tableInfo.getEntityName() + "Criteria.java";
                 }
             }, new FileOutConfig("/template/" + PREFIX + "Controller.java.ftl") {
@@ -514,8 +513,7 @@ public class MybatisPlusGenerator {
                     // 自定义输入文件名称
                     String path = config.getOutputDir() +
                         "/" + meta.getPackageName().replaceAll("\\.", "/") +
-                        "/" + meta.getModuleName() + "/db/model/" +
-                        "/";
+                        "/" + meta.getModuleName() + "/db/model/";
                     return path + tableInfo.getEntityName() + "Db.java";
                 }
                 // }, new FileOutConfig("/template/" + PREFIX + "ServiceTest.java.vm") {
