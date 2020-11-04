@@ -1,5 +1,11 @@
 # super core
 
+## 更新日志
+
+### super.3.0.3
+
+[feat] 新增跨域配置，支持跨域请求
+
 ## Git commit 规范
 
 ### commit message格式

@@ -176,12 +176,12 @@
     <parent>
         <groupId>vip.isass</groupId>
         <artifactId>super</artifactId>
-        <version>super.3.0.2-SNAPSHOT</version>
+        <version>super.3.0.3</version>
     </parent>
 
     <!-- 本项目信息 -->
     <artifactId>super-core-mq-kafka011</artifactId>
-    <version>super.3.0.2-SNAPSHOT</version>
+    <version>super.3.0.3</version>
 
     <properties>
         <kafka.version>0.11.0.3</kafka.version>
