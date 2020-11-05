@@ -220,7 +220,14 @@
 
         <repository>
             <id>center-snapshots</id>
+            <name>center-snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+
+        <repository>
+            <id>center</id>
+            <name>center</name>
+            <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
 
