@@ -184,7 +184,7 @@
     <!-- 快照版格式：super.x.y.z-SNAPSHOT-->
     <groupId>vip.isass</groupId>
     <artifactId>super</artifactId>
-    <version>super.3.0.4-release</version>
+    <version>super.3.0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -228,7 +228,7 @@
 
         <!-- start isass-core -->
 
-        <super-core.version>super.3.0.4-release</super-core.version>
+        <super-core.version>super.3.0.5-SNAPSHOT</super-core.version>
 
         <!-- end isass-core -->
 
