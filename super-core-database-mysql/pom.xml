@@ -176,12 +176,12 @@
     <parent>
         <groupId>vip.isass</groupId>
         <artifactId>super</artifactId>
-        <version>super.3.0.3</version>
+        <version>super.3.0.3-release</version>
     </parent>
 
     <!-- 本项目信息 -->
     <artifactId>super-core-database-mysql</artifactId>
-    <version>super.3.0.3</version>
+    <version>super.3.0.3-release</version>
 
     <dependencies>
         <dependency>
