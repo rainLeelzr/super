@@ -223,33 +223,6 @@
         <!-- start isass-core -->
 
         <super-core.version>super.3.0.3</super-core.version>
-        <core-cache.version>super.3.0.3</core-cache.version>
-        <core-database.version>super.3.0.3</core-database.version>
-        <core-database-mybatisplus.version>super.3.0.3</core-database-mybatisplus.version>
-        <core-database-mybatisplus-postgresql.version>super.3.0.3
-        </core-database-mybatisplus-postgresql.version>
-        <core-database-mybatisplus-mysql.version>super.3.0.3
-        </core-database-mybatisplus-mysql.version>
-        <core-database-mysql.version>super.3.0.3</core-database-mysql.version>
-        <core-database-postgresql.version>super.3.0.3</core-database-postgresql.version>
-        <core-database-querydsl.version>super.3.0.3</core-database-querydsl.version>
-        <core-database-sharding-jdbc.version>super.3.0.3</core-database-sharding-jdbc.version>
-        <core-elasticsearch.version>super.3.0.3</core-elasticsearch.version>
-        <core-encryption.version>super.3.0.3</core-encryption.version>
-        <core-mq.version>super.3.0.3</core-mq.version>
-        <core-mq-ons.version>super.3.0.3</core-mq-ons.version>
-        <core-mq-kafka011.version>super.3.0.3</core-mq-kafka011.version>
-        <core-net.version>super.3.0.3</core-net.version>
-        <core-net-tcp.version>super.3.0.3</core-net-tcp.version>
-        <core-net-websocket.version>super.3.0.3</core-net-websocket.version>
-        <core-protobuf.version>super.3.0.3</core-protobuf.version>
-        <core-web.version>super.3.0.3</core-web.version>
-        <core-web-res.version>super.3.0.3</core-web-res.version>
-        <core-web-rpc-feign.version>super.3.0.3</core-web-rpc-feign.version>
-        <core-web-security.version>super.3.0.3</core-web-security.version>
-        <core-web-swagger.version>super.3.0.3</core-web-swagger.version>
-        <core-mongobd.version>super.3.0.3</core-mongobd.version>
-        <core-database-listener.version>super.3.0.3</core-database-listener.version>
 
         <!-- end isass-core -->
 
@@ -378,139 +351,139 @@
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web</artifactId>
-                <version>${core-web.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web-security</artifactId>
-                <version>${core-web-security.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web-res</artifactId>
-                <version>${core-web-res.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web-rpc-feign</artifactId>
-                <version>${core-web-rpc-feign.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web-swagger</artifactId>
-                <version>${core-web-swagger.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-encryption</artifactId>
-                <version>${core-encryption.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-protobuf</artifactId>
-                <version>${core-protobuf.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-cache</artifactId>
-                <version>${core-cache.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database</artifactId>
-                <version>${core-database.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-mysql</artifactId>
-                <version>${core-database-mysql.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-postgresql</artifactId>
-                <version>${core-database-postgresql.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-mybatisplus</artifactId>
-                <version>${core-database-mybatisplus.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-querydsl</artifactId>
-                <version>${core-database-querydsl.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-mybatisplus-postgresql</artifactId>
-                <version>${core-database-mybatisplus-postgresql.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-mybatisplus-mysql</artifactId>
-                <version>${core-database-mybatisplus-mysql.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-sharding-jdbc</artifactId>
-                <version>${core-database-sharding-jdbc.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-mq</artifactId>
-                <version>${core-mq.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-mq-ons</artifactId>
-                <version>${core-mq-ons.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-mq-kafka011</artifactId>
-                <version>${core-mq-kafka011.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-net</artifactId>
-                <version>${core-net.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-net-tcp</artifactId>
-                <version>${core-net-tcp.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-net-websocket</artifactId>
-                <version>${core-net-websocket.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-elasticsearch</artifactId>
-                <version>${core-elasticsearch.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <!-- rocketmq -->

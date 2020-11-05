@@ -194,35 +194,7 @@
             <artifactId>spring-boot-starter</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!--<dependency>-->
-        <!--<groupId>org.mybatis.spring.boot</groupId>-->
-        <!--<artifactId>mybatis-spring-boot-starter</artifactId>-->
-        <!--&lt;!&ndash;<scope>provided</scope>&ndash;&gt;-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-        <!--<groupId>org.apache.rocketmq</groupId>-->
-        <!--<artifactId>rocketmq-client</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.apache.rocketmq</groupId>-->
-        <!--<artifactId>rocketmq-common</artifactId>-->
-        <!--</dependency>-->
-
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>false</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <repositories>
         <repository>
