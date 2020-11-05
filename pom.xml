@@ -180,8 +180,8 @@
     </parent>
 
     <!-- 本项目信息 -->
-    <!-- 正式版格式：super.3.0.3-release-->
-    <!-- 快照版格式：super.3.0.3-SNAPSHOT-->
+    <!-- 正式版格式：super.x.y.z-release-->
+    <!-- 快照版格式：super.x.y.z-SNAPSHOT-->
     <groupId>vip.isass</groupId>
     <artifactId>super</artifactId>
     <version>super.3.0.3-release</version>
@@ -228,7 +228,7 @@
 
         <!-- start isass-core -->
 
-        <super-core.version>${project.version}</super-core.version>
+        <super-core.version>super.3.0.3-release</super-core.version>
 
         <!-- end isass-core -->
 
