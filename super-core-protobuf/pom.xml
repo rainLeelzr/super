@@ -176,12 +176,12 @@
     <parent>
         <groupId>vip.isass</groupId>
         <artifactId>super</artifactId>
-        <version>super.3.0.3-release</version>
+        <version>super.3.0.4-release</version>
     </parent>
 
     <!-- 本项目信息 -->
     <artifactId>super-core-protobuf</artifactId>
-    <version>super.3.0.3-release</version>
+    <version>super.3.0.4-release</version>
 
     <dependencies>
         <dependency>
