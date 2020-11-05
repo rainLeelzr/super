@@ -28,7 +28,7 @@ pipeline {
                 }
             }
             steps {
-                sh "mvn -U -am clean deploy -DskipTests"
+                sh "mvn -U -am clean deploy -DskipTests -Pisass-deploy"
             }
         }
     }
