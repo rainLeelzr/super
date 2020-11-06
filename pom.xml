@@ -817,6 +817,31 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <prefix>git</prefix>
+                    <verbose>true</verbose>
+                    <dateFormat>yyyyMMddHHmmss</dateFormat>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/version.txt
+                    </generateGitPropertiesFilename>
+                    <format>txt</format>
+                    <abbrevLength>8</abbrevLength>
+                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                    <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
+                    <includeOnlyProperties>git.build.version,git.branch,git.commit.time,git.commit.id.abbrev
+                    </includeOnlyProperties>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
