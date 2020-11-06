@@ -248,7 +248,7 @@
         <flyway.version>6.3.3</flyway.version>
         <sharding-jdbc.version>4.0.0-RC2</sharding-jdbc.version>
         <p6spy.version>3.9.0</p6spy.version>
-        <dynamic-datasource.version>3.0.0</dynamic-datasource.version>
+        <dynamic-datasource.version>3.2.1</dynamic-datasource.version>
         <!--<mysql-connector-java.version>5.1.47</mysql-connector-java.version>-->
 
         <!-- net -->

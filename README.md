@@ -15,6 +15,7 @@
 #### optimize
 
 - 支持跨域，微服务自动集成跨域功能
+- dynamic-datasource 从 3.0.0 升级为 3.2.1
 
 ---
 
