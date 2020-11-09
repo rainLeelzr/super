@@ -173,6 +173,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import vip.isass.core.support.IsassConfig;
@@ -185,6 +186,7 @@ import java.util.stream.Collectors;
 /**
  * @author Rain
  */
+@Slf4j
 @Component
 public class DbEntityConvert {
 
@@ -258,6 +260,8 @@ public class DbEntityConvert {
             if (classes.isEmpty()) {
                 if (StrUtil.isNotBlank(packageName) && !IsassConfig.PACKAGE_NAME.equals(packageName)) {
                     classes = ClassUtil.scanPackageBySuper(packageName, entityClass);
+                } else {
+                    log.warn("没有配置info.package，db 实体映射可能失败");
                 }
             }
             return classes.stream()
