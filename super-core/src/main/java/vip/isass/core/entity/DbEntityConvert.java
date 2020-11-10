@@ -169,9 +169,9 @@
 
 package vip.isass.core.entity;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.cglib.CglibUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -201,7 +201,7 @@ public class DbEntityConvert {
     private static final Map<Class<?>, Class<?>> DB_ENTITY_MAP = new ConcurrentHashMap<>();
 
     /**
-     * todo 改成 MapStruct 提高性能
+     * 把 entity 转换为 dbEntity
      *
      * @param <E>    entity
      * @param <EDB>  db entity
@@ -220,9 +220,7 @@ public class DbEntityConvert {
             throw new UnsupportedOperationException(StrUtil.format("entity[{}]没有DbEntity的子类实现", entity.getClass().getName()));
         }
 
-        EDB edb = dbEntityClass.newInstance();
-        BeanUtil.copyProperties(entity, edb);
-        return edb;
+        return CglibUtil.copy(entity, dbEntityClass);
     }
 
     @SuppressWarnings("unchecked")
@@ -231,31 +229,34 @@ public class DbEntityConvert {
     }
 
     @SuppressWarnings("unchecked")
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<EDB> convertToEdbEntitys(Collection<E> entitys) {
-        List<EDB> edbEntitys = new ArrayList<>(entitys.size());
-        for (E entity : entitys) {
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<EDB> convertToEdbEntities(Collection<E> entities) {
+        List<EDB> edbEntities = new ArrayList<>(entities.size());
+        for (E entity : entities) {
             if (entity instanceof DbEntity) {
-                edbEntitys.add((EDB) entity);
+                edbEntities.add((EDB) entity);
             } else {
-                edbEntitys.add(convertToDbEntity(entity));
+                edbEntities.add(convertToDbEntity(entity));
             }
         }
-        return edbEntitys;
+        return edbEntities;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<E> convertToEntitys(Collection<EDB> entitys) {
-        if (entitys == null) {
-            return null;
-        }
-        return entitys.stream()
+    // 命名有误，将再未来版本删除此方法
+    @Deprecated
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<E> convertToEntitys(Collection<EDB> entities) {
+        return convertToEntities(entities);
+    }
+
+    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<E> convertToEntities(Collection<EDB> entities) {
+        return entities == null
+            ? null
+            : entities.stream()
             .map(DbEntityConvert::convertToEntity)
             .collect(Collectors.toList());
     }
 
-    @SuppressWarnings("unchecked")
     private static Class<?> getDbEntityClass(Class<?> entityClass) {
-        Class<?> aClass = DB_ENTITY_MAP.computeIfAbsent(entityClass, (k) -> {
+        return DB_ENTITY_MAP.computeIfAbsent(entityClass, (k) -> {
             Set<Class<?>> classes = ClassUtil.scanPackageBySuper(IsassConfig.PACKAGE_NAME, entityClass);
             if (classes.isEmpty()) {
                 if (StrUtil.isNotBlank(packageName) && !IsassConfig.PACKAGE_NAME.equals(packageName)) {
@@ -269,8 +270,6 @@ public class DbEntityConvert {
                 .findFirst()
                 .orElse(null);
         });
-
-        return aClass;
     }
 
 }

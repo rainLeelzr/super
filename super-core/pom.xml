@@ -214,6 +214,10 @@
             <artifactId>swagger-models</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+        </dependency>
     </dependencies>
 
     <repositories>

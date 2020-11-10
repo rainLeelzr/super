@@ -256,7 +256,7 @@
         <protobuf-java-format.version>1.2</protobuf-java-format.version>
 
         <canal.client.version>1.0.25</canal.client.version>
-        <hutool.version>5.3.0</hutool.version>
+        <hutool.version>5.4.7</hutool.version>
         <rocketmq.version>4.1.0-incubating</rocketmq.version>
         <ons.version>1.8.0.Final</ons.version>
 
@@ -291,6 +291,8 @@
         <tx-lcn.version>5.0.2.RELEASE</tx-lcn.version>
 
         <findbugs.version>3.0.1</findbugs.version>
+
+        <cglib.version>3.3.0</cglib.version>
     </properties>
 
     <!-- maven功能说明 -->
@@ -717,6 +719,12 @@
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>annotations</artifactId>
                 <version>${findbugs.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>${cglib.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
