@@ -292,7 +292,7 @@
 
         <findbugs.version>3.0.1</findbugs.version>
 
-        <cglib.version>3.3.0</cglib.version>
+        <cglib.version>3.2.3</cglib.version>
     </properties>
 
     <!-- maven功能说明 -->

@@ -169,9 +169,9 @@
 
 package vip.isass.core.entity;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.cglib.CglibUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -220,7 +220,8 @@ public class DbEntityConvert {
             throw new UnsupportedOperationException(StrUtil.format("entity[{}]没有DbEntity的子类实现", entity.getClass().getName()));
         }
 
-        return CglibUtil.copy(entity, dbEntityClass);
+        return BeanUtil.copyProperties(entity, dbEntityClass);
+//        return CglibUtil.copy(entity, dbEntityClass);
     }
 
     @SuppressWarnings("unchecked")
