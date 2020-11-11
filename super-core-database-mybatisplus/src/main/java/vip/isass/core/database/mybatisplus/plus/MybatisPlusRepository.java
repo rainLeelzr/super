@@ -253,12 +253,12 @@ public abstract class MybatisPlusRepository<
         if (CollUtil.isEmpty(entities)) {
             return false;
         }
-        return super.saveBatch(DbEntityConvert.convertToEdbEntitys(entities));
+        return super.saveBatch(DbEntityConvert.convertToEdbEntities(entities));
     }
 
     @Override
     public boolean addBatch(Collection<E> entities, int batchSize) {
-        return super.saveBatch(DbEntityConvert.convertToEdbEntitys(entities), batchSize);
+        return super.saveBatch(DbEntityConvert.convertToEdbEntities(entities), batchSize);
     }
 
     // ****************************** 删 start ******************************

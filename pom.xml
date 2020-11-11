@@ -180,9 +180,11 @@
     </parent>
 
     <!-- 本项目信息 -->
+    <!-- 正式版格式：super.x.y.z-release-->
+    <!-- 快照版格式：super.x.y.z-SNAPSHOT-->
     <groupId>vip.isass</groupId>
     <artifactId>super</artifactId>
-    <version>super.3.0.2-SNAPSHOT</version>
+    <version>super.3.0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -215,43 +217,19 @@
 
     <!-- 配置属性 -->
     <properties>
+        <!-- start build properties -->
+
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
+        <!-- end build properties -->
+
         <!-- start isass-core -->
 
-        <super-core.version>super.3.0.2-SNAPSHOT</super-core.version>
-        <core-cache.version>super.3.0.2-SNAPSHOT</core-cache.version>
-        <core-database.version>super.3.0.2-SNAPSHOT</core-database.version>
-        <core-database-mybatisplus.version>super.3.0.2-SNAPSHOT</core-database-mybatisplus.version>
-        <core-database-mybatisplus-postgresql.version>super.3.0.2-SNAPSHOT
-        </core-database-mybatisplus-postgresql.version>
-        <core-database-mybatisplus-mysql.version>super.3.0.2-SNAPSHOT
-        </core-database-mybatisplus-mysql.version>
-        <core-database-mysql.version>super.3.0.2-SNAPSHOT</core-database-mysql.version>
-        <core-database-postgresql.version>super.3.0.2-SNAPSHOT</core-database-postgresql.version>
-        <core-database-querydsl.version>super.3.0.2-SNAPSHOT</core-database-querydsl.version>
-        <core-database-sharding-jdbc.version>super.3.0.2-SNAPSHOT</core-database-sharding-jdbc.version>
-        <core-elasticsearch.version>super.3.0.2-SNAPSHOT</core-elasticsearch.version>
-        <core-encryption.version>super.3.0.2-SNAPSHOT</core-encryption.version>
-        <core-mq.version>super.3.0.2-SNAPSHOT</core-mq.version>
-        <core-mq-ons.version>super.3.0.2-SNAPSHOT</core-mq-ons.version>
-        <core-mq-spring-event.version>super.3.0.2-SNAPSHOT</core-mq-spring-event.version>
-        <core-mq-kafka011.version>super.3.0.2-SNAPSHOT</core-mq-kafka011.version>
-        <core-net.version>super.3.0.2-SNAPSHOT</core-net.version>
-        <core-net-tcp.version>super.3.0.2-SNAPSHOT</core-net-tcp.version>
-        <core-net-websocket.version>super.3.0.2-SNAPSHOT</core-net-websocket.version>
-        <core-protobuf.version>super.3.0.2-SNAPSHOT</core-protobuf.version>
-        <core-web.version>super.3.0.2-SNAPSHOT</core-web.version>
-        <core-web-res.version>super.3.0.2-SNAPSHOT</core-web-res.version>
-        <core-web-rpc-feign.version>super.3.0.2-SNAPSHOT</core-web-rpc-feign.version>
-        <core-web-security.version>super.3.0.2-SNAPSHOT</core-web-security.version>
-        <core-web-swagger.version>super.3.0.2-SNAPSHOT</core-web-swagger.version>
-        <core-mongobd.version>super.3.0.2-SNAPSHOT</core-mongobd.version>
-        <core-database-listener.version>super.3.0.2-SNAPSHOT</core-database-listener.version>
+        <super-core.version>super.3.0.5-SNAPSHOT</super-core.version>
 
         <!-- end isass-core -->
 
@@ -271,7 +249,7 @@
         <flyway.version>6.3.3</flyway.version>
         <sharding-jdbc.version>4.0.0-RC2</sharding-jdbc.version>
         <p6spy.version>3.9.0</p6spy.version>
-        <dynamic-datasource.version>3.0.0</dynamic-datasource.version>
+        <dynamic-datasource.version>3.2.1</dynamic-datasource.version>
         <!--<mysql-connector-java.version>5.1.47</mysql-connector-java.version>-->
 
         <!-- net -->
@@ -279,7 +257,7 @@
         <protobuf-java-format.version>1.2</protobuf-java-format.version>
 
         <canal.client.version>1.0.25</canal.client.version>
-        <hutool.version>5.3.0</hutool.version>
+        <hutool.version>5.4.7</hutool.version>
         <rocketmq.version>4.1.0-incubating</rocketmq.version>
         <ons.version>1.8.0.Final</ons.version>
 
@@ -314,6 +292,8 @@
         <tx-lcn.version>5.0.2.RELEASE</tx-lcn.version>
 
         <findbugs.version>3.0.1</findbugs.version>
+
+        <cglib.version>3.2.3</cglib.version>
     </properties>
 
     <!-- maven功能说明 -->
@@ -380,145 +360,145 @@
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web</artifactId>
-                <version>${core-web.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web-security</artifactId>
-                <version>${core-web-security.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web-res</artifactId>
-                <version>${core-web-res.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web-rpc-feign</artifactId>
-                <version>${core-web-rpc-feign.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web-swagger</artifactId>
-                <version>${core-web-swagger.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-encryption</artifactId>
-                <version>${core-encryption.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-protobuf</artifactId>
-                <version>${core-protobuf.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-cache</artifactId>
-                <version>${core-cache.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database</artifactId>
-                <version>${core-database.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-mysql</artifactId>
-                <version>${core-database-mysql.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-postgresql</artifactId>
-                <version>${core-database-postgresql.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-mybatisplus</artifactId>
-                <version>${core-database-mybatisplus.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-querydsl</artifactId>
-                <version>${core-database-querydsl.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-mybatisplus-postgresql</artifactId>
-                <version>${core-database-mybatisplus-postgresql.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-mybatisplus-mysql</artifactId>
-                <version>${core-database-mybatisplus-mysql.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-database-sharding-jdbc</artifactId>
-                <version>${core-database-sharding-jdbc.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-mq</artifactId>
-                <version>${core-mq.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-mq-ons</artifactId>
-                <version>${core-mq-ons.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-mq-spring-event</artifactId>
-                <version>${core-mq-spring-event.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-mq-kafka011</artifactId>
-                <version>${core-mq-kafka011.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-net</artifactId>
-                <version>${core-net.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-net-tcp</artifactId>
-                <version>${core-net-tcp.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-net-websocket</artifactId>
-                <version>${core-net-websocket.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-elasticsearch</artifactId>
-                <version>${core-elasticsearch.version}</version>
+                <version>${super-core.version}</version>
             </dependency>
 
             <!-- rocketmq -->
@@ -747,6 +727,12 @@
                 <artifactId>annotations</artifactId>
                 <version>${findbugs.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>${cglib.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -846,6 +832,31 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <prefix>git</prefix>
+                    <verbose>true</verbose>
+                    <dateFormat>yyyyMMddHHmmss</dateFormat>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/version.txt
+                    </generateGitPropertiesFilename>
+                    <format>txt</format>
+                    <abbrevLength>8</abbrevLength>
+                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                    <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
+                    <includeOnlyProperties>git.build.version,git.branch,git.commit.time,git.commit.id.abbrev
+                    </includeOnlyProperties>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -962,18 +973,6 @@
         </developer>
     </developers>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
-    </distributionManagement>
-
     <repositories>
         <repository>
             <id>alimaven</id>
@@ -983,8 +982,27 @@
 
         <repository>
             <id>center-snapshots</id>
+            <name>center-snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
+
+        <repository>
+            <id>center</id>
+            <name>center</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>

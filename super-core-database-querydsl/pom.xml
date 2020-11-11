@@ -176,12 +176,12 @@
     <parent>
         <groupId>vip.isass</groupId>
         <artifactId>super</artifactId>
-        <version>super.3.0.2-SNAPSHOT</version>
+        <version>super.3.0.5-SNAPSHOT</version>
     </parent>
 
     <!-- 本项目信息 -->
     <artifactId>super-core-database-querydsl</artifactId>
-    <version>super.3.0.2-SNAPSHOT</version>
+    <version>super.3.0.5-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -220,16 +220,19 @@
 
         <repository>
             <id>center-snapshots</id>
+            <name>center-snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+
+        <repository>
+            <id>center</id>
+            <name>center</name>
+            <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
 
     <build>
         <plugins>
-            <!--<plugin>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-            <!--</plugin>-->
             <plugin>
                 <groupId>com.mysema.maven</groupId>
                 <artifactId>apt-maven-plugin</artifactId>
@@ -246,14 +249,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>false</skip>
-                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -169,7 +169,10 @@
 
 package vip.isass.core.web.security.config;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -195,6 +198,7 @@ import java.util.List;
 /**
  * @author Rain
  */
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -226,6 +230,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private TerminalOnlineConfiguration terminalOnlineConfiguration;
 
+    @Getter
+    @Value("${security.enable:true}")
+    private boolean enable;
+
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService)
@@ -238,6 +246,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        log.info("spring security enable: {}", enable);
+
         List<String> permitUrls = permitUrlConfiguration.getPermitUrls();
 
         http
@@ -285,6 +295,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilter(new MsAuthenticationFilter(authenticationManager()))
 
             .anonymous();
+
+        if (!enable) {
+            http.authorizeRequests().anyRequest().permitAll();
+        }
 
     }
 

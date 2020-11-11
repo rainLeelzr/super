@@ -167,54 +167,29 @@
  *
  */
 
-package vip.isass.core.web.security.processor;
+package vip.isass.core.criteria;
 
-import org.springframework.security.config.annotation.ObjectPostProcessor;
-import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import vip.isass.core.web.security.metadata.SecurityMetadataSource;
-import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
-import vip.isass.core.web.uri.UriPrefixProvider;
-
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
+ * 基于mysql的条件
+ *
  * @author Rain
  */
-public class FilterSecurityInterceptorSourcePostProcessor implements ObjectPostProcessor<FilterSecurityInterceptor> {
+@Getter
+@Setter
+@ToString
+@Accessors(chain = true)
+public class OrderByCriteria implements IOrderByCriteria<Object, OrderByCriteria> {
 
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
-
-    private SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager;
-
-    private UriPrefixProvider prefixProvider;
-
-    private List<String> permitUrls;
-
-    public FilterSecurityInterceptorSourcePostProcessor(
-        RequestMappingHandlerMapping requestMappingHandlerMapping,
-        SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager,
-        UriPrefixProvider prefixProvider,
-        List<String> permitUrls) {
-        this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-        this.securityMetadataSourceProviderManager = securityMetadataSourceProviderManager;
-        this.prefixProvider = prefixProvider;
-        this.permitUrls = permitUrls;
-    }
-
-    @Override
-    public <O extends FilterSecurityInterceptor> O postProcess(O object) {
-        FilterInvocationSecurityMetadataSource securityMetadataSource =
-            new SecurityMetadataSource(
-                requestMappingHandlerMapping,
-                object.getSecurityMetadataSource(),
-                securityMetadataSourceProviderManager,
-                prefixProvider,
-                permitUrls);
-        object.setSecurityMetadataSource(securityMetadataSource);
-
-        return object;
-    }
+    /**
+     * 排序
+     * id asc 或者 id desc, modify_Time desc
+     */
+    public String orderBy;
 
 }
+

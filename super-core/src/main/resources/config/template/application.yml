@@ -1,0 +1,150 @@
+#########################################
+##########                     ##########
+##########       default       ##########
+##########                     ##########
+#########################################
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10GB
+      max-request-size: 10GB
+
+  #数据库配置
+  datasource:
+    dynamic:
+      primary: master
+      datasource:
+        master:
+          type: com.zaxxer.hikari.HikariDataSource
+          driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+          username: ${spring.datasource.mysql.master.username}
+          password: ${spring.datasource.mysql.master.password}
+          hikari:
+            maximum-pool-size: 20
+            minimumIdle: 5
+            auto-commit: true
+            idleTimeout: 600000
+            connectionTimeout: 30000
+            maxLifetime: 900000
+            connection-test-query: SELECT 1
+
+    mysql:
+      master:
+        host: 172.25.21.59
+        port: 3306
+        username: root
+        password: suntek
+
+    postgresql:
+      master:
+        host: 172.25.22.121
+        port: 30050
+        username: postgres
+        password: postgis123456#
+
+  elasticsearch:
+    rest:
+      uris: http://172.25.22.121:30010
+      username: elastic
+      password: suntek
+
+  #  redis:
+  #    host: 192.168.56.101
+  #    port: 30090
+  #    password: devredis123!@#
+  #    database: 0
+  #    timeout: 5000ms
+  #    lettuce:
+  #      pool:
+  #        min-idle: 0
+  #        max-idle: 8
+  #        max-active: 8
+  #        max-wait: 5000ms
+
+  flyway:
+    #  当迁移时发现目标schema非空，而且带有没有元数据的表时，是否自动执行基准迁移，默认false.
+    baseline-on-migrate: true
+    locations: classpath:db/mysql
+    user: ${spring.datasource.mysql.master.username}
+    password: ${spring.datasource.mysql.master.password}
+
+#klock:
+#  address: ${spring.redis.host}:${spring.redis.port}
+##  password: ${spring.redis.password}
+#  database: ${spring.redis.database}
+#  waitTime: 30
+#  leaseTime: 60
+
+security:
+  enable: true
+  jwt:
+    secret: FtvTa6nt4vfDFVST
+  ms:
+    secret: FtvTa6nt4vfDFVST
+  auth:
+    url:
+      get-all-res: http://172.25.22.120:20000/auth-service/v2/api-res
+      add-batch-res: http://172.25.22.120:20000/auth-service/v2/api-res/batch
+
+mybatis-plus:
+  mapper-locations: classpath*:/com/suntek/**/*Mapper.xml
+
+management:
+  endpoint:
+    env:
+      enabled: true
+  endpoints:
+    web:
+      base-path: /${spring.application.name}/actuator
+      exposure:
+        include: "*"
+
+## 开启Swagger的Basic认证功能,默认是false
+knife4j:
+  basic:
+    enable: false
+    username: isass
+    password: isass123456!
+
+feign:
+  httpclient:
+    connection-timeout: 8000
+  compression:
+    request:
+      min-request-size: 204800
+
+  attachment:
+    url: http://172.25.22.120:20000
+  layer:
+    url: http://172.25.22.120:20000
+  log:
+    url: http://172.25.22.120:20000
+  base:
+    url: http://172.25.22.120:20000
+  auth:
+    url: http://172.25.22.120:20000
+  uom:
+    url: http://172.25.22.120:20000
+
+ribbon:
+  # 连接超时
+  ConnectTimeout: 2000
+  # 响应超时
+  ReadTimeout: 8000
+
+logging:
+  level:
+    vip:
+      isass: debug
+    com:
+      suntek: debug
+
+#########################################
+##########                     ##########
+##########      dev-rain       ##########
+##########                     ##########
+#########################################
+---
+spring:
+  profiles: dev-rain
+

@@ -167,54 +167,55 @@
  *
  */
 
-package vip.isass.core.web.security.processor;
+package vip.isass.core.log;
 
-import org.springframework.security.config.annotation.ObjectPostProcessor;
-import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import vip.isass.core.web.security.metadata.SecurityMetadataSource;
-import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
-import vip.isass.core.web.uri.UriPrefixProvider;
+import cn.hutool.core.util.StrUtil;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
-/**
- * @author Rain
- */
-public class FilterSecurityInterceptorSourcePostProcessor implements ObjectPostProcessor<FilterSecurityInterceptor> {
+@Aspect
+@Component
+public class InvokeLogAop {
 
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    @Before(value = "@annotation(vip.isass.core.log.InvokeLog)")
+    public void beforeInvoke(JoinPoint joinPoint) throws Throwable {
+        Class<?> targetClass = joinPoint.getTarget().getClass();
+        String className = targetClass.getName();
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
 
-    private SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager;
+        InvokeLog annotation = method.getAnnotation(InvokeLog.class);
 
-    private UriPrefixProvider prefixProvider;
+        String logStr = annotation.parameter()
+            ? StrUtil.format("开始执行 {}[{}]", method.getName(), Arrays.toString(joinPoint.getArgs()))
+            : StrUtil.format("开始执行 {}", method.getName());
 
-    private List<String> permitUrls;
-
-    public FilterSecurityInterceptorSourcePostProcessor(
-        RequestMappingHandlerMapping requestMappingHandlerMapping,
-        SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager,
-        UriPrefixProvider prefixProvider,
-        List<String> permitUrls) {
-        this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-        this.securityMetadataSourceProviderManager = securityMetadataSourceProviderManager;
-        this.prefixProvider = prefixProvider;
-        this.permitUrls = permitUrls;
-    }
-
-    @Override
-    public <O extends FilterSecurityInterceptor> O postProcess(O object) {
-        FilterInvocationSecurityMetadataSource securityMetadataSource =
-            new SecurityMetadataSource(
-                requestMappingHandlerMapping,
-                object.getSecurityMetadataSource(),
-                securityMetadataSourceProviderManager,
-                prefixProvider,
-                permitUrls);
-        object.setSecurityMetadataSource(securityMetadataSource);
-
-        return object;
+        Logger log = LoggerFactory.getLogger(targetClass);
+        switch (annotation.level()) {
+            case ERROR:
+                log.error(logStr);
+                break;
+            case WARN:
+                log.warn(logStr);
+                break;
+            case INFO:
+                log.info(logStr);
+                break;
+            case DEBUG:
+                log.debug(logStr);
+                break;
+            case TRACE:
+                log.trace(logStr);
+                break;
+        }
     }
 
 }

@@ -167,54 +167,53 @@
  *
  */
 
-package vip.isass.core.web.security.processor;
+package vip.isass.core.criteria;
 
-import org.springframework.security.config.annotation.ObjectPostProcessor;
-import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import vip.isass.core.web.security.metadata.SecurityMetadataSource;
-import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
-import vip.isass.core.web.uri.UriPrefixProvider;
-
-import java.util.List;
+import cn.hutool.core.util.StrUtil;
+import vip.isass.core.entity.TimeTracedEntity;
 
 /**
+ * 基于mysql的条件
+ *
  * @author Rain
  */
-public class FilterSecurityInterceptorSourcePostProcessor implements ObjectPostProcessor<FilterSecurityInterceptor> {
+public interface IOrderByCriteria<E, C extends IOrderByCriteria<E, C>> extends ICriteria<E, C> {
 
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    String ASC = "asc";
 
-    private SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager;
+    String DESC = "desc";
 
-    private UriPrefixProvider prefixProvider;
+    String getOrderBy();
 
-    private List<String> permitUrls;
+    C setOrderBy(String orderBy);
 
-    public FilterSecurityInterceptorSourcePostProcessor(
-        RequestMappingHandlerMapping requestMappingHandlerMapping,
-        SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager,
-        UriPrefixProvider prefixProvider,
-        List<String> permitUrls) {
-        this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-        this.securityMetadataSourceProviderManager = securityMetadataSourceProviderManager;
-        this.prefixProvider = prefixProvider;
-        this.permitUrls = permitUrls;
+    @SuppressWarnings("unchecked")
+    default C orderByCreateTimeDescIfBlank() {
+        if (StrUtil.isBlank(getOrderBy())) {
+            orderByCreateTimeDesc();
+        }
+        return (C) this;
     }
 
-    @Override
-    public <O extends FilterSecurityInterceptor> O postProcess(O object) {
-        FilterInvocationSecurityMetadataSource securityMetadataSource =
-            new SecurityMetadataSource(
-                requestMappingHandlerMapping,
-                object.getSecurityMetadataSource(),
-                securityMetadataSourceProviderManager,
-                prefixProvider,
-                permitUrls);
-        object.setSecurityMetadataSource(securityMetadataSource);
+    @SuppressWarnings("unchecked")
+    default C orderByModifyTimeDescIfBlank() {
+        if (StrUtil.isBlank(getOrderBy())) {
+            orderByModifyTimeDesc();
+        }
+        return (C) this;
+    }
 
-        return object;
+    @SuppressWarnings("unchecked")
+    default C orderByCreateTimeDesc() {
+        setOrderBy(TimeTracedEntity.CREATED_TIME + StrUtil.SPACE + DESC);
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orderByModifyTimeDesc() {
+        setOrderBy(TimeTracedEntity.MODIFY_TIME + StrUtil.SPACE + DESC);
+        return (C) this;
     }
 
 }
+

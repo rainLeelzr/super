@@ -167,54 +167,21 @@
  *
  */
 
-package vip.isass.core.web.security.processor;
+package vip.isass.core.log;
 
-import org.springframework.security.config.annotation.ObjectPostProcessor;
-import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import vip.isass.core.web.security.metadata.SecurityMetadataSource;
-import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
-import vip.isass.core.web.uri.UriPrefixProvider;
+import org.slf4j.event.Level;
 
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * @author Rain
- */
-public class FilterSecurityInterceptorSourcePostProcessor implements ObjectPostProcessor<FilterSecurityInterceptor> {
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface InvokeLog {
 
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    Level level() default Level.DEBUG;
 
-    private SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager;
-
-    private UriPrefixProvider prefixProvider;
-
-    private List<String> permitUrls;
-
-    public FilterSecurityInterceptorSourcePostProcessor(
-        RequestMappingHandlerMapping requestMappingHandlerMapping,
-        SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager,
-        UriPrefixProvider prefixProvider,
-        List<String> permitUrls) {
-        this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-        this.securityMetadataSourceProviderManager = securityMetadataSourceProviderManager;
-        this.prefixProvider = prefixProvider;
-        this.permitUrls = permitUrls;
-    }
-
-    @Override
-    public <O extends FilterSecurityInterceptor> O postProcess(O object) {
-        FilterInvocationSecurityMetadataSource securityMetadataSource =
-            new SecurityMetadataSource(
-                requestMappingHandlerMapping,
-                object.getSecurityMetadataSource(),
-                securityMetadataSourceProviderManager,
-                prefixProvider,
-                permitUrls);
-        object.setSecurityMetadataSource(securityMetadataSource);
-
-        return object;
-    }
+    boolean parameter() default true;
 
 }

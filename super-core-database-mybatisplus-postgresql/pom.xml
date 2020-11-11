@@ -176,12 +176,12 @@
     <parent>
         <groupId>vip.isass</groupId>
         <artifactId>super</artifactId>
-        <version>super.3.0.2-SNAPSHOT</version>
+        <version>super.3.0.5-SNAPSHOT</version>
     </parent>
 
     <!-- 本项目信息 -->
     <artifactId>super-core-database-mybatisplus-postgresql</artifactId>
-    <version>super.3.0.2-SNAPSHOT</version>
+    <version>super.3.0.5-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -195,18 +195,6 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>false</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <repositories>
         <repository>
             <id>alimaven</id>
@@ -216,7 +204,14 @@
 
         <repository>
             <id>center-snapshots</id>
+            <name>center-snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+
+        <repository>
+            <id>center</id>
+            <name>center</name>
+            <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
 

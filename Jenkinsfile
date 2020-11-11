@@ -3,10 +3,9 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = "git@gitee.com:isass/super.git"
-        AUTHORS = sh(script: "git log --oneline -1 --format=%an", returnStdout: true).trim()
+        COMMIT_ID = sh(script: "git log -1 --pretty='%h'", returnStdout: true).trim()
         COMMIT_LOGS = sh(script: "git log -1 --pretty='%s'", returnStdout: true).trim()
-        RESULT = '成功'
+        AUTHORS = sh(script: "git log --oneline -1 --format=%an", returnStdout: true).trim()
     }
 
     stages {
@@ -28,13 +27,15 @@ pipeline {
                 }
             }
             steps {
-                sh "mvn -U -am clean deploy -DskipTests"
+                sh "mvn -T 1C -U -am clean deploy -DskipTests -Pisass-deploy"
             }
         }
     }
 
     post {
         always {
+            echo "[${JOB_NAME}]部署结果[${currentBuild.result}]"
+            echo "作者：${AUTHORS}\n内容：${COMMIT_LOGS}"
             deleteDir()
         }
     }
