@@ -167,92 +167,20 @@
  *
  */
 
-package vip.isass.core.mq.kafka011.producer;
-
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
-import vip.isass.core.mq.MessageType;
-import vip.isass.core.mq.core.MqMessageContext;
-import vip.isass.core.mq.core.producer.MqProducer;
-import vip.isass.core.mq.core.producer.ProducerSelector;
-import vip.isass.core.mq.kafka011.Kafka011Const;
-import vip.isass.core.mq.kafka011.config.InstanceConfiguration;
-import vip.isass.core.mq.kafka011.config.Kafka011ConfigUtil;
-import vip.isass.core.mq.kafka011.config.Kafka011Configuration;
-import vip.isass.core.mq.kafka011.config.ProducerConfiguration;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+package vip.isass.core.mq.core;
 
 /**
- * @author Rain
+ * 消费业务抛出异常时的处理策略
  */
-@Component
-public class Kafka011ProducerSelector implements ProducerSelector {
+public enum FailStrategy {
 
-    @Resource
-    private Kafka011Configuration kafka011Configuration;
+    // 忽略错误，视为消费成功。消费管理器实现方应该向消息中间件响应消费成功的命令
+    IGNORE,
 
-    @Resource
-    private Kafka011ProducerAutoConfiguration kafka011ProducerAutoConfiguration;
+    // 重试（默认策略）。重试的具体逻辑与策略，应由消息中间件响实现
+    RETRY,
 
-    private Map<String, Kafka011Producer> producerGroupByProducerId = Collections.emptyMap();
-
-    @Override
-    public MqProducer selectProducer(final MqMessageContext mqMessageContext) {
-        final InstanceConfiguration instanceConfiguration = Kafka011ConfigUtil.selectInstance(
-            kafka011Configuration, mqMessageContext.getInstance());
-        mqMessageContext.setInstance(instanceConfiguration.getInstanceName());
-
-        ProducerConfiguration producerConfiguration = Kafka011ConfigUtil.selectProducer(
-            kafka011Configuration, instanceConfiguration, mqMessageContext.getProducerId());
-
-        // 设置topic
-        if (StrUtil.isBlank(mqMessageContext.getTopic())) {
-            switch (mqMessageContext.getMessageType()) {
-                case MessageType.COMMON_MESSAGE:
-                    mqMessageContext.setTopic(instanceConfiguration.getCommonMessageTopic());
-                    break;
-                case MessageType.TIMING_MESSAGE:
-                    throw new UnsupportedOperationException("未支持TIMING_MESSAGE");
-                case MessageType.DELAY_MESSAGE:
-                    throw new UnsupportedOperationException("未支持DELAY_MESSAGE");
-                case MessageType.TRANSACTION_MESSAGE:
-                    throw new UnsupportedOperationException("未支持TRANSACTION_MESSAGE");
-                case MessageType.SHARDING_SEQUENTIAL_MESSAGE:
-                    mqMessageContext.setTopic(instanceConfiguration.getShardingSequentialMessageTopic());
-                    break;
-                case MessageType.GLOBAL_SEQUENTIAL_MESSAGE:
-                    mqMessageContext.setTopic(instanceConfiguration.getGlobalSequentialMessageTopic());
-                    break;
-                default:
-                    throw new UnsupportedOperationException("未支持" + mqMessageContext.getMessageType());
-            }
-        }
-
-        return producerGroupByProducerId.get(producerConfiguration.getProducerId());
-    }
-
-
-    @Override
-    public String manufacturer() {
-        return Kafka011Const.MANUFACTURER;
-    }
-
-    @PostConstruct
-    public void init() {
-        if (CollUtil.isEmpty(kafka011ProducerAutoConfiguration.getProducers())) {
-            return;
-        }
-
-        producerGroupByProducerId = kafka011ProducerAutoConfiguration.getProducers()
-            .stream()
-            .collect(Collectors.toMap((o) -> o.getProducerProperties().getProducerId(), Function.identity()));
-    }
+    // 立即重试，消费管理器实现方直接在本地重试消费，不经过消息中间件的干预。在某些不支持重试消费的消息中间件中，可用此策略实现重试功能
+    RETRY_IMMEDIATELY;
 
 }

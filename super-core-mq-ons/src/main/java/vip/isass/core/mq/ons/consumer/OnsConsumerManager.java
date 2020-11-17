@@ -167,64 +167,198 @@
  *
  */
 
-package vip.isass.core.mq.spring.event.consumer;
+package vip.isass.core.mq.ons.consumer;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import com.aliyun.openservices.ons.api.*;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import vip.isass.core.mq.core.SubscribeModel;
-import vip.isass.core.mq.core.consumer.EventListener;
-import vip.isass.core.mq.core.consumer.MqConsumer;
-import vip.isass.core.mq.spring.event.SpringEventConst;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import vip.isass.core.mq.MessageType;
+import vip.isass.core.mq.core.FailStrategy;
+import vip.isass.core.mq.core.MqMessage;
+import vip.isass.core.mq.core.MqMessageContext;
+import vip.isass.core.mq.core.consumer.IMqConsumer;
+import vip.isass.core.mq.core.consumer.MqConsumerManager;
+import vip.isass.core.mq.ons.OnsConst;
+import vip.isass.core.mq.ons.config.InstanceConfiguration;
+import vip.isass.core.mq.ons.config.OnsConfigUtil;
+import vip.isass.core.mq.ons.config.OnsConfiguration;
+import vip.isass.core.mq.ons.config.RegionConfiguration;
+import vip.isass.core.support.JsonUtil;
 
-import javax.annotation.PreDestroy;
-import java.lang.reflect.Method;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Rain
  */
 @Slf4j
-@Getter
-@Setter
-@Accessors(chain = true)
-public class SpringEventConsumer implements MqConsumer {
+@Component
+public class OnsConsumerManager implements MqConsumerManager {
 
-    private EventListener eventListener;
+    @Resource
+    private OnsConfiguration onsConfiguration;
 
-    private SubscribeModel subscribeModel;
+    @Autowired(required = false)
+    private List<IMqConsumer> mqConsumers;
 
-    private String region;
-
-    private String instance;
-
-    private String producerId;
-
-    private String consumerId;
-
-    private String topic;
-
-    private String tag;
-
-    private Integer consumeThreadNumber;
-
-    private Object runtimeBean;
-
-    private Method runtimeMethod;
+    private List<Consumer> consumers;
 
     @Override
     public String getManufacturer() {
-        return SpringEventConst.MANUFACTURER;
+        return OnsConst.MANUFACTURER;
     }
 
     @Override
     public void subscribe() {
+        if (CollUtil.isEmpty(mqConsumers)) {
+            return;
+        }
+        consumers = new ArrayList<>(mqConsumers.size());
+        for (IMqConsumer mqConsumer : mqConsumers) {
+            if (StrUtil.isNotBlank(mqConsumer.getManufacturer()) && !OnsConst.MANUFACTURER.equals(mqConsumer.getManufacturer())) {
+                continue;
+            }
 
+            String region = MapUtil.getStr(mqConsumer.getProperties(), OnsConst.REGION);
+            RegionConfiguration regionConfiguration = OnsConfigUtil.selectRegion(onsConfiguration, region);
+
+            String instance = MapUtil.getStr(mqConsumer.getProperties(), OnsConst.INSTANCE);
+            InstanceConfiguration instanceConfiguration = OnsConfigUtil.selectInstance(regionConfiguration, instance);
+
+            Properties properties = createProperties(mqConsumer, instanceConfiguration);
+            Consumer consumer = ONSFactory.createConsumer(properties);
+            consumer.subscribe(
+                parseTopic(mqConsumer, instanceConfiguration),
+                mqConsumer.getTag(),
+                (message, context) -> {
+                    log.debug("收到mq消息：{}", message);
+                    Object payload;
+                    try {
+                        payload = getPayload(mqConsumer, message);
+                    } catch (Exception e) {
+                        log.error("反序列化mq消息错误，此消息将标记为消费成功：{}，", e.getMessage(), e);
+                        return Action.CommitMessage;
+                    }
+                    MqMessageContext mqMessageContext = new MqMessage()
+                        .setTopic(message.getTopic())
+                        .setTag(message.getTag())
+                        .setKey(message.getKey())
+                        .setShardingKey(message.getShardingKey())
+                        .setConsumeAtMills(message.getStartDeliverTime())
+                        .setMessageType(mqConsumer.getMessageType())
+                        .setPayload(payload);
+                    return doConsume(mqConsumer, mqMessageContext);
+                });
+            consumer.start();
+
+            consumers.add(consumer);
+        }
     }
 
-    @PreDestroy
-    public void destroy() {
+    private Properties createProperties(IMqConsumer mqConsumer, InstanceConfiguration instanceConfiguration) {
+        Properties properties = new Properties();
+        properties.put(PropertyKeyConst.NAMESRV_ADDR, instanceConfiguration.getNamesrvAddr());
+        properties.put(PropertyKeyConst.AccessKey, instanceConfiguration.getAccessKey());
+        properties.put(PropertyKeyConst.SecretKey, instanceConfiguration.getSecretKey());
+        properties.put(PropertyKeyConst.GROUP_ID, mqConsumer.getConsumerId());
 
+        if (mqConsumer.getConsumeThreadNumber() != null && mqConsumer.getConsumeThreadNumber() != -1) {
+            properties.put(PropertyKeyConst.ConsumeThreadNums, mqConsumer.getConsumeThreadNumber());
+        }
+
+        // 订阅方式
+        switch (mqConsumer.getSubscribeModel()) {
+            case BROADCASTING:
+                properties.put(PropertyKeyConst.MessageModel, PropertyValueConst.BROADCASTING);
+                break;
+            case CLUSTERING:
+                properties.put(PropertyKeyConst.MessageModel, PropertyValueConst.CLUSTERING);
+                break;
+            default:
+        }
+        return properties;
+    }
+
+    private Action doConsume(IMqConsumer mqConsumer, MqMessageContext mqMessageContext) {
+        try {
+            mqConsumer.consume(mqMessageContext);
+            return Action.CommitMessage;
+        } catch (Exception e) {
+            Throwable unwrap = ExceptionUtil.unwrap(e);
+            log.error("mq消费错误：{}", unwrap.getMessage(), unwrap);
+
+            FailStrategy failStrategy = mqConsumer.getFailStrategy();
+            switch (failStrategy) {
+                case IGNORE:
+                    log.info("忽略消费异常");
+                    return Action.CommitMessage;
+                case RETRY:
+                    return Action.ReconsumeLater;
+                case RETRY_IMMEDIATELY:
+                    for (int i = 0; i < mqConsumer.getImmediatelyRetryCount(); i++) {
+                        log.info("正在开始第{}次重试消费。重试最大次数为{}", i + 1, mqConsumer.getImmediatelyRetryCount());
+                        try {
+                            mqConsumer.consume(mqMessageContext);
+                        } catch (Exception e1) {
+                            log.error("重试消费错误: {}", e1.getMessage(), e1);
+                        }
+                    }
+                    log.info("超过最大立即重试次数，将视为正常消费");
+                    return Action.CommitMessage;
+                default:
+                    log.error("未实现[{}]的失败重试策略逻辑，将视为正常消费", failStrategy);
+                    return Action.CommitMessage;
+            }
+        }
+    }
+
+    private String parseTopic(IMqConsumer mqConsumer, InstanceConfiguration instanceConfiguration) {
+        if (StrUtil.isNotBlank(mqConsumer.getTopic())) {
+            return mqConsumer.getTopic();
+        }
+        switch (mqConsumer.getMessageType()) {
+            case MessageType.COMMON_MESSAGE:
+                return instanceConfiguration.getCommonMessageTopic();
+            case MessageType.TIMING_MESSAGE:
+            case MessageType.DELAY_MESSAGE:
+                return instanceConfiguration.getTimingMessageTopic();
+            case MessageType.TRANSACTION_MESSAGE:
+                throw new UnsupportedOperationException("未支持事务消息");
+            case MessageType.SHARDING_SEQUENTIAL_MESSAGE:
+                return instanceConfiguration.getShardingSequentialMessageTopic();
+            case MessageType.GLOBAL_SEQUENTIAL_MESSAGE:
+                return instanceConfiguration.getGlobalSequentialMessageTopic();
+            default:
+                throw new UnsupportedOperationException("未支持消息类型:" + mqConsumer.getMessageType());
+        }
+    }
+
+    @SneakyThrows
+    private Object getPayload(IMqConsumer mqConsumer, Message message) {
+        if (mqConsumer.getTypeReference() != null) {
+            return JsonUtil.DEFAULT_INSTANCE.readValue(message.getBody(), mqConsumer.getTypeReference());
+        }
+        return message.getBody();
+    }
+
+    @Override
+    public void destroy() {
+        if (consumers != null) {
+            consumers.forEach(Admin::shutdown);
+        }
+    }
+
+    @Override
+    public boolean isEnable() {
+        return onsConfiguration.isEnable();
     }
 
 }

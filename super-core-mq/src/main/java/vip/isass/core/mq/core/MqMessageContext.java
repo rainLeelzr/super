@@ -169,6 +169,11 @@
 
 package vip.isass.core.mq.core;
 
+import cn.hutool.core.map.MapUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Rain
  */
@@ -183,18 +188,6 @@ public interface MqMessageContext {
     String getManufacturer();
 
     MqMessageContext setManufacturer(String manufacturer);
-
-    String getRegion();
-
-    MqMessageContext setRegion(String region);
-
-    String getInstance();
-
-    MqMessageContext setInstance(String instance);
-
-    String getProducerId();
-
-    MqMessageContext setProducerId(String producerId);
 
     int getMessageType();
 
@@ -281,5 +274,21 @@ public interface MqMessageContext {
     long getCreateTime();
 
     MqMessageContext setCreateTime(long createTime);
+
+    Map<String, Object> getProperties();
+
+    MqMessageContext setProperties(Map<String, Object> properties);
+
+    default String getStringProperty(String key) {
+        return MapUtil.getStr(getProperties(), key);
+    }
+
+    default MqMessageContext setProperty(String key, Object value) {
+        if (getProperties() == null) {
+            setProperties(new HashMap<>());
+        }
+        getProperties().put(key, value);
+        return this;
+    }
 
 }

@@ -176,4 +176,8 @@ public interface Kafka011Const {
 
     String MANUFACTURER = "kafka011";
 
+    String INSTANCE = "instance";
+
+    String PRODUCER_ID = "producerId";
+
 }

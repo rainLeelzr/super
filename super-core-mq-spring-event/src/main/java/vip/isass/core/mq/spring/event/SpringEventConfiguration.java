@@ -184,6 +184,8 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("mq.spring-event")
 public class SpringEventConfiguration {
 
-    private String defaultTopic;
+    private boolean enable;
+
+    private String defaultTopic = "";
 
 }

@@ -53,3 +53,4 @@
 | nps | web:30070 bridge:30071 http_proxy:30072 https_proxy:30073|
 | kurento | http/ws:30100 upd:30105-30399|
 | stun | tcp/udp 30400|
+| nexus3 | 30500|

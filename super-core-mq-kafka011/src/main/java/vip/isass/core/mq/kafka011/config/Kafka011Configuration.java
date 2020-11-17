@@ -189,6 +189,8 @@ import java.util.List;
 @ConfigurationProperties("mq.kafka011")
 public class Kafka011Configuration {
 
+    private boolean enable;
+
     private String defaultInstance;
 
     private List<InstanceConfiguration> instances;

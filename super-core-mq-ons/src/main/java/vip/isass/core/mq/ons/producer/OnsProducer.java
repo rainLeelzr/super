@@ -173,14 +173,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.aliyun.openservices.ons.api.*;
 import com.aliyun.openservices.ons.api.order.OrderProducer;
-import vip.isass.core.mq.MessageType;
-import vip.isass.core.mq.core.MqMessageContext;
-import vip.isass.core.mq.core.producer.MqProducer;
-import vip.isass.core.mq.ons.config.ProducerProperties;
-import vip.isass.core.serialization.GenericJackson;
-import vip.isass.core.serialization.JacksonSerializable;
-import vip.isass.core.support.JsonUtil;
-import vip.isass.core.support.SystemClock;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -189,8 +181,7 @@ import lombok.extern.slf4j.Slf4j;
 import vip.isass.core.mq.MessageType;
 import vip.isass.core.mq.core.MqMessageContext;
 import vip.isass.core.mq.core.producer.MqProducer;
-import vip.isass.core.serialization.GenericJackson;
-import vip.isass.core.serialization.JacksonSerializable;
+import vip.isass.core.mq.ons.config.ProducerProperties;
 import vip.isass.core.support.JsonUtil;
 import vip.isass.core.support.SystemClock;
 
@@ -255,16 +246,10 @@ public class OnsProducer implements MqProducer {
 
     @SneakyThrows
     private byte[] getBody(MqMessageContext mqMessageContext) {
-        byte[] body;
         Object payload = mqMessageContext.getPayload();
-        if (payload == null) {
-            body = null;
-        } else if (payload instanceof JacksonSerializable) {
-            body = JsonUtil.NOT_NULL_INSTANCE.writeValueAsBytes(payload);
-        } else {
-            body = GenericJackson.INSTANCE.serialize(mqMessageContext.getPayload());
-        }
-        return body;
+        return payload == null
+            ? null
+            : JsonUtil.NOT_NULL_INSTANCE.writeValueAsBytes(payload);
     }
 
     private String getTopic(MqMessageContext mqMessageContext) {

@@ -189,6 +189,8 @@ import java.util.List;
 @ConfigurationProperties("mq.ons")
 public class OnsConfiguration {
 
+    private boolean enable;
+
     private String defaultRegion;
 
     private List<RegionConfiguration> regions;

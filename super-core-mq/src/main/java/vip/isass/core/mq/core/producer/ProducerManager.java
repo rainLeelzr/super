@@ -167,46 +167,29 @@
  *
  */
 
-package vip.isass.core.mq.spring.event.producer;
+package vip.isass.core.mq.core.producer;
 
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
 import vip.isass.core.mq.core.MqMessageContext;
-import vip.isass.core.mq.core.producer.MqProducer;
-import vip.isass.core.mq.core.producer.ProducerSelector;
-import vip.isass.core.mq.spring.event.SpringEventConfiguration;
-import vip.isass.core.mq.spring.event.SpringEventConst;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 /**
  * @author Rain
  */
-@Component
-public class SpringEventProducerSelector implements ProducerSelector {
+public interface ProducerManager {
 
-    @Resource
-    private ApplicationEventPublisher applicationEventPublisher;
+    /**
+     * 提供实现的厂商
+     * 例如：阿里云rocketmq、kafaka、rabbitmq
+     *
+     * @return manufacturer name
+     */
+    String manufacturer();
 
-    @Resource
-    private SpringEventConfiguration springEventConfiguration;
+    void init();
 
-    private SpringEventProducer springEventProducer;
+    void destroy();
 
-    @PostConstruct
-    public void init() {
-        springEventProducer = new SpringEventProducer(applicationEventPublisher, springEventConfiguration);
-    }
+    boolean isEnable();
 
-    @Override
-    public MqProducer selectProducer(final MqMessageContext mqMessageContext) {
-        return springEventProducer;
-    }
-
-    @Override
-    public String manufacturer() {
-        return SpringEventConst.MANUFACTURER;
-    }
+    void send(MqMessageContext mqMessageContext);
 
 }

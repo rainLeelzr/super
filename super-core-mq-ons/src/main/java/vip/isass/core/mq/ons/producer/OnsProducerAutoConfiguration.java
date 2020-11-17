@@ -197,6 +197,9 @@ public class OnsProducerAutoConfiguration {
 
     @PostConstruct
     public void init() {
+        if (!onsConfiguration.isEnable()) {
+            return;
+        }
         onsProducers = new ArrayList<>();
         List<RegionConfiguration> regions = onsConfiguration.getRegions();
         if (regions == null) {

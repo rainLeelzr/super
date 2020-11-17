@@ -176,4 +176,10 @@ public interface OnsConst {
 
     String MANUFACTURER = "ons";
 
+    String REGION = "region";
+
+    String INSTANCE = "instance";
+
+    String PRODUCER_ID = "producerId";
+
 }

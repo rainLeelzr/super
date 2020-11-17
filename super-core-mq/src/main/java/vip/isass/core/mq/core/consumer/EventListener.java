@@ -171,7 +171,6 @@ package vip.isass.core.mq.core.consumer;
 
 import org.springframework.stereotype.Component;
 import vip.isass.core.mq.MessageType;
-import vip.isass.core.mq.core.SubscribeModel;
 
 import java.lang.annotation.*;
 
@@ -201,13 +200,6 @@ public @interface EventListener {
     String instance() default "";
 
     String consumerId();
-
-    /**
-     * 消费模式
-     *
-     * @return subscribe model
-     */
-    SubscribeModel subscribeModel() default SubscribeModel.CLUSTERING;
 
     int messageType() default MessageType.COMMON_MESSAGE;
 

@@ -170,52 +170,82 @@
 package vip.isass.core.mq.core.consumer;
 
 
-import lombok.NonNull;
+import com.fasterxml.jackson.core.type.TypeReference;
+import vip.isass.core.mq.MessageType;
+import vip.isass.core.mq.core.FailStrategy;
+import vip.isass.core.mq.core.MqMessageContext;
 import vip.isass.core.mq.core.SubscribeModel;
 
-import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Map;
 
 /**
+ * 消费者
+ * 用户需要实现此接口，复写 consume，执行消费逻辑，并注册为 spring bean
+ *
  * @author Rain
  */
-public interface MqConsumer {
+public interface IMqConsumer {
 
-    MqConsumer setEventListener(EventListener eventListener);
+    // 如果设置了，则此消费者只能消费此厂商生产的消息
+    default String getManufacturer() {
+        return "";
+    }
 
-    EventListener getEventListener();
-
-    @NonNull String getManufacturer();
-
-    SubscribeModel getSubscribeModel();
-
-    MqConsumer setSubscribeModel(SubscribeModel subscribeModel);
+    default SubscribeModel getSubscribeModel() {
+        return SubscribeModel.CLUSTERING;
+    }
 
     String getConsumerId();
 
-    MqConsumer setConsumerId(String consumerId);
-
     String getTopic();
-
-    MqConsumer setTopic(String topic);
 
     String getTag();
 
-    MqConsumer setTag(String tag);
+    default Integer getConsumeThreadNumber() {
+        // 返回 null, 则采用厂商默认配置
+        return null;
+    }
 
-    Integer getConsumeThreadNumber();
+    void consume(MqMessageContext mqMessageContext);
 
-    MqConsumer setConsumeThreadNumber(Integer consumeThreadNumber);
+    default Map<String, ?> getProperties() {
+        return Collections.emptyMap();
+    }
 
-    void subscribe();
+    default int getMessageType() {
+        return MessageType.COMMON_MESSAGE;
+    }
 
-    Object getRuntimeBean();
+    default FailStrategy getFailStrategy() {
+        return FailStrategy.RETRY;
+    }
 
-    MqConsumer setRuntimeBean(Object runtimeBean);
+    /**
+     * 立即重试次数，当 失败策略是 FailStrategy.RETRY_IMMEDIATELY 时生效
+     * 负数无效，若需要无限重试，请设置为 Integer.MAX_VALUE
+     *
+     * @return 立即重试次数
+     */
+    default int getImmediatelyRetryCount() {
+        return 1;
+    }
 
-    Method getRuntimeMethod();
+    /**
+     * 获取消息中间件的原始消息，通常是消息中间件封装的对象。消息管理器在消费消息时，将会赋值
+     *
+     * @return 原始消息
+     */
+    default Object getOriginalMqMessage() {
+        return null;
+    }
 
-    MqConsumer setRuntimeMethod(Method runtimeMethod);
-
-    void destroy();
-
+    /**
+     * 如果需要框架自动转换消息类型，则复写此方法
+     *
+     * @return TypeReference
+     */
+    default TypeReference<?> getTypeReference() {
+        return null;
+    }
 }

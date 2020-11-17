@@ -186,10 +186,16 @@ import java.util.List;
 @ComponentScan
 public class MqAutoConfiguration {
 
-    @Value("${mq.default:}")
+    /**
+     * 总开关
+     */
+    @Value("${mq.enable:false}")
+    private Boolean enable;
+
+    @Value("${mq.default.manufacturer:}")
     private String defaultManufacturer;
 
-    @Value("${mq.disable:}")
-    private List<String> disable;
+    @Value("${mq.disable.disableConsumerIds:}")
+    private List<String> disableConsumerIds;
 
 }
