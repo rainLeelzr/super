@@ -307,6 +307,7 @@ public class OnsConsumerManager implements MqConsumerManager {
                         log.info("正在开始第{}次重试消费。重试最大次数为{}", i + 1, mqConsumer.getImmediatelyRetryCount());
                         try {
                             mqConsumer.consume(mqMessageContext);
+                            return Action.CommitMessage;
                         } catch (Exception e1) {
                             log.error("重试消费错误: {}", e1.getMessage(), e1);
                         }

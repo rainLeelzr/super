@@ -245,6 +245,7 @@ public class SpringEventMqConsumerManager implements ApplicationListener<IsassMq
                         log.info("正在开始第{}次重试消费。重试最大次数为{}", i + 1, maxRetryCount);
                         try {
                             mqConsumer.consume(mqMessageContext);
+                            return;
                         } catch (Exception e1) {
                             log.error("重试消费错误: {}", e1.getMessage(), e1);
                         }
