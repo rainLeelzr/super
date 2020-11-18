@@ -276,6 +276,9 @@ public class SpringEventMqConsumerManager implements ApplicationListener<IsassMq
 
     @Override
     public void subscribe() {
+        if (CollUtil.isEmpty(mqConsumers)) {
+            return;
+        }
         mqConsumers = mqConsumers.stream()
             // 判断厂商
             .filter(mc -> StrUtil.isBlank(mc.getManufacturer()) || mc.getManufacturer().equals(getManufacturer()))
