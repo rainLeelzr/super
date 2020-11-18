@@ -327,7 +327,11 @@ public abstract class MybatisPlusRepository<
         Serializable realId = id;
         TableInfo tableInfo = TableInfoHelper.getTableInfo(edbClass);
         if (tableInfo != null && Number.class.isAssignableFrom(tableInfo.getKeyType())) {
-            realId = Long.parseLong(id.toString());
+            try {
+                realId = Long.parseLong(id.toString());
+            } catch (NumberFormatException e) {
+                return null;
+            }
         }
 
         if (IdEntity.class.isAssignableFrom(edbClass)) {
