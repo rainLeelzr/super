@@ -175,6 +175,8 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -322,13 +324,19 @@ public abstract class MybatisPlusRepository<
     @Override
     public E getEntityById(Serializable id) {
         Class<EDB> edbClass = currentModelClass();
+        Serializable realId = id;
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(edbClass);
+        if (tableInfo != null && Number.class.isAssignableFrom(tableInfo.getKeyType())) {
+            realId = Long.parseLong(id.toString());
+        }
+
         if (IdEntity.class.isAssignableFrom(edbClass)) {
             String columnName = getColumnName(edbClass);
             if (StrUtil.isNotBlank(columnName)) {
-                return getByWrapper(new QueryWrapper<EDB>().eq(columnName, id));
+                return getByWrapper(new QueryWrapper<EDB>().eq(columnName, realId));
             }
         }
-        EDB edb = super.getById(id);
+        EDB edb = super.getById(realId);
         return edb == null ? null : edb.convertToEntity();
     }
 
