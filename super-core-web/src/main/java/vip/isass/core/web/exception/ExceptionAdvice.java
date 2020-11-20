@@ -202,31 +202,7 @@ public class ExceptionAdvice {
     @ExceptionHandler(Exception.class)
     private Resp<?> exceptionHandler(Exception e) {
         log.error(e.getMessage(), e);
-
-        Resp<?> resp = null;
-        if (e instanceof UnifiedException) {
-            UnifiedException exception = (UnifiedException) e;
-
-            Exception cause = (Exception) exception.getCause();
-            if (exception.getStatus() == null && cause != null) {
-                resp = parseRespByExcetption(cause);
-            }
-
-            return resp == null
-                ? new Resp<>()
-                .setSuccess(false)
-                .setStatus(ObjectUtil.defaultIfNull(exception.getStatus(), StatusMessageEnum.UNDEFINED.getStatus()))
-                .setMessage(exception.getMsg())
-                : resp;
-        }
-
-        resp = parseRespByExcetption(e);
-        return resp == null
-            ? new Resp<>()
-            .setSuccess(Boolean.FALSE)
-            .setStatus(StatusMessageEnum.UNDEFINED.getStatus())
-            .setMessage(defaultMessage(ExceptionUtil.unwrap(e)))
-            : resp;
+        return createRespByException(e);
     }
 
     /**
@@ -239,7 +215,34 @@ public class ExceptionAdvice {
         return t.getClass().getSimpleName() + ((t.getMessage() == null) ? "" : (": " + t.getMessage()));
     }
 
-    private Resp parseRespByExcetption(Exception e) {
+    public Resp<?> createRespByException(Exception e) {
+        Resp<?> resp = null;
+        if (e instanceof UnifiedException) {
+            UnifiedException exception = (UnifiedException) e;
+
+            Exception cause = (Exception) exception.getCause();
+            if (exception.getStatus() == null && cause != null) {
+                resp = createRespByExceptionFromExceptionMappings(cause);
+            }
+
+            return resp == null
+                ? new Resp<>()
+                .setSuccess(false)
+                .setStatus(ObjectUtil.defaultIfNull(exception.getStatus(), StatusMessageEnum.UNDEFINED.getStatus()))
+                .setMessage(exception.getMsg())
+                : resp;
+        }
+
+        resp = createRespByExceptionFromExceptionMappings(e);
+        return resp == null
+            ? new Resp<>()
+            .setSuccess(Boolean.FALSE)
+            .setStatus(StatusMessageEnum.UNDEFINED.getStatus())
+            .setMessage(defaultMessage(ExceptionUtil.unwrap(e)))
+            : resp;
+    }
+
+    private Resp<?> createRespByExceptionFromExceptionMappings(Exception e) {
         for (IExceptionMapping exceptionMapping : exceptionMappings) {
             IStatusMessage statusMessage = exceptionMapping.getStatusCode(e);
             if (statusMessage == null) {
