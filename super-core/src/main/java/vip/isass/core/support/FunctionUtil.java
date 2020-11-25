@@ -204,6 +204,12 @@ public class FunctionUtil {
         return null;
     }
 
+    public static <T> void consumeIfTrue(boolean flag, T t, Consumer<T> consumer) {
+        if (flag) {
+            consumer.accept(t);
+        }
+    }
+
     public static <T> T applyIfTrue(boolean flag, Supplier<T> supplier) {
         if (flag) {
             return supplier.get();
