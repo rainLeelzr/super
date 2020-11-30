@@ -169,6 +169,7 @@
 
 package vip.isass.core.web.swagger;
 
+import cn.hutool.core.convert.Convert;
 import com.fasterxml.classmate.ResolvedType;
 import com.google.common.base.Optional;
 import io.swagger.annotations.ApiModelProperty;
@@ -210,12 +211,14 @@ public class IsassEnumPropertyPlugin implements ModelPropertyBuilderPlugin {
                 Method getCodeMethod = rawPrimaryType.getMethod("getCode");
                 Method getDescMethod = rawPrimaryType.getMethod("getDesc");
 
+                Class<?> codeFieldReturnType = getCodeMethod.getReturnType();
+
                 Enum<?>[] values = (Enum<?>[]) rawPrimaryType.getEnumConstants();
                 final List<String> displayValues = Arrays
                     .stream(values)
                     .map(e -> {
                         try {
-                            return Integer.toString((Integer) getCodeMethod.invoke(e));
+                            return Convert.convert(codeFieldReturnType, getCodeMethod.invoke(e)).toString();
                         } catch (Exception e1) {
                             log.error(e1.getMessage(), e1);
                         }
@@ -224,7 +227,7 @@ public class IsassEnumPropertyPlugin implements ModelPropertyBuilderPlugin {
                     .collect(Collectors.toList());
                 final AllowableListValues allowableListValues = new AllowableListValues(displayValues, rawPrimaryType.getTypeName());
                 //固定设置为int类型
-                final ResolvedType resolvedType = context.getResolver().resolve(int.class);
+                final ResolvedType resolvedType = context.getResolver().resolve(codeFieldReturnType);
 
                 String desc = annotation.isPresent() ? annotation.get().value() : "";
                 if (!desc.contains("[枚举--")) {
@@ -233,7 +236,7 @@ public class IsassEnumPropertyPlugin implements ModelPropertyBuilderPlugin {
                         + Arrays.stream(values)
                         .map(e -> {
                             try {
-                                return getCodeMethod.invoke(e) + ":" + e.name() + ":" + getDescMethod.invoke(e);
+                                return getCodeMethod.invoke(e) + "（" + e.name() + ", " + getDescMethod.invoke(e)+")";
                             } catch (Exception e1) {
                                 log.error(e1.getMessage(), e1);
                             }
