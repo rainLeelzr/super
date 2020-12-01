@@ -279,7 +279,7 @@
 
         <!--<elasticsearch.version>7.2.0</elasticsearch.version>-->
 
-        <poi-ooxml.version>4.1.0</poi-ooxml.version>
+        <poi-ooxml.version>4.1.2</poi-ooxml.version>
         <xerces.version>2.12.0</xerces.version>
 
         <klock.version>1.4-RELEASE</klock.version>
