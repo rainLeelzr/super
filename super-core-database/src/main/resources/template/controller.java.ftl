@@ -20,6 +20,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
+@Api(tags = "<#if table.comment??>${table.comment!}<#else>${table.name?replace("${cfg.tablePrefix[0]}_","","f")?replace("_","-")}</#if>")
 public class ${table.controllerName} implements IController<${entity}> {
 
     @Resource
