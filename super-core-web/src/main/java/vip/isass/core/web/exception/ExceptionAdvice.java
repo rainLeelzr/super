@@ -201,7 +201,11 @@ public class ExceptionAdvice {
      */
     @ExceptionHandler(Exception.class)
     private Resp<?> exceptionHandler(Exception e) {
-        log.error(e.getMessage(), e);
+        if (e instanceof UnifiedException) {
+            log.debug(e.getMessage(), e);
+        } else {
+            log.error(e.getMessage(), e);
+        }
         return createRespByException(e);
     }
 
