@@ -214,7 +214,7 @@ public interface IV1Service<E, C extends ICriteria<E, C>> {
     // ****************************** 删 start ******************************
 
     default boolean deleteById(Serializable id) {
-        if (!StrUtil.isBlankIfStr(id)) {
+        if (StrUtil.isBlankIfStr(id)) {
             throw new IllegalArgumentException("id必填");
         }
         return getV1Repository().deleteById(id);
