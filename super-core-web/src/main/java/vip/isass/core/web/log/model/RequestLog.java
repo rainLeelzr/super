@@ -169,65 +169,240 @@
 
 package vip.isass.core.web.log.model;
 
+import cn.hutool.core.date.DateUtil;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
-import vip.isass.core.log.Log;
+import vip.isass.core.entity.Json;
+import vip.isass.core.support.JsonUtil;
 
-import java.util.Map;
+import java.util.Date;
 
 /**
+ * copy from vip.isass.log.api.model.entity.RequestLog
+ *
  * @author Rain
  */
 @Getter
 @Setter
 @Accessors(chain = true)
-public class RequestLog implements Log {
-
-    private String time;
-
-    private String loginUser;
-
-    private String uri;
-
-    private String method;
-
-    private Map<String, String> requestHeader;
-
-    private Map<String, String> responseHeader;
-
-    private String param;
-
-    private String responseBody;
+public class RequestLog {
 
     /**
-     * 请求耗时，毫秒
+     * <p>
+     * 标题
+     * </p>
+     * 数据库字段名: title
+     * 数据库字段类型: varchar(128)
      */
-    private int cost;
+    @ApiModelProperty("标题")
+    private String title;
+
+    /**
+     * <p>
+     * 用户id
+     * </p>
+     * 数据库字段名: user_id
+     * 数据库字段类型: varchar(64)
+     */
+    @ApiModelProperty("用户id")
+    private String userId;
+
+    /**
+     * <p>
+     * 用户昵称
+     * </p>
+     * 数据库字段名: nick_name
+     * 数据库字段类型: varchar(64)
+     */
+    @ApiModelProperty("用户昵称")
+    private String nickName;
+
+    /**
+     * <p>
+     * 请求地址
+     * </p>
+     * 数据库字段名: uri
+     * 数据库字段类型: varchar(512)
+     */
+    @ApiModelProperty("请求地址")
+    private String uri;
+
+    /**
+     * <p>
+     * http方法
+     * </p>
+     * 数据库字段名: method
+     * 数据库字段类型: varchar(16)
+     */
+    @ApiModelProperty("http方法")
+    private String method;
+
+    /**
+     * <p>
+     * 请求头
+     * </p>
+     * 数据库字段名: request_header
+     * 数据库字段类型: json
+     */
+    @ApiModelProperty("请求头")
+    private Json requestHeader;
+
+    /**
+     * <p>
+     * 响应头
+     * </p>
+     * 数据库字段名: response_header
+     * 数据库字段类型: json
+     */
+    @ApiModelProperty("响应头")
+    private Json responseHeader;
+
+    /**
+     * <p>
+     * 请求参数
+     * </p>
+     * 数据库字段名: request_param
+     * 数据库字段类型: varchar(512)
+     */
+    @ApiModelProperty("请求参数")
+    private String requestParam;
+
+    /**
+     * <p>
+     * 响应内容
+     * </p>
+     * 数据库字段名: response_content
+     * 数据库字段类型: varchar(512)
+     */
+    @ApiModelProperty("响应内容")
+    private String responseContent;
+
+    /**
+     * <p>
+     * 异常消息
+     * </p>
+     * 数据库字段名: exception_message
+     * 数据库字段类型: varchar(255)
+     */
+    @ApiModelProperty("异常消息")
+    private String exceptionMessage;
+
+    /**
+     * <p>
+     * 异常消息堆栈
+     * </p>
+     * 数据库字段名: exception_detail
+     * 数据库字段类型: varchar(1024)
+     */
+    @ApiModelProperty("异常消息堆栈")
+    private String exceptionDetail;
+
+    /**
+     * <p>
+     * 操作系统
+     * </p>
+     * 数据库字段名: os
+     * 数据库字段类型: varchar(32)
+     */
+    @ApiModelProperty("操作系统")
+    private String os;
+
+    /**
+     * <p>
+     * 浏览器
+     * </p>
+     * 数据库字段名: browser
+     * 数据库字段类型: varchar(32)
+     */
+    @ApiModelProperty("浏览器")
+    private String browser;
+
+    /**
+     * <p>
+     * 客户端ip
+     * </p>
+     * 数据库字段名: remote_addr
+     * 数据库字段类型: varchar(64)
+     */
+    @ApiModelProperty("客户端ip")
+    private String remoteAddr;
+
+    /**
+     * <p>
+     * 请求时间
+     * </p>
+     * 数据库字段名: request_time
+     * 数据库字段类型: bigint(20)
+     */
+    @ApiModelProperty("请求时间")
+    private Long requestTime;
+
+    /**
+     * <p>
+     * 耗时
+     * </p>
+     * 数据库字段名: cost
+     * 数据库字段类型: int(11)
+     */
+    @ApiModelProperty("耗时")
+    private Integer cost;
+
+    /**
+     * <p>
+     * 租户id
+     * </p>
+     * 数据库字段名: tenant_id
+     * 数据库字段类型: varchar(64)
+     */
+    @ApiModelProperty("租户id")
+    private String tenantId;
+
+    /**
+     * <p>
+     * 应用id
+     * </p>
+     * 数据库字段名: app_id
+     * 数据库字段类型: varchar(64)
+     */
+    @ApiModelProperty("应用id")
+    private String appId;
+
+    /**
+     * <p>
+     * 微服务名
+     * </p>
+     * 数据库字段名: service_name
+     * 数据库字段类型: varchar(32)
+     */
+    @ApiModelProperty("微服务名")
+    private String serviceName;
 
     @Override
+    @SneakyThrows
     public String toString() {
-        return new StringBuilder("{")
-            .append("\"time\":\"")
-            .append(time).append('\"')
-            .append(",\"loginUser\":\"")
-            .append(loginUser).append('\"')
-            .append(",\"uri\":\"")
-            .append(uri).append('\"')
-            .append(",\"method\":\"")
-            .append(method).append('\"')
-            .append(",\"requestHeader\":")
-            .append(requestHeader)
-            .append(",\"responseHeader\":")
-            .append(responseHeader)
-            .append(",\"param\":\"")
-            .append(param).append('\"')
-            .append(",\"responseBody\":\"")
-            .append(responseBody).append('\"')
-            .append(",\"cost\":")
-            .append(cost)
-            .append('}')
-            .toString();
+        return "RequestLog{" +
+            "title='" + title + '\'' +
+            ", userId='" + userId + '\'' +
+            ", nickName='" + nickName + '\'' +
+            ", uri='" + uri + '\'' +
+            ", method='" + method + '\'' +
+            ", requestHeader=" + JsonUtil.DEFAULT_INSTANCE.writeValueAsString(requestHeader) +
+            ", responseHeader=" + JsonUtil.DEFAULT_INSTANCE.writeValueAsString(responseHeader) +
+            ", requestParam='" + requestParam + '\'' +
+            ", responseContent='" + responseContent + '\'' +
+            ", exceptionMessage='" + exceptionMessage + '\'' +
+            ", exceptionDetail='" + exceptionDetail + '\'' +
+            ", os='" + os + '\'' +
+            ", browser='" + browser + '\'' +
+            ", remoteAddr='" + remoteAddr + '\'' +
+            ", requestTime=" + DateUtil.formatDateTime(new Date(requestTime)) +
+            ", cost=" + cost +
+            ", tenantId='" + tenantId + '\'' +
+            ", appId='" + appId + '\'' +
+            ", serviceName='" + serviceName + '\'' +
+            '}';
     }
-
 }

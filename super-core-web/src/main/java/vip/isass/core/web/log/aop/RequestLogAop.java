@@ -169,23 +169,33 @@
 
 package vip.isass.core.web.log.aop;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import vip.isass.core.exception.UnifiedException;
-import vip.isass.core.login.LoginUser;
-import vip.isass.core.login.LoginUserUtil;
-import vip.isass.core.web.log.model.RequestLog;
+import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.http.useragent.UserAgent;
+import cn.hutool.http.useragent.UserAgentUtil;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHeaders;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.HandlerMapping;
+import vip.isass.core.login.LoginUser;
+import vip.isass.core.login.LoginUserUtil;
+import vip.isass.core.support.JsonUtil;
+import vip.isass.core.support.SystemClock;
+import vip.isass.core.web.log.model.RequestLog;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -193,8 +203,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /**
@@ -208,90 +216,118 @@ public class RequestLogAop {
 
     private static final int LENGTH_LIMIT = 5000;
 
-    @Around("execution(vip.isass.core.web.Resp *..controller..*(..))")
+    @Around("execution(* *..*Controller.*(..))")
     public Object requestLog(ProceedingJoinPoint pjp) throws Throwable {
         return handle(pjp);
     }
 
     public Object handle(ProceedingJoinPoint pjp) throws Throwable {
-        RequestLog requestLog = new RequestLog().setTime(DateUtil.now());
+        RequestLog requestLog = new RequestLog().setRequestTime(SystemClock.now());
 
         LoginUser loginUser = LoginUserUtil.getLoginUser();
         if (loginUser != null) {
-            requestLog.setLoginUser(loginUser.toString());
+            requestLog.setUserId(loginUser.getUserId())
+                .setNickName(loginUser.getNickName());
         }
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
             HttpServletRequest request = requestAttributes.getRequest();
-
-            requestLog.setUri(request.getRequestURI())
-                .setMethod(request.getMethod())
-                .setParam(request.getParameterMap() == null
-                    ? null
-                    : StrUtil.subPre(
-                    request.getParameterMap()
-                        .entrySet()
-                        .stream()
-                        .map(entry -> {
-                            String[] valueArr = entry.getValue();
-                            String value = ArrayUtil.isEmpty(valueArr)
-                                ? ""
-                                : Stream.of(valueArr)
-                                .collect(Collectors.joining(","));
-                            return entry.getKey() + "[" + value + "]";
-                        })
-                        .collect(Collectors.joining(",")),
-                    LENGTH_LIMIT));
-
-            Optional.of(request.getHeaderNames())
-                .ifPresent(names -> {
-                    Map<String, String> requestHeaders = new HashMap<>(16);
-                    while (names.hasMoreElements()) {
-                        String name = names.nextElement();
-                        requestHeaders.put(name, request.getHeader(name));
-                    }
-                    requestLog.setRequestHeader(requestHeaders);
-                });
+            fillWithRequest(requestLog, request);
         } else {
             requestLog.setUri("非web请求，线程：" + Thread.currentThread().getName());
         }
 
-        TimeInterval timeInterval = null;
+        fillParameters(requestLog, pjp);
+
+        TimeInterval timeInterval = new TimeInterval();
         try {
-            timeInterval = new TimeInterval();
             Object proceed = pjp.proceed();
-            requestLog.setCost((int) timeInterval.interval())
-                .setResponseBody(proceed == null ? null : StrUtil.subPre(proceed.toString(), LENGTH_LIMIT));
+            requestLog.setResponseContent(proceed == null
+                ? null
+                : StrUtil.subPre(ObjectUtil.toString(proceed), LENGTH_LIMIT));
             return proceed;
         } catch (Throwable throwable) {
-            if (timeInterval != null) {
-                requestLog.setCost((int) timeInterval.interval());
-            }
-            if (throwable instanceof UnifiedException) {
-                UnifiedException unifiedException = (UnifiedException) throwable;
-                requestLog.setResponseBody(unifiedException.toString());
-            } else {
-                requestLog.setResponseBody(StrUtil.subPre(ExceptionUtil.stacktraceToString(throwable), LENGTH_LIMIT));
-            }
+            fillWithException(requestLog, throwable);
             throw throwable;
         } finally {
+            requestLog.setCost((int) timeInterval.interval());
+
             if (requestAttributes != null) {
                 HttpServletResponse response = requestAttributes.getResponse();
-                Optional.ofNullable(response)
-                    .ifPresent(r -> {
-                        Collection<String> responseHeaderNames = r.getHeaderNames();
-                        if (CollUtil.isNotEmpty(responseHeaderNames)) {
-                            Map<String, String> responseHeaders = new HashMap<>(16);
-                            for (String headerName : responseHeaderNames) {
-                                String header = r.getHeader(headerName);
-                                responseHeaders.put(headerName, header);
-                            }
-                            requestLog.setResponseHeader(responseHeaders);
-                        }
-                    });
+                fillWithResponse(requestLog, response);
             }
             log.debug(requestLog.toString());
         }
+    }
+
+    private void fillParameters(RequestLog requestLog, ProceedingJoinPoint pjp) {
+        MethodSignature methodSignature = (MethodSignature) pjp.getSignature();
+        String[] parameterNames = methodSignature.getParameterNames();
+        if (ArrayUtil.isEmpty(parameterNames)) {
+            return;
+        }
+
+        try {
+            HashMap<String, Object> map = MapUtil.newHashMap(parameterNames.length);
+            Object[] args = pjp.getArgs();
+            for (int i = 0; i < parameterNames.length; i++) {
+                Object arg = args[i];
+                Object value = BeanUtil.isBean(arg.getClass())
+                    ? JSONUtil.toJsonStr(arg)
+                    : ObjectUtil.toString(arg);
+                map.put(parameterNames[i], value);
+            }
+            requestLog.setRequestParam(JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(map));
+        } catch (Exception e) {
+            requestLog.setRequestParam("格式化参数失败" + e.getMessage());
+        }
+    }
+
+    private void fillWithException(RequestLog requestLog, Throwable throwable) {
+        Throwable t = ExceptionUtil.unwrap(throwable);
+        requestLog.setExceptionMessage(t.toString())
+            .setExceptionDetail(StrUtil.subPre(ExceptionUtil.stacktraceToString(t), LENGTH_LIMIT));
+    }
+
+    private void fillWithResponse(RequestLog requestLog, HttpServletResponse response) {
+        Optional.ofNullable(response)
+            .ifPresent(r -> {
+                Collection<String> responseHeaderNames = r.getHeaderNames();
+                if (CollUtil.isNotEmpty(responseHeaderNames)) {
+                    Map<String, String> responseHeaders = new HashMap<>(16);
+                    for (String headerName : responseHeaderNames) {
+                        String header = r.getHeader(headerName);
+                        responseHeaders.put(headerName, header);
+                    }
+                    requestLog.setResponseHeader(JsonUtil.fromObject(responseHeaders));
+                }
+            });
+    }
+
+    private void fillWithRequest(RequestLog requestLog, HttpServletRequest request) {
+        String mapping = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        requestLog.setUri(mapping).setMethod(request.getMethod());
+
+        Optional.of(request.getHeaderNames())
+            .ifPresent(names -> {
+                Map<String, String> requestHeaders = new HashMap<>(16);
+                while (names.hasMoreElements()) {
+                    String name = names.nextElement();
+                    requestHeaders.put(name, request.getHeader(name));
+                }
+                requestLog.setRequestHeader(JsonUtil.fromObject(requestHeaders));
+            });
+
+        Optional.of(request.getHeaders(HttpHeaders.USER_AGENT))
+            .ifPresent(userAgents -> {
+                while (userAgents.hasMoreElements()) {
+                    UserAgent ua = UserAgentUtil.parse(userAgents.nextElement());
+                    requestLog.setOs(ua.getOs().toString())
+                        .setBrowser(ua.getBrowser().toString());
+                }
+            });
+
+        requestLog.setRemoteAddr(ServletUtil.getClientIP(request));
     }
 
 }

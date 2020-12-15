@@ -192,6 +192,7 @@ import java.util.stream.Collectors;
 
 /**
  * url 资源注册器
+ * todo 添加资源注册的配置总开关
  *
  * @author Rain
  */
