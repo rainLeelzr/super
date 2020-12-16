@@ -187,6 +187,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -204,7 +205,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-
 /**
  * @author Rain
  * 请求日志记录器
@@ -216,13 +216,18 @@ public class RequestLogAop {
 
     private static final int LENGTH_LIMIT = 5000;
 
+    @Value("${spring.application.name:unknown}")
+    private String appName;
+
     @Around("execution(* *..*Controller.*(..))")
     public Object requestLog(ProceedingJoinPoint pjp) throws Throwable {
         return handle(pjp);
     }
 
     public Object handle(ProceedingJoinPoint pjp) throws Throwable {
-        RequestLog requestLog = new RequestLog().setRequestTime(SystemClock.now());
+        RequestLog requestLog = new RequestLog()
+            .setRequestTime(SystemClock.now())
+            .setServiceName(appName);
 
         LoginUser loginUser = LoginUserUtil.getLoginUser();
         if (loginUser != null) {
