@@ -174,6 +174,8 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import vip.isass.core.criteria.ICriteria;
 import vip.isass.core.exception.AbsentException;
+import vip.isass.core.exception.UnifiedException;
+import vip.isass.core.exception.code.IStatusMessage;
 import vip.isass.core.repository.IRepository;
 
 import java.io.Serializable;
@@ -278,6 +280,14 @@ public interface IV1Service<E, C extends ICriteria<E, C>> {
         return getV1Repository().getByCriteriaOrException(criteria);
     }
 
+    default E getByCriteriaOrException(ICriteria<E, C> criteria, IStatusMessage statusMessage) {
+        E e = getByCriteria(criteria);
+        if (e == null) {
+            throw new UnifiedException(statusMessage);
+        }
+        return e;
+    }
+
     default List<E> findByCriteria(ICriteria<E, C> criteria) {
         return getV1Repository().findByCriteria(criteria);
     }
@@ -322,8 +332,22 @@ public interface IV1Service<E, C extends ICriteria<E, C>> {
         getV1Repository().exceptionIfPresentByCriteria(criteria);
     }
 
+    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria, IStatusMessage statusMessage) {
+        Integer count = countByCriteria(criteria);
+        if (count > 0) {
+            throw new UnifiedException(statusMessage);
+        }
+    }
+
     default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
         getV1Repository().exceptionIfAbsentByCriteria(criteria);
+    }
+
+    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria, IStatusMessage statusMessage) {
+        Integer count = countByCriteria(criteria);
+        if (count == 0) {
+            throw new UnifiedException(statusMessage);
+        }
     }
 
 }

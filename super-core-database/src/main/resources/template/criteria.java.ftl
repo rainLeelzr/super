@@ -63,7 +63,7 @@ public class ${entity}Criteria extends <#if isIdEntity>IdCriteria<${entity}Crite
 <#if field.name?lower_case == cfg.idEntity.ID_COLUMN_NAME?lower_case>
 <#continue>
 </#if>
-    //************************************************** ${field.propertyName} **************************************************//
+    // region ************************************ ${field.propertyName} ************************************//
 
 <#---------- 所有字段类型都有的查询条件 ------------>
 <#include "./segment/criteria_property_name_all_type.java.ftl">
@@ -81,7 +81,7 @@ public class ${entity}Criteria extends <#if isIdEntity>IdCriteria<${entity}Crite
 <#if field.name?lower_case == cfg.idEntity.ID_COLUMN_NAME?lower_case>
 <#continue>
 </#if>
-    //************************************************** ${field.propertyName} setter **************************************************//
+    // endregion ************************************ ${field.propertyName} setter ************************************//
 
 <#---------- 所有字段类型都有的 setter 方法 ------------>
 <#include "./segment/criteria_setter_all_type.java.ftl">

@@ -203,13 +203,10 @@ public enum StatusMessageEnum implements IStatusMessage {
     INTERNAL_SERVER_ERROR_500(500, "服务器内部错误"),
 
     // 用户名密码错误,
-    USERNAME_PASSWORD_ERROR(1001, "用户名或密码错误"),
     ILLEGAL_ARGUMENT_ERROR(1002, "参数错误:{}"),
-    MOBILE_ABSENT(1003, "手机未注册"),
 
     URI_PARSE_ERROR(1003, "uri解析错误"),
     HTTP_METHOD_PARSE_ERROR(1004, "http method 解析错误"),
-    MOBILE_PRESENT(1005, "手机用户已存在"),
     VERIFICATION_CODE_ERROR(1006, "验证码错误");
 
     private Integer status;
