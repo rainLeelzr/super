@@ -167,13 +167,13 @@
  *
  */
 
-package vip.isass.core.web.log;
+package vip.isass.core.log.requestlog;
 
-import vip.isass.core.web.log.model.RequestLog;
+import vip.isass.core.support.api.ApiService;
 
 import java.util.List;
 
-public interface IRequestLogService {
+public interface IRequestLogService extends ApiService {
 
     void add(RequestLog requestLog);
 

@@ -193,12 +193,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
+import vip.isass.core.log.requestlog.IRequestLogService;
+import vip.isass.core.log.requestlog.RequestLog;
 import vip.isass.core.login.LoginUser;
 import vip.isass.core.login.LoginUserUtil;
 import vip.isass.core.support.JsonUtil;
 import vip.isass.core.support.SystemClock;
-import vip.isass.core.web.log.IRequestLogService;
-import vip.isass.core.web.log.model.RequestLog;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

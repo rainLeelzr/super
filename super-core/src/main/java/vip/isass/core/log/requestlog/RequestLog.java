@@ -167,7 +167,7 @@
  *
  */
 
-package vip.isass.core.web.log.model;
+package vip.isass.core.log.requestlog;
 
 import cn.hutool.core.date.DateUtil;
 import io.swagger.annotations.ApiModelProperty;
