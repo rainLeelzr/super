@@ -218,6 +218,8 @@ public class RequestLogAop {
 
     private static final int LENGTH_LIMIT = 5000;
 
+    private static final int REQUEST_PARAM_LENGTH_LIMIT = 512;
+
     @Value("${spring.application.name:unknown}")
     private String appName;
 
@@ -300,7 +302,9 @@ public class RequestLogAop {
                     : ObjectUtil.toString(arg);
                 map.put(parameterNames[i], value);
             }
-            requestLog.setRequestParam(JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(map));
+            requestLog.setRequestParam(StrUtil.subPre(
+                JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(map),
+                REQUEST_PARAM_LENGTH_LIMIT));
         } catch (Exception e) {
             requestLog.setRequestParam("格式化参数失败" + e.getMessage());
         }
