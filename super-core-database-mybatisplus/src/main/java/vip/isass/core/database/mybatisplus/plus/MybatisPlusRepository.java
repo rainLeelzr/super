@@ -288,6 +288,7 @@ public abstract class MybatisPlusRepository<
     //****************************** 改 start ******************************
 
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean updateEntityById(E entity) {
         IdEntity idEntity = (IdEntity) entity;
         Serializable id = idEntity.getId();
@@ -298,10 +299,9 @@ public abstract class MybatisPlusRepository<
         EDB edb = DbEntityConvert.convertToDbEntity(entity);
 
         String idColumnName = idEntity.getIdColumnName();
-
         boolean b = IdEntity.ID_COLUMN_NAME.equalsIgnoreCase(idColumnName)
             ? super.updateById(edb)
-            : super.update(edb, new UpdateWrapper<EDB>().set(idColumnName, idEntity.getId()));
+            : super.update(edb, new UpdateWrapper<EDB>().eq(idColumnName, idEntity.getId()));
 
         // 回写版本字段到 entity
         if (entity instanceof VersionEntity) {
