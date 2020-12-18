@@ -174,6 +174,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
@@ -288,13 +289,21 @@ public abstract class MybatisPlusRepository<
 
     @Override
     public boolean updateEntityById(E entity) {
-        Serializable id = ((IdEntity) entity).getId();
+        IdEntity idEntity = (IdEntity) entity;
+        Serializable id = idEntity.getId();
         Assert.notNull(id, "id 不能为null");
         if (id instanceof String) {
             Assert.notBlank((String) id, "id 不能为空");
         }
         EDB edb = DbEntityConvert.convertToDbEntity(entity);
-        boolean b = super.updateById(edb);
+
+        String idColumnName = idEntity.getIdColumnName();
+
+        boolean b = IdEntity.ID_COLUMN_NAME.equalsIgnoreCase(idColumnName)
+            ? super.updateById(edb)
+            : super.update(edb, new UpdateWrapper<EDB>().set(idColumnName, idEntity.getId()));
+
+        // 回写版本字段到 entity
         if (entity instanceof VersionEntity) {
             VersionEntity versionEntity = (VersionEntity) entity;
             VersionEntity versionDbEntity = (VersionEntity) edb;
