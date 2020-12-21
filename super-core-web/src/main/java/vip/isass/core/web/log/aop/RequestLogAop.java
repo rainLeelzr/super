@@ -279,7 +279,7 @@ public class RequestLogAop {
                 try {
                     requestLogService.add(requestLog);
                 } catch (Exception e) {
-                    log.error("持久化请求日志失败: {}", e.getMessage(), e);
+                    log.error("持久化请求日志失败: {}", e.getMessage());
                 }
             }
         }
