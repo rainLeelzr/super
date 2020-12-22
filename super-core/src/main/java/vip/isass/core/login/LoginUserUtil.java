@@ -178,7 +178,7 @@ import vip.isass.core.support.SpringContextUtil;
  */
 public class LoginUserUtil {
 
-    private static LoginUserService service = null;
+    private static volatile LoginUserService service = null;
 
     public static LoginUser getLoginUser() {
         if (service == null) {
