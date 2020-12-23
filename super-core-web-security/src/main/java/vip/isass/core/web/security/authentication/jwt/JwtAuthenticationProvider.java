@@ -186,14 +186,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import vip.isass.core.support.LocalDateTimeUtil;
 import vip.isass.core.web.security.IsassGrantedAuthority;
-import vip.isass.core.web.security.RoleVo;
 import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
 
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -237,12 +235,11 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
         // 获取用户拥有的角色
         Collection<GrantedAuthority> configAttributes = Collections.emptyList();
-        Collection<RoleVo> roles = securityMetadataSourceProviderManager.findRolesByUserId(jwtClaim.getUid());
-        if (!CollUtil.isEmpty(roles)) {
-            configAttributes = roles.stream()
-                .filter(Objects::nonNull)
-                .filter(r -> StrUtil.isNotBlank(r.getCode()))
-                .map(r -> new IsassGrantedAuthority(r.getId(), r.getCode()))
+        Collection<String> roleCodes = securityMetadataSourceProviderManager.findRoleCodesByUserId(jwtClaim.getUid());
+        if (!CollUtil.isEmpty(roleCodes)) {
+            configAttributes = roleCodes.stream()
+                .filter(StrUtil::isNotBlank)
+                .map(IsassGrantedAuthority::new)
                 .collect(Collectors.toList());
         }
 

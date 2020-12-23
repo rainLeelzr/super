@@ -167,27 +167,50 @@
  *
  */
 
-package vip.isass.core.web.security;
+package vip.isass.core.web.res;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
-import vip.isass.core.support.JsonUtil;
 
-@Getter
-@Setter
+import java.util.Objects;
+
+/**
+ * @author Rain
+ */
 @Accessors(chain = true)
-public class RoleVo {
+public class HttpApiResource {
 
-    private String id;
+    @Getter
+    @Setter
+    private String parentId;
 
-    private String code;
+    /**
+     * 名称
+     */
+    @Getter
+    @Setter
+    private String name;
+
+    /**
+     * 资源标识
+     */
+    @Getter
+    @Setter
+    private String uri;
 
     @Override
-    @SneakyThrows
-    public String toString() {
-        return JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(this);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HttpApiResource that = (HttpApiResource) o;
+        return Objects.equals(name, that.name) &&
+            Objects.equals(uri, that.uri);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, uri);
     }
 
 }

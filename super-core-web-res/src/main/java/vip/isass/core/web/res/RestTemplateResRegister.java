@@ -199,9 +199,6 @@ public class RestTemplateResRegister implements ResRegister {
     @javax.annotation.Resource
     private MsAuthenticationHeaderProvider msAuthenticationHeaderProvider;
 
-    @Value("${security.auth.url.get-all-res:}")
-    private String getAllResUrl;
-
     @Value("${security.auth.url.add-batch-res:}")
     private String addBatchRes;
 
@@ -209,11 +206,6 @@ public class RestTemplateResRegister implements ResRegister {
 
     @PostConstruct
     public void postConstruct() {
-        if (this.getAllResUrl.isEmpty()) {
-            log.warn("未配置security.auth.url.get-all-res");
-            isInited = false;
-            return;
-        }
         if (this.addBatchRes.isEmpty()) {
             log.warn("未配置security.auth.url.add-batch-res");
             isInited = false;
@@ -223,47 +215,13 @@ public class RestTemplateResRegister implements ResRegister {
     }
 
     @Override
-    public List<Resource> getAllRegisteredResourceByAppId(String appId) {
-        if (!isInited) {
-            log.warn("RestTemplateResRegister未初始化成功，getAllRegisteredResourceByPrefixUri将返回空列表");
-            return Collections.emptyList();
-        }
-
-        return getAllRegisteredResourceByUrl(
-            getAllResUrl + (StrUtil.isBlank(appId) ? "" : "?appId=" + appId));
-    }
-
-    private List<Resource> getAllRegisteredResourceByUrl(String url) {
-        ParameterizedTypeReference<Resp<List<Resource>>> type = new ParameterizedTypeReference<Resp<List<Resource>>>() {
-
-        };
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(msAuthenticationHeaderProvider.getHeaderName(), msAuthenticationHeaderProvider.getValue());
-        ResponseEntity<Resp<List<Resource>>> response;
-        try {
-            response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                new HttpEntity<>(httpHeaders),
-                type
-            );
-        } catch (Exception e) {
-            log.error("获取已注册resource失败！");
-            log.error(e.getMessage(), e);
-            return Collections.emptyList();
-        }
-        Resp<List<Resource>> resp = response.getBody();
-        return resp == null ? Collections.emptyList() : resp.getData();
-    }
-
-    @Override
-    public void register(Collection<Resource> collect) {
+    public void register(Collection<HttpApiResource> collect) {
         if (!isInited) {
             log.warn("RestTemplateResRegister未初始化成功，将停止执行资源注册");
             return;
         }
 
-        HttpEntity<Collection<Resource>> httpEntity = new HttpEntity<>(collect);
+        HttpEntity<Collection<HttpApiResource>> httpEntity = new HttpEntity<>(collect);
         ParameterizedTypeReference<Resp<Integer>> type = new ParameterizedTypeReference<Resp<Integer>>() {
         };
 

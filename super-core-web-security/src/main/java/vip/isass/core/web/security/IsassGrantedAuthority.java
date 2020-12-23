@@ -178,13 +178,10 @@ import java.util.Objects;
 public class IsassGrantedAuthority implements GrantedAuthority {
 
     @Getter
-    private final String roleId;
-
     private final String roleCode;
 
-    public IsassGrantedAuthority(String roleId, String roleCode) {
+    public IsassGrantedAuthority(String roleCode) {
         Assert.notBlank(roleCode, "roleCode");
-        this.roleId = roleId;
         this.roleCode = roleCode;
     }
 
@@ -198,13 +195,12 @@ public class IsassGrantedAuthority implements GrantedAuthority {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IsassGrantedAuthority that = (IsassGrantedAuthority) o;
-        return Objects.equals(roleId, that.roleId) &&
-            Objects.equals(roleCode, that.roleCode);
+        return Objects.equals(roleCode, that.roleCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(roleId, roleCode);
+        return Objects.hash(roleCode);
     }
 
     @Override

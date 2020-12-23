@@ -170,21 +170,19 @@
 package vip.isass.core.web.res;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Rain
  */
 public interface ResRegister {
 
-    List<Resource> getAllRegisteredResourceByAppId(String prefixUri);
-
     /**
      * 将一个集合的资源全部进行注册
      * <p>记录入数据库</p>
-     *SessionManager
+     * SessionManager
+     *
      * @param resources resources
      */
-    void register(Collection<Resource> resources);
+    void register(Collection<HttpApiResource> resources);
 
 }

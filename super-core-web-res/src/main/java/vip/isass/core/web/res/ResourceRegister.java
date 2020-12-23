@@ -185,8 +185,8 @@ import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import vip.isass.core.web.uri.UriPrefixProvider;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -200,20 +200,17 @@ import java.util.stream.Collectors;
 @Component
 public class ResourceRegister implements SmartLifecycle {
 
-    @javax.annotation.Resource
+    @Resource
     private RequestMappingHandlerMapping handlerMapping;
 
-    @javax.annotation.Resource
+    @Resource
     private ResRegister resRegister;
-
-    @javax.annotation.Resource
-    private UriPrefixProvider uriPrefixProvider;
 
     @Autowired(required = false)
     private IgnoreUrlResProvider ignoreUrlResProvider;
 
-    @Value("isass-${spring.application.name:unknow}")
-    private String appId;
+    @Value("${spring.application.name:unknown}")
+    private String appName;
 
     private static boolean IS_RUNNING = false;
 
@@ -225,43 +222,23 @@ public class ResourceRegister implements SmartLifecycle {
             .orElse(Collections.emptyList());
 
         Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
-        List<Resource> collect = handlerMethods
+        List<HttpApiResource> collect = handlerMethods
             .entrySet()
             .parallelStream()
-            .map(h -> {
-                    String tag;
-                    Api annotation = h.getValue().getBeanType().getAnnotation(Api.class);
-                    if (annotation == null) {
-                        tag = h.getValue().getBeanType().getSimpleName();
-                    } else {
-                        String[] tags = annotation.tags();
-                        tag = ArrayUtil.isEmpty(tags) || StrUtil.isBlank(tags[0])
-                            ? h.getValue().getBeanType().getSimpleName()
-                            : tags[0];
-                    }
+            .map(entry -> {
+                    String name = parseHttpApiName(entry);
+                    RequestMethodsRequestCondition methodsCondition = entry.getKey().getMethodsCondition();
+                    PatternsRequestCondition patternsCondition = entry.getKey().getPatternsCondition();
 
-                    String name = tag;
-                    ApiOperation apiOperation = h.getValue().getMethodAnnotation(ApiOperation.class);
-                    if (apiOperation == null || StrUtil.isBlank(apiOperation.value())) {
-                        name = tag + "-" + h.getValue().getMethod().getName();
-                    } else {
-                        name = tag + "-" + apiOperation.value();
-                    }
-
-                    RequestMethodsRequestCondition methodsCondition = h.getKey().getMethodsCondition();
-                    PatternsRequestCondition patternsCondition = h.getKey().getPatternsCondition();
-
-                    Set<Resource> resources = new HashSet<>(4);
+                    Set<HttpApiResource> resources = new HashSet<>(4);
                     for (RequestMethod requestMethod : methodsCondition.getMethods()) {
                         for (String uri : patternsCondition.getPatterns()) {
                             if (ignoreUrls.contains(uri)) {
                                 continue;
                             }
-                            Resource resource = new Resource()
-                                .setHttpMethod(requestMethod.name())
-                                .setTransportProtocol(Resource.TransportProtocol.HTTP)
-                                .setAppId(appId)
-                                .setUri(uriPrefixProvider.getUriPrefix() + uri.trim());
+                            HttpApiResource resource = new HttpApiResource()
+                                .setParentId(appName)
+                                .setUri(requestMethod.name().toUpperCase() + " " + uri);
                             resource.setName(StrUtil.nullToDefault(name, StrUtil.subPre(resource.getUri(), 32)));
                             resources.add(resource);
                         }
@@ -277,72 +254,33 @@ public class ResourceRegister implements SmartLifecycle {
         }
 
         try {
-            List<Resource> allRegisteredResource = resRegister.getAllRegisteredResourceByAppId(appId);
-            if (CollUtil.isNotEmpty(allRegisteredResource)) {
-                collect = collect.stream()
-                    .filter(r -> !this.isExist(r, allRegisteredResource))
-                    .collect(Collectors.toList());
-            }
-
-            if (CollUtil.isNotEmpty(collect)) {
-                resRegister.register(collect);
-            }
-
+            resRegister.register(collect);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("注册 http api 资源失败：{}", e.getMessage());
         }
     }
 
-    /**
-     * 判断一个资源是否已存在集合中
-     */
-    private boolean isExist(Resource resource, Collection<Resource> resources) {
-        if (resource == null || CollUtil.isEmpty(resources)) {
-            return false;
+    private String parseHttpApiName(Map.Entry<RequestMappingInfo, HandlerMethod> entry) {
+        // 类的描述
+        String name;
+        Api annotation = entry.getValue().getBeanType().getAnnotation(Api.class);
+        if (annotation == null) {
+            name = entry.getValue().getBeanType().getSimpleName();
+        } else {
+            String[] tags = annotation.tags();
+            name = ArrayUtil.isEmpty(tags) || StrUtil.isBlank(tags[0])
+                ? entry.getValue().getBeanType().getSimpleName()
+                : tags[0];
         }
 
-        for (Resource temp : resources) {
-            // 如果传输协议不相同，则执行下一次循环
-            if (resource.getTransportProtocol() != temp.getTransportProtocol()) {
-                continue;
-            }
-
-            // 判断 appId
-            if (!(StrUtil.isNotBlank(resource.getAppId()) && StrUtil.isNotBlank(temp.getAppId()))) {
-                continue;
-            }
-            if (resource.getAppId() == null) {
-                continue;
-            }
-            if (!resource.getAppId().equals(temp.getAppId())) {
-                continue;
-            }
-
-            // 判断 httpMethod
-            if (!(StrUtil.isNotBlank(resource.getHttpMethod()) && StrUtil.isNotBlank(temp.getHttpMethod()))) {
-                continue;
-            }
-            if (resource.getHttpMethod() == null) {
-                continue;
-            }
-            if (!resource.getHttpMethod().equals(temp.getHttpMethod())) {
-                continue;
-            }
-
-            // 判断 uri
-            if (!(StrUtil.isNotBlank(resource.getUri()) && StrUtil.isNotBlank(temp.getUri()))) {
-                continue;
-            }
-            if (resource.getUri() == null) {
-                continue;
-            }
-            if (!resource.getUri().equals(temp.getUri())) {
-                continue;
-            }
-
-            return true;
-        }
-        return false;
+        // 方法的描述
+        ApiOperation apiOperation = entry.getValue().getMethodAnnotation(ApiOperation.class);
+        return name
+            + "-"
+            + (
+            (apiOperation == null || StrUtil.isBlank(apiOperation.value()))
+                ? entry.getValue().getMethod().getName()
+                : apiOperation.value());
     }
 
     @Override

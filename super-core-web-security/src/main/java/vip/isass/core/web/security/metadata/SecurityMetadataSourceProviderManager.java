@@ -171,7 +171,6 @@ package vip.isass.core.web.security.metadata;
 
 import org.springframework.stereotype.Service;
 import vip.isass.core.support.FunctionUtil;
-import vip.isass.core.web.security.RoleVo;
 import vip.isass.core.web.security.config.WebSecurityConfig;
 
 import javax.annotation.Resource;
@@ -188,15 +187,15 @@ public class SecurityMetadataSourceProviderManager {
     @Resource
     private WebSecurityConfig webSecurityConfig;
 
-    public Collection<RoleVo> findRolesByUserId(String userId) {
+    public Collection<String> findRoleCodesByUserId(String userId) {
         return webSecurityConfig.isEnable()
-            ? FunctionUtil.getFirstNotNullValueFromCollection(providers, service -> service.findRolesByUserId(userId))
+            ? FunctionUtil.getFirstNotNullValueFromCollection(providers, service -> service.findRoleCodesByUserId(userId))
             : Collections.emptyList();
     }
 
-    public Collection<RoleVo> findRolesByUri(String uri, String method) {
+    public Collection<String> findRoleCodesByUri(String uri) {
         return webSecurityConfig.isEnable()
-            ? FunctionUtil.getFirstNotNullValueFromCollection(providers, service -> service.findRoleVosByUri(uri, method))
+            ? FunctionUtil.getFirstNotNullValueFromCollection(providers, service -> service.findRoleCodesByUri(uri))
             : Collections.emptyList();
     }
 
