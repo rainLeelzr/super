@@ -237,7 +237,7 @@ public class ResourceRegister implements SmartLifecycle {
                                 continue;
                             }
                             HttpApiResource resource = new HttpApiResource()
-                                .setParentId(appName)
+                                .setServiceName(appName)
                                 .setUri(requestMethod.name().toUpperCase() + " " + uri);
                             resource.setName(StrUtil.nullToDefault(name, StrUtil.subPre(resource.getUri(), 32)));
                             resources.add(resource);

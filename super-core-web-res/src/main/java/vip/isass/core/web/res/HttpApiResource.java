@@ -183,7 +183,7 @@ public class HttpApiResource {
 
     @Getter
     @Setter
-    private String parentId;
+    private String serviceName;
 
     /**
      * 名称
