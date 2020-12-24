@@ -169,11 +169,15 @@
 
 package vip.isass.core.web.swagger;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import vip.isass.core.web.res.IgnoreUrlResProvider;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Rain
@@ -181,9 +185,28 @@ import java.util.Collections;
 @Component
 public class SwaggerIgnoreUrlResProvider implements IgnoreUrlResProvider {
 
+    @Value("${spring.application.name:}")
+    private String appName;
+
     @Override
     public Collection<String> getUrls() {
-        return Collections.singletonList("/v2/api-docs-ext");
+        List<String> list = CollUtil.newArrayList(
+            "/doc.html",
+            "/swagger-resources",
+            "/swagger-resources/configuration/ui",
+            "/v2/api-docs",
+            "/v2/api-docs-ext",
+            "/webjars/css/app.3167b4c3.css",
+            "/webjars/js/app.e4826b43.js",
+            "/webjars/js/chunk-vendors.86544bae.js");
+
+        if (StrUtil.isNotBlank(appName)) {
+            List<String> collect = list.stream()
+                .map(l -> "/" + appName + l)
+                .collect(Collectors.toList());
+            list.addAll(collect);
+        }
+        return list;
     }
 
 }

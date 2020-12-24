@@ -167,67 +167,17 @@
  *
  */
 
-package vip.isass.core.web.security.config;
+package vip.isass.core.web.security;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import vip.isass.core.web.security.PermitUrlProvider;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
+ * 允许访问的资源
+ *
  * @author Rain
  */
-@Getter
-@Setter
-@Accessors(chain = true)
-@ToString
-@Configuration
-@ConfigurationProperties("security.auth")
-public class PermitUrlConfiguration {
+public interface PermitUrlProvider {
 
-    @Value("${spring.application.name:}")
-    private String appName;
-
-    @Autowired(required = false)
-    private List<PermitUrlProvider> permitUrlProviders;
-
-    /**
-     * 配置文件配置的url
-     */
-    private List<String> permitUrls;
-
-    public List<String> getPermitUrls() {
-        HashSet<String> permitUrls = CollUtil.newHashSet(
-            "/error",
-            StrUtil.isBlank(appName) ? "/actuator/health" : ("/" + appName + "/actuator/health"),
-            "/actuator/health"
-        );
-
-        if (permitUrlProviders != null) {
-            permitUrls.addAll(permitUrlProviders.stream()
-                .map(PermitUrlProvider::getUrls)
-                .filter(CollUtil::isNotEmpty)
-                .flatMap(Collection::stream)
-                .filter(StrUtil::isNotBlank)
-                .collect(Collectors.toList()));
-        }
-        if (CollUtil.isNotEmpty(this.permitUrls)) {
-            permitUrls.addAll(this.permitUrls);
-        }
-        return new ArrayList<>(permitUrls);
-    }
+    Collection<String> getUrls();
 
 }
