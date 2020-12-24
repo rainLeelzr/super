@@ -275,7 +275,8 @@ public class RequestLogAop {
             log.debug(requestLog.toString());
 
             // todo 持久化请求日志需要改为异步
-            if (requestLogService != null) {
+            if (requestLogService != null
+                && !"/log-service/requestLog".equals(requestLog.getUri())) {
                 try {
                     requestLogService.add(requestLog);
                 } catch (Exception e) {
