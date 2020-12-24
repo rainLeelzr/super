@@ -185,7 +185,7 @@ import vip.isass.core.web.header.AdditionalRequestHeaderProvider;
 @Component
 public class MsAuthenticationHeaderProvider implements AdditionalRequestHeaderProvider {
 
-    public static final String HEADER = "Ms-Authorization";
+    public static final String HEADER = "ms-authorization";
 
     @Value("${spring.application.name:unknown}")
     private String appName;
