@@ -205,7 +205,7 @@ public class FeignRequestInterceptor {
                         String name = headerNames.nextElement();
 
                         // 透传 token
-                        if (JwtConst.HEADER_NAME.equalsIgnoreCase(name)) {
+                        if (JwtConst.HEADER_NAME.equals(name)) {
                             template.header(name, request.getHeader(name));
                             break;
                         }
@@ -224,19 +224,9 @@ public class FeignRequestInterceptor {
                         return;
                     }
 
-                    if (request == null || request.getHeaderNames() == null) {
+                    if (template.headers().get(h.getHeaderName()) == null) {
                         template.header(h.getHeaderName(), h.getValue());
-                        return;
                     }
-
-                    Enumeration<String> headerNames = request.getHeaderNames();
-                    while (headerNames.hasMoreElements()) {
-                        if (h.getHeaderName().equalsIgnoreCase(headerNames.nextElement())) {
-                            return;
-                        }
-                    }
-                    template.header(h.getHeaderName(), h.getValue());
-
                 });
             }
         };
