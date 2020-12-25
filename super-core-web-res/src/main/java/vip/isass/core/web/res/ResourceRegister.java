@@ -204,7 +204,7 @@ public class ResourceRegister implements SmartLifecycle {
     private RequestMappingHandlerMapping handlerMapping;
 
     @Resource
-    private ResRegister resRegister;
+    private IResRegisterService resRegisterService;
 
     @Autowired(required = false)
     private IgnoreUrlResProvider ignoreUrlResProvider;
@@ -254,9 +254,9 @@ public class ResourceRegister implements SmartLifecycle {
         }
 
         try {
-            resRegister.register(collect);
+            resRegisterService.register(collect);
         } catch (Exception e) {
-            log.error("注册 http api 资源失败：{}", e.getMessage());
+            log.error("注册 api 资源失败：{}", e.getMessage());
         }
     }
 

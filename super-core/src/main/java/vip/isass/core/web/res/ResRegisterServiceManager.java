@@ -169,20 +169,26 @@
 
 package vip.isass.core.web.res;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Rain
  */
-public interface ResRegister {
+@Primary
+@Service
+public class ResRegisterServiceManager implements IResRegisterService {
 
-    /**
-     * 将一个集合的资源全部进行注册
-     * <p>记录入数据库</p>
-     * SessionManager
-     *
-     * @param resources resources
-     */
-    void register(Collection<HttpApiResource> resources);
+    @Autowired(required = false)
+    private List<IResRegisterService> services;
+
+    @Override
+    public void register(Collection<HttpApiResource> resources) {
+        consume(services, s -> s.register(resources));
+    }
 
 }

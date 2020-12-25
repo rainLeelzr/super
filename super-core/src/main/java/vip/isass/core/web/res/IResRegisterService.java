@@ -169,80 +169,19 @@
 
 package vip.isass.core.web.res;
 
-import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
-import vip.isass.core.web.Resp;
-import vip.isass.core.web.security.authentication.ms.MsAuthenticationHeaderProvider;
+import vip.isass.core.support.api.ApiService;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
-/**
- * 通过 RestTemplate 调用远程服务注册资源
- *
- * @author Rain
- */
-@Slf4j
-@ConditionalOnMissingBean(ResRegister.class)
-public class RestTemplateResRegister implements ResRegister {
+public interface IResRegisterService extends ApiService {
 
-    @javax.annotation.Resource
-    private RestTemplate restTemplate;
-
-    @javax.annotation.Resource
-    private MsAuthenticationHeaderProvider msAuthenticationHeaderProvider;
-
-    @Value("${security.auth.url.add-batch-res:}")
-    private String addBatchRes;
-
-    private boolean isInited = false;
-
-    @PostConstruct
-    public void postConstruct() {
-        if (this.addBatchRes.isEmpty()) {
-            log.warn("未配置security.auth.url.add-batch-res");
-            isInited = false;
-            return;
-        }
-        isInited = true;
-    }
-
-    @Override
-    public void register(Collection<HttpApiResource> collect) {
-        if (!isInited) {
-            log.warn("RestTemplateResRegister未初始化成功，将停止执行资源注册");
-            return;
-        }
-
-        HttpEntity<Collection<HttpApiResource>> httpEntity = new HttpEntity<>(collect);
-        ParameterizedTypeReference<Resp<Integer>> type = new ParameterizedTypeReference<Resp<Integer>>() {
-        };
-
-        ResponseEntity<Resp<Integer>> resp;
-        try {
-            resp = restTemplate.exchange(
-                addBatchRes,
-                HttpMethod.POST,
-                httpEntity,
-                type
-            );
-        } catch (Exception e) {
-            log.error("注册resource失败！{}", addBatchRes);
-            log.error(e.getMessage(), e);
-            return;
-        }
-        if (resp.getStatusCode() == HttpStatus.OK && resp.getBody() != null && resp.getBody().getSuccess()) {
-            log.info("成功注册了{}个resource", collect.size());
-        } else {
-            log.error("保存resource错误:{}", resp.toString());
-        }
-    }
+    /**
+     * 将一个集合的资源全部进行注册
+     * <p>记录入数据库</p>
+     * SessionManager
+     *
+     * @param resources resources
+     */
+    void register(Collection<HttpApiResource> resources);
 
 }
