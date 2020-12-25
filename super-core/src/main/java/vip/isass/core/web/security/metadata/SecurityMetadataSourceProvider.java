@@ -183,8 +183,7 @@ public interface SecurityMetadataSourceProvider {
     Collection<String> findRoleCodesByUserId(String userId);
 
     /**
-     * @param uri    uri
-     * @param method method
+     * @param uri uri
      * @return 访问指定 uri 需要的角色
      */
     Collection<String> findRoleCodesByUri(String uri);
