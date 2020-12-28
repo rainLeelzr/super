@@ -202,10 +202,7 @@ import vip.isass.core.support.SystemClock;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Rain
@@ -223,6 +220,18 @@ public class RequestLogAop {
     @Value("${spring.application.name:unknown}")
     private String appName;
 
+    /**
+     * 请求日志总开关
+     */
+    @Value("${core.web.log.requestLog.enable:true}")
+    private boolean enable;
+
+    /**
+     * 不记录请求日志的url
+     */
+    @Value("${core.web.log.requestLog.ignoreUrls:}")
+    private List<String> ignoreUrls;
+
     @Autowired(required = false)
     private IRequestLogService requestLogService;
 
@@ -232,6 +241,9 @@ public class RequestLogAop {
 
     @Around("execution(* *..*Controller.*(..))")
     public Object requestLog(ProceedingJoinPoint pjp) throws Throwable {
+        if (!enable) {
+            return pjp.proceed();
+        }
         return handle(pjp);
     }
 
@@ -248,7 +260,10 @@ public class RequestLogAop {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
             HttpServletRequest request = requestAttributes.getRequest();
-            fillWithRequest(requestLog, request);
+            boolean ignoreUrl = fillWithRequest(requestLog, request);
+            if (ignoreUrl) {
+                return pjp.proceed();
+            }
         } else {
             requestLog.setUri("非web请求，线程：" + Thread.currentThread().getName());
         }
@@ -332,8 +347,11 @@ public class RequestLogAop {
             });
     }
 
-    private void fillWithRequest(RequestLog requestLog, HttpServletRequest request) {
+    private boolean fillWithRequest(RequestLog requestLog, HttpServletRequest request) {
         String mapping = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        if (ignoreUrls.contains(mapping)) {
+            return true;
+        }
         requestLog.setUri(mapping).setMethod(request.getMethod());
 
         Optional.of(request.getHeaderNames())
@@ -356,6 +374,7 @@ public class RequestLogAop {
             });
 
         requestLog.setRemoteAddr(ServletUtil.getClientIP(request));
+        return false;
     }
 
 }
