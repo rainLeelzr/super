@@ -181,6 +181,7 @@ import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import cn.hutool.json.JSONUtil;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -189,7 +190,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
@@ -210,7 +212,8 @@ import java.util.*;
  */
 @Slf4j
 @Aspect
-@Component
+@Configuration
+@ConfigurationProperties("core.web.log.request-log")
 public class RequestLogAop {
 
     private static final int LENGTH_LIMIT = 5000;
@@ -223,27 +226,29 @@ public class RequestLogAop {
     /**
      * 请求日志总开关
      */
-    @Value("${core.web.log.requestLog.enable:true}")
+    @Setter
     private boolean enable;
 
     /**
      * 不记录请求日志的url
      */
-    @Value("${core.web.log.requestLog.ignoreUrls:}")
+    @Setter
     private List<String> ignoreUrls;
 
     /**
      * 不记录请求日志的url前缀
      */
-    @Value("${core.web.log.requestLog.ignoreUrlsStartWith:}")
+    @Setter
     private List<String> ignoreUrlsStartWith;
+
+    /**
+     * 当请求日志队列满的时候丢弃新日志,默认true
+     */
+    @Setter
+    private Boolean discardNewLog;
 
     @Autowired(required = false)
     private IRequestLogService requestLogService;
-
-    // 当请求日志队列满的时候丢弃新日志,默认true
-    @Value("${core.web.log.requestLog.discardNewLog:true}")
-    private Boolean discardNewLog;
 
     @Around("execution(* *..*Controller.*(..))")
     public Object requestLog(ProceedingJoinPoint pjp) throws Throwable {
