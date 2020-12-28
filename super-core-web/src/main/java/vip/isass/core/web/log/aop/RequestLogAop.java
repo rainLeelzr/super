@@ -232,6 +232,12 @@ public class RequestLogAop {
     @Value("${core.web.log.requestLog.ignoreUrls:}")
     private List<String> ignoreUrls;
 
+    /**
+     * 不记录请求日志的url前缀
+     */
+    @Value("${core.web.log.requestLog.ignoreUrlsStartWith:}")
+    private List<String> ignoreUrlsStartWith;
+
     @Autowired(required = false)
     private IRequestLogService requestLogService;
 
@@ -351,6 +357,11 @@ public class RequestLogAop {
         String mapping = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         if (ignoreUrls.contains(mapping)) {
             return true;
+        }
+        for (String startWithUrl : ignoreUrlsStartWith) {
+            if (mapping.startsWith(startWithUrl)) {
+                return true;
+            }
         }
         requestLog.setUri(mapping).setMethod(request.getMethod());
 
