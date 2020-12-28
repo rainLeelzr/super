@@ -848,9 +848,9 @@
                     <verbose>true</verbose>
                     <dateFormat>yyyyMMddHHmmss</dateFormat>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                    <generateGitPropertiesFilename>${project.build.outputDirectory}/version.txt
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties
                     </generateGitPropertiesFilename>
-                    <format>txt</format>
+                    <format>properties</format>
                     <abbrevLength>8</abbrevLength>
                     <failOnNoGitDirectory>false</failOnNoGitDirectory>
                     <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
