@@ -227,25 +227,25 @@ public class RequestLogAop {
      * 请求日志总开关
      */
     @Setter
-    private boolean enable;
+    private boolean enable = true;
 
     /**
      * 不记录请求日志的url
      */
     @Setter
-    private List<String> ignoreUrls;
+    private List<String> ignoreUrls = Collections.emptyList();
 
     /**
      * 不记录请求日志的url前缀
      */
     @Setter
-    private List<String> ignoreUrlsStartWith;
+    private List<String> ignoreUrlsStartWith = Collections.emptyList();
 
     /**
      * 当请求日志队列满的时候丢弃新日志,默认true
      */
     @Setter
-    private Boolean discardNewLog;
+    private boolean discardNewLog = true;
 
     @Autowired(required = false)
     private IRequestLogService requestLogService;
