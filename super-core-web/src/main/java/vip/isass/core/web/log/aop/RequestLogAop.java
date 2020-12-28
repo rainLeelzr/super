@@ -242,7 +242,7 @@ public class RequestLogAop {
     private IRequestLogService requestLogService;
 
     // 当请求日志队列满的时候丢弃新日志,默认true
-    @Value("${core-web.log.requestLog.discardNewLog:true}")
+    @Value("${core.web.log.requestLog.discardNewLog:true}")
     private Boolean discardNewLog;
 
     @Around("execution(* *..*Controller.*(..))")
