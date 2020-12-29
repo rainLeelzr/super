@@ -180,7 +180,7 @@
     <springProperty scope="context" name="APP_NAME" source="spring.application.name"/>
 
     <!-- 定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
-    <property name="LOG_HOME" value="./applogs"/>
+    <property name="LOG_HOME" value="./logs"/>
 
     <!-- 定义日志内容格式 -->
     <!-- %d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
