@@ -202,6 +202,7 @@
         <module>super-core-mq-ons</module>
         <module>super-core-mq-kafka011</module>
         <module>super-core-mq-spring-event</module>
+        <module>super-core-deploy</module>
         <module>super-core-web</module>
         <module>super-core-web-security</module>
         <module>super-core-web-res</module>
@@ -354,6 +355,12 @@
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-deploy</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
@@ -854,11 +861,42 @@
                     <abbrevLength>8</abbrevLength>
                     <failOnNoGitDirectory>false</failOnNoGitDirectory>
                     <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
-                    <includeOnlyProperties>git.build.version,git.branch,git.commit.time,git.commit.id.abbrev
+                    <includeOnlyProperties>
+                        git.build.host,git.remote.origin.url,git.build.version,git.branch,git.commit.time,git.commit.id.abbrev
                     </includeOnlyProperties>
                 </configuration>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>vip.isass</groupId>
+                            <artifactId>super-core-deploy</artifactId>
+                            <version>${super-core.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>bin</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                            <configuration>
+                                <finalName>${project.artifactId}</finalName>
+                                <descriptorRefs>
+                                    <descriptorRef>assembly</descriptorRef>
+                                </descriptorRefs>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <profiles>
