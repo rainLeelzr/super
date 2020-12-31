@@ -179,12 +179,25 @@
         <dependencySet>
             <outputDirectory>${project.artifactId}</outputDirectory>
             <includes>
-                <include>vip.isass:super-core-deploy</include>
+                <include>vip.isass:super-core-deploy-springboot</include>
             </includes>
             <unpack>true</unpack>
             <unpackOptions>
                 <includes>
                     <include>application.properties</include>
+                </includes>
+                <filtered>true</filtered>
+            </unpackOptions>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>${project.artifactId}</outputDirectory>
+            <includes>
+                <include>vip.isass:super-core-deploy</include>
+            </includes>
+            <unpack>true</unpack>
+            <unpackOptions>
+                <includes>
                     <include>deploy.md</include>
                     <include>logback-spring.xml</include>
                     <include>start.bat</include>
@@ -202,7 +215,7 @@
             <unpack>true</unpack>
             <unpackOptions>
                 <includes>
-                    <include>start.sh</include>
+                    <include>*.sh</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>
@@ -226,11 +239,6 @@
             <includes>
                 <include>*.sh</include>
             </includes>
-        </fileSet>
-
-        <fileSet>
-            <directory>${project.build.outputDirectory}/deploy</directory>
-            <outputDirectory>${project.artifactId}</outputDirectory>
         </fileSet>
 
         <fileSet>

@@ -203,6 +203,8 @@
         <module>super-core-mq-kafka011</module>
         <module>super-core-mq-spring-event</module>
         <module>super-core-deploy</module>
+        <module>super-core-deploy-springboot</module>
+        <module>super-core-deploy-springcloud</module>
         <module>super-core-web</module>
         <module>super-core-web-security</module>
         <module>super-core-web-res</module>
@@ -361,6 +363,18 @@
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-deploy</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-deploy-springboot</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-deploy-springcloud</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
@@ -867,18 +881,12 @@
                 </configuration>
             </plugin>
         </plugins>
+
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <dependencies>
-                        <dependency>
-                            <groupId>vip.isass</groupId>
-                            <artifactId>super-core-deploy</artifactId>
-                            <version>${super-core.version}</version>
-                        </dependency>
-                    </dependencies>
                     <executions>
                         <execution>
                             <id>bin</id>
