@@ -184,7 +184,7 @@
             <unpack>true</unpack>
             <unpackOptions>
                 <includes>
-                    <include>application.properties</include>
+                    <include>deploy/application.properties</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>
@@ -198,9 +198,9 @@
             <unpack>true</unpack>
             <unpackOptions>
                 <includes>
-                    <include>deploy.md</include>
-                    <include>logback-spring.xml</include>
-                    <include>start.bat</include>
+                    <include>deploy/deploy.md</include>
+                    <include>deploy/logback-spring.xml</include>
+                    <include>deploy/start.bat</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>
@@ -215,7 +215,7 @@
             <unpack>true</unpack>
             <unpackOptions>
                 <includes>
-                    <include>*.sh</include>
+                    <include>deploy/start.sh</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>
@@ -225,7 +225,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.build.outputDirectory}/deploy</directory>
-            <outputDirectory>${project.artifactId}</outputDirectory>
+            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
             <excludes>
                 <exclude>*.sh</exclude>
             </excludes>
@@ -233,7 +233,7 @@
 
         <fileSet>
             <directory>${project.build.outputDirectory}/deploy</directory>
-            <outputDirectory>${project.artifactId}</outputDirectory>
+            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
             <lineEnding>unix</lineEnding>
             <fileMode>0755</fileMode>
             <includes>
@@ -243,7 +243,7 @@
 
         <fileSet>
             <directory>${project.build.directory}</directory>
-            <outputDirectory>${project.artifactId}</outputDirectory>
+            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>
@@ -251,7 +251,7 @@
 
         <fileSet>
             <directory>${project.build.outputDirectory}</directory>
-            <outputDirectory>${project.artifactId}</outputDirectory>
+            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
             <includes>
                 <include>git.properties</include>
             </includes>
