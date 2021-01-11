@@ -212,8 +212,9 @@ public class IsassOperationSummaryReader implements OperationBuilderPlugin {
             summary = descriptions.resolve(apiOperationAnnotation.get().value());
         }
 
-
-        summary = new StringBuilder(summary).insert(1, "-" + tags[0].substring(2)).toString();
+        summary = new StringBuilder(summary)
+            .insert(summary.indexOf("-"), "-" + StrUtil.removePrefix(tags[0], "v1"))
+            .toString();
         context.operationBuilder().summary(descriptions.resolve(summary));
     }
 

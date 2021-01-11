@@ -218,6 +218,11 @@ public abstract class QuerydslRepository<
         return false;
     }
 
+    @Override
+    public E addOrUpdate(E entity, List<String> uniqueColumns) {
+        return null;
+    }
+
     // ****************************** 删 start ******************************
 
     @Override

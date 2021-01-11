@@ -213,6 +213,10 @@ public interface IV1Service<E, C extends ICriteria<E, C>> {
         return entity;
     }
 
+    default E addOrUpdate(E entity, List<String> uniqueColumns) {
+        return getV1Repository().addOrUpdate(entity, uniqueColumns);
+    }
+
     // ****************************** 删 start ******************************
 
     default boolean deleteById(Serializable id) {

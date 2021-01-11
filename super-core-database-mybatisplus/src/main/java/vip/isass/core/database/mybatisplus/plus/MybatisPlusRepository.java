@@ -169,6 +169,7 @@
 
 package vip.isass.core.database.mybatisplus.plus;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
@@ -194,6 +195,7 @@ import vip.isass.core.repository.IRepository;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -262,6 +264,25 @@ public abstract class MybatisPlusRepository<
     @Override
     public boolean addBatch(Collection<E> entities, int batchSize) {
         return super.saveBatch(DbEntityConvert.convertToEdbEntities(entities), batchSize);
+    }
+
+    @Override
+    public E addOrUpdate(E entity, List<String> uniqueColumns) {
+        Assert.notEmpty(uniqueColumns, "uniqueColumns");
+        QueryWrapper<EDB> wrapper = new QueryWrapper<>();
+        Map<String, Object> map = BeanUtil.beanToMap(entity);
+        for (String uniqueColumn : uniqueColumns) {
+            Object value = map.get(StrUtil.toCamelCase(uniqueColumn));
+            Assert.notNull(value, "uniqueColumn[{}]必填", uniqueColumn);
+            wrapper.eq(uniqueColumn, value);
+        }
+
+        if (isPresentByWrapper(wrapper)) {
+            updateByWrapper(entity, wrapper);
+        } else {
+            add(entity);
+        }
+        return entity;
     }
 
     // ****************************** 删 start ******************************

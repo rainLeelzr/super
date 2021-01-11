@@ -220,6 +220,10 @@ public interface IRepository<E, C extends ICriteria<E, C>> {
         throw new UnsupportedOperationException();
     }
 
+    default E addOrUpdate(E entity, List<String> uniqueColumns) {
+        throw new UnsupportedOperationException();
+    }
+
     // ****************************** 删 start ******************************
 
     default boolean deleteById(Serializable id) {

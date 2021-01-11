@@ -170,6 +170,7 @@
 package vip.isass.core.web;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
@@ -244,7 +245,7 @@ public interface IV1Controller<
 
     @SuppressWarnings("rawtypes")
     @PostMapping("")
-    @ApiOperation(value = "增-单个实体", position = 9)
+    @ApiOperation(value = "增-单实体", position = 9)
     default Resp<String> add(@RequestBody @Valid E entity) {
         getService().add(entity);
         return Resp.bizSuccess(entity instanceof IdEntity ? ((IdEntity) entity).getId().toString() : "");
@@ -256,20 +257,30 @@ public interface IV1Controller<
         return Resp.bizSuccess(getService().addBatch(entities).size());
     }
 
+    @PostMapping("/add-update/{uniqueColumns}")
+    @ApiOperation(value = "增改-根据字段-全部实体", position = 11,
+        notes = "根据 uniqueColumns 字段和 entity 对应的值作为查询条件，如果已存在数据，则更新数据，否则新增数据。")
+    @ApiImplicitParam(name = "uniqueColumns", value = "唯一字段名列表，根据此字段判断需要新增或者修改", required = true)
+    default Resp<?> addOrUpdate(@RequestBody @Valid E entity,
+                                @PathVariable("uniqueColumns") List<String> uniqueColumns) {
+        getService().addOrUpdate(entity, uniqueColumns);
+        return Resp.bizSuccess();
+    }
+
     @PutMapping("/allColumns")
-    @ApiOperation(value = "改-根据id-全部字段", position = 11)
+    @ApiOperation(value = "改-根据id-全部字段", position = 12)
     default Resp<Boolean> updateAllColumnsById(@RequestBody @Valid E entity) {
         return Resp.bizSuccess(getService().updateEntityById(entity));
     }
 
     @PutMapping("")
-    @ApiOperation(value = "改-根据id-非空字段", position = 12)
+    @ApiOperation(value = "改-根据id-非空字段", position = 13)
     default Resp<Boolean> updateExcludeNullFieldsById(@RequestBody @Valid E entity) {
         return Resp.bizSuccess(getService().updateEntityById(entity));
     }
 
     @DeleteMapping("/{ids}")
-    @ApiOperation(value = "删-根据批量id", position = 13)
+    @ApiOperation(value = "删-根据批量id", position = 14)
     default Resp<Boolean> deleteByIds(@PathVariable("ids") @ApiParam(value = "ids,用英文逗号,隔开") List<String> ids) {
         return Resp.bizSuccess(getService().deleteByIds(ids));
     }
