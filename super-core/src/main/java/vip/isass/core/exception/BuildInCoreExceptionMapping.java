@@ -182,7 +182,6 @@ import vip.isass.core.exception.code.StatusMessageEnum;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -215,14 +214,14 @@ public class BuildInCoreExceptionMapping implements IExceptionMapping {
         String message;
         Throwable unwrap = ExceptionUtil.unwrap(e);
         if (unwrap instanceof BindException) {
-            message = parseMessage((BindException) e);
+            message = parseBindExceptionMessage((BindException) unwrap);
         } else {
-            message = e.getMessage();
+            message = unwrap.getMessage();
         }
         return message;
     }
 
-    private String parseMessage(BindException e) {
+    private String parseBindExceptionMessage(BindException e) {
         return e.getAllErrors()
             .stream()
             .map(error -> {
