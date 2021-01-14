@@ -197,43 +197,43 @@ public class IdCriteria<
     @ApiModelProperty("id等于")
     private PK id;
 
-    @ApiModelProperty("或者id等于")
+    @ApiModelProperty(hidden = true, value = "或者id等于")
     private PK orId;
 
-    @ApiModelProperty("id不等于")
+    @ApiModelProperty(hidden = true, value = "id不等于")
     private PK idNotEqual;
 
-    @ApiModelProperty("或者id不等于")
+    @ApiModelProperty(hidden = true, value = "或者id不等于")
     private PK orIdNotEqual;
 
-    @ApiModelProperty("id所在范围")
+    @ApiModelProperty(hidden = true, value = "id所在范围")
     private Collection<PK> idIn;
 
-    @ApiModelProperty("或者id所在范围")
+    @ApiModelProperty(hidden = true, value = "或者id所在范围")
     private Collection<PK> orIdIn;
 
-    @ApiModelProperty("id不在范围")
+    @ApiModelProperty(hidden = true, value = "id不在范围")
     private Collection<PK> idNotIn;
 
-    @ApiModelProperty("或者id不在范围")
+    @ApiModelProperty(hidden = true, value = "或者id不在范围")
     private Collection<PK> orIdNotIn;
 
-    @ApiModelProperty("id包含字符")
+    @ApiModelProperty(hidden = true, value = "id包含字符")
     private String idLike;
 
-    @ApiModelProperty("或者id包含字符")
+    @ApiModelProperty(hidden = true, value = "或者id包含字符")
     private String orIdLike;
 
-    @ApiModelProperty("id不包含字符")
+    @ApiModelProperty(hidden = true, value = "id不包含字符")
     private String idNotLike;
 
-    @ApiModelProperty("或者id不包含字符")
+    @ApiModelProperty(hidden = true, value = "或者id不包含字符")
     private String orIdNotLike;
 
-    @ApiModelProperty("id开始以")
+    @ApiModelProperty(hidden = true, value = "id开始以")
     private String idStartWith;
 
-    @ApiModelProperty("或者id开始以")
+    @ApiModelProperty(hidden = true, value = "或者id开始以")
     private String orIdStartWith;
 
     //************************************************** id setter **************************************************//

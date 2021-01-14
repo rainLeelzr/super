@@ -169,6 +169,7 @@
 
 package vip.isass.core.criteria;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -189,6 +190,7 @@ public abstract class AbstractCriteria<E, C extends AbstractCriteria<E, C>>
     // region selectColumn
 
     @Getter
+    @ApiModelProperty("查询字段")
     private List<String> selectColumns;
 
     // endregion selectColumn
@@ -203,11 +205,13 @@ public abstract class AbstractCriteria<E, C extends AbstractCriteria<E, C>>
     /**
      * 分页页码
      */
+    @ApiModelProperty("分页页码，从1开始")
     public Long pageNum;
 
     /**
      * 每页大小
      */
+    @ApiModelProperty("每页大小")
     public Long pageSize;
 
     /**
@@ -215,8 +219,10 @@ public abstract class AbstractCriteria<E, C extends AbstractCriteria<E, C>>
      * id asc 或者 id desc, modify_Time desc
      */
     @Getter
+    @ApiModelProperty(value = "排序", example = "create_Time desc")
     public String orderBy;
 
+    @ApiModelProperty(hidden = true)
     private Boolean searchCountFlag;
 
     // endregion page
