@@ -285,4 +285,10 @@ public interface IV1Controller<
         return Resp.bizSuccess(getService().deleteByIds(ids));
     }
 
+    @DeleteMapping("")
+    @ApiOperation(value = "删-根据条件", position = 15)
+    default Resp<Boolean> deleteByCriteria(@ModelAttribute C criteria) {
+        return Resp.bizSuccess(getService().deleteByCriteria(criteria));
+    }
+
 }

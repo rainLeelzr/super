@@ -298,6 +298,7 @@ public abstract class MybatisPlusRepository<
     }
 
     public boolean deleteByWrapper(Wrapper<EDB> wrapper) {
+        Assert.isTrue(!wrapper.isEmptyOfNormal(), "删除失败，删除条件不能为空");
         return super.remove(wrapper);
     }
 
