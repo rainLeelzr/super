@@ -173,7 +173,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
-import vip.isass.core.criteria.ICriteria;
 import vip.isass.core.criteria.IPageCriteria;
 
 import java.util.ArrayList;
@@ -203,25 +202,45 @@ public class BatchUtil {
      * @return records
      */
     public static <R, E, C extends IPageCriteria<E, C>> List<R> findAllByBatchPage(IPageCriteria<E, C> countCriteria,
-                                                                                   Function<ICriteria<E, C>, Integer> countFunction,
+                                                                                   Function<IPageCriteria<E, C>, Integer> countFunction,
                                                                                    IPageCriteria<E, C> fetchCriteria,
                                                                                    Function<IPageCriteria<E, C>, IPage<E>> fetchFunction,
                                                                                    Function<IPage<E>, List<R>> consumeFunction) {
+        return BatchUtil.<R, E, C>findAllByBatchPage(
+            countCriteria,
+            countFunction,
+            fetchCriteria,
+            fetchFunction,
+            consumeFunction,
+            -1
+        );
+    }
+
+    public static <R, E, C extends IPageCriteria<E, C>> List<R> findAllByBatchPage(IPageCriteria<E, C> countCriteria,
+                                                                                   Function<IPageCriteria<E, C>, Integer> countFunction,
+                                                                                   IPageCriteria<E, C> fetchCriteria,
+                                                                                   Function<IPageCriteria<E, C>, IPage<E>> fetchFunction,
+                                                                                   Function<IPage<E>, List<R>> consumeFunction,
+                                                                                   int limitResultSize) {
         Assert.notNull(countCriteria, "countCriteria");
         int totalCount = countFunction.apply(countCriteria);
-        List<R> result = new ArrayList<>(totalCount);
+        List<R> result = new ArrayList<>(Math.min(totalCount, limitResultSize));
 
         long currentPage = 1L;
+
         fetchCriteria.setPageNum(currentPage).setPageSize(fetchCriteria.getPageSize() == 20L ? 1000L : fetchCriteria.getPageSize()).setSearchCountFlag(Boolean.FALSE);
         long totalPageNum = (long) Math.ceil((double) totalCount / fetchCriteria.getPageSize());
         IPage<E> page;
         do {
-            log.debug("findAllByBatchPage 进度：{}/{}", currentPage, totalPageNum);
+            log.debug("findAllByBatchPage 进度：{}/{}", currentPage, totalCount);
             page = fetchFunction.apply(fetchCriteria);
             result.addAll(consumeFunction.apply(page));
             fetchCriteria.setPageNum(++currentPage);
 
-            log.debug("已获取记录数：{}", result.size());
+            log.debug("已获取记录数：{},限制记录条数：{}", result.size(), limitResultSize);
+            if (limitResultSize > -1 && result.size() >= limitResultSize) {
+                break;
+            }
         } while (currentPage <= totalPageNum);
 
         return result;
@@ -247,36 +266,6 @@ public class BatchUtil {
             consumeFunction.accept(page);
         } while (currentPage <= totalPageNum);
 
-    }
-
-    public static <R, E, C extends IPageCriteria<E, C>> List<R> findAllByBatchPage(IPageCriteria<E, C> countCriteria,
-                                                                                   Function<IPageCriteria<E, C>, Integer> countFunction,
-                                                                                   IPageCriteria<E, C> fetchCriteria,
-                                                                                   Function<IPageCriteria<E, C>, IPage<E>> fetchFunction,
-                                                                                   Function<IPage<E>, List<R>> consumeFunction,
-                                                                                   int limitResultSize) {
-        Assert.notNull(countCriteria, "countCriteria");
-        int totalCount = countFunction.apply(countCriteria);
-        List<R> result = new ArrayList<>(Math.min(totalCount, limitResultSize));
-
-        long currentPage = 1L;
-
-        fetchCriteria.setPageNum(currentPage).setPageSize(fetchCriteria.getPageSize() == 20L ? 1000L : fetchCriteria.getPageSize()).setSearchCountFlag(Boolean.FALSE);
-        long totalPageNum = (long) Math.ceil((double) totalCount / fetchCriteria.getPageSize());
-        IPage<E> page;
-        do {
-            log.debug("findAllByBatchPage 进度：{}/{}", currentPage, totalCount);
-            page = fetchFunction.apply(fetchCriteria);
-            result.addAll(consumeFunction.apply(page));
-            fetchCriteria.setPageNum(++currentPage);
-
-            log.debug("已获取记录数：{},限制记录条数：{}", result.size(), limitResultSize);
-            if (result.size() >= limitResultSize) {
-                break;
-            }
-        } while (currentPage <= totalPageNum);
-
-        return result;
     }
 
     /**
