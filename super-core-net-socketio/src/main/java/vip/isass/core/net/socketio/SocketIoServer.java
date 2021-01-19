@@ -196,7 +196,7 @@ public class SocketIoServer {
     @Resource
     private SocketIOServer socketIOServer;
 
-    public static final Map<String, SocketIOClient> CLIENT_BY_USER_ID = new ConcurrentHashMap<>();
+    static final Map<String, SocketIOClient> CLIENT_BY_USER_ID = new ConcurrentHashMap<>();
 
     @Bean
     public SocketIOServer socketIOServer() {
@@ -206,7 +206,7 @@ public class SocketIoServer {
         config.setPort(socketIoConfiguration.getTcpPort());
         config.setBossThreads(1);
 
-        log.info("正在启动 tcp server [{}:{}]", config.getHostname(), config.getPort());
+        log.info("正在启动 SocketIo [{}:{}]", config.getHostname(), config.getPort());
 
         SocketConfig sockConfig = new SocketConfig();
         sockConfig.setReuseAddress(true);// 解决SOCKET服务端重启"Address already in use"异常
@@ -215,7 +215,6 @@ public class SocketIoServer {
 
         SocketIOServer socketServer = new SocketIOServer(config);
         socketServer.start();
-        log.info("socketio 启动成功！");
         return socketServer;
     }
 
