@@ -169,7 +169,6 @@
 
 package vip.isass.core.cache.redis;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
@@ -186,7 +185,6 @@ import vip.isass.core.support.JsonUtil;
 @Configuration
 @EnableCaching
 @ComponentScan
-@ConditionalOnProperty(name = "spring.redis.enable", havingValue = "true", matchIfMissing = false)
 public class RedisConfig extends CachingConfigurerSupport {
 
     @Bean
