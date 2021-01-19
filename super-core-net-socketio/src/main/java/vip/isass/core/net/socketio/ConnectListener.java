@@ -167,52 +167,28 @@
  *
  */
 
-package vip.isass.core.cache.redis;
+package vip.isass.core.net.socketio;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachingConfigurerSupport;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.*;
-import vip.isass.core.support.JsonUtil;
+import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.annotation.OnConnect;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
-@Configuration
-@EnableCaching
-@ComponentScan
-@ConditionalOnProperty(name = "spring.redis.enable", havingValue = "true", matchIfMissing = false)
-public class RedisConfig extends CachingConfigurerSupport {
+import javax.annotation.Resource;
 
-    @Bean
-    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
+@Slf4j
+@Component
+public class ConnectListener {
 
-        // 配置序列化
-        config.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
-        config.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+    @Resource
+    private SocketIoServer socketIoServer;
 
-        return RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(config).build();
-    }
-
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(factory);
-        template.setDefaultSerializer(RedisSerializer.string());
-
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer =
-            new Jackson2JsonRedisSerializer<>(Object.class);
-        jackson2JsonRedisSerializer.setObjectMapper(JsonUtil.NOT_NULL_INSTANCE);
-
-        template.setValueSerializer(jackson2JsonRedisSerializer);
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
-        return template;
+    @OnConnect
+    public void onConnect(SocketIOClient client) {
+        log.info("[{}]client connect [{}]{}",
+                socketIoServer.getAllClients().size(),
+                client.getSessionId(),
+                client.getRemoteAddress());
     }
 
 }

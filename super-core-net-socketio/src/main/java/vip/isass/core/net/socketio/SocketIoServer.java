@@ -167,52 +167,80 @@
  *
  */
 
-package vip.isass.core.cache.redis;
+package vip.isass.core.net.socketio;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachingConfigurerSupport;
-import org.springframework.cache.annotation.EnableCaching;
+import com.corundumstudio.socketio.Configuration;
+import com.corundumstudio.socketio.SocketConfig;
+import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.SocketIOServer;
+import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.*;
-import vip.isass.core.support.JsonUtil;
 
-@Configuration
-@EnableCaching
-@ComponentScan
-@ConditionalOnProperty(name = "spring.redis.enable", havingValue = "true", matchIfMissing = false)
-public class RedisConfig extends CachingConfigurerSupport {
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * socketIO服务端
+ */
+@Slf4j
+@org.springframework.context.annotation.Configuration
+public class SocketIoServer {
+
+    @Resource
+    private SocketIoConfiguration socketIoConfiguration;
+
+    @Resource
+    private SocketIOServer socketIOServer;
+
+    public static final Map<String, SocketIOClient> CLIENT_BY_USER_ID = new ConcurrentHashMap<>();
 
     @Bean
-    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
+    public SocketIOServer socketIOServer() {
+        // 初始化服务
+        Configuration config = new Configuration();
 
-        // 配置序列化
-        config.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
-        config.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+        config.setPort(socketIoConfiguration.getTcpPort());
+        config.setBossThreads(1);
 
-        return RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(config).build();
+        log.info("正在启动 tcp server [{}:{}]", config.getHostname(), config.getPort());
+
+        SocketConfig sockConfig = new SocketConfig();
+        sockConfig.setReuseAddress(true);// 解决SOCKET服务端重启"Address already in use"异常
+        sockConfig.setTcpKeepAlive(false);
+        config.setSocketConfig(sockConfig);
+
+        SocketIOServer socketServer = new SocketIOServer(config);
+        socketServer.start();
+        log.info("socketio 启动成功！");
+        return socketServer;
     }
 
+    public Collection<SocketIOClient> getAllClients() {
+        return socketIOServer == null ? Collections.emptyList() : socketIOServer.getAllClients();
+    }
+
+    /**
+     * 用于扫描netty-socketio的注解，比如 @OnConnect、@OnEvent
+     **/
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(factory);
-        template.setDefaultSerializer(RedisSerializer.string());
+    public SpringAnnotationScanner springAnnotationScanner() {
+        return new SpringAnnotationScanner(socketIOServer());
+    }
 
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer =
-            new Jackson2JsonRedisSerializer<>(Object.class);
-        jackson2JsonRedisSerializer.setObjectMapper(JsonUtil.NOT_NULL_INSTANCE);
+    public void sendByUserId(String userId, String event, Object data) {
+        SocketIOClient socketIOClient = CLIENT_BY_USER_ID.get(userId);
+        if (socketIOClient == null) {
+            return;
+        }
+        socketIOClient.sendEvent(event, data);
+    }
 
-        template.setValueSerializer(jackson2JsonRedisSerializer);
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
-        return template;
+    public void broadcast(String event, Object data) {
+        socketIOServer.getAllClients().parallelStream().forEach(c -> c.sendEvent(event, data));
     }
 
 }

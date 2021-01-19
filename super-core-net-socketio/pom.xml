@@ -180,7 +180,7 @@
     </parent>
 
     <!-- 本项目信息 -->
-    <artifactId>super-core-cache</artifactId>
+    <artifactId>super-core-net-socketio</artifactId>
     <version>super.3.0.5-SNAPSHOT</version>
 
     <dependencies>
@@ -189,49 +189,17 @@
             <artifactId>super-core</artifactId>
         </dependency>
 
-        <!-- 缓存 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.cache</groupId>
-            <artifactId>cache-api</artifactId>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${netty.version}</version>
         </dependency>
 
-        <!-- redis 的默认实现 lettuce 用到连接池-->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
+            <groupId>com.corundumstudio.socketio</groupId>
+            <artifactId>netty-socketio</artifactId>
+            <version>${netty-socketio.version}</version>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.ehcache</groupId>-->
-        <!--<artifactId>ehcache</artifactId>-->
-        <!--</dependency>-->
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>alimaven</id>
-            <name>aliyun maven</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-        </repository>
-
-        <repository>
-            <id>center-snapshots</id>
-            <name>center-snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-
-        <repository>
-            <id>center</id>
-            <name>center</name>
-            <url>https://repo.maven.apache.org/maven2</url>
-        </repository>
-    </repositories>
 
 </project>

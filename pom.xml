@@ -213,6 +213,7 @@
         <module>super-core-net</module>
         <module>super-core-net-tcp</module>
         <module>super-core-net-websocket</module>
+        <module>super-core-net-socketio</module>
         <module>super-core-protobuf</module>
         <module>super-core-elasticsearch</module>
         <module>super-core-encryption</module>
@@ -243,7 +244,7 @@
         <alibaba-nacos.version>2.2.1.RELEASE</alibaba-nacos.version>
         <!--<netty.version>4.1.15.Final</netty.version>-->
         <netty.version>4.1.36.Final</netty.version>
-
+        <netty-socketio.version>1.7.18</netty-socketio.version>
         <skywalking.version>6.6.0</skywalking.version>
 
         <!-- 数据库 -->
@@ -513,6 +514,12 @@
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-net-websocket</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>super-core-net-socketio</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
