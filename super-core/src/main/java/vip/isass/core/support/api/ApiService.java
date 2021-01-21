@@ -197,7 +197,7 @@ public interface ApiService {
         return null;
     }
 
-    default <S, V> void consume(Collection<S> services, Consumer<S> consumer) {
+    default <S> void consume(Collection<S> services, Consumer<S> consumer) {
         if (services == null) {
             throw new UnsupportedOperationException("当前环境没有" + this.getClass().getSimpleName());
         }
@@ -208,7 +208,7 @@ public interface ApiService {
         }
     }
 
-    default <S, V> void consumeWithoutException(Collection<S> services, Consumer<S> consumer) {
+    default <S> void consumeWithoutException(Collection<S> services, Consumer<S> consumer) {
         if (services == null) {
             throw new UnsupportedOperationException("当前环境没有" + this.getClass().getSimpleName());
         }

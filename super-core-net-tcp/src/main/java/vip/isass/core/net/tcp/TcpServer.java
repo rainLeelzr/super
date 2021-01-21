@@ -200,7 +200,7 @@ public class TcpServer implements ApplicationListener<ContextRefreshedEvent> {
     @Resource
     private ChannelInitializerHandler channelInitializerHandler;
 
-    @Value("${server.tcp.port:20031}")
+    @Value("${server.tcp.port:20002}")
     private int port;
 
     private ExecutorService executorService;

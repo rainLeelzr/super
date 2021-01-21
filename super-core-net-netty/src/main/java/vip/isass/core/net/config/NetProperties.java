@@ -167,27 +167,22 @@
  *
  */
 
-package vip.isass.core.net.request.worker.event.handler;
+package vip.isass.core.net.config;
 
-import vip.isass.core.net.request.Request;
-import vip.isass.core.net.request.worker.event.WorkCompletedEvent;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationListener;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Rain
  */
-@Slf4j
-public class WorkCompletedHandler implements ApplicationListener<WorkCompletedEvent> {
+@Getter
+@Setter
+@Configuration
+@ConfigurationProperties(prefix = "isass")
+public class NetProperties {
 
-    /**
-     * 网络请求的业务处理完成时，触发此方法。
-     * 不论业务过程是否抛出异常，均触发此方法。
-     */
-    @Override
-    public void onApplicationEvent(WorkCompletedEvent event) {
-        Request request = event.getRequest();
-        log.debug("业务处理已完成。{},", request.toString());
-    }
+    private int restTemplateTimeOut = 20_000;
 
 }

@@ -180,7 +180,7 @@
     </parent>
 
     <!-- 本项目信息 -->
-    <artifactId>super-core-net</artifactId>
+    <artifactId>super-core-net-netty</artifactId>
     <version>super.3.0.5-SNAPSHOT</version>
 
     <dependencies>
@@ -210,25 +210,4 @@
             <version>${netty.version}</version>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>alimaven</id>
-            <name>aliyun maven</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-        </repository>
-
-        <repository>
-            <id>center-snapshots</id>
-            <name>center-snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-
-        <repository>
-            <id>center</id>
-            <name>center</name>
-            <url>https://repo.maven.apache.org/maven2</url>
-        </repository>
-    </repositories>
-
 </project>

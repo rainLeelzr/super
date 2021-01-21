@@ -199,7 +199,7 @@ public class WebsocketServer implements ApplicationListener<ContextRefreshedEven
     @Resource
     private ChannelInitializerHandler channelInitializerHandler;
 
-    @Value("${server.websocket.port:20071}")
+    @Value("${server.websocket.port:20003}")
     private int port;
 
     private ExecutorService executorService;

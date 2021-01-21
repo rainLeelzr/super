@@ -210,7 +210,7 @@
         <module>super-core-web-res</module>
         <module>super-core-web-swagger</module>
         <module>super-core-web-rpc-feign</module>
-        <module>super-core-net</module>
+        <module>super-core-net-netty</module>
         <module>super-core-net-tcp</module>
         <module>super-core-net-websocket</module>
         <module>super-core-net-socketio</module>
@@ -501,7 +501,7 @@
 
             <dependency>
                 <groupId>vip.isass</groupId>
-                <artifactId>super-core-net</artifactId>
+                <artifactId>super-core-net-netty</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 

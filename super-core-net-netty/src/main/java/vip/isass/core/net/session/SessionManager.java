@@ -169,13 +169,14 @@
 
 package vip.isass.core.net.session;
 
-import vip.isass.core.net.packet.Packet;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import io.netty.channel.Channel;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
+import vip.isass.core.net.packet.Packet;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -189,6 +190,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Rain
  */
 @Slf4j
+@Component
 public class SessionManager {
 
     private Map<Channel, Session> sessionMapOfChannel = new ConcurrentHashMap<>();
