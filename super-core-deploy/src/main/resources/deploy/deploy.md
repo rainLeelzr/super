@@ -11,12 +11,10 @@
 
 ## 创建数据库
 
-- 首次部署时，在 mysql 实例上创建数据库，用于存储本服务的数据
+- 启动服务时，程序会自动判断数据库是否存在，不存在则自动创建数据库。数据库名读取 `spring.datasource.mysql.master.database` 的配置
 
-- 可用 navicat 等数据库工具，或者 sql 创建数据库。提供 sql 如下：
+- 如需更改数据库名，请修改参数 `spring.datasource.mysql.master.database`
 
-``` sql
-CREATE DATABASE @service-name@ DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_general_ci
 ```
 
 ## 拷贝文件
