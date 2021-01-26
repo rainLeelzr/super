@@ -184,7 +184,7 @@
             <unpack>true</unpack>
             <unpackOptions>
                 <includes>
-                    <include>deploy/bootstrap.properties</include>
+                    <include>deploy/application.properties</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>
