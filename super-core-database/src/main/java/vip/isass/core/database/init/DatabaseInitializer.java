@@ -204,7 +204,7 @@ public class DatabaseInitializer implements ApplicationContextInitializer<Config
             return;
         }
         try {
-            log.info("开始创建数据库: 数据库不存在则创建自动创建数据库");
+            log.info("开始创建数据库: 数据库不存在则自动创建数据库");
             initDatabase(url, username, password);
         } catch (Exception e) {
             log.info("数据库初始化失败");
