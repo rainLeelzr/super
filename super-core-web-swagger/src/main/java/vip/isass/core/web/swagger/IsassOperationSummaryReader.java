@@ -202,7 +202,9 @@ public class IsassOperationSummaryReader implements OperationBuilderPlugin {
         }
         Api api = apiAnnotation.get();
         String[] tags = api.tags();
-        if (ArrayUtil.isEmpty(tags) || StrUtil.isBlank(tags[0]) || !tags[0].startsWith("v1")) {
+        if (ArrayUtil.isEmpty(tags)
+            || StrUtil.isBlank(tags[0])
+            || !tags[0].startsWith("v1")) {
             return;
         }
 
@@ -210,6 +212,9 @@ public class IsassOperationSummaryReader implements OperationBuilderPlugin {
         Optional<ApiOperation> apiOperationAnnotation = context.findAnnotation(ApiOperation.class);
         if (apiOperationAnnotation.isPresent() && StringUtils.hasText(apiOperationAnnotation.get().value())) {
             summary = descriptions.resolve(apiOperationAnnotation.get().value());
+        }
+        if (!summary.contains("-")) {
+            return;
         }
 
         summary = new StringBuilder(summary)
