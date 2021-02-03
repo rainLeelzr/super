@@ -169,12 +169,8 @@
 
 package vip.isass.core.web.res;
 
-import vip.isass.core.web.interceptor.RestTemplateInterceptor;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.Resource;
-
 
 /**
  * @author Rain
@@ -182,8 +178,5 @@ import javax.annotation.Resource;
 @Configuration
 @ComponentScan
 public class ResAutoConfiguration {
-
-    @Resource
-    private RestTemplateInterceptor restTemplateInterceptor;
 
 }

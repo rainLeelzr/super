@@ -234,6 +234,10 @@ public class DatabaseInitializer implements ApplicationContextInitializer<Config
             jdbcUrl = jdbcUrl.replace(":impala", "");
         }
 
+        if (jdbcUrl.startsWith("jdbc:p6spy")) {
+            jdbcUrl = jdbcUrl.replace(":p6spy", "");
+        }
+
         if (!jdbcUrl.startsWith("jdbc:")
             || (pos1 = jdbcUrl.indexOf(':', 5)) == -1) {
             throw new IllegalArgumentException("Invalid JDBC url.");

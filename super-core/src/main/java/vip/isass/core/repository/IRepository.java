@@ -310,4 +310,8 @@ public interface IRepository<E, C extends ICriteria<E, C>> {
         throw new UnsupportedOperationException();
     }
 
+    default boolean addIfAbsent(E entity, List<String> uniqueColumns) {
+        throw new UnsupportedOperationException();
+    }
+
 }

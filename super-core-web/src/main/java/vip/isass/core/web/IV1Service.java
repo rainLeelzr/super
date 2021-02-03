@@ -172,6 +172,7 @@ package vip.isass.core.web;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springframework.transaction.annotation.Transactional;
 import vip.isass.core.criteria.ICriteria;
 import vip.isass.core.exception.AbsentException;
 import vip.isass.core.exception.UnifiedException;
@@ -196,11 +197,13 @@ public interface IV1Service<E, C extends ICriteria<E, C>> {
         return entity;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     default Collection<E> addBatch(Collection<E> entities) {
         getV1Repository().addBatch(entities);
         return entities;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     default Collection<E> addBatch(Collection<E> entities, int batchSize) {
         getV1Repository().addBatch(entities, batchSize);
         return entities;
@@ -213,8 +216,26 @@ public interface IV1Service<E, C extends ICriteria<E, C>> {
         return entity;
     }
 
+    default Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns) {
+        int count = 0;
+        for (E entity : entities) {
+            if (getV1Repository().addIfAbsent(entity, uniqueColumns)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     default E addOrUpdate(E entity, List<String> uniqueColumns) {
         return getV1Repository().addOrUpdate(entity, uniqueColumns);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    default int addOrUpdateEntities(List<E> entities, List<String> uniqueColumns) {
+        for (E entity : entities) {
+            getV1Repository().addOrUpdate(entity, uniqueColumns);
+        }
+        return entities.size();
     }
 
     // ****************************** 删 start ******************************

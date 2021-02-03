@@ -257,6 +257,13 @@ public interface IV1Controller<
         return Resp.bizSuccess(getService().addBatch(entities).size());
     }
 
+    @PostMapping("/batch/absent/{uniqueColumns}")
+    @ApiOperation(value = "增-不存在时-批量实体", position = 10)
+    default Resp<Integer> addBatchIfAbsent(@RequestBody List<E> entities,
+                                           @PathVariable("uniqueColumns") List<String> uniqueColumns) {
+        return Resp.bizSuccess(getService().addBatchIfAbsent(entities, uniqueColumns));
+    }
+
     @PostMapping("/add-update/{uniqueColumns}")
     @ApiOperation(value = "增改-根据字段-全部实体", position = 11,
         notes = "根据 uniqueColumns 字段和 entity 对应的值作为查询条件，如果已存在数据，则更新数据，否则新增数据。")
@@ -265,6 +272,15 @@ public interface IV1Controller<
                                 @PathVariable("uniqueColumns") List<String> uniqueColumns) {
         getService().addOrUpdate(entity, uniqueColumns);
         return Resp.bizSuccess();
+    }
+
+    @PostMapping("/add-update/batch/{uniqueColumns}")
+    @ApiOperation(value = "增改-根据字段-批量实体", position = 11,
+        notes = "根据 uniqueColumns 字段和 每个 entity 对应的值作为查询条件，如果已存在数据，则更新数据，否则新增数据。")
+    @ApiImplicitParam(name = "uniqueColumns", value = "唯一字段名列表，根据此字段判断需要新增或者修改", required = true)
+    default Resp<Integer> addOrUpdateEntities(@RequestBody @Valid List<E> entities,
+                                              @PathVariable("uniqueColumns") List<String> uniqueColumns) {
+        return Resp.bizSuccess(getService().addOrUpdateEntities(entities, uniqueColumns));
     }
 
     @PutMapping("/allColumns")

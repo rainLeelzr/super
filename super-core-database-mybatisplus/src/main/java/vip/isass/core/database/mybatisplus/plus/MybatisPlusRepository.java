@@ -267,6 +267,24 @@ public abstract class MybatisPlusRepository<
     }
 
     @Override
+    public boolean addIfAbsent(E entity, List<String> uniqueColumns) {
+        Assert.notEmpty(uniqueColumns, "uniqueColumns");
+        QueryWrapper<EDB> wrapper = new QueryWrapper<>();
+        Map<String, Object> map = BeanUtil.beanToMap(entity);
+        for (String uniqueColumn : uniqueColumns) {
+            Object value = map.get(StrUtil.toCamelCase(uniqueColumn));
+            Assert.notNull(value, "uniqueColumn[{}]必填", uniqueColumn);
+            wrapper.eq(uniqueColumn, value);
+        }
+
+        if (isPresentByWrapper(wrapper)) {
+            return false;
+        }
+        add(entity);
+        return true;
+    }
+
+    @Override
     public E addOrUpdate(E entity, List<String> uniqueColumns) {
         Assert.notEmpty(uniqueColumns, "uniqueColumns");
         QueryWrapper<EDB> wrapper = new QueryWrapper<>();
