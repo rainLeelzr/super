@@ -207,7 +207,7 @@ public class FeignEncoder implements Encoder {
 
     private Encoder springEncoder;
 
-    private List<Converter<String>> converters;
+    private final List<Converter<String>> converters;
 
     public FeignEncoder() {
         converters = CollUtil.newArrayList(new Converter<String>() {
@@ -217,6 +217,7 @@ public class FeignEncoder implements Encoder {
             }
 
             @Override
+            @SuppressWarnings({"unchecked", "rawtypes"})
             public String convert(Object collection) {
                 return CollUtil.join((Collection) collection, ",");
             }
