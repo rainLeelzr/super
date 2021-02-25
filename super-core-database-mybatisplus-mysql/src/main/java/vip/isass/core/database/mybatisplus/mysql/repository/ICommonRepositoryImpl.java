@@ -167,110 +167,44 @@
  *
  */
 
-package vip.isass.core.entity;
+package vip.isass.core.database.mybatisplus.mysql.repository;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.StrUtil;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import vip.isass.core.support.IsassConfig;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import org.springframework.stereotype.Repository;
+import vip.isass.core.database.mybatisplus.mysql.mapper.ICommonMapper;
+import vip.isass.core.entity.DbEntityConvert;
+import vip.isass.core.entity.IdEntity;
+import vip.isass.core.repository.ICommonRepository;
 
 import javax.annotation.Resource;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * @author Rain
- */
-@Slf4j
-@Component
-public class DbEntityConvert {
-
-    private static String packageName;
+@Repository
+public class ICommonRepositoryImpl implements ICommonRepository {
 
     @Resource
-    public void setPackageName(@Value("${info.package:}") String packageName) {
-        DbEntityConvert.packageName = packageName;
-    }
+    private ICommonMapper iCommonMapper;
 
-    // key: entity; value: dbEntity
-    private static final Map<Class<?>, Class<?>> DB_ENTITY_MAP = new ConcurrentHashMap<>();
-
-    /**
-     * 把 entity 转换为 dbEntity
-     *
-     * @param <E>    entity
-     * @param <EDB>  db entity
-     * @param entity entity
-     * @return db entity
-     */
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> EDB convertToDbEntity(E entity) {
-        if (entity == null || entity instanceof DbEntity) {
-            return (EDB) entity;
-        }
-
-        Class<EDB> dbEntityClass = (Class<EDB>) getDbEntityClass(entity.getClass());
-        if (dbEntityClass == null) {
-            throw new UnsupportedOperationException(StrUtil.format("entity[{}]没有DbEntity的子类实现", entity.getClass().getName()));
-        }
-
-        return BeanUtil.copyProperties(entity, dbEntityClass);
-        //        return CglibUtil.copy(entity, dbEntityClass);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> E convertToEntity(EDB entity) {
-        return (E) entity;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<EDB> convertToEdbEntities(Collection<E> entities) {
-        List<EDB> edbEntities = new ArrayList<>(entities.size());
-        for (E entity : entities) {
-            if (entity instanceof DbEntity) {
-                edbEntities.add((EDB) entity);
-            } else {
-                edbEntities.add(convertToDbEntity(entity));
-            }
-        }
-        return edbEntities;
-    }
-
-    // 命名有误，将再未来版本删除此方法
-    @Deprecated
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<E> convertToEntitys(Collection<EDB> entities) {
-        return convertToEntities(entities);
-    }
-
-    public static <E extends IEntity<E>, EDB extends DbEntity<E, EDB>> List<E> convertToEntities(Collection<EDB> entities) {
-        return entities == null
-            ? null
-            : entities.stream()
-            .map(DbEntityConvert::convertToEntity)
-            .collect(Collectors.toList());
-    }
-
-    public static Class<?> getDbEntityClass(Class<?> entityClass) {
-        return DB_ENTITY_MAP.computeIfAbsent(entityClass, (k) -> {
-            Set<Class<?>> classes = ClassUtil.scanPackageBySuper(IsassConfig.PACKAGE_NAME, entityClass);
-            if (classes.isEmpty()) {
-                if (StrUtil.isNotBlank(packageName) && !IsassConfig.PACKAGE_NAME.equals(packageName)) {
-                    classes = ClassUtil.scanPackageBySuper(packageName, entityClass);
-                } else {
-                    log.warn("没有配置info.package，db 实体映射可能失败");
-                }
-            }
-            return classes.stream()
-                .filter(DbEntity.class::isAssignableFrom)
-                .findFirst()
-                .orElse(null);
-        });
+    @Override
+    public <PK extends Serializable, E extends IdEntity<PK, E>> List<E>
+    findAllSubRecords(Class<E> entityClass,
+                      String idColumnName,
+                      String parentIdColumnName,
+                      PK id,
+                      boolean returnIdRecord) {
+        Class<?> edbClass = DbEntityConvert.getDbEntityClass(entityClass);
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(edbClass);
+        Assert.notNull(tableInfo, "解析不到[{}]的tableInfo", entityClass.getName());
+        List<Map<String, Object>> list = iCommonMapper
+            .findAllSubRecords(tableInfo.getTableName(), idColumnName, parentIdColumnName, id, returnIdRecord);
+        List<E> collect = list.stream().map(l -> Convert.convert(entityClass, l)).collect(Collectors.toList());
+        return collect;
     }
 
 }
