@@ -267,6 +267,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // 禁用缓存
             .headers().cacheControl().disable()
 
+            // 允许加载iframe
+            .frameOptions().disable()
+
+            // 禁用只能通过HTTPS访问当前资源
+            .httpStrictTransportSecurity().disable()
+
             .and()
 
             // 配置请求授权
