@@ -179,7 +179,7 @@ public interface ICommonRepository {
     /**
      * 查找指定 id 的所有子类
      *
-     * @param entity             实体类型
+     * @param entityClass        实体类型
      * @param idColumnName       主键的字段名
      * @param parentIdColumnName 父 id 的字段名
      * @param id                 id 的值
