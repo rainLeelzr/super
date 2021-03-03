@@ -176,12 +176,12 @@
     <parent>
         <groupId>vip.isass</groupId>
         <artifactId>super</artifactId>
-        <version>super.3.0.5-SNAPSHOT</version>
+        <version>super.3.0.6-SNAPSHOT</version>
     </parent>
 
     <!-- 本项目信息 -->
     <artifactId>super-core-deploy-springcloud</artifactId>
-    <version>super.3.0.5-SNAPSHOT</version>
+    <version>super.3.0.6-SNAPSHOT</version>
 
     <dependencies>
         <dependency>

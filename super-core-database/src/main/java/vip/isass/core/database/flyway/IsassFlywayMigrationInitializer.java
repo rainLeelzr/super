@@ -167,16 +167,40 @@
  *
  */
 
-package vip.isass.core.support;
+package vip.isass.core.database.flyway;
 
-public interface IsassConfig {
+import org.flywaydb.core.Flyway;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 
-    String PACKAGE_NAME = "vip.isass";
+import java.util.List;
 
-    String ISASS_CORE_VERSION = "super.3.0.6-SNAPSHOT";
+public class IsassFlywayMigrationInitializer extends FlywayMigrationInitializer {
 
-    String ISASS_API_VERSION = "isass-api.3.0.6-SNAPSHOT";
+    private final List<Flyway> flyways;
 
-    String NEW_PROJECT_VERSION = "1.0.0";
+    private FlywayMigrationStrategy migrationStrategy;
+
+    public IsassFlywayMigrationInitializer(List<Flyway> flyways) {
+        super(flyways.get(0));
+        this.flyways = flyways;
+    }
+
+    public IsassFlywayMigrationInitializer(List<Flyway> flyways, FlywayMigrationStrategy migrationStrategy) {
+        super(flyways.get(0), migrationStrategy);
+        this.flyways = flyways;
+        this.migrationStrategy = migrationStrategy;
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        flyways.forEach(flyway -> {
+            if (this.migrationStrategy != null) {
+                this.migrationStrategy.migrate(flyway);
+            } else {
+                flyway.migrate();
+            }
+        });
+    }
 
 }

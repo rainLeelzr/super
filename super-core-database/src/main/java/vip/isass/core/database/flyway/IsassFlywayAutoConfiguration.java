@@ -167,16 +167,38 @@
  *
  */
 
-package vip.isass.core.support;
+package vip.isass.core.database.flyway;
 
-public interface IsassConfig {
+import org.flywaydb.core.Flyway;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-    String PACKAGE_NAME = "vip.isass";
+import java.util.List;
 
-    String ISASS_CORE_VERSION = "super.3.0.6-SNAPSHOT";
+/**
+ * 为了支持单体打包后，各微服务的flyway能独立管理，需修改源码
+ */
+@Configuration
+@ConditionalOnClass(Flyway.class)
+@ConditionalOnProperty(prefix = "spring.flyway", name = "enabled", matchIfMissing = true)
+@AutoConfigureAfter({
+    DataSourceAutoConfiguration.class,
+    JdbcTemplateAutoConfiguration.class,
+    HibernateJpaAutoConfiguration.class})
+public class IsassFlywayAutoConfiguration {
 
-    String ISASS_API_VERSION = "isass-api.3.0.6-SNAPSHOT";
-
-    String NEW_PROJECT_VERSION = "1.0.0";
+    @Bean
+    public IsassFlywayMigrationInitializer flywayInitializer(List<Flyway> flyways,
+                                                             ObjectProvider<FlywayMigrationStrategy> migrationStrategy) {
+        return new IsassFlywayMigrationInitializer(flyways, migrationStrategy.getIfAvailable());
+    }
 
 }
