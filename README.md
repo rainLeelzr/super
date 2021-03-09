@@ -19,6 +19,14 @@
 
 ---
 
+### super.3.0.6
+
+#### feat
+
+- 各微服务合成一个单体包后，各微服务的flyway支持独立管理
+
+---
+
 ## Git commit 规范
 
 ### commit message格式

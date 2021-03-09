@@ -9,6 +9,7 @@ java \
 1>/dev/null 2>&1 &
 
 echo 'starting...'
+echo '5秒后将自动打印日志，ctrl+c 可退出日志，且不会关闭正在运行的程序...'
 
 sleep 5
 
