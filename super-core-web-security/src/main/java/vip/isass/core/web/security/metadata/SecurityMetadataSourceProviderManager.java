@@ -188,9 +188,7 @@ public class SecurityMetadataSourceProviderManager {
     private WebSecurityConfig webSecurityConfig;
 
     public Collection<String> findRoleCodesByUserId(String userId) {
-        return webSecurityConfig.isEnable()
-            ? FunctionUtil.getFirstNotNullValueFromCollection(providers, service -> service.findRoleCodesByUserId(userId))
-            : Collections.emptyList();
+        return FunctionUtil.getFirstNotNullValueFromCollection(providers, service -> service.findRoleCodesByUserId(userId));
     }
 
     public Collection<String> findRoleCodesByUri(String uri) {
