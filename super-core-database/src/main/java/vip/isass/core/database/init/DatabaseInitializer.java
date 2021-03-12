@@ -193,6 +193,14 @@ public class DatabaseInitializer implements ApplicationContextInitializer<Config
         if (RUN) {
             return;
         }
+
+        String autoCreate = applicationContext.getEnvironment().getProperty(
+            "spring.datasource.autoCreate");
+        if ("false".equalsIgnoreCase(autoCreate)) {
+            RUN = true;
+            return;
+        }
+
         String url = applicationContext.getEnvironment().getProperty(
             "spring.datasource.dynamic.datasource.master.url");
         String username = applicationContext.getEnvironment().getProperty(
