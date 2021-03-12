@@ -226,6 +226,7 @@ public class MybatisPlusGenerator {
         DataSourceConfig dataSourceConfig = new DataSourceConfig()
             .setDbType(meta.getDbType())
             .setUrl(meta.getDataSourceUrl())
+            .setSchemaName(meta.getSchemaName())
             .setUsername(meta.getDataSourceUserName())
             .setPassword(meta.getDataSourcePassword());
 

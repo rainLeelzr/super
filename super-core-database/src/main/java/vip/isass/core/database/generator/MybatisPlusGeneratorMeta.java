@@ -191,6 +191,8 @@ public class MybatisPlusGeneratorMeta {
 
     private String dataSourceUrl;
 
+    private String schemaName;
+
     private String outputDir;
 
     private String moduleName;
