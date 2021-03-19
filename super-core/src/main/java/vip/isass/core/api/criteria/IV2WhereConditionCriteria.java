@@ -169,13 +169,167 @@
 
 package vip.isass.core.api.criteria;
 
+import cn.hutool.core.lang.Assert;
 import vip.isass.core.api.entity.IV2Entity;
+import vip.isass.core.criteria.Condition;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 基于mysql的条件
  *
  * @author Rain
  */
-public interface IV2Criteria<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> {
+public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2WhereConditionCriteria<E, C>>
+    extends IV2Criteria<E, C> {
+
+    /**
+     * whereConditions 相关方法
+     *
+     * @return where condition list
+     */
+    List<V2WhereCondition> getWhereConditions();
+
+    C setWhereConditions(List<V2WhereCondition> whereConditions);
+
+    /**
+     * 添加查询条件
+     *
+     * @param column column
+     * @param value  value
+     */
+    default void equals(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(column, Condition.EQUAL, value));
+    }
+
+    default void orEquals(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.EQUAL, value));
+    }
+
+    default void notEquals(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_EQUAL, value));
+    }
+
+    default void orNotEquals(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_EQUAL, value));
+    }
+
+    default void lessThan(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN, value));
+    }
+
+    default void orLessThan(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN, value));
+    }
+
+    default void lessThanEqual(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN_EQUAL, value));
+    }
+
+    default void orLessThanEqual(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN_EQUAL, value));
+    }
+
+    default void greaterThan(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN, value));
+    }
+
+    default void orGreaterThan(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN, value));
+    }
+
+    default void greaterThanEqual(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN_EQUAL, value));
+    }
+
+    default void orGreaterThanEqual(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN_EQUAL, value));
+    }
+
+    default void like(String column, String value) {
+        Assert.notBlank(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LIKE, value));
+    }
+
+    default void orLike(String column, String value) {
+        Assert.notBlank(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LIKE, value));
+    }
+
+    default void notLike(String column, String value) {
+        Assert.notBlank(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_LIKE, value));
+    }
+
+    default void orNotLike(String column, String value) {
+        Assert.notBlank(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_LIKE, value));
+    }
+
+    default void in(String column, Collection<?> values) {
+        Assert.notEmpty(values, "values不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.IN, values));
+    }
+
+    default void orIn(String column, Collection<?> values) {
+        Assert.notEmpty(values, "values不能为空");
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.IN, values));
+    }
+
+    default void notIn(String column, Collection<?> values) {
+        Assert.notEmpty(values, "values不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_IN, values));
+    }
+
+    default void orNotIn(String column, Collection<?> values) {
+        Assert.notEmpty(values, "values不能为空");
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_IN, values));
+    }
+
+    default void startWith(String column, String value) {
+        Assert.notBlank(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.START_WITH, value));
+    }
+
+    default void orStartWith(String column, String value) {
+        Assert.notBlank(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.START_WITH, value));
+    }
+
+    @SuppressWarnings("unchecked")
+    default C isNull(String column) {
+        Assert.notBlank(column, "column不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.IS_NULL, null));
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C isNotNull(String column) {
+        Assert.notBlank(column, "column不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.IS_NOT_NULL, null));
+        return (C) this;
+    }
+
+    default void collectionContainsAll(String column, Collection<String> value) {
+        Assert.notEmpty(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.CONTAINS_ALL, value));
+    }
+
+    default void collectionContainsAny(String column, Collection<String> value) {
+        Assert.notEmpty(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.CONTAINS_ANY, value));
+    }
 
 }

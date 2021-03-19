@@ -169,13 +169,25 @@
 
 package vip.isass.core.api.criteria;
 
-import vip.isass.core.api.entity.IV2Entity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import vip.isass.core.criteria.Condition;
 
 /**
- * 基于mysql的条件
- *
  * @author Rain
  */
-public interface IV2Criteria<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class V2WhereCondition {
+
+    private String columnName;
+
+    private Condition condition;
+
+    private Object value;
 
 }
