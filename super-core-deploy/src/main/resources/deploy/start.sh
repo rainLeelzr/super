@@ -1,9 +1,12 @@
 nohup \
 java \
--Xms512M \
--Xmx2048M \
--XX:MetaspaceSize=512M \
--XX:MaxMetaspaceSize=2048M \
+-Xms4G \
+-Xmx4G \
+-Xmn2G \
+-XX:SurvivorRatio=8 \
+-XX:InitialSurvivorRatio=8 \
+-XX:MetaspaceSize=256M \
+-XX:MaxMetaspaceSize=256M \
 -jar \
 @project.artifactId@.jar \
 1>/dev/null 2>&1 &
