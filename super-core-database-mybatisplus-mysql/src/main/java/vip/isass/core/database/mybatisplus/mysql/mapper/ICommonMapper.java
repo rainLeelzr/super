@@ -182,6 +182,7 @@ public interface ICommonMapper {
                                                 String idColumnName,
                                                 String parentIdColumnName,
                                                 Serializable id,
-                                                boolean returnIdRecord);
+                                                boolean returnIdRecord,
+                                                String logicDeleteSql);
 
 }
