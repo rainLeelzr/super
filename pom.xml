@@ -900,6 +900,7 @@
                     <useReleaseProfile>false</useReleaseProfile>
                     <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                     <pushChanges>false</pushChanges>
+                    <preparationGoals>clean validate</preparationGoals>
                 </configuration>
             </plugin>
         </plugins>
