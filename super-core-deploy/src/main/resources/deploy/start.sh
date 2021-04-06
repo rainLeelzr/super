@@ -1,8 +1,8 @@
 nohup \
 java \
--Xms4G \
--Xmx4G \
--Xmn2G \
+-Xms6G \
+-Xmx6G \
+-Xmn3G \
 -XX:SurvivorRatio=8 \
 -XX:InitialSurvivorRatio=8 \
 -XX:MetaspaceSize=256M \
