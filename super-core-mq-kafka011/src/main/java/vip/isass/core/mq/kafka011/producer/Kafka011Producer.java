@@ -169,19 +169,25 @@
 
 package vip.isass.core.mq.kafka011.producer;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import vip.isass.core.mq.MessageType;
 import vip.isass.core.mq.core.MqMessageContext;
 import vip.isass.core.mq.core.producer.MqProducer;
 import vip.isass.core.mq.kafka011.config.ProducerProperties;
-import vip.isass.core.serialization.GenericJackson;
-import vip.isass.core.serialization.JacksonSerializable;
 import vip.isass.core.support.JsonUtil;
+
+import java.util.Properties;
+import java.util.concurrent.Future;
 
 /**
  * @author Rain
@@ -194,61 +200,36 @@ public class Kafka011Producer implements MqProducer {
     @Setter
     private ProducerProperties producerProperties;
 
-//    private Producer producer;
+    private Producer producer;
 
 //    private OrderProducer orderProducer;
 
     @Override
     public void send(MqMessageContext mqMessageContext) {
-//        Assert.notNull(mqMessageContext);
-//        Assert.notBlank(mqMessageContext.getTopic());
+        Assert.notNull(mqMessageContext);
+        Assert.notBlank(mqMessageContext.getTopic());
 //        Assert.notBlank(mqMessageContext.getTag());
-//        Assert.notNull(mqMessageContext.getPayload());
+        Assert.notNull(mqMessageContext.getPayload());
 //
-//        Message msg = new Message(
-//            getTopic(mqMessageContext),
-//            mqMessageContext.getTag(),
-//            getBody(mqMessageContext));
-//        msg.setKey(mqMessageContext.getKey());
-//
-//        // 设置定时、延时信息
-//        if (mqMessageContext.getConsumeAtMills() != null) {
-//            msg.setStartDeliverTime(mqMessageContext.getConsumeAtMills());
-//        } else if (mqMessageContext.getDelayMills() != null) {
-//            msg.setStartDeliverTime(SystemClock.now() + mqMessageContext.getDelayMills());
-//        }
-//
-//        try {
-//            SendResult sendResult;
-//            if (MessageType.SHARDING_SEQUENTIAL_MESSAGE == mqMessageContext.getMessageType()) {
-//                sendResult = orderProducer.send(msg, mqMessageContext.getShardingKey());
-//            } else {
-//                sendResult = producer.send(msg);
-//            }
-//            // 同步发送消息，只要不抛异常就是成功
-//            if (sendResult != null) {
-//                log.debug("mq发送成功。Topic[{}], tag[{}], msgId[{}], messageKey[{}]",
-//                    msg.getTopic(),
-//                    msg.getTag(),
-//                    sendResult.getMessageId(),
-//                    mqMessageContext.getKey());
-//            }
-//        } catch (Exception e) {
-//            log.error("mq发送失败。tag[{}], messageKey[{}]", msg.getTag(), mqMessageContext.getKey());
-//            throw e;
-//        }
+        ProducerRecord<String, String> record = new ProducerRecord<>(
+            getTopic(mqMessageContext), "", getBody(mqMessageContext));
+
+        try {
+            Future send = producer.send(record);
+        } catch (Exception e) {
+            log.error("mq发送失败,topic[{}], messageKey[{}]", mqMessageContext.getTopic(), mqMessageContext.getKey());
+            throw e;
+        }
     }
 
     @SneakyThrows
-    private byte[] getBody(MqMessageContext mqMessageContext) {
-        byte[] body;
+    private String getBody(MqMessageContext mqMessageContext) {
+        String body;
         Object payload = mqMessageContext.getPayload();
         if (payload == null) {
             body = null;
-        } else if (payload instanceof JacksonSerializable) {
-            body = JsonUtil.NOT_NULL_INSTANCE.writeValueAsBytes(payload);
         } else {
-            body = GenericJackson.INSTANCE.serialize(mqMessageContext.getPayload());
+            body = JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(payload);
         }
         return body;
     }
@@ -278,37 +259,25 @@ public class Kafka011Producer implements MqProducer {
 
     @Override
     public Kafka011Producer init() {
-//        Assert.notNull(producerProperties);
+        Assert.notNull(producerProperties);
 //        Assert.notBlank(producerProperties.getNamesrvAddr());
 //        Assert.notBlank(producerProperties.getAccessKey());
 //        Assert.notBlank(producerProperties.getSecretKey());
-//        Assert.notBlank(producerProperties.getProducerId());
-//
-//        Properties properties = new Properties();
-//        properties.put(PropertyKeyConst.NAMESRV_ADDR, producerProperties.getNamesrvAddr());
-//        properties.put(PropertyKeyConst.AccessKey, producerProperties.getAccessKey());
-//        properties.put(PropertyKeyConst.SecretKey, producerProperties.getSecretKey());
-//        properties.setProperty(PropertyKeyConst.GROUP_ID, producerProperties.getProducerId());
-//        properties.setProperty(PropertyKeyConst.SendMsgTimeoutMillis, TimeUnit.SECONDS.toMillis(3L) + "");
-//
-//        producer = ONSFactory.createProducer(properties);
-//        producer.start();
-//
-//        orderProducer = ONSFactory.createOrderProducer(properties);
-//        orderProducer.start();
-//
-//        return this;
-        return null;
+        Assert.notBlank(producerProperties.getProducerId());
+
+        Properties kafkaProps = new Properties();
+        kafkaProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, producerProperties.getNamesrvAddr());
+        kafkaProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        kafkaProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        producer = new KafkaProducer<String, String>(kafkaProps);
+        return this;
     }
 
     @Override
     public void destroy() {
-//        if (producer != null) {
-//            producer.shutdown();
-//        }
-//        if (orderProducer != null) {
-//            orderProducer.shutdown();
-//        }
+        if (producer != null) {
+            producer.close();
+        }
     }
 
 }
