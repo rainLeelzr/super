@@ -16,5 +16,5 @@ echo '5秒后将自动打印日志，ctrl+c 可退出日志，且不会关闭正
 
 sleep 5
 
-tail -f -n 1000 ./logs/@service-name@/*.log
+tail -f -n 100 ./logs/@service-name@/*.log
 
