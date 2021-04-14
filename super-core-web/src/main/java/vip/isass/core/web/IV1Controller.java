@@ -219,6 +219,12 @@ public interface IV1Controller<
         return Resp.bizSuccess(getService().findByCriteria(criteria));
     }
 
+    @GetMapping("/all")
+    @ApiOperation(value = "查-全部-列表", position = 4)
+    default Resp<List<E>> findAll() {
+        return Resp.bizSuccess(getService().findAll());
+    }
+
     @GetMapping("/count")
     @ApiOperation(value = "查-根据条件-实体数量", position = 5)
     default Resp<Integer> countByCriteria(@ModelAttribute C criteria) {
