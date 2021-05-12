@@ -177,26 +177,26 @@ import vip.isass.core.web.security.metadata.SecurityMetadataSource;
 import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
 import vip.isass.core.web.uri.UriPrefixProvider;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author Rain
  */
 public class FilterSecurityInterceptorSourcePostProcessor implements ObjectPostProcessor<FilterSecurityInterceptor> {
 
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-    private SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager;
+    private final SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager;
 
-    private UriPrefixProvider prefixProvider;
+    private final UriPrefixProvider prefixProvider;
 
-    private List<String> permitUrls;
+    private final Collection<String> permitUrls;
 
     public FilterSecurityInterceptorSourcePostProcessor(
         RequestMappingHandlerMapping requestMappingHandlerMapping,
         SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager,
         UriPrefixProvider prefixProvider,
-        List<String> permitUrls) {
+        Collection<String> permitUrls) {
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.securityMetadataSourceProviderManager = securityMetadataSourceProviderManager;
         this.prefixProvider = prefixProvider;

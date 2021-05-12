@@ -173,6 +173,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -193,6 +194,7 @@ import vip.isass.core.web.security.processor.FilterSecurityInterceptorSourcePost
 import vip.isass.core.web.uri.UriPrefixProvider;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -248,10 +250,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         log.info("spring security enable: {}", enable);
 
-        List<String> permitUrls = permitUrlConfiguration.getPermitUrls();
+        Collection<String> permitUrls = permitUrlConfiguration.getPermitUrls();
 
         http
-            // 跨域
+            // 允许跨域
             .cors()
 
             .and()
@@ -270,43 +272,46 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // 允许加载iframe
             .frameOptions().disable()
 
-            // 禁用只能通过HTTPS访问当前资源
+            // 禁用只能通过 HTTPS 访问当前资源
             .httpStrictTransportSecurity().disable()
 
             .and()
 
-            // 配置请求授权
-            .authorizeRequests()
-            // 允许以下请求
-            .antMatchers(permitUrls.toArray(new String[]{}))
-            .permitAll()
-
-            // 不能写这个，写了就代表只要登录了，就可以访问
-            // .anyRequest().authenticated()
-
-            // 添加自定义角色获取器
-            .withObjectPostProcessor(new FilterSecurityInterceptorSourcePostProcessor(
-                requestMappingHandlerMapping,
-                securityMetadataSourceProviderManager,
-                uriPrefixProvider,
-                permitUrls))
-            .withObjectPostProcessor(new AffirmativeBasedPostProcessor())
-
-            .and()
-
-            // 验证token
-            .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtService, terminalOnlineConfiguration))
-
-            // 验证微服务之间调用的权限
-            .addFilter(new MsAuthenticationFilter(authenticationManager()))
-
+            // 允许匿名用户机制
             .anonymous();
 
-        if (!enable) {
+        if (enable) {
+            http
+                // 允许 actuator 的请求
+                .authorizeRequests()
+                .requestMatchers(EndpointRequest.toAnyEndpoint())
+                .permitAll()
+
+                .and()
+
+                // 允许自定义配置的 url 的请求
+                .authorizeRequests()
+                .antMatchers(permitUrls.toArray(new String[]{}))
+                .permitAll()
+
+                // 添加自定义角色获取器
+                .withObjectPostProcessor(new FilterSecurityInterceptorSourcePostProcessor(
+                    requestMappingHandlerMapping,
+                    securityMetadataSourceProviderManager,
+                    uriPrefixProvider,
+                    permitUrls))
+                .withObjectPostProcessor(new AffirmativeBasedPostProcessor())
+
+                .and()
+
+                // token 校验过滤器
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtService, terminalOnlineConfiguration))
+
+                // 微服务之间调用权限校验过滤器
+                .addFilter(new MsAuthenticationFilter(authenticationManager()));
+        } else {
             http.authorizeRequests().anyRequest().permitAll();
         }
-
     }
-
 
 }

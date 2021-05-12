@@ -176,12 +176,10 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import vip.isass.core.web.security.PermitUrlProvider;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -198,9 +196,6 @@ import java.util.stream.Collectors;
 @ConfigurationProperties("security.auth")
 public class PermitUrlConfiguration {
 
-    @Value("${spring.application.name:}")
-    private String appName;
-
     @Autowired(required = false)
     private List<PermitUrlProvider> permitUrlProviders;
 
@@ -209,11 +204,9 @@ public class PermitUrlConfiguration {
      */
     private List<String> permitUrls;
 
-    public List<String> getPermitUrls() {
+    public Collection<String> getPermitUrls() {
         HashSet<String> permitUrls = CollUtil.newHashSet(
-            "/error",
-            StrUtil.isBlank(appName) ? "/actuator/health" : ("/" + appName + "/actuator/health"),
-            "/actuator/health"
+            "/error"
         );
 
         if (permitUrlProviders != null) {
@@ -224,10 +217,9 @@ public class PermitUrlConfiguration {
                 .filter(StrUtil::isNotBlank)
                 .collect(Collectors.toList()));
         }
-        if (CollUtil.isNotEmpty(this.permitUrls)) {
-            permitUrls.addAll(this.permitUrls);
-        }
-        return new ArrayList<>(permitUrls);
+        return CollUtil.isEmpty(this.permitUrls)
+            ? permitUrls
+            : CollUtil.addAll(permitUrls, this.permitUrls);
     }
 
 }
