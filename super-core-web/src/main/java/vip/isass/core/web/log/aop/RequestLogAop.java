@@ -363,6 +363,7 @@ public class RequestLogAop {
         String mapping = (String) ObjectUtil.defaultIfNull(
             request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI),
             request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE));
+        mapping = mapping == null ? "" : mapping;
         if (ignoreUrls.contains(mapping)) {
             return true;
         }
