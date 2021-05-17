@@ -252,6 +252,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         Collection<String> permitUrls = permitUrlConfiguration.getPermitUrls();
 
+        FilterSecurityInterceptorSourcePostProcessor filterSecurityInterceptorSourcePostProcessor =
+            new FilterSecurityInterceptorSourcePostProcessor(
+                requestMappingHandlerMapping,
+                securityMetadataSourceProviderManager,
+                uriPrefixProvider,
+                permitUrls);
+
+        AffirmativeBasedPostProcessor affirmativeBasedPostProcessor = new AffirmativeBasedPostProcessor();
+
         http
             // 允许跨域
             .cors()
@@ -277,6 +286,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
             .and()
 
+            // jwt 校验过滤器
+            .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtService, terminalOnlineConfiguration))
+
+            // 微服务之间调用权限校验过滤器
+            .addFilter(new MsAuthenticationFilter(authenticationManager()))
+
             // 允许匿名用户机制
             .anonymous();
 
@@ -295,22 +310,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
 
                 // 添加自定义角色获取器
-                .withObjectPostProcessor(new FilterSecurityInterceptorSourcePostProcessor(
-                    requestMappingHandlerMapping,
-                    securityMetadataSourceProviderManager,
-                    uriPrefixProvider,
-                    permitUrls))
-                .withObjectPostProcessor(new AffirmativeBasedPostProcessor())
-
-                .and()
-
-                // token 校验过滤器
-                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtService, terminalOnlineConfiguration))
-
-                // 微服务之间调用权限校验过滤器
-                .addFilter(new MsAuthenticationFilter(authenticationManager()));
+                .withObjectPostProcessor(filterSecurityInterceptorSourcePostProcessor)
+                .withObjectPostProcessor(affirmativeBasedPostProcessor);
         } else {
-            http.authorizeRequests().anyRequest().permitAll();
+            http.authorizeRequests()
+                .anyRequest()
+                .permitAll()
+
+                // 添加自定义角色获取器
+                .withObjectPostProcessor(filterSecurityInterceptorSourcePostProcessor)
+                .withObjectPostProcessor(affirmativeBasedPostProcessor);
         }
     }
 
