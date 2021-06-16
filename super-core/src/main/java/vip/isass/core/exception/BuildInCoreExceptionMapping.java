@@ -174,6 +174,7 @@ import cn.hutool.core.exceptions.ValidateException;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -202,6 +203,7 @@ public class BuildInCoreExceptionMapping implements IExceptionMapping {
         .put(IOException.class, StatusMessageEnum.IO_ERROR)
         .put(FileNotFoundException.class, StatusMessageEnum.FILE_NOT_FOUND)
         .put(BindException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
+        .put(HttpMessageConversionException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
         .build();
 
     @Override
