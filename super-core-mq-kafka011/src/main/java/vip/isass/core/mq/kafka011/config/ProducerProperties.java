@@ -174,6 +174,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.util.Map;
+
 /**
  * @author Rain
  */
@@ -204,5 +206,7 @@ public class ProducerProperties {
     private String globalSequentialMessageTopic;
 
     private String timingMessageTopic;
+
+    private Map<String, String> properties;
 
 }

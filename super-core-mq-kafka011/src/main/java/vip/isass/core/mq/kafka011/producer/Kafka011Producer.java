@@ -169,6 +169,7 @@
 
 package vip.isass.core.mq.kafka011.producer;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
@@ -202,15 +203,15 @@ public class Kafka011Producer implements MqProducer {
 
     private Producer producer;
 
-//    private OrderProducer orderProducer;
+    //    private OrderProducer orderProducer;
 
     @Override
     public void send(MqMessageContext mqMessageContext) {
         Assert.notNull(mqMessageContext);
         Assert.notBlank(mqMessageContext.getTopic());
-//        Assert.notBlank(mqMessageContext.getTag());
+        //        Assert.notBlank(mqMessageContext.getTag());
         Assert.notNull(mqMessageContext.getPayload());
-//
+        //
         ProducerRecord<String, String> record = new ProducerRecord<>(
             getTopic(mqMessageContext), "", getBody(mqMessageContext));
 
@@ -260,15 +261,15 @@ public class Kafka011Producer implements MqProducer {
     @Override
     public Kafka011Producer init() {
         Assert.notNull(producerProperties);
-//        Assert.notBlank(producerProperties.getNamesrvAddr());
-//        Assert.notBlank(producerProperties.getAccessKey());
-//        Assert.notBlank(producerProperties.getSecretKey());
         Assert.notBlank(producerProperties.getProducerId());
 
         Properties kafkaProps = new Properties();
         kafkaProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, producerProperties.getNamesrvAddr());
         kafkaProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         kafkaProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        if (CollUtil.isNotEmpty(producerProperties.getProperties())) {
+            kafkaProps.putAll(producerProperties.getProperties());
+        }
         producer = new KafkaProducer<String, String>(kafkaProps);
         return this;
     }
