@@ -175,6 +175,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * kafka011 mq实例配置
@@ -211,8 +212,9 @@ public class InstanceConfiguration {
 
     private String defaultProducer;
 
-    private List<ProducerConfiguration> producers;
+    private Map<String, String> properties;
 
+    private List<ProducerConfiguration> producers;
 
 
 }

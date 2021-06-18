@@ -288,6 +288,9 @@ public class Kafka011ConsumerManager implements MqConsumerManager {
         FunctionUtil.consumeIfNotNull(instanceConfiguration.getSessionTimeoutMs(), p -> properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, p));
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+        if (CollUtil.isNotEmpty(instanceConfiguration.getProperties())) {
+            properties.putAll(instanceConfiguration.getProperties());
+        }
         return properties;
     }
 
