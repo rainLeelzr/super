@@ -215,7 +215,9 @@ public class Kafka011ProducerAutoConfiguration {
                         .setCommonMessageTopic(instanceConfiguration.getCommonMessageTopic())
                         .setGlobalSequentialMessageTopic(instanceConfiguration.getGlobalSequentialMessageTopic())
                         .setShardingSequentialMessageTopic(instanceConfiguration.getShardingSequentialMessageTopic())
-                        .setTimingMessageTopic(instanceConfiguration.getTimingMessageTopic()))
+                        .setTimingMessageTopic(instanceConfiguration.getTimingMessageTopic())
+                        .setProperties(producerConfiguration.getProperties().getProperties())
+                    )
                     .init());
             }
         }

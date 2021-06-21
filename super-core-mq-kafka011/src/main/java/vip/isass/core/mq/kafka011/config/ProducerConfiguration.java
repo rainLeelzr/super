@@ -187,4 +187,6 @@ public class ProducerConfiguration {
 
     private String producerId;
 
+    private ProducerProperties properties;
+
 }
