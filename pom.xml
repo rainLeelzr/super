@@ -232,6 +232,8 @@
 
         <!-- end build properties -->
 
+        <tomcat.version>9.0.48</tomcat.version>
+
         <!-- start isass-core -->
 
         <super-core.version>super.3.0.6-SNAPSHOT</super-core.version>
