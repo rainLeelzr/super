@@ -216,5 +216,4 @@ public class InstanceConfiguration {
 
     private List<ProducerConfiguration> producers;
 
-
 }

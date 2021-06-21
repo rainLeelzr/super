@@ -176,7 +176,6 @@ import org.springframework.context.annotation.Configuration;
 import vip.isass.core.mq.kafka011.config.InstanceConfiguration;
 import vip.isass.core.mq.kafka011.config.Kafka011Configuration;
 import vip.isass.core.mq.kafka011.config.ProducerConfiguration;
-import vip.isass.core.mq.kafka011.config.ProducerProperties;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -207,17 +206,8 @@ public class Kafka011ProducerAutoConfiguration {
         for (InstanceConfiguration instanceConfiguration : kafka011Configuration.getInstances()) {
             for (ProducerConfiguration producerConfiguration : instanceConfiguration.getProducers()) {
                 producers.add(new Kafka011Producer()
-                    .setProducerProperties(new ProducerProperties()
-                        .setInstanceName(instanceConfiguration.getInstanceName())
-                        .setNamesrvAddr(instanceConfiguration.getServers())
-                        .setProducerId(producerConfiguration.getProducerId())
-                        .setDefaultTopic(instanceConfiguration.getDefaultTopic())
-                        .setCommonMessageTopic(instanceConfiguration.getCommonMessageTopic())
-                        .setGlobalSequentialMessageTopic(instanceConfiguration.getGlobalSequentialMessageTopic())
-                        .setShardingSequentialMessageTopic(instanceConfiguration.getShardingSequentialMessageTopic())
-                        .setTimingMessageTopic(instanceConfiguration.getTimingMessageTopic())
-                        .setProperties(producerConfiguration.getProperties().getProperties())
-                    )
+                    .setInstanceConfiguration(instanceConfiguration)
+                    .setProducerConfiguration(producerConfiguration)
                     .init());
             }
         }

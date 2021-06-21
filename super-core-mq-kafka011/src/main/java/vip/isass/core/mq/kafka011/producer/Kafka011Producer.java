@@ -184,7 +184,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import vip.isass.core.mq.MessageType;
 import vip.isass.core.mq.core.MqMessageContext;
 import vip.isass.core.mq.core.producer.MqProducer;
-import vip.isass.core.mq.kafka011.config.ProducerProperties;
+import vip.isass.core.mq.kafka011.config.InstanceConfiguration;
+import vip.isass.core.mq.kafka011.config.ProducerConfiguration;
 import vip.isass.core.support.JsonUtil;
 
 import java.util.Properties;
@@ -199,7 +200,11 @@ public class Kafka011Producer implements MqProducer {
 
     @Getter
     @Setter
-    private ProducerProperties producerProperties;
+    private InstanceConfiguration instanceConfiguration;
+
+    @Getter
+    @Setter
+    private ProducerConfiguration producerConfiguration;
 
     private Producer producer;
 
@@ -242,17 +247,16 @@ public class Kafka011Producer implements MqProducer {
         int messageType = mqMessageContext.getMessageType();
         switch (messageType) {
             case MessageType.COMMON_MESSAGE:
-                return producerProperties.getCommonMessageTopic();
+                return instanceConfiguration.getCommonMessageTopic();
             case MessageType.TIMING_MESSAGE:
-                return producerProperties.getTimingMessageTopic();
             case MessageType.DELAY_MESSAGE:
-                return producerProperties.getTimingMessageTopic();
+                return instanceConfiguration.getTimingMessageTopic();
             case MessageType.TRANSACTION_MESSAGE:
                 throw new UnsupportedOperationException("未支持事务消息");
             case MessageType.SHARDING_SEQUENTIAL_MESSAGE:
-                return producerProperties.getShardingSequentialMessageTopic();
+                return instanceConfiguration.getShardingSequentialMessageTopic();
             case MessageType.GLOBAL_SEQUENTIAL_MESSAGE:
-                return producerProperties.getGlobalSequentialMessageTopic();
+                return instanceConfiguration.getGlobalSequentialMessageTopic();
             default:
                 throw new UnsupportedOperationException("未支持消息类型:" + messageType);
         }
@@ -260,15 +264,17 @@ public class Kafka011Producer implements MqProducer {
 
     @Override
     public Kafka011Producer init() {
-        Assert.notNull(producerProperties);
-        Assert.notBlank(producerProperties.getProducerId());
+        Assert.notNull(instanceConfiguration);
+        Assert.notBlank(instanceConfiguration.getServers());
+        Assert.notNull(producerConfiguration);
+        Assert.notBlank(producerConfiguration.getProducerId());
 
         Properties kafkaProps = new Properties();
-        kafkaProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, producerProperties.getNamesrvAddr());
+        kafkaProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, instanceConfiguration.getServers());
         kafkaProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         kafkaProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        if (CollUtil.isNotEmpty(producerProperties.getProperties())) {
-            kafkaProps.putAll(producerProperties.getProperties());
+        if (CollUtil.isNotEmpty(producerConfiguration.getProperties())) {
+            kafkaProps.putAll(producerConfiguration.getProperties());
         }
         producer = new KafkaProducer<String, String>(kafkaProps);
         return this;

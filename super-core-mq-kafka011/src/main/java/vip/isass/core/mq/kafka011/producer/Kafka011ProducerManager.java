@@ -237,7 +237,6 @@ public class Kafka011ProducerManager implements ProducerManager {
         return producerGroupByProducerId.get(producerConfiguration.getProducerId());
     }
 
-
     @Override
     public String manufacturer() {
         return Kafka011Const.MANUFACTURER;
@@ -268,7 +267,7 @@ public class Kafka011ProducerManager implements ProducerManager {
 
         producerGroupByProducerId = kafka011ProducerAutoConfiguration.getProducers()
             .stream()
-            .collect(Collectors.toMap((o) -> o.getProducerProperties().getProducerId(), Function.identity()));
+            .collect(Collectors.toMap((o) -> o.getProducerConfiguration().getProducerId(), Function.identity()));
     }
 
 }

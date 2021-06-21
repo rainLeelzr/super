@@ -174,6 +174,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.util.Map;
+
 /**
  * 阿里云mq实例配置
  *
@@ -187,6 +189,8 @@ public class ProducerConfiguration {
 
     private String producerId;
 
-    private ProducerProperties properties;
+    private String defaultTopic;
+
+    private Map<String, String> properties;
 
 }
