@@ -181,7 +181,13 @@
         FIND_IN_SET( ${parentIdColumnName}, @pids ) > 0,
         @pids := CONCAT( @pids, ',', ${idColumnName} ), '0' ) AS ischild
         FROM
-        ( SELECT * FROM ${tableName} AS t ORDER BY t.${idColumnName} ASC ) t1,
+        ( SELECT * FROM ${tableName} AS t
+        <where>
+            <if test="logicDeleteSql !=null and logicDeleteSql != ''">
+                ${logicDeleteSql}
+            </if>
+        </where>
+        ORDER BY t.${idColumnName} ASC ) t1,
         ( SELECT @pids := #{id} ) t2
         ) t3
         WHERE

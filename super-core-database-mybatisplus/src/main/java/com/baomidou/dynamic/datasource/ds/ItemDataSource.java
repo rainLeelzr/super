@@ -167,42 +167,79 @@
  *
  */
 
-package vip.isass.core.mq.kafka011.config;
+package com.baomidou.dynamic.datasource.ds;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
-/**
- * @author Rain
- */
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
-public class ProducerProperties {
+import com.baomidou.dynamic.datasource.enums.SeataMode;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.datasource.AbstractDataSource;
 
-    private String regionName;
+import javax.sql.DataSource;
+import java.io.Closeable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-    private String instanceName;
+@Slf4j
+@Data
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class ItemDataSource extends AbstractDataSource implements Closeable {
 
-    private String namesrvAddr;
+    private String name;
 
-    private String accessKey;
+    private DataSource realDataSource;
 
-    private String secretKey;
+    private DataSource dataSource;
 
-    private String producerId;
+    private Boolean p6spy;
 
-    private String defaultTopic;
+    private Boolean seata;
 
-    private String commonMessageTopic;
+    private SeataMode seataMode;
 
-    private String shardingSequentialMessageTopic;
+    @Override
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
 
-    private String globalSequentialMessageTopic;
+    @Override
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return super.isWrapperFor(iface) || iface.isInstance(realDataSource) || iface.isInstance(dataSource);
+    }
 
-    private String timingMessageTopic;
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T unwrap(Class<T> iface) {
+        if (iface.isInstance(this)) {
+            return (T) this;
+        }
+        if (iface.isInstance(realDataSource)) {
+            return (T) realDataSource;
+        }
+        if (iface.isInstance(dataSource)) {
+            return (T) dataSource;
+        }
+        return null;
+    }
 
+    @Override
+    public Connection getConnection(String username, String password) throws SQLException {
+        return dataSource.getConnection(username, password);
+    }
+
+    @Override
+    public void close() {
+        Class<? extends DataSource> clazz = realDataSource.getClass();
+        try {
+            Method closeMethod = clazz.getDeclaredMethod("close");
+            closeMethod.invoke(realDataSource);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            log.warn("dynamic-datasource close the datasource named [{}] failed,", name, e);
+        }
+    }
 }

@@ -202,6 +202,7 @@ import vip.isass.core.login.LoginUserUtil;
 import vip.isass.core.support.JsonUtil;
 import vip.isass.core.support.SystemClock;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -359,7 +360,10 @@ public class RequestLogAop {
     }
 
     private boolean fillWithRequest(RequestLog requestLog, HttpServletRequest request) {
-        String mapping = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String mapping = (String) ObjectUtil.defaultIfNull(
+            request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI),
+            request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE));
+        mapping = mapping == null ? "" : mapping;
         if (ignoreUrls.contains(mapping)) {
             return true;
         }

@@ -197,15 +197,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-    private FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
+    private final FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
 
-    private SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager;
+    private final SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager;
 
-    private List<String> permitUrls;
+    private final Collection<String> permitUrls;
 
-    private UriPrefixProvider uriPrefixProvider;
+    private final UriPrefixProvider uriPrefixProvider;
 
     private static final List<String> IGNORE_LOGGING_URI = CollUtil.newArrayList("/error");
 
@@ -224,7 +224,7 @@ public class SecurityMetadataSource implements FilterInvocationSecurityMetadataS
                                   FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource,
                                   SecurityMetadataSourceProviderManager securityMetadataSourceProviderManager,
                                   UriPrefixProvider uriPrefixProvider,
-                                  List<String> permitUrls) {
+                                  Collection<String> permitUrls) {
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.filterInvocationSecurityMetadataSource = filterInvocationSecurityMetadataSource;
         this.securityMetadataSourceProviderManager = securityMetadataSourceProviderManager;

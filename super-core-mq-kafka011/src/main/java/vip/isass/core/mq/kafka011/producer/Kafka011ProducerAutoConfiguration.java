@@ -173,7 +173,9 @@ import cn.hutool.core.collection.CollUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import vip.isass.core.mq.kafka011.config.InstanceConfiguration;
 import vip.isass.core.mq.kafka011.config.Kafka011Configuration;
+import vip.isass.core.mq.kafka011.config.ProducerConfiguration;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -197,24 +199,18 @@ public class Kafka011ProducerAutoConfiguration {
 
     @PostConstruct
     public void init() {
+        if (!kafka011Configuration.isEnable()) {
+            return;
+        }
         producers = new ArrayList<>();
-//        for (InstanceConfiguration instanceConfiguration : kafka011Configuration.getInstances()) {
-//            for (ProducerConfiguration producerConfiguration : instanceConfiguration.getProducers()) {
-//                producers.add(new Kafka011Producer()
-//                    .setProducerProperties(new ProducerProperties()
-//                        .setInstanceName(instanceConfiguration.getInstanceName())
-//                        .setNamesrvAddr(instanceConfiguration.getNamesrvAddr())
-//                        .setAccessKey(instanceConfiguration.getAccessKey())
-//                        .setSecretKey(instanceConfiguration.getSecretKey())
-//                        .setProducerId(producerConfiguration.getProducerId())
-//                        .setDefaultTopic(instanceConfiguration.getDefaultTopic())
-//                        .setCommonMessageTopic(instanceConfiguration.getCommonMessageTopic())
-//                        .setGlobalSequentialMessageTopic(instanceConfiguration.getGlobalSequentialMessageTopic())
-//                        .setShardingSequentialMessageTopic(instanceConfiguration.getShardingSequentialMessageTopic())
-//                        .setTimingMessageTopic(instanceConfiguration.getTimingMessageTopic()))
-//                    .init());
-//            }
-//        }
+        for (InstanceConfiguration instanceConfiguration : kafka011Configuration.getInstances()) {
+            for (ProducerConfiguration producerConfiguration : instanceConfiguration.getProducers()) {
+                producers.add(new Kafka011Producer()
+                    .setInstanceConfiguration(instanceConfiguration)
+                    .setProducerConfiguration(producerConfiguration)
+                    .init());
+            }
+        }
     }
 
     @PreDestroy

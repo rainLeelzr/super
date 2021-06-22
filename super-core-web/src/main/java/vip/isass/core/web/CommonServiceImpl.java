@@ -181,7 +181,7 @@ import java.util.List;
 @Service
 public class CommonServiceImpl implements ICommonService {
 
-    @Autowired
+    @Autowired(required = false)
     private ICommonRepository commonRepository;
 
     @Override
@@ -190,6 +190,10 @@ public class CommonServiceImpl implements ICommonService {
                                                                                           String parentIdColumnName,
                                                                                           PK id,
                                                                                           boolean returnIdRecord) {
+        if (commonRepository == null) {
+            throw new UnsupportedOperationException("当前环境没有ICommonRepository的实现");
+        }
+
         Assert.notNull(id, "id必填");
         return commonRepository.findAllSubRecords(
             entityClass,

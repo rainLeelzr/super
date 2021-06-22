@@ -37,6 +37,7 @@
 | isass-doc| http:20340 |
 | isass-service-tag | http:20350 |
 | isass-service-uom | http:20360 |
+| isass-service-wechat | http:20370 |
 
 # 第3方服务
 | 名称 | 端口 |
@@ -44,13 +45,22 @@
 | jenkins | 30001 |
 | elasticsearch | 30010 |
 | redis | 30020 |
+| redis_exporter | 30080 |
 | mysql | 30030 |
+| mysql_exporter | 30090 |
 | nacos | 30040 |
 | rancher | http30050,https30051 |
 | postgresql | 30060 |
 | oap | 11800 |
 | oapui | 8080 |
-| nps | web:30070 bridge:30071 http_proxy:30072 https_proxy:30073|
-| kurento | http/ws:30100 upd:30105-30399|
-| stun | tcp/udp 30400|
-| nexus3 | 30500|
+| nps | web:30070 bridge:30071 http_proxy:30072 https_proxy:30073 |
+| kurento | http/ws:30100 upd:30105-30399 |
+| stun | tcp/udp 30400 |
+| node_exporter | 30410 |
+| nexus3 | 30500 |
+| elasticvue | 30510 |
+| prometheus | 30520 |
+| alertManager | 30530 |
+| grafana | 30540 |
+| grafana | 30550 |
+

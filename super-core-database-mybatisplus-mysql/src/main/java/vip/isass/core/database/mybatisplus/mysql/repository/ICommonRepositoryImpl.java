@@ -200,11 +200,17 @@ public class ICommonRepositoryImpl implements ICommonRepository {
                       boolean returnIdRecord) {
         Class<?> edbClass = DbEntityConvert.getDbEntityClass(entityClass);
         TableInfo tableInfo = TableInfoHelper.getTableInfo(edbClass);
+        String logicDeleteSql = tableInfo.getLogicDeleteSql(false, true);
         Assert.notNull(tableInfo, "解析不到[{}]的tableInfo", entityClass.getName());
         List<Map<String, Object>> list = iCommonMapper
-            .findAllSubRecords(tableInfo.getTableName(), idColumnName, parentIdColumnName, id, returnIdRecord);
-        List<E> collect = list.stream().map(l -> Convert.convert(entityClass, l)).collect(Collectors.toList());
-        return collect;
+            .findAllSubRecords(
+                tableInfo.getTableName(),
+                idColumnName,
+                parentIdColumnName,
+                id,
+                returnIdRecord,
+                logicDeleteSql);
+        return list.stream().map(l -> Convert.convert(entityClass, l)).collect(Collectors.toList());
     }
 
 }

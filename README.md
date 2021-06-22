@@ -88,3 +88,10 @@ subject是commit目的的简短描述，不超过50个字符。
 - 便于程序员对提交历史进行追溯，了解发生了什么情况。
 - 一旦约束了commit message，意味着我们将慎重的进行每一次提交，不能再一股脑的把各种各样的改动都放在一个git commit里面，这样一来整个代码改动的历史也将更加清晰。
 - 格式化的commit message才可以用于自动化输出Change log。
+
+## 服务注册与发现开关
+- spring.cloud.discovery.enabled（不用配置）
+- spring.cloud.nacos.discovery.enabled （用到nacos时，配置此开关为false，则可关闭）
+
+## 注册中心
+- spring.cloud.nacos.config.enabled （用到nacos时，配置此开关为false，则可关闭）
