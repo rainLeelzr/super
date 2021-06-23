@@ -167,59 +167,203 @@
  *
  */
 
-package vip.isass.core.api.entity;
+package vip.isass.core.api.service;
 
-import java.beans.Transient;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vip.isass.core.criteria.ICriteria;
+import vip.isass.core.entity.IEntity;
 
-/**
- * 逻辑删除
- *
- * @author Rain
- */
-public interface IV2LogicDeleteEntity<E extends IV2LogicDeleteEntity<E>> extends IV2Entity<E> {
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-    String LOGIC_DELETE_COLUMN_NAME = "delete_flag";
+public interface IV2ServiceManager<E extends IEntity<E>, C extends ICriteria<E, C>, S extends IV2Service<E, C>>
+    extends IV2Service<E, C> {
 
-    String LOGIC_DELETE_PROPERTY = "deleteFlag";
+    Logger LOGGER = LoggerFactory.getLogger(IV2ServiceManager.class);
 
-    Boolean DEFAULT_LOGIC_DELETE_VALUE = Boolean.FALSE;
+    List<S> getServices();
 
-    /**
-     * 获取删除标识
-     *
-     * @return LogicDelete
-     */
-    Boolean getLogicDelete();
+    // region 增
 
-    /**
-     * 设置删除标识
-     *
-     * @param logicDelete LogicDelete
-     * @return this object
-     */
-    E setLogicDelete(Boolean logicDelete);
-
-    @Transient
-    default String getLogicDeleteColumnName() {
-        return LOGIC_DELETE_COLUMN_NAME;
+    default E add(E entity) {
+        return applyUntilNotNull(s -> s.add(entity));
     }
 
-    /**
-     * 如果删除标识为 null, 则设置删除标识为 false，并返回删除标识
-     *
-     * @return this object
-     */
-    @SuppressWarnings("unchecked")
-    default E computeDefaultLogicDeleteIfAbsent() {
-        if (getLogicDelete() == null) {
-            setLogicDelete(Boolean.FALSE);
+    default Collection<E> addBatch(Collection<E> entities) {
+        return applyUntilNotNull(s -> s.addBatch(entities));
+    }
+
+    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
+        return applyUntilNotNull(s -> s.addBatch(entities, batchSize));
+    }
+
+    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.addIfAbsent(entity, criteria));
+    }
+
+    // endregion
+
+    //  region 删
+
+    default Boolean deleteById(Serializable id) {
+        return applyUntilNotNull(s -> s.deleteById(id));
+    }
+
+    default Boolean deleteByIds(Collection<? extends Serializable> ids) {
+        return applyUntilNotNull(s -> s.deleteByIds(ids));
+    }
+
+    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.deleteByCriteria(criteria));
+    }
+
+    // endregion
+
+    // region 改
+
+    default Boolean updateById(E entity) {
+        return applyUntilNotNull(s -> s.updateById(entity));
+    }
+
+    default Boolean updateEntityById(E entity) {
+        return applyUntilNotNull(s -> s.updateEntityById(entity));
+    }
+
+    default void updateByIdOrException(E entity) {
+        consume(s -> s.updateByIdOrException(entity));
+    }
+
+    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.updateByCriteria(entity, criteria));
+    }
+
+    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
+        consume(s -> s.updateByCriteriaOrException(entity, criteria));
+    }
+
+    // endregion
+
+    //  region 查
+
+    default E getById(Serializable id) {
+        return applyUntilNotNull(s -> s.getById(id));
+    }
+
+    default E getByIdOrException(Serializable id) {
+        return applyUntilNotNull(s -> s.getByIdOrException(id));
+    }
+
+    default E getByCriteria(ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.getByCriteria(criteria));
+    }
+
+    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.getByCriteriaOrWarn(criteria));
+    }
+
+    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.getByCriteriaOrException(criteria));
+    }
+
+    default List<E> findByCriteria(ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.findByCriteria(criteria));
+    }
+
+    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.findPageByCriteria(criteria));
+    }
+
+    default List<E> findAll() {
+        return applyUntilNotNull(IV2Service::findAll);
+    }
+
+    default Integer countByCriteria(ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.countByCriteria(criteria));
+    }
+
+    default Integer countAll() {
+        return applyUntilNotNull(IV2Service::countAll);
+    }
+
+    default boolean isPresentById(Serializable id) {
+        return applyUntilNotNull(s -> s.isPresentById(id));
+    }
+
+    default boolean isPresentByColumn(String columnName, Object value) {
+        return applyUntilNotNull(s -> s.isPresentByColumn(columnName, value));
+    }
+
+    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.isPresentByCriteria(criteria));
+    }
+
+    default boolean isAbsentByColumn(String columnName, Object value) {
+        return applyUntilNotNull(s -> s.isAbsentByColumn(columnName, value));
+    }
+
+    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
+        return applyUntilNotNull(s -> s.isAbsentByCriteria(criteria));
+    }
+
+    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
+        consume(s -> s.exceptionIfPresentByCriteria(criteria));
+    }
+
+    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
+        consume(s -> s.exceptionIfAbsentByCriteria(criteria));
+    }
+
+    // endregion
+
+    // region util
+
+    default <V> V applyUntilNotNull(Function<S, V> function) {
+        checkServices();
+
+        for (S service : getServices()) {
+            V value = function.apply(service);
+            if (value != null) {
+                return value;
+            }
         }
-        return (E) this;
+        return null;
     }
 
-    @Override
-    default E randomEntity() {
-        return setLogicDelete(randomBoolean());
+    default void consume(Consumer<S> consumer) {
+        checkServices();
+
+        for (S service : getServices()) {
+            consumer.accept(service);
+            return;
+        }
     }
+
+    default void consumeWithoutException(Consumer<S> consumer) {
+        checkServices();
+
+        for (S service : getServices()) {
+            try {
+                consumer.accept(service);
+                return;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    default void checkServices() {
+        if (getServices() == null) {
+            throw new UnsupportedOperationException(
+                StrUtil.format("当前服务没有[{}]的实现类", this.getClass().getSimpleName()));
+        }
+    }
+
+    // endregion
 
 }

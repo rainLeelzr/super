@@ -176,21 +176,41 @@ import vip.isass.core.sequence.impl.LongSequence;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 含有主键类型的接口
+ * 主键类型泛型的定义始终放在第一位
+ *
  * @author Rain
  */
 public interface IV2PkEntity<PK extends Serializable, E extends IV2PkEntity<PK, E>> extends IV2Entity<E> {
 
+    Map<Class<?>, Class<?>> PK_CLASS_CACHE = new ConcurrentHashMap<>(64);
+
     @SuppressWarnings("unchecked")
     default Class<PK> findPkClass() {
-        Type[] types = this.getClass().getGenericInterfaces();
-        String typeName = types[0].getTypeName();
-        System.out.println(typeName);
-        ParameterizedType parameterizedType = (ParameterizedType) types[0];
-        Type type = parameterizedType.getActualTypeArguments()[0];
-        return (Class<PK>) type;
+        Class<?> thisClass = this.getClass();
+        return (Class<PK>) PK_CLASS_CACHE.computeIfAbsent(thisClass, c -> {
+            Type[] types = thisClass.getGenericInterfaces();
+            String typeName = types[0].getTypeName();
+            System.out.println(typeName);
+            ParameterizedType parameterizedType = (ParameterizedType) types[0];
+            Type type = parameterizedType.getActualTypeArguments()[0];
+            return (Class<?>) type;
+        });
     }
+    //
+    //    @SuppressWarnings("unchecked")
+    //    default Class<PK> findPkClass() {
+    //        Type[] types = this.getClass().getGenericInterfaces();
+    //        String typeName = types[0].getTypeName();
+    //        System.out.println(typeName);
+    //        ParameterizedType parameterizedType = (ParameterizedType) types[0];
+    //        Type type = parameterizedType.getActualTypeArguments()[0];
+    //        return (Class<PK>) type;
+    //    }
 
     @SuppressWarnings("unchecked")
     default PK randomPk() {

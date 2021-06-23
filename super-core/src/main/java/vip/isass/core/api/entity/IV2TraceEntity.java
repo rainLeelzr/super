@@ -169,38 +169,73 @@
 
 package vip.isass.core.api.entity;
 
+import java.beans.Transient;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
+ * 审计追踪类型实体
+ * UPK: user 的主键类型
+ *
  * @author Rain
  */
-public interface IV2TraceEntity<PK extends Serializable, E extends IV2TraceEntity<PK, E>> extends IV2PkEntity<PK, E> {
+public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEntity<UPK, E>>
+    extends IV2PkEntity<UPK, E> {
 
     String CREATE_USER_ID_COLUMN_NAME = "create_user_id";
     String CREATE_USER_ID_PROPERTY = "createUserId";
 
+    @Transient
+    default String getCreateUserIdColumnName() {
+        return CREATE_USER_ID_COLUMN_NAME;
+    }
+
     String CREATE_USER_NAME_COLUMN_NAME = "create_user_name";
     String CREATE_USER_NAME_PROPERTY = "createUserName";
+
+    @Transient
+    default String getCreateUserNameColumnName() {
+        return CREATE_USER_NAME_COLUMN_NAME;
+    }
 
     String CREATED_TIME_COLUMN_NAME = "create_time";
     String CREATED_TIME_PROPERTY = "createTime";
 
+    @Transient
+    default String getCreatedTimeColumnName() {
+        return CREATED_TIME_COLUMN_NAME;
+    }
+
     String MODIFY_USER_ID_COLUMN_NAME = "modify_user_id";
     String MODIFY_USER_ID_PROPERTY = "modifyUserId";
+
+    @Transient
+    default String getModifyUserIdColumnName() {
+        return MODIFY_USER_ID_COLUMN_NAME;
+    }
 
     String MODIFY_USER_NAME_COLUMN_NAME = "modify_user_name";
     String MODIFY_USER_NAME_PROPERTY = "modifyUserName";
 
+    @Transient
+    default String getModifyUserNameColumnName() {
+        return MODIFY_USER_NAME_COLUMN_NAME;
+    }
+
     String MODIFY_TIME_COLUMN_NAME = "modify_time";
     String MODIFY_TIME_PROPERTY = "modifyTime";
+
+    @Transient
+    default String getModifyTimeColumnColumnName() {
+        return MODIFY_TIME_COLUMN_NAME;
+    }
 
     /**
      * 获取创建用户的 id
      *
      * @return create user id
      */
-    PK getCreateUserId();
+    UPK getCreateUserId();
 
     /**
      * 设置创建用户的 id
@@ -208,7 +243,7 @@ public interface IV2TraceEntity<PK extends Serializable, E extends IV2TraceEntit
      * @param createUserId create user id
      * @return this object
      */
-    E setCreateUserId(PK createUserId);
+    E setCreateUserId(UPK createUserId);
 
     /**
      * @return 创建用户的用户名
@@ -243,7 +278,7 @@ public interface IV2TraceEntity<PK extends Serializable, E extends IV2TraceEntit
      *
      * @return modify user id
      */
-    PK getModifyUserId();
+    UPK getModifyUserId();
 
     /**
      * 设置修改用户的 id
@@ -251,7 +286,7 @@ public interface IV2TraceEntity<PK extends Serializable, E extends IV2TraceEntit
      * @param modifyUserId modify user id
      * @return this object
      */
-    E setModifyUserId(PK modifyUserId);
+    E setModifyUserId(UPK modifyUserId);
 
     /**
      * 获取修改用户的用户名

@@ -167,17 +167,22 @@
  *
  */
 
-package vip.isass.core.api.criteria;
+package vip.isass.core.api.criteria.type;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import io.swagger.annotations.ApiModelProperty;
+import vip.isass.core.api.criteria.IV2Criteria;
+import vip.isass.core.api.criteria.V2WhereCondition;
 import vip.isass.core.api.entity.IV2Entity;
 import vip.isass.core.criteria.Condition;
 
+import java.beans.Transient;
 import java.util.Collection;
 import java.util.List;
 
 /**
- * 基于mysql的条件
+ * sql 的 where 条件接口
  *
  * @author Rain
  */
@@ -189,9 +194,19 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
      *
      * @return where condition list
      */
+    @ApiModelProperty(hidden = true)
     List<V2WhereCondition> getWhereConditions();
 
-    C setWhereConditions(List<V2WhereCondition> whereConditions);
+    @SuppressWarnings("unchecked")
+    default C setWhereConditions(List<V2WhereCondition> whereConditions) {
+        getWhereConditions().clear();
+        if (CollUtil.isNotEmpty(whereConditions)) {
+            getWhereConditions().addAll(whereConditions);
+        }
+        return (C) this;
+    }
+
+    // region 所有类型都有的条件
 
     /**
      * 添加查询条件
@@ -199,113 +214,100 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
      * @param column column
      * @param value  value
      */
-    default void equals(String column, Object value) {
+    @SuppressWarnings("unchecked")
+    default C equals(String column, Object value) {
         getWhereConditions().add(new V2WhereCondition(column, Condition.EQUAL, value));
+        return (C) this;
     }
 
-    default void orEquals(String column, Object value) {
+    @Transient
+    default <T> T getEquals(String column, Class<T> clazz) {
+        return getValue(column, Condition.EQUAL, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orEquals(String column, Object value) {
         getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
         getWhereConditions().add(new V2WhereCondition(column, Condition.EQUAL, value));
+        return (C) this;
     }
 
-    default void notEquals(String column, Object value) {
+    @Transient
+    default <T> T getOrEquals(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C notEquals(String column, Object value) {
         getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_EQUAL, value));
+        return (C) this;
     }
 
-    default void orNotEquals(String column, Object value) {
+    @Transient
+    default <T> T getNotEquals(String column, Class<T> clazz) {
+        return getValue(column, Condition.NOT_EQUAL, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orNotEquals(String column, Object value) {
         getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
         getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_EQUAL, value));
+        return (C) this;
     }
 
-    default void lessThan(String column, Object value) {
-        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN, value));
+    @Transient
+    default <T> T getOrNotEquals(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
     }
 
-    default void orLessThan(String column, Object value) {
-        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
-        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN, value));
-    }
-
-    default void lessThanEqual(String column, Object value) {
-        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN_EQUAL, value));
-    }
-
-    default void orLessThanEqual(String column, Object value) {
-        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
-        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN_EQUAL, value));
-    }
-
-    default void greaterThan(String column, Object value) {
-        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN, value));
-    }
-
-    default void orGreaterThan(String column, Object value) {
-        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
-        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN, value));
-    }
-
-    default void greaterThanEqual(String column, Object value) {
-        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN_EQUAL, value));
-    }
-
-    default void orGreaterThanEqual(String column, Object value) {
-        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
-        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN_EQUAL, value));
-    }
-
-    default void like(String column, String value) {
-        Assert.notBlank(value, "value不能为空");
-        getWhereConditions().add(new V2WhereCondition(column, Condition.LIKE, value));
-    }
-
-    default void orLike(String column, String value) {
-        Assert.notBlank(value, "value不能为空");
-        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
-        getWhereConditions().add(new V2WhereCondition(column, Condition.LIKE, value));
-    }
-
-    default void notLike(String column, String value) {
-        Assert.notBlank(value, "value不能为空");
-        getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_LIKE, value));
-    }
-
-    default void orNotLike(String column, String value) {
-        Assert.notBlank(value, "value不能为空");
-        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
-        getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_LIKE, value));
-    }
-
-    default void in(String column, Collection<?> values) {
+    @SuppressWarnings("unchecked")
+    default C in(String column, Collection<?> values) {
         Assert.notEmpty(values, "values不能为空");
         getWhereConditions().add(new V2WhereCondition(column, Condition.IN, values));
+        return (C) this;
     }
 
-    default void orIn(String column, Collection<?> values) {
+    @Transient
+    default <T> T getIn(String column, Class<T> clazz) {
+        return getValue(column, Condition.IN, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orIn(String column, Collection<?> values) {
         Assert.notEmpty(values, "values不能为空");
         getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
         getWhereConditions().add(new V2WhereCondition(column, Condition.IN, values));
+        return (C) this;
     }
 
-    default void notIn(String column, Collection<?> values) {
+    @Transient
+    default <T> T getOrIn(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C notIn(String column, Collection<?> values) {
         Assert.notEmpty(values, "values不能为空");
         getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_IN, values));
+        return (C) this;
     }
 
-    default void orNotIn(String column, Collection<?> values) {
+    @Transient
+    default <T> T getNotIn(String column, Class<T> clazz) {
+        return getValue(column, Condition.NOT_IN, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orNotIn(String column, Collection<?> values) {
         Assert.notEmpty(values, "values不能为空");
         getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
         getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_IN, values));
+        return (C) this;
     }
 
-    default void startWith(String column, String value) {
-        Assert.notBlank(value, "value不能为空");
-        getWhereConditions().add(new V2WhereCondition(column, Condition.START_WITH, value));
-    }
-
-    default void orStartWith(String column, String value) {
-        Assert.notBlank(value, "value不能为空");
-        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
-        getWhereConditions().add(new V2WhereCondition(column, Condition.START_WITH, value));
+    @Transient
+    default <T> T getOrNotIn(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
     }
 
     @SuppressWarnings("unchecked")
@@ -315,6 +317,24 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
         return (C) this;
     }
 
+    @Transient
+    default <T> T getIsNull(String column, Class<T> clazz) {
+        return getValue(column, Condition.IS_NULL, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orIsNull(String column) {
+        Assert.notBlank(column, "column不能为空");
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.IS_NULL, null));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getOrIsNull(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
     @SuppressWarnings("unchecked")
     default C isNotNull(String column) {
         Assert.notBlank(column, "column不能为空");
@@ -322,14 +342,247 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
         return (C) this;
     }
 
-    default void collectionContainsAll(String column, Collection<String> value) {
-        Assert.notEmpty(value, "value不能为空");
-        getWhereConditions().add(new V2WhereCondition(column, Condition.CONTAINS_ALL, value));
+    @Transient
+    default <T> T getIsNotNull(String column, Class<T> clazz) {
+        return getValue(column, Condition.IS_NOT_NULL, clazz);
     }
 
-    default void collectionContainsAny(String column, Collection<String> value) {
+
+    @SuppressWarnings("unchecked")
+    default C orIsNotNull(String column) {
+        Assert.notBlank(column, "column不能为空");
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.IS_NOT_NULL, null));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getOrIsNotNull(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
+    // endregion
+
+    // region 数字类型字段拥有的条件
+
+    @SuppressWarnings("unchecked")
+    default C lessThan(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getLessThan(String column, Class<T> clazz) {
+        return getValue(column, Condition.LESS_THAN, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orLessThan(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getOrLessThan(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C lessThanEqual(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN_EQUAL, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getLessThanEqual(String column, Class<T> clazz) {
+        return getValue(column, Condition.LESS_THAN_EQUAL, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orLessThanEqual(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LESS_THAN_EQUAL, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getOrLessThanEqual(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C greaterThan(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getGreaterThan(String column, Class<T> clazz) {
+        return getValue(column, Condition.GREATER_THAN, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orGreaterThan(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getOrGreaterThan(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C greaterThanEqual(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN_EQUAL, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getGreaterThanEqual(String column, Class<T> clazz) {
+        return getValue(column, Condition.GREATER_THAN_EQUAL, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orGreaterThanEqual(String column, Object value) {
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.GREATER_THAN_EQUAL, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getOrGreaterThanEqual(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
+    // endregion
+
+    // region 字符串类型字段拥有的条件
+
+    @SuppressWarnings("unchecked")
+    default C like(String column, Object value) {
+        Assert.notNull(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LIKE, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getLike(String column, Class<T> clazz) {
+        return getValue(column, Condition.LIKE, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orLike(String column, Object value) {
+        Assert.notNull(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.LIKE, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getOrLike(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C notLike(String column, Object value) {
+        Assert.notNull(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_LIKE, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getNotLike(String column, Class<T> clazz) {
+        return getValue(column, Condition.NOT_LIKE, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orNotLike(String column, Object value) {
+        Assert.notNull(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.NOT_LIKE, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getOrNotLike(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C startWith(String column, Object value) {
+        Assert.notNull(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.START_WITH, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getStartWith(String column, Class<T> clazz) {
+        return getValue(column, Condition.START_WITH, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C orStartWith(String column, Object value) {
+        Assert.notNull(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(null, Condition.OR, null));
+        getWhereConditions().add(new V2WhereCondition(column, Condition.START_WITH, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getOrStartWith(String column, Class<T> clazz) {
+        return getValue(column, Condition.OR, clazz);
+    }
+
+    // endregion
+
+    // region json 类型字段拥有的条件
+
+    @SuppressWarnings("unchecked")
+    default C collectionContainsAll(String column, Collection<String> value) {
+        Assert.notBlank(column, "column不能为空");
+        Assert.notEmpty(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(column, Condition.CONTAINS_ALL, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getCollectionContainsAll(String column, Class<T> clazz) {
+        return getValue(column, Condition.CONTAINS_ALL, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C collectionContainsAny(String column, Collection<String> value) {
+        Assert.notBlank(column, "column不能为空");
         Assert.notEmpty(value, "value不能为空");
         getWhereConditions().add(new V2WhereCondition(column, Condition.CONTAINS_ANY, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> T getCollectionContainsAny(String column, Class<T> clazz) {
+        return getValue(column, Condition.CONTAINS_ANY, clazz);
+    }
+
+    // endregion
+
+    @Transient
+    @SuppressWarnings("unchecked")
+    default <T> T getValue(String column, Condition condition, Class<T> clazz) {
+        return getWhereConditions().stream()
+            .filter(c -> condition == c.getCondition())
+            .filter(c -> column.equalsIgnoreCase(c.getColumnName()))
+            .map(c -> (T) c.getValue())
+            .findFirst()
+            .orElse(null);
+    }
+
+    default boolean hasCondition(String column, Condition condition) {
+        return getWhereConditions().stream()
+            .filter(c -> condition == c.getCondition())
+            .anyMatch(c -> column.equalsIgnoreCase(c.getColumnName()));
     }
 
 }

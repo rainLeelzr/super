@@ -179,7 +179,8 @@ import java.io.Serializable;
 /**
  * @author Rain
  */
-public interface IV2ParentIdEntity<PK extends Serializable, E extends IV2ParentIdEntity<PK, E>> extends IV2IdEntity<PK, E> {
+public interface IV2ParentIdEntity<PK extends Serializable, E extends IV2ParentIdEntity<PK, E>>
+    extends IV2IdEntity<PK, E> {
 
     String PARENT_ID_COLUMN_NAME = "parent_id";
 

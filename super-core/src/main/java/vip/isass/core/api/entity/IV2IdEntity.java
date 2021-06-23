@@ -179,10 +179,16 @@ import java.io.Serializable;
 /**
  * @author Rain
  */
-public interface IV2IdEntity<PK extends Serializable, E extends IV2IdEntity<PK, E>> extends IV2PkEntity<PK, E> {
+public interface IV2IdEntity<PK extends Serializable, E extends IV2IdEntity<PK, E>>
+    extends IV2PkEntity<PK, E> {
 
     //  默认的 id 字段名
     String ID_COLUMN_NAME = "id";
+
+    @Transient
+    default String getIdColumnName() {
+        return ID_COLUMN_NAME;
+    }
 
     /**
      * @return id
@@ -197,11 +203,6 @@ public interface IV2IdEntity<PK extends Serializable, E extends IV2IdEntity<PK, 
      * @return this object
      */
     E setId(PK id);
-
-    @Transient
-    default String getIdColumnName() {
-        return ID_COLUMN_NAME;
-    }
 
     /**
      * 生成一个随机 id

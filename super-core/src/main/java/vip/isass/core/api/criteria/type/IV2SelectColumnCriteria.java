@@ -167,59 +167,94 @@
  *
  */
 
-package vip.isass.core.api.entity;
+package vip.isass.core.api.criteria.type;
 
-import java.beans.Transient;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import vip.isass.core.api.criteria.IV2Criteria;
+import vip.isass.core.api.entity.IV2Entity;
+
+import java.util.Collection;
 
 /**
- * 逻辑删除
+ * sql 的 select 字段条件接口
  *
  * @author Rain
  */
-public interface IV2LogicDeleteEntity<E extends IV2LogicDeleteEntity<E>> extends IV2Entity<E> {
+public interface IV2SelectColumnCriteria<E extends IV2Entity<E>, C extends IV2SelectColumnCriteria<E, C>>
+    extends IV2Criteria<E, C> {
 
-    String LOGIC_DELETE_COLUMN_NAME = "delete_flag";
-
-    String LOGIC_DELETE_PROPERTY = "deleteFlag";
-
-    Boolean DEFAULT_LOGIC_DELETE_VALUE = Boolean.FALSE;
+    String DISTINCT = "DISTINCT ";
 
     /**
-     * 获取删除标识
+     * get select columns list
      *
-     * @return LogicDelete
+     * @return select column list
      */
-    Boolean getLogicDelete();
+    Collection<String> getSelectColumns();
 
-    /**
-     * 设置删除标识
-     *
-     * @param logicDelete LogicDelete
-     * @return this object
-     */
-    E setLogicDelete(Boolean logicDelete);
-
-    @Transient
-    default String getLogicDeleteColumnName() {
-        return LOGIC_DELETE_COLUMN_NAME;
+    default C setSelectColumn(String selectColumn) {
+        getSelectColumns().clear();
+        return addSelectColumn(selectColumn);
     }
 
-    /**
-     * 如果删除标识为 null, 则设置删除标识为 false，并返回删除标识
-     *
-     * @return this object
-     */
+    default C setSelectColumns(Collection<String> selectColumns) {
+        getSelectColumns().clear();
+        return addSelectColumns(selectColumns);
+    }
+
+    default C setSelectColumns(String... selectColumns) {
+        getSelectColumns().clear();
+        return addSelectColumns(selectColumns);
+    }
+
     @SuppressWarnings("unchecked")
-    default E computeDefaultLogicDeleteIfAbsent() {
-        if (getLogicDelete() == null) {
-            setLogicDelete(Boolean.FALSE);
+    default C addSelectColumn(String selectColumn) {
+        if (StrUtil.isNotBlank(selectColumn)) {
+            getSelectColumns().add(selectColumn);
         }
-        return (E) this;
+        return (C) this;
     }
 
-    @Override
-    default E randomEntity() {
-        return setLogicDelete(randomBoolean());
+    @SuppressWarnings("unchecked")
+    default C addSelectColumns(Collection<String> selectColumns) {
+        if (CollUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().addAll(selectColumns);
+        }
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C addSelectColumns(String... selectColumns) {
+        if (ArrayUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().addAll(CollUtil.toList(selectColumns));
+        }
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C unSelectColumn(String selectColumn) {
+        if (StrUtil.isNotBlank(selectColumn)) {
+            getSelectColumns().remove(selectColumn);
+        }
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C unSelectColumns(Collection<String> selectColumns) {
+        if (CollUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().removeAll(selectColumns);
+        }
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C unSelectColumns(String... selectColumns) {
+        if (ArrayUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().removeAll(CollUtil.toList(selectColumns));
+        }
+        return (C) this;
     }
 
 }

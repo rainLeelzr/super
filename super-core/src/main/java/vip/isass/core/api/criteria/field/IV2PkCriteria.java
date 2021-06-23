@@ -167,90 +167,38 @@
  *
  */
 
-package vip.isass.core.api.service;
+package vip.isass.core.api.criteria.field;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
+import vip.isass.core.api.criteria.IV2Criteria;
+import vip.isass.core.api.entity.IV2Entity;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public interface IV2ManagerService<E extends IEntity<E>, C extends ICriteria<E, C>> {
+/**
+ * 主键类型条件接口
+ *
+ * @author Rain
+ */
+public interface IV2PkCriteria<PK extends Serializable, E extends IV2Entity<E>, C extends IV2PkCriteria<PK, E, C>>
+    extends IV2Criteria<E, C> {
 
-    // region 增
+    Map<Class<?>, Class<?>> PK_CLASS_CACHE = new ConcurrentHashMap<>(64);
 
-    E add(E entity);
-
-    Collection<E> addBatch(Collection<E> entities);
-
-    Collection<E> addBatch(Collection<E> entities, int batchSize);
-
-    E addIfAbsent(E entity, ICriteria<E, C> criteria);
-
-    // endregion
-
-    //  region 删
-
-    Boolean deleteById(Serializable id);
-
-    Boolean deleteByIds(Collection<? extends Serializable> ids);
-
-    Boolean deleteByCriteria(ICriteria<E, C> criteria);
-
-    // endregion
-
-    // region 改
-
-    Boolean updateById(E entity);
-
-    Boolean updateEntityById(E entity);
-
-    void updateByIdOrException(E entity);
-
-    Boolean updateByCriteria(E entity, ICriteria<E, C> criteria);
-
-    void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria);
-
-    // endregion
-
-    //  region 查
-
-    E getById(Serializable id);
-
-    E getByIdOrException(Serializable id);
-
-    E getByCriteria(ICriteria<E, C> criteria);
-
-    E getByCriteriaOrWarn(ICriteria<E, C> criteria);
-
-    E getByCriteriaOrException(ICriteria<E, C> criteria);
-
-    List<E> findByCriteria(ICriteria<E, C> criteria);
-
-    IPage<E> findPageByCriteria(ICriteria<E, C> criteria);
-
-    List<E> findAll();
-
-    Integer countByCriteria(ICriteria<E, C> criteria);
-
-    Integer countAll();
-
-    boolean isPresentById(Serializable id);
-
-    boolean isPresentByColumn(String columnName, Object value);
-
-    boolean isPresentByCriteria(ICriteria<E, C> criteria);
-
-    boolean isAbsentByColumn(String columnName, Object value);
-
-    boolean isAbsentByCriteria(ICriteria<E, C> criteria);
-
-    void exceptionIfPresentByCriteria(ICriteria<E, C> criteria);
-
-    void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria);
-
-    // endregion
+    @SuppressWarnings("unchecked")
+    default Class<PK> findPkClass() {
+        Class<?> thisClass = this.getClass();
+        return (Class<PK>) PK_CLASS_CACHE.computeIfAbsent(thisClass, c -> {
+            Type[] types = thisClass.getGenericInterfaces();
+            String typeName = types[0].getTypeName();
+            System.out.println(typeName);
+            ParameterizedType parameterizedType = (ParameterizedType) types[0];
+            Type type = parameterizedType.getActualTypeArguments()[0];
+            return (Class<?>) type;
+        });
+    }
 
 }

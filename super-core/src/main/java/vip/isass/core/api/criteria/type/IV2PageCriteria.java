@@ -167,59 +167,43 @@
  *
  */
 
-package vip.isass.core.api.entity;
+package vip.isass.core.api.criteria.type;
 
-import java.beans.Transient;
+import io.swagger.annotations.ApiModelProperty;
+import vip.isass.core.api.criteria.IV2Criteria;
+import vip.isass.core.api.entity.IV2Entity;
+import vip.isass.core.page.PageConst;
 
 /**
- * 逻辑删除
+ * page 分页条件接口
  *
  * @author Rain
  */
-public interface IV2LogicDeleteEntity<E extends IV2LogicDeleteEntity<E>> extends IV2Entity<E> {
+public interface IV2PageCriteria<E extends IV2Entity<E>, C extends IV2PageCriteria<E, C>>
+    extends IV2Criteria<E, C> {
 
-    String LOGIC_DELETE_COLUMN_NAME = "delete_flag";
+    Long DEFAULT_PAGE_NUM = 1L;
 
-    String LOGIC_DELETE_PROPERTY = "deleteFlag";
+    Long DEFAULT_PAGE_SIZE = 20L;
 
-    Boolean DEFAULT_LOGIC_DELETE_VALUE = Boolean.FALSE;
+    Boolean DEFAULT_SEARCH_COUNT_FLAG = Boolean.TRUE;
 
-    /**
-     * 获取删除标识
-     *
-     * @return LogicDelete
-     */
-    Boolean getLogicDelete();
+    Long getPageNum();
 
-    /**
-     * 设置删除标识
-     *
-     * @param logicDelete LogicDelete
-     * @return this object
-     */
-    E setLogicDelete(Boolean logicDelete);
+    C setPageNum(Long pageNum);
 
-    @Transient
-    default String getLogicDeleteColumnName() {
-        return LOGIC_DELETE_COLUMN_NAME;
+    Long getPageSize();
+
+    C setPageSize(Long pageSize);
+
+    default C setMaxPageSize() {
+        return setPageSize(PageConst.MAX_PAGE_SIZE);
     }
 
-    /**
-     * 如果删除标识为 null, 则设置删除标识为 false，并返回删除标识
-     *
-     * @return this object
-     */
-    @SuppressWarnings("unchecked")
-    default E computeDefaultLogicDeleteIfAbsent() {
-        if (getLogicDelete() == null) {
-            setLogicDelete(Boolean.FALSE);
-        }
-        return (E) this;
-    }
+    @ApiModelProperty("是否发起 count sql。默认true。当不需要")
+    Boolean getSearchCountFlag();
 
-    @Override
-    default E randomEntity() {
-        return setLogicDelete(randomBoolean());
-    }
+    C setSearchCountFlag(Boolean searchCountFlag);
 
 }
+

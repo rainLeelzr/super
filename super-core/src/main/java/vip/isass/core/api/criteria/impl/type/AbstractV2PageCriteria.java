@@ -167,59 +167,78 @@
  *
  */
 
-package vip.isass.core.api.entity;
+package vip.isass.core.api.criteria.impl.type;
 
-import java.beans.Transient;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+import vip.isass.core.api.criteria.type.IV2PageCriteria;
+import vip.isass.core.api.entity.IV2Entity;
 
 /**
- * 逻辑删除
+ * 基于mysql的条件
  *
  * @author Rain
  */
-public interface IV2LogicDeleteEntity<E extends IV2LogicDeleteEntity<E>> extends IV2Entity<E> {
-
-    String LOGIC_DELETE_COLUMN_NAME = "delete_flag";
-
-    String LOGIC_DELETE_PROPERTY = "deleteFlag";
-
-    Boolean DEFAULT_LOGIC_DELETE_VALUE = Boolean.FALSE;
+@ToString
+@Accessors(chain = true)
+public abstract class AbstractV2PageCriteria<E extends IV2Entity<E>, C extends AbstractV2PageCriteria<E, C>>
+    implements IV2PageCriteria<E, C> {
 
     /**
-     * 获取删除标识
-     *
-     * @return LogicDelete
+     * 分页页码
      */
-    Boolean getLogicDelete();
+    private Long pageNum;
 
     /**
-     * 设置删除标识
-     *
-     * @param logicDelete LogicDelete
-     * @return this object
+     * 每页大小
      */
-    E setLogicDelete(Boolean logicDelete);
-
-    @Transient
-    default String getLogicDeleteColumnName() {
-        return LOGIC_DELETE_COLUMN_NAME;
-    }
+    private Long pageSize;
 
     /**
-     * 如果删除标识为 null, 则设置删除标识为 false，并返回删除标识
-     *
-     * @return this object
+     * 排序
+     * id asc 或者 id desc, modify_Time desc
      */
-    @SuppressWarnings("unchecked")
-    default E computeDefaultLogicDeleteIfAbsent() {
-        if (getLogicDelete() == null) {
-            setLogicDelete(Boolean.FALSE);
-        }
-        return (E) this;
+    @Getter
+    private String orderBy;
+
+    private Boolean searchCountFlag;
+
+    @Override
+    public Long getPageNum() {
+        return pageNum == null ? DEFAULT_PAGE_NUM : pageNum < 1L ? 1L : pageNum;
     }
 
     @Override
-    default E randomEntity() {
-        return setLogicDelete(randomBoolean());
+    @SuppressWarnings("unchecked")
+    public C setPageNum(Long pageNum) {
+        this.pageNum = pageNum;
+        return (C) this;
+    }
+
+    @Override
+    public Long getPageSize() {
+        return pageSize == null ? DEFAULT_PAGE_SIZE : pageSize < 1L ? DEFAULT_PAGE_SIZE : pageSize;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setPageSize(Long pageSize) {
+        this.pageSize = pageSize;
+        return (C) this;
+    }
+
+    @Override
+    public Boolean getSearchCountFlag() {
+        return searchCountFlag == null ? DEFAULT_SEARCH_COUNT_FLAG : searchCountFlag;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setSearchCountFlag(Boolean searchCountFlag) {
+        this.searchCountFlag = searchCountFlag;
+        return (C) this;
     }
 
 }
+

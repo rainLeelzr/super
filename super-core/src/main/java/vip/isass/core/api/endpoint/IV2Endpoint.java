@@ -178,7 +178,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public interface IV2Endpoint<E extends IEntity<E>, C extends ICriteria<E, C>> {
+public interfacexIV2Endpoint<E extends IEntity<E>, C extends ICriteria<E, C>> {
 
     // region 增
 

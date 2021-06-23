@@ -167,164 +167,58 @@
  *
  */
 
-package vip.isass.core.api.criteria;
+package vip.isass.core.api.criteria.type;
 
-import cn.hutool.core.collection.CollUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import vip.isass.core.api.entity.IV2IdEntity;
-import vip.isass.core.entity.IdEntity;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
+import cn.hutool.core.util.StrUtil;
+import vip.isass.core.api.criteria.IV2Criteria;
+import vip.isass.core.api.criteria.field.IV2TraceCriteria;
+import vip.isass.core.api.entity.IV2Entity;
 
 /**
- * 基于mysql的条件
+ * order by 排序条件接口
  *
  * @author Rain
  */
-public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK, E>, C
-    extends IV2IdCriteria<PK, E, C>> {
+public interface IV2OrderByCriteria<E extends IV2Entity<E>, C extends IV2OrderByCriteria<E, C>>
+    extends IV2Criteria<E, C> {
 
-    List<V2WhereCondition> getWhereConditions();
+    String ASC = " asc";
 
-    //************************************************** id setter **************************************************//
+    String DESC = " desc";
+
+    String getOrderBy();
+
+    C setOrderBy(String orderBy);
 
     @SuppressWarnings("unchecked")
-    public C setId(PK id) {
-        this.id = id;
-        equals(IdEntity.ID_COLUMN_NAME, this.id);
+    default C orderByCreateTimeDescIfBlank() {
+        if (StrUtil.isBlank(getOrderBy())) {
+            return orderByCreateTimeDesc();
+        }
         return (C) this;
     }
 
     @SuppressWarnings("unchecked")
-    public C setOrId(PK id) {
-        this.orId = id;
-        orEquals(IdEntity.ID_COLUMN_NAME, this.orId);
+    default C orderByModifyTimeDescIfBlank() {
+        if (StrUtil.isBlank(getOrderBy())) {
+            return orderByModifyTimeDesc();
+        }
         return (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setIdNotEqual(PK id) {
-        this.id = id;
-        notEquals(IdEntity.ID_COLUMN_NAME, this.id);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C orderByCreateTimeDesc() {
+        return this instanceof IV2TraceCriteria
+            ? setOrderBy(((IV2TraceCriteria) this).getCreatedTimeColumnName() + DESC)
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrNotEqual(PK id) {
-        this.orId = id;
-        orNotEquals(IdEntity.ID_COLUMN_NAME, this.orId);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C orderByModifyTimeDesc() {
+        return this instanceof IV2TraceCriteria
+            ? setOrderBy(((IV2TraceCriteria) this).getModifyTimeColumnColumnName() + DESC)
+            : (C) this;
     }
-
-    @SuppressWarnings("unchecked")
-    public C setIdIn(Collection<PK> ids) {
-        this.idIn = ids;
-        in(IdEntity.ID_COLUMN_NAME, this.idIn);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setOrIdIn(Collection<PK> ids) {
-        this.orIdIn = ids;
-        orIn(IdEntity.ID_COLUMN_NAME, this.orIdIn);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setIdNotIn(Collection<PK> ids) {
-        this.idNotIn = ids;
-        notIn(IdEntity.ID_COLUMN_NAME, this.idNotIn);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotIn(Collection<PK> ids) {
-        this.orIdNotIn = ids;
-        orNotIn(IdEntity.ID_COLUMN_NAME, this.orIdNotIn);
-        return (C) this;
-    }
-
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setIdIn(PK... ids) {
-        this.idIn = CollUtil.newHashSet(ids);
-        in(IdEntity.ID_COLUMN_NAME, this.idIn);
-        return (C) this;
-    }
-
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setOrIdIn(PK... ids) {
-        this.orIdIn = CollUtil.newHashSet(ids);
-        orIn(IdEntity.ID_COLUMN_NAME, this.orIdIn);
-        return (C) this;
-    }
-
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setIdNotIn(PK... ids) {
-        this.idNotIn = CollUtil.newHashSet(ids);
-        notIn(IdEntity.ID_COLUMN_NAME, this.idNotIn);
-        return (C) this;
-    }
-
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotIn(PK... ids) {
-        this.orIdNotIn = CollUtil.newHashSet(ids);
-        orNotIn(IdEntity.ID_COLUMN_NAME, this.orIdNotIn);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setIdLike(String idLike) {
-        this.idLike = idLike;
-        like(IdEntity.ID_COLUMN_NAME, this.idLike);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setOrIdLike(String orIdLike) {
-        this.orIdLike = orIdLike;
-        orLike(IdEntity.ID_COLUMN_NAME, this.orIdLike);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setIdNotLike(String idNotLike) {
-        this.idNotLike = idNotLike;
-        notLike(IdEntity.ID_COLUMN_NAME, this.idNotLike);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotLike(String orIdNotLike) {
-        this.orIdNotLike = orIdNotLike;
-        orNotLike(IdEntity.ID_COLUMN_NAME, this.orIdNotLike);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setIdStartWith(String idStartWith) {
-        this.idStartWith = idStartWith;
-        startWith(IdEntity.ID_COLUMN_NAME, idStartWith);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setOrIdStartWith(String orIdStartWith) {
-        this.orIdStartWith = orIdStartWith;
-        orStartWith(IdEntity.ID_COLUMN_NAME, orIdStartWith);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C selectId() {
-        this.setSelectColumns(IdEntity.ID_COLUMN_NAME);
-        return (C) this;
-    }
-
 
 }
+
