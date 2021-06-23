@@ -167,39 +167,30 @@
  *
  */
 
-package vip.isass.core.api.criteria.type;
+package vip.isass.core.api.criteria.impl.type;
 
-import cn.hutool.core.util.StrUtil;
-import vip.isass.core.api.criteria.IV2Criteria;
+import lombok.ToString;
+import vip.isass.core.api.criteria.type.IV2SelectColumnCriteria;
 import vip.isass.core.api.entity.IV2Entity;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
- * order by 排序条件接口
- *
- * @author Rain
+ * select 字段查询条件抽象类
  */
-public interface IV2OrderByCriteria<E extends IV2Entity<E>, C extends IV2OrderByCriteria<E, C>>
-    extends IV2Criteria<E, C> {
+@ToString
+public abstract class AbstractV2SelectColumnCriteria<E extends IV2Entity<E>, C extends AbstractV2SelectColumnCriteria<E, C>>
+    implements IV2SelectColumnCriteria<E, C> {
 
-    String ASC = " asc";
+    private Collection<String> selectColumns;
 
-    String DESC = " desc";
-
-    String getOrderBy();
-
-    C setOrderBy(String orderBy);
-
-    @SuppressWarnings("unchecked")
-    default C orderByIfBlank(String column, String direction) {
-        if (StrUtil.isBlank(getOrderBy())) {
-            return orderBy(column, direction);
+    @Override
+    public Collection<String> getSelectColumns() {
+        if (selectColumns == null) {
+            selectColumns = new ArrayList<>(16);
         }
-        return (C) this;
-    }
-
-    default C orderBy(String column, String direction) {
-        return setOrderBy(column + " " + direction);
+        return selectColumns;
     }
 
 }
-

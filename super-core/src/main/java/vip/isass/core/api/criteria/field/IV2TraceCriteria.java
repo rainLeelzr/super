@@ -171,6 +171,7 @@ package vip.isass.core.api.criteria.field;
 
 import io.swagger.annotations.ApiModelProperty;
 import vip.isass.core.api.criteria.IV2Criteria;
+import vip.isass.core.api.criteria.type.IV2OrderByCriteria;
 import vip.isass.core.api.criteria.type.IV2WhereConditionCriteria;
 import vip.isass.core.api.entity.IV2TraceEntity;
 
@@ -190,6 +191,8 @@ public interface IV2TraceCriteria<
     C extends IV2TraceCriteria<UPK, E, C>
     > extends IV2Criteria<E, C> {
 
+    // region 获取字段名方法
+
     @Transient
     String getCreateUserIdColumnName();
 
@@ -207,6 +210,8 @@ public interface IV2TraceCriteria<
 
     @Transient
     String getModifyTimeColumnColumnName();
+
+    // endregion
 
     // region createUserId
 
@@ -1309,6 +1314,38 @@ public interface IV2TraceCriteria<
     }
 
     // endregion
+
+    // endregion
+
+    // region 时间字段排序方法
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C orderByCreateTimeDescIfBlank() {
+        return this instanceof IV2OrderByCriteria
+            ? (C) ((IV2OrderByCriteria) this).orderByIfBlank(getCreatedTimeColumnName(), IV2OrderByCriteria.DESC)
+            : (C) this;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C orderByModifyTimeDescIfBlank() {
+        return this instanceof IV2OrderByCriteria
+            ? (C) ((IV2OrderByCriteria) this).orderByIfBlank(getModifyTimeColumnColumnName(), IV2OrderByCriteria.DESC)
+            : (C) this;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C orderByCreateTimeDesc() {
+        return this instanceof IV2OrderByCriteria
+            ? (C) ((IV2OrderByCriteria) this).orderBy(getCreatedTimeColumnName(), IV2OrderByCriteria.DESC)
+            : (C) this;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C orderByModifyTimeDesc() {
+        return this instanceof IV2OrderByCriteria
+            ? (C) ((IV2OrderByCriteria) this).orderBy(getModifyTimeColumnColumnName(), IV2OrderByCriteria.DESC)
+            : (C) this;
+    }
 
     // endregion
 

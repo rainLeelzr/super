@@ -167,39 +167,28 @@
  *
  */
 
-package vip.isass.core.api.criteria.type;
+package vip.isass.core.api.criteria.impl.type;
 
-import cn.hutool.core.util.StrUtil;
-import vip.isass.core.api.criteria.IV2Criteria;
+import lombok.Getter;
+import lombok.ToString;
+import vip.isass.core.api.criteria.type.IV2OrderByCriteria;
 import vip.isass.core.api.entity.IV2Entity;
 
 /**
- * order by 排序条件接口
- *
- * @author Rain
+ * 排序条件抽象类
  */
-public interface IV2OrderByCriteria<E extends IV2Entity<E>, C extends IV2OrderByCriteria<E, C>>
-    extends IV2Criteria<E, C> {
+@ToString
+public abstract class AbstractV2OrderByCriteria<E extends IV2Entity<E>, C extends AbstractV2OrderByCriteria<E, C>>
+    implements IV2OrderByCriteria<E, C> {
 
-    String ASC = " asc";
+    @Getter
+    private String orderBy;
 
-    String DESC = " desc";
-
-    String getOrderBy();
-
-    C setOrderBy(String orderBy);
-
+    @Override
     @SuppressWarnings("unchecked")
-    default C orderByIfBlank(String column, String direction) {
-        if (StrUtil.isBlank(getOrderBy())) {
-            return orderBy(column, direction);
-        }
+    public C setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
         return (C) this;
     }
 
-    default C orderBy(String column, String direction) {
-        return setOrderBy(column + " " + direction);
-    }
-
 }
-

@@ -171,17 +171,15 @@ package vip.isass.core.api.criteria.impl.type;
 
 import lombok.Getter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import vip.isass.core.api.criteria.type.IV2PageCriteria;
 import vip.isass.core.api.entity.IV2Entity;
 
 /**
- * 基于mysql的条件
+ * 分页查询条件抽象类
  *
  * @author Rain
  */
 @ToString
-@Accessors(chain = true)
 public abstract class AbstractV2PageCriteria<E extends IV2Entity<E>, C extends AbstractV2PageCriteria<E, C>>
     implements IV2PageCriteria<E, C> {
 
@@ -194,13 +192,6 @@ public abstract class AbstractV2PageCriteria<E extends IV2Entity<E>, C extends A
      * 每页大小
      */
     private Long pageSize;
-
-    /**
-     * 排序
-     * id asc 或者 id desc, modify_Time desc
-     */
-    @Getter
-    private String orderBy;
 
     private Boolean searchCountFlag;
 
