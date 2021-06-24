@@ -169,67 +169,30 @@
 
 package vip.isass.core.api.criteria.impl.type;
 
-import lombok.Getter;
 import lombok.ToString;
-import vip.isass.core.api.criteria.type.IV2PageCriteria;
+import vip.isass.core.api.criteria.type.IV2SelectColumnCriteria;
 import vip.isass.core.api.entity.IV2Entity;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
- * 分页查询条件抽象类
- *
- * @author Rain
+ * select 字段查询条件
  */
 @ToString
-public abstract class AbstractV2PageCriteria<E extends IV2Entity<E>, C extends AbstractV2PageCriteria<E, C>>
-    implements IV2PageCriteria<E, C> {
+public class V2SelectColumnCriteria<
+    E extends IV2Entity<E>,
+    C extends V2SelectColumnCriteria<E, C>
+    > implements IV2SelectColumnCriteria<E, C> {
 
-    /**
-     * 分页页码
-     */
-    private Long pageNum;
-
-    /**
-     * 每页大小
-     */
-    private Long pageSize;
-
-    private Boolean searchCountFlag;
+    private Collection<String> selectColumns;
 
     @Override
-    public Long getPageNum() {
-        return pageNum == null ? DEFAULT_PAGE_NUM : pageNum < 1L ? 1L : pageNum;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public C setPageNum(Long pageNum) {
-        this.pageNum = pageNum;
-        return (C) this;
-    }
-
-    @Override
-    public Long getPageSize() {
-        return pageSize == null ? DEFAULT_PAGE_SIZE : pageSize < 1L ? DEFAULT_PAGE_SIZE : pageSize;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public C setPageSize(Long pageSize) {
-        this.pageSize = pageSize;
-        return (C) this;
-    }
-
-    @Override
-    public Boolean getSearchCountFlag() {
-        return searchCountFlag == null ? DEFAULT_SEARCH_COUNT_FLAG : searchCountFlag;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public C setSearchCountFlag(Boolean searchCountFlag) {
-        this.searchCountFlag = searchCountFlag;
-        return (C) this;
+    public Collection<String> getSelectColumns() {
+        if (selectColumns == null) {
+            selectColumns = new ArrayList<>(16);
+        }
+        return selectColumns;
     }
 
 }
-

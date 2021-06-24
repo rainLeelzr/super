@@ -170,27 +170,29 @@
 package vip.isass.core.api.criteria.impl.type;
 
 import lombok.ToString;
-import vip.isass.core.api.criteria.type.IV2SelectColumnCriteria;
+import vip.isass.core.api.criteria.V2WhereCondition;
+import vip.isass.core.api.criteria.type.IV2WhereConditionCriteria;
 import vip.isass.core.api.entity.IV2Entity;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 /**
- * select 字段查询条件抽象类
+ * where 查询条件
  */
 @ToString
-public abstract class AbstractV2SelectColumnCriteria<E extends IV2Entity<E>, C extends AbstractV2SelectColumnCriteria<E, C>>
-    implements IV2SelectColumnCriteria<E, C> {
+public class V2WhereConditionCriteria<
+    E extends IV2Entity<E>,
+    C extends V2WhereConditionCriteria<E, C>
+    > implements IV2WhereConditionCriteria<E, C> {
 
-    private Collection<String> selectColumns;
+    private List<V2WhereCondition> whereConditions;
 
-    @Override
-    public Collection<String> getSelectColumns() {
-        if (selectColumns == null) {
-            selectColumns = new ArrayList<>(16);
+    public List<V2WhereCondition> getWhereConditions() {
+        if (whereConditions == null) {
+            whereConditions = new ArrayList<>();
         }
-        return selectColumns;
+        return whereConditions;
     }
 
 }

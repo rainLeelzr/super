@@ -169,26 +169,66 @@
 
 package vip.isass.core.api.criteria.impl.type;
 
-import lombok.Getter;
 import lombok.ToString;
-import vip.isass.core.api.criteria.type.IV2OrderByCriteria;
+import vip.isass.core.api.criteria.type.IV2PageCriteria;
 import vip.isass.core.api.entity.IV2Entity;
 
 /**
- * 排序条件抽象类
+ * 分页查询条件
+ *
+ * @author Rain
  */
 @ToString
-public abstract class AbstractV2OrderByCriteria<E extends IV2Entity<E>, C extends AbstractV2OrderByCriteria<E, C>>
-    implements IV2OrderByCriteria<E, C> {
+public class V2PageCriteria<E extends IV2Entity<E>, C extends V2PageCriteria<E, C>>
+    implements IV2PageCriteria<E, C> {
 
-    @Getter
-    private String orderBy;
+    /**
+     * 分页页码
+     */
+    private Long pageNum;
+
+    /**
+     * 每页大小
+     */
+    private Long pageSize;
+
+    private Boolean searchCountFlag;
+
+    @Override
+    public Long getPageNum() {
+        return pageNum == null ? DEFAULT_PAGE_NUM : pageNum < 1L ? 1L : pageNum;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
-    public C setOrderBy(String orderBy) {
-        this.orderBy = orderBy;
+    public C setPageNum(Long pageNum) {
+        this.pageNum = pageNum;
+        return (C) this;
+    }
+
+    @Override
+    public Long getPageSize() {
+        return pageSize == null ? DEFAULT_PAGE_SIZE : pageSize < 1L ? DEFAULT_PAGE_SIZE : pageSize;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setPageSize(Long pageSize) {
+        this.pageSize = pageSize;
+        return (C) this;
+    }
+
+    @Override
+    public Boolean getSearchCountFlag() {
+        return searchCountFlag == null ? DEFAULT_SEARCH_COUNT_FLAG : searchCountFlag;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setSearchCountFlag(Boolean searchCountFlag) {
+        this.searchCountFlag = searchCountFlag;
         return (C) this;
     }
 
 }
+
