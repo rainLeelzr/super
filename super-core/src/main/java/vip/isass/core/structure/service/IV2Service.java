@@ -167,185 +167,90 @@
  *
  */
 
-package vip.isass.core.web.rpc.feign;
+package vip.isass.core.structure.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.springframework.core.Ordered;
-import vip.isass.core.structure.service.IV2Service;
-import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
-import vip.isass.core.support.api.ApiOrder;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>> extends IV2Service<E, C>, Ordered {
-
-    IV2FeignClient<E, C> getFeignClient();
-
-    @Override
-    default int getOrder() {
-        return ApiOrder.FEIGN_SERVICE;
-    }
+public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> {
 
     // region 增
 
-    @Override
-    default E add(E entity) {
-        return getFeignClient().add(entity).dataIfSuccessOrException();
-    }
+    E add(E entity);
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities) {
-        return getFeignClient().addBatch(entities).dataIfSuccessOrException();
-    }
+    Collection<E> addBatch(Collection<E> entities);
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        return getFeignClient().addBatch(entities, batchSize).dataIfSuccessOrException();
-    }
+    Collection<E> addBatch(Collection<E> entities, int batchSize);
 
-    @Override
-    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().addIfAbsent(entity, criteria).dataIfSuccessOrException();
-    }
+    E addIfAbsent(E entity, IV2Criteria<E, C> criteria);
 
     // endregion
 
     //  region 删
 
-    @Override
-    default Boolean deleteById(Serializable id) {
-        return getFeignClient().deleteById(id).dataIfSuccessOrException();
-    }
+    Boolean deleteById(Serializable id);
 
-    @Override
-    default Boolean deleteByIds(Collection<? extends Serializable> ids) {
-        return getFeignClient().deleteByIds(ids).dataIfSuccessOrException();
-    }
+    Boolean deleteByIds(Collection<? extends Serializable> ids);
 
-    @Override
-    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().deleteByCriteria(criteria).dataIfSuccessOrException();
-    }
+    Boolean deleteByCriteria(IV2Criteria<E, C> criteria);
 
     // endregion
 
     // region 改
 
-    @Override
-    default Boolean updateById(E entity) {
-        return getFeignClient().updateById(entity).dataIfSuccessOrException();
-    }
+    Boolean updateById(E entity);
 
-    @Override
-    default Boolean updateEntityById(E entity) {
-        return getFeignClient().updateEntityById(entity).dataIfSuccessOrException();
-    }
+    Boolean updateEntityById(E entity);
 
-    @Override
-    default void updateByIdOrException(E entity) {
-        getFeignClient().updateByIdOrException(entity).dataIfSuccessOrException();
-    }
+    void updateByIdOrException(E entity);
 
-    @Override
-    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().updateByCriteria(entity, criteria).dataIfSuccessOrException();
-    }
+    Boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria);
 
-    @Override
-    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
-        getFeignClient().updateByCriteriaOrException(entity, criteria).dataIfSuccessOrException();
-    }
+    void updateByCriteriaOrException(E entity, IV2Criteria<E, C> criteria);
 
     // endregion
 
     //  region 查
 
-    @Override
-    default E getById(Serializable id) {
-        return getFeignClient().getById(id).dataIfSuccessOrException();
-    }
+    E getById(Serializable id);
 
-    @Override
-    default E getByIdOrException(Serializable id) {
-        return getFeignClient().getByIdOrException(id).dataIfSuccessOrException();
-    }
+    E getByIdOrException(Serializable id);
 
-    @Override
-    default E getByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteria(criteria).dataIfSuccessOrException();
-    }
+    E getByCriteria(IV2Criteria<E, C> criteria);
 
-    @Override
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrWarn(criteria).dataIfSuccessOrException();
-    }
+    E getByCriteriaOrWarn(IV2Criteria<E, C> criteria);
 
-    @Override
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrException(criteria).dataIfSuccessOrException();
-    }
+    E getByCriteriaOrException(IV2Criteria<E, C> criteria);
 
-    @Override
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findByCriteria(criteria).dataIfSuccessOrException();
-    }
+    List<E> findByCriteria(IV2Criteria<E, C> criteria);
 
-    @Override
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findPageByCriteria(criteria).dataIfSuccessOrException();
-    }
+    IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria);
 
-    @Override
-    default List<E> findAll() {
-        return getFeignClient().findAll().dataIfSuccessOrException();
-    }
+    List<E> findAll();
 
-    @Override
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().countByCriteria(criteria).dataIfSuccessOrException();
-    }
+    Integer countByCriteria(IV2Criteria<E, C> criteria);
 
-    @Override
-    default Integer countAll() {
-        return getFeignClient().countAll().dataIfSuccessOrException();
-    }
+    Integer countAll();
 
-    @Override
-    default boolean isPresentById(Serializable id) {
-        return getFeignClient().isPresentById(id).dataIfSuccessOrException();
-    }
+    boolean isPresentById(Serializable id);
 
-    @Override
-    default boolean isPresentByColumn(String columnName, Object value) {
-        return getFeignClient().isPresentByColumn(columnName, value).dataIfSuccessOrException();
-    }
+    boolean isPresentByColumn(String columnName, Object value);
 
-    @Override
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isPresentByCriteria(criteria).dataIfSuccessOrException();
-    }
+    boolean isPresentByCriteria(IV2Criteria<E, C> criteria);
 
-    @Override
-    default boolean isAbsentByColumn(String columnName, Object value) {
-        return getFeignClient().isAbsentByColumn(columnName, value).dataIfSuccessOrException();
-    }
+    boolean isAbsentByColumn(String columnName, Object value);
 
-    @Override
-    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isAbsentByCriteria(criteria).dataIfSuccessOrException();
-    }
+    boolean isAbsentByCriteria(IV2Criteria<E, C> criteria);
 
-    @Override
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfPresentByCriteria(criteria).dataIfSuccessOrException();
-    }
+    void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria);
 
-    @Override
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfAbsentByCriteria(criteria).dataIfSuccessOrException();
-    }
+    void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria);
+
+    // endregion
 
 }

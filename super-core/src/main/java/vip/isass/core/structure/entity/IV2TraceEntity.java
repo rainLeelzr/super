@@ -167,185 +167,165 @@
  *
  */
 
-package vip.isass.core.web.rpc.feign;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.springframework.core.Ordered;
-import vip.isass.core.structure.service.IV2Service;
-import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
-import vip.isass.core.support.api.ApiOrder;
-
+import java.beans.Transient;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
+import java.time.LocalDateTime;
 
-public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>> extends IV2Service<E, C>, Ordered {
+/**
+ * 审计追踪类型实体
+ * UPK: user 的主键类型
+ *
+ * @author Rain
+ */
+public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEntity<UPK, E>>
+    extends IV2PkEntity<UPK, E> {
 
-    IV2FeignClient<E, C> getFeignClient();
+    String CREATE_USER_ID_COLUMN_NAME = "create_user_id";
+    String CREATE_USER_ID_PROPERTY = "createUserId";
 
-    @Override
-    default int getOrder() {
-        return ApiOrder.FEIGN_SERVICE;
+    @Transient
+    default String getCreateUserIdColumnName() {
+        return CREATE_USER_ID_COLUMN_NAME;
     }
 
-    // region 增
+    String CREATE_USER_NAME_COLUMN_NAME = "create_user_name";
+    String CREATE_USER_NAME_PROPERTY = "createUserName";
 
-    @Override
-    default E add(E entity) {
-        return getFeignClient().add(entity).dataIfSuccessOrException();
+    @Transient
+    default String getCreateUserNameColumnName() {
+        return CREATE_USER_NAME_COLUMN_NAME;
     }
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities) {
-        return getFeignClient().addBatch(entities).dataIfSuccessOrException();
+    String CREATED_TIME_COLUMN_NAME = "create_time";
+    String CREATED_TIME_PROPERTY = "createTime";
+
+    @Transient
+    default String getCreatedTimeColumnName() {
+        return CREATED_TIME_COLUMN_NAME;
     }
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        return getFeignClient().addBatch(entities, batchSize).dataIfSuccessOrException();
+    String MODIFY_USER_ID_COLUMN_NAME = "modify_user_id";
+    String MODIFY_USER_ID_PROPERTY = "modifyUserId";
+
+    @Transient
+    default String getModifyUserIdColumnName() {
+        return MODIFY_USER_ID_COLUMN_NAME;
     }
 
-    @Override
-    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().addIfAbsent(entity, criteria).dataIfSuccessOrException();
+    String MODIFY_USER_NAME_COLUMN_NAME = "modify_user_name";
+    String MODIFY_USER_NAME_PROPERTY = "modifyUserName";
+
+    @Transient
+    default String getModifyUserNameColumnName() {
+        return MODIFY_USER_NAME_COLUMN_NAME;
     }
 
-    // endregion
+    String MODIFY_TIME_COLUMN_NAME = "modify_time";
+    String MODIFY_TIME_PROPERTY = "modifyTime";
 
-    //  region 删
-
-    @Override
-    default Boolean deleteById(Serializable id) {
-        return getFeignClient().deleteById(id).dataIfSuccessOrException();
+    @Transient
+    default String getModifyTimeColumnColumnName() {
+        return MODIFY_TIME_COLUMN_NAME;
     }
 
-    @Override
-    default Boolean deleteByIds(Collection<? extends Serializable> ids) {
-        return getFeignClient().deleteByIds(ids).dataIfSuccessOrException();
-    }
+    /**
+     * 获取创建用户的 id
+     *
+     * @return create user id
+     */
+    UPK getCreateUserId();
+
+    /**
+     * 设置创建用户的 id
+     *
+     * @param createUserId create user id
+     * @return this object
+     */
+    E setCreateUserId(UPK createUserId);
+
+    /**
+     * @return 创建用户的用户名
+     */
+    String getCreateUserName();
+
+    /**
+     * 设置创建用户的用户名
+     *
+     * @param createUserName create user name
+     * @return this object
+     */
+    E setCreateUserName(String createUserName);
+
+    /**
+     * 获取创建记录的时间
+     *
+     * @return create time
+     */
+    LocalDateTime getCreateTime();
+
+    /**
+     * 设置创建记录的时间
+     *
+     * @param createTime create time
+     * @return this object
+     */
+    E setCreateTime(LocalDateTime createTime);
+
+    /**
+     * 获取修改用户的 id
+     *
+     * @return modify user id
+     */
+    UPK getModifyUserId();
+
+    /**
+     * 设置修改用户的 id
+     *
+     * @param modifyUserId modify user id
+     * @return this object
+     */
+    E setModifyUserId(UPK modifyUserId);
+
+    /**
+     * 获取修改用户的用户名
+     *
+     * @return modify user name
+     */
+    String getModifyUserName();
+
+    /**
+     * 设置修改用户的用户名
+     *
+     * @param modifyUserName modify user name
+     * @return this object
+     */
+    E setModifyUserName(String modifyUserName);
+
+    /**
+     * 获取修改记录的时间
+     *
+     * @return modify time
+     */
+    LocalDateTime getModifyTime();
+
+    /**
+     * 设置修改记录的时间
+     *
+     * @param modifyTime modify time
+     * @return this object
+     */
+    E setModifyTime(LocalDateTime modifyTime);
 
     @Override
-    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().deleteByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    // endregion
-
-    // region 改
-
-    @Override
-    default Boolean updateById(E entity) {
-        return getFeignClient().updateById(entity).dataIfSuccessOrException();
-    }
-
-    @Override
-    default Boolean updateEntityById(E entity) {
-        return getFeignClient().updateEntityById(entity).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void updateByIdOrException(E entity) {
-        getFeignClient().updateByIdOrException(entity).dataIfSuccessOrException();
-    }
-
-    @Override
-    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().updateByCriteria(entity, criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
-        getFeignClient().updateByCriteriaOrException(entity, criteria).dataIfSuccessOrException();
-    }
-
-    // endregion
-
-    //  region 查
-
-    @Override
-    default E getById(Serializable id) {
-        return getFeignClient().getById(id).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByIdOrException(Serializable id) {
-        return getFeignClient().getByIdOrException(id).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrWarn(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrException(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findPageByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default List<E> findAll() {
-        return getFeignClient().findAll().dataIfSuccessOrException();
-    }
-
-    @Override
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().countByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default Integer countAll() {
-        return getFeignClient().countAll().dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isPresentById(Serializable id) {
-        return getFeignClient().isPresentById(id).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isPresentByColumn(String columnName, Object value) {
-        return getFeignClient().isPresentByColumn(columnName, value).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isPresentByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isAbsentByColumn(String columnName, Object value) {
-        return getFeignClient().isAbsentByColumn(columnName, value).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isAbsentByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfPresentByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfAbsentByCriteria(criteria).dataIfSuccessOrException();
+    default E randomEntity() {
+        return setCreateUserId(randomPk())
+            .setCreateUserName(randomString())
+            .setCreateTime(randomLocalDateTime())
+            .setModifyUserId(randomPk())
+            .setModifyUserName(randomString())
+            .setModifyTime(randomLocalDateTime());
     }
 
 }

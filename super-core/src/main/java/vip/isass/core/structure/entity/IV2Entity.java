@@ -167,185 +167,53 @@
  *
  */
 
-package vip.isass.core.web.rpc.feign;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.springframework.core.Ordered;
-import vip.isass.core.structure.service.IV2Service;
-import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
-import vip.isass.core.support.api.ApiOrder;
+import cn.hutool.core.util.RandomUtil;
+import vip.isass.core.support.LocalDateTimeUtil;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>> extends IV2Service<E, C>, Ordered {
+/**
+ * @author Rain
+ */
+public interface IV2Entity<E extends IV2Entity<E>> {
 
-    IV2FeignClient<E, C> getFeignClient();
+    long serialVersionUID = 1L;
 
-    @Override
-    default int getOrder() {
-        return ApiOrder.FEIGN_SERVICE;
+    default String randomString() {
+        return RandomUtil.randomString(6);
     }
 
-    // region 增
-
-    @Override
-    default E add(E entity) {
-        return getFeignClient().add(entity).dataIfSuccessOrException();
+    default Byte randomByte() {
+        return (byte) RandomUtil.randomInt(Byte.MAX_VALUE);
     }
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities) {
-        return getFeignClient().addBatch(entities).dataIfSuccessOrException();
+    default Boolean randomBoolean() {
+        return RandomUtil.randomBoolean();
     }
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        return getFeignClient().addBatch(entities, batchSize).dataIfSuccessOrException();
+    default Integer randomInteger() {
+        return RandomUtil.randomInt();
     }
 
-    @Override
-    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().addIfAbsent(entity, criteria).dataIfSuccessOrException();
+    default Long randomLong() {
+        return RandomUtil.randomLong();
     }
 
-    // endregion
-
-    //  region 删
-
-    @Override
-    default Boolean deleteById(Serializable id) {
-        return getFeignClient().deleteById(id).dataIfSuccessOrException();
+    default BigDecimal randomBigDecimal() {
+        return RandomUtil.randomBigDecimal(BigDecimal.TEN);
     }
 
-    @Override
-    default Boolean deleteByIds(Collection<? extends Serializable> ids) {
-        return getFeignClient().deleteByIds(ids).dataIfSuccessOrException();
+    default LocalDateTime randomLocalDateTime() {
+        return LocalDateTimeUtil.now();
     }
 
-    @Override
-    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().deleteByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    // endregion
-
-    // region 改
-
-    @Override
-    default Boolean updateById(E entity) {
-        return getFeignClient().updateById(entity).dataIfSuccessOrException();
-    }
-
-    @Override
-    default Boolean updateEntityById(E entity) {
-        return getFeignClient().updateEntityById(entity).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void updateByIdOrException(E entity) {
-        getFeignClient().updateByIdOrException(entity).dataIfSuccessOrException();
-    }
-
-    @Override
-    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().updateByCriteria(entity, criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
-        getFeignClient().updateByCriteriaOrException(entity, criteria).dataIfSuccessOrException();
-    }
-
-    // endregion
-
-    //  region 查
-
-    @Override
-    default E getById(Serializable id) {
-        return getFeignClient().getById(id).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByIdOrException(Serializable id) {
-        return getFeignClient().getByIdOrException(id).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrWarn(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrException(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findPageByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default List<E> findAll() {
-        return getFeignClient().findAll().dataIfSuccessOrException();
-    }
-
-    @Override
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().countByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default Integer countAll() {
-        return getFeignClient().countAll().dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isPresentById(Serializable id) {
-        return getFeignClient().isPresentById(id).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isPresentByColumn(String columnName, Object value) {
-        return getFeignClient().isPresentByColumn(columnName, value).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isPresentByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isAbsentByColumn(String columnName, Object value) {
-        return getFeignClient().isAbsentByColumn(columnName, value).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isAbsentByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfPresentByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfAbsentByCriteria(criteria).dataIfSuccessOrException();
-    }
+    /**
+     * 生成随机的entity
+     * 所有字段都随机赋值
+     */
+    E randomEntity();
 
 }

@@ -167,185 +167,94 @@
  *
  */
 
-package vip.isass.core.web.rpc.feign;
+package vip.isass.core.structure.criteria.type;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.springframework.core.Ordered;
-import vip.isass.core.structure.service.IV2Service;
-import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
-import vip.isass.core.support.api.ApiOrder;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
 
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 
-public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>> extends IV2Service<E, C>, Ordered {
+/**
+ * sql 的 select 字段条件接口
+ *
+ * @author Rain
+ */
+public interface IV2SelectColumnCriteria<E extends IV2Entity<E>, C extends IV2SelectColumnCriteria<E, C>>
+    extends IV2Criteria<E, C> {
 
-    IV2FeignClient<E, C> getFeignClient();
+    String DISTINCT = "DISTINCT ";
 
-    @Override
-    default int getOrder() {
-        return ApiOrder.FEIGN_SERVICE;
+    /**
+     * get select columns list
+     *
+     * @return select column list
+     */
+    Collection<String> getSelectColumns();
+
+    default C setSelectColumn(String selectColumn) {
+        getSelectColumns().clear();
+        return addSelectColumn(selectColumn);
     }
 
-    // region 增
-
-    @Override
-    default E add(E entity) {
-        return getFeignClient().add(entity).dataIfSuccessOrException();
+    default C setSelectColumns(Collection<String> selectColumns) {
+        getSelectColumns().clear();
+        return addSelectColumns(selectColumns);
     }
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities) {
-        return getFeignClient().addBatch(entities).dataIfSuccessOrException();
+    default C setSelectColumns(String... selectColumns) {
+        getSelectColumns().clear();
+        return addSelectColumns(selectColumns);
     }
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        return getFeignClient().addBatch(entities, batchSize).dataIfSuccessOrException();
+    @SuppressWarnings("unchecked")
+    default C addSelectColumn(String selectColumn) {
+        if (StrUtil.isNotBlank(selectColumn)) {
+            getSelectColumns().add(selectColumn);
+        }
+        return (C) this;
     }
 
-    @Override
-    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().addIfAbsent(entity, criteria).dataIfSuccessOrException();
+    @SuppressWarnings("unchecked")
+    default C addSelectColumns(Collection<String> selectColumns) {
+        if (CollUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().addAll(selectColumns);
+        }
+        return (C) this;
     }
 
-    // endregion
-
-    //  region 删
-
-    @Override
-    default Boolean deleteById(Serializable id) {
-        return getFeignClient().deleteById(id).dataIfSuccessOrException();
+    @SuppressWarnings("unchecked")
+    default C addSelectColumns(String... selectColumns) {
+        if (ArrayUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().addAll(CollUtil.toList(selectColumns));
+        }
+        return (C) this;
     }
 
-    @Override
-    default Boolean deleteByIds(Collection<? extends Serializable> ids) {
-        return getFeignClient().deleteByIds(ids).dataIfSuccessOrException();
+    @SuppressWarnings("unchecked")
+    default C unSelectColumn(String selectColumn) {
+        if (StrUtil.isNotBlank(selectColumn)) {
+            getSelectColumns().remove(selectColumn);
+        }
+        return (C) this;
     }
 
-    @Override
-    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().deleteByCriteria(criteria).dataIfSuccessOrException();
+    @SuppressWarnings("unchecked")
+    default C unSelectColumns(Collection<String> selectColumns) {
+        if (CollUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().removeAll(selectColumns);
+        }
+        return (C) this;
     }
 
-    // endregion
-
-    // region 改
-
-    @Override
-    default Boolean updateById(E entity) {
-        return getFeignClient().updateById(entity).dataIfSuccessOrException();
-    }
-
-    @Override
-    default Boolean updateEntityById(E entity) {
-        return getFeignClient().updateEntityById(entity).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void updateByIdOrException(E entity) {
-        getFeignClient().updateByIdOrException(entity).dataIfSuccessOrException();
-    }
-
-    @Override
-    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().updateByCriteria(entity, criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
-        getFeignClient().updateByCriteriaOrException(entity, criteria).dataIfSuccessOrException();
-    }
-
-    // endregion
-
-    //  region 查
-
-    @Override
-    default E getById(Serializable id) {
-        return getFeignClient().getById(id).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByIdOrException(Serializable id) {
-        return getFeignClient().getByIdOrException(id).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrWarn(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrException(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findPageByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default List<E> findAll() {
-        return getFeignClient().findAll().dataIfSuccessOrException();
-    }
-
-    @Override
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().countByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default Integer countAll() {
-        return getFeignClient().countAll().dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isPresentById(Serializable id) {
-        return getFeignClient().isPresentById(id).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isPresentByColumn(String columnName, Object value) {
-        return getFeignClient().isPresentByColumn(columnName, value).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isPresentByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isAbsentByColumn(String columnName, Object value) {
-        return getFeignClient().isAbsentByColumn(columnName, value).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isAbsentByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfPresentByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfAbsentByCriteria(criteria).dataIfSuccessOrException();
+    @SuppressWarnings("unchecked")
+    default C unSelectColumns(String... selectColumns) {
+        if (ArrayUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().removeAll(CollUtil.toList(selectColumns));
+        }
+        return (C) this;
     }
 
 }

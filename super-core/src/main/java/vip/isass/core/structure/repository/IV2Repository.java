@@ -167,185 +167,153 @@
  *
  */
 
-package vip.isass.core.web.rpc.feign;
+package vip.isass.core.structure.repository;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.springframework.core.Ordered;
-import vip.isass.core.structure.service.IV2Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
-import vip.isass.core.support.api.ApiOrder;
+import vip.isass.core.entity.IdEntity;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>> extends IV2Service<E, C>, Ordered {
+/**
+ * @author Rain
+ */
+public interface IV2Repository<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> {
 
-    IV2FeignClient<E, C> getFeignClient();
+    Logger LOGGER = LoggerFactory.getLogger(IV2Repository.class);
 
-    @Override
-    default int getOrder() {
-        return ApiOrder.FEIGN_SERVICE;
+    Map<Class<?>, String> ID_COLUMN_NAMES = new ConcurrentHashMap<>(64);
+
+    default String getColumnName(Class<?> clazz) {
+        return ID_COLUMN_NAMES.computeIfAbsent(clazz, c -> {
+            if (IV2Entity.class.isAssignableFrom(c)) {
+                IV2Entity entity = null;
+                try {
+                    entity = (IV2Entity) c.newInstance();
+                } catch (Exception e) {
+                    LOGGER.error("{}", e.getMessage(), e);
+                }
+                return StrUtil.nullToEmpty(entity.getIdColumnName());
+            }
+            return "";
+        });
     }
 
-    // region 增
+    // ****************************** 增 start ******************************
 
-    @Override
-    default E add(E entity) {
-        return getFeignClient().add(entity).dataIfSuccessOrException();
+    default boolean add(E entity) {
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities) {
-        return getFeignClient().addBatch(entities).dataIfSuccessOrException();
+    default boolean addBatch(Collection<E> entities) {
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        return getFeignClient().addBatch(entities, batchSize).dataIfSuccessOrException();
+    default boolean addBatch(Collection<E> entities, int batchSize) {
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().addIfAbsent(entity, criteria).dataIfSuccessOrException();
+    default E addOrUpdate(E entity, List<String> uniqueColumns) {
+        throw new UnsupportedOperationException();
     }
 
-    // endregion
+    // ****************************** 删 start ******************************
 
-    //  region 删
-
-    @Override
-    default Boolean deleteById(Serializable id) {
-        return getFeignClient().deleteById(id).dataIfSuccessOrException();
+    default boolean deleteById(Serializable id) {
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    default Boolean deleteByIds(Collection<? extends Serializable> ids) {
-        return getFeignClient().deleteByIds(ids).dataIfSuccessOrException();
+    default boolean deleteByIds(Collection<? extends Serializable> ids) {
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().deleteByCriteria(criteria).dataIfSuccessOrException();
+    default boolean deleteByCriteria(ICriteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
     }
 
-    // endregion
+    //****************************** 改 start ******************************
 
-    // region 改
-
-    @Override
-    default Boolean updateById(E entity) {
-        return getFeignClient().updateById(entity).dataIfSuccessOrException();
+    default boolean updateEntityById(E entity) {
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    default Boolean updateEntityById(E entity) {
-        return getFeignClient().updateEntityById(entity).dataIfSuccessOrException();
+    default boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    default void updateByIdOrException(E entity) {
-        getFeignClient().updateByIdOrException(entity).dataIfSuccessOrException();
+    // ****************************** 查 start ******************************
+
+    default E getEntityById(Serializable id) {
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().updateByCriteria(entity, criteria).dataIfSuccessOrException();
-    }
-
-    @Override
-    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
-        getFeignClient().updateByCriteriaOrException(entity, criteria).dataIfSuccessOrException();
-    }
-
-    // endregion
-
-    //  region 查
-
-    @Override
-    default E getById(Serializable id) {
-        return getFeignClient().getById(id).dataIfSuccessOrException();
-    }
-
-    @Override
     default E getByIdOrException(Serializable id) {
-        return getFeignClient().getByIdOrException(id).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default E getByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteria(criteria).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrWarn(criteria).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrException(criteria).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findByCriteria(criteria).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findPageByCriteria(criteria).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default List<E> findAll() {
-        return getFeignClient().findAll().dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default Integer countByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().countByCriteria(criteria).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default Integer countAll() {
-        return getFeignClient().countAll().dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default boolean isPresentById(Serializable id) {
-        return getFeignClient().isPresentById(id).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default boolean isPresentByColumn(String columnName, Object value) {
-        return getFeignClient().isPresentByColumn(columnName, value).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isPresentByCriteria(criteria).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    default boolean isAbsentByColumn(String columnName, Object value) {
-        return getFeignClient().isAbsentByColumn(columnName, value).dataIfSuccessOrException();
-    }
-
-    @Override
-    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isAbsentByCriteria(criteria).dataIfSuccessOrException();
-    }
-
-    @Override
     default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfPresentByCriteria(criteria).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfAbsentByCriteria(criteria).dataIfSuccessOrException();
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean addIfAbsent(E entity, List<String> uniqueColumns) {
+        throw new UnsupportedOperationException();
     }
 
 }

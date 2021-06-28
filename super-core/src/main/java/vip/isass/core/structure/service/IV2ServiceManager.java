@@ -167,185 +167,204 @@
  *
  */
 
-package vip.isass.core.web.rpc.feign;
+package vip.isass.core.structure.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.springframework.core.Ordered;
-import vip.isass.core.structure.service.IV2Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
-import vip.isass.core.support.api.ApiOrder;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>> extends IV2Service<E, C>, Ordered {
+public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria<E, C>, S extends IV2Service<E, C>>
+    extends IV2Service<E, C> {
 
-    IV2FeignClient<E, C> getFeignClient();
+    Logger LOGGER = LoggerFactory.getLogger(IV2ServiceManager.class);
 
-    @Override
-    default int getOrder() {
-        return ApiOrder.FEIGN_SERVICE;
-    }
+    List<S> getServices();
 
     // region 增
 
-    @Override
     default E add(E entity) {
-        return getFeignClient().add(entity).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.add(entity));
     }
 
-    @Override
     default Collection<E> addBatch(Collection<E> entities) {
-        return getFeignClient().addBatch(entities).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.addBatch(entities));
     }
 
-    @Override
     default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        return getFeignClient().addBatch(entities, batchSize).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.addBatch(entities, batchSize));
     }
 
-    @Override
     default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().addIfAbsent(entity, criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.addIfAbsent(entity, criteria));
     }
 
     // endregion
 
     //  region 删
 
-    @Override
     default Boolean deleteById(Serializable id) {
-        return getFeignClient().deleteById(id).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.deleteById(id));
     }
 
-    @Override
     default Boolean deleteByIds(Collection<? extends Serializable> ids) {
-        return getFeignClient().deleteByIds(ids).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.deleteByIds(ids));
     }
 
-    @Override
     default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().deleteByCriteria(criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.deleteByCriteria(criteria));
     }
 
     // endregion
 
     // region 改
 
-    @Override
     default Boolean updateById(E entity) {
-        return getFeignClient().updateById(entity).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.updateById(entity));
     }
 
-    @Override
     default Boolean updateEntityById(E entity) {
-        return getFeignClient().updateEntityById(entity).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.updateEntityById(entity));
     }
 
-    @Override
     default void updateByIdOrException(E entity) {
-        getFeignClient().updateByIdOrException(entity).dataIfSuccessOrException();
+        consume(s -> s.updateByIdOrException(entity));
     }
 
-    @Override
     default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().updateByCriteria(entity, criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.updateByCriteria(entity, criteria));
     }
 
-    @Override
     default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
-        getFeignClient().updateByCriteriaOrException(entity, criteria).dataIfSuccessOrException();
+        consume(s -> s.updateByCriteriaOrException(entity, criteria));
     }
 
     // endregion
 
     //  region 查
 
-    @Override
     default E getById(Serializable id) {
-        return getFeignClient().getById(id).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.getById(id));
     }
 
-    @Override
     default E getByIdOrException(Serializable id) {
-        return getFeignClient().getByIdOrException(id).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.getByIdOrException(id));
     }
 
-    @Override
     default E getByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteria(criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.getByCriteria(criteria));
     }
 
-    @Override
     default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrWarn(criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.getByCriteriaOrWarn(criteria));
     }
 
-    @Override
     default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrException(criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.getByCriteriaOrException(criteria));
     }
 
-    @Override
     default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findByCriteria(criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.findByCriteria(criteria));
     }
 
-    @Override
     default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findPageByCriteria(criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.findPageByCriteria(criteria));
     }
 
-    @Override
     default List<E> findAll() {
-        return getFeignClient().findAll().dataIfSuccessOrException();
+        return applyUntilNotNull(IV2Service::findAll);
     }
 
-    @Override
     default Integer countByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().countByCriteria(criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.countByCriteria(criteria));
     }
 
-    @Override
     default Integer countAll() {
-        return getFeignClient().countAll().dataIfSuccessOrException();
+        return applyUntilNotNull(IV2Service::countAll);
     }
 
-    @Override
     default boolean isPresentById(Serializable id) {
-        return getFeignClient().isPresentById(id).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.isPresentById(id));
     }
 
-    @Override
     default boolean isPresentByColumn(String columnName, Object value) {
-        return getFeignClient().isPresentByColumn(columnName, value).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.isPresentByColumn(columnName, value));
     }
 
-    @Override
     default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isPresentByCriteria(criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.isPresentByCriteria(criteria));
     }
 
-    @Override
     default boolean isAbsentByColumn(String columnName, Object value) {
-        return getFeignClient().isAbsentByColumn(columnName, value).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.isAbsentByColumn(columnName, value));
     }
 
-    @Override
     default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isAbsentByCriteria(criteria).dataIfSuccessOrException();
+        return applyUntilNotNull(s -> s.isAbsentByCriteria(criteria));
     }
 
-    @Override
     default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfPresentByCriteria(criteria).dataIfSuccessOrException();
+        consume(s -> s.exceptionIfPresentByCriteria(criteria));
     }
 
-    @Override
     default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfAbsentByCriteria(criteria).dataIfSuccessOrException();
+        consume(s -> s.exceptionIfAbsentByCriteria(criteria));
     }
+
+    // endregion
+
+    // region util
+
+    default <V> V applyUntilNotNull(Function<S, V> function) {
+        checkServices();
+
+        for (S service : getServices()) {
+            V value = function.apply(service);
+            if (value != null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    default void consume(Consumer<S> consumer) {
+        checkServices();
+
+        for (S service : getServices()) {
+            consumer.accept(service);
+            return;
+        }
+    }
+
+    default void consumeWithoutException(Consumer<S> consumer) {
+        checkServices();
+
+        for (S service : getServices()) {
+            try {
+                consumer.accept(service);
+                return;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    default void checkServices() {
+        if (getServices() == null) {
+            throw new UnsupportedOperationException(
+                StrUtil.format("当前服务没有[{}]的实现类", this.getClass().getSimpleName()));
+        }
+    }
+
+    // endregion
 
 }

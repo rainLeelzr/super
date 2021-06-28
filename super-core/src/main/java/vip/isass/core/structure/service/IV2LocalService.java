@@ -167,185 +167,159 @@
  *
  */
 
-package vip.isass.core.web.rpc.feign;
+package vip.isass.core.structure.service;
 
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.springframework.core.Ordered;
-import vip.isass.core.structure.service.IV2Service;
 import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
-import vip.isass.core.support.api.ApiOrder;
+import vip.isass.core.exception.AbsentException;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
+import vip.isass.core.structure.repository.IV2Repository;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>> extends IV2Service<E, C>, Ordered {
+/**
+ * @author rain
+ */
+public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
+    extends IV2Service<E, C> {
 
-    IV2FeignClient<E, C> getFeignClient();
+    IV2Repository<E, C> getMpRepository();
 
-    @Override
-    default int getOrder() {
-        return ApiOrder.FEIGN_SERVICE;
-    }
-
-    // region 增
-
-    @Override
+    // ****************************** 增 start ******************************
     default E add(E entity) {
-        return getFeignClient().add(entity).dataIfSuccessOrException();
+        getMpRepository().add(entity);
+        return entity;
     }
 
-    @Override
     default Collection<E> addBatch(Collection<E> entities) {
-        return getFeignClient().addBatch(entities).dataIfSuccessOrException();
+        getMpRepository().addBatch(entities);
+        return entities;
     }
 
-    @Override
     default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        return getFeignClient().addBatch(entities, batchSize).dataIfSuccessOrException();
+        getMpRepository().addBatch(entities, batchSize);
+        return entities;
     }
 
-    @Override
     default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().addIfAbsent(entity, criteria).dataIfSuccessOrException();
+        if (this.isAbsentByCriteria(criteria)) {
+            return this.add(entity);
+        }
+        return null;
     }
 
-    // endregion
+    // ****************************** 删 start ******************************
 
-    //  region 删
-
-    @Override
     default Boolean deleteById(Serializable id) {
-        return getFeignClient().deleteById(id).dataIfSuccessOrException();
+        return getMpRepository().deleteById(id);
     }
 
-    @Override
     default Boolean deleteByIds(Collection<? extends Serializable> ids) {
-        return getFeignClient().deleteByIds(ids).dataIfSuccessOrException();
+        return getMpRepository().deleteByIds(ids);
     }
 
-    @Override
     default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().deleteByCriteria(criteria).dataIfSuccessOrException();
+        return getMpRepository().deleteByCriteria(criteria);
     }
 
-    // endregion
-
-    // region 改
-
-    @Override
+    //****************************** 改 start ******************************
     default Boolean updateById(E entity) {
-        return getFeignClient().updateById(entity).dataIfSuccessOrException();
+        return updateEntityById(entity);
     }
 
-    @Override
     default Boolean updateEntityById(E entity) {
-        return getFeignClient().updateEntityById(entity).dataIfSuccessOrException();
+        return getMpRepository().updateEntityById(entity);
     }
 
-    @Override
     default void updateByIdOrException(E entity) {
-        getFeignClient().updateByIdOrException(entity).dataIfSuccessOrException();
+        if (!updateEntityById(entity)) {
+            throw new AbsentException("更新失败，记录不存在");
+        }
     }
 
-    @Override
     default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
-        return getFeignClient().updateByCriteria(entity, criteria).dataIfSuccessOrException();
+        return getMpRepository().updateByCriteria(entity, criteria);
     }
 
-    @Override
     default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
-        getFeignClient().updateByCriteriaOrException(entity, criteria).dataIfSuccessOrException();
+        if (!getMpRepository().updateByCriteria(entity, criteria)) {
+            throw new AbsentException("更新失败，记录不存在");
+        }
     }
 
-    // endregion
-
-    //  region 查
-
-    @Override
+    // ****************************** 查 start ******************************
     default E getById(Serializable id) {
-        return getFeignClient().getById(id).dataIfSuccessOrException();
+        Assert.notNull(id, "id");
+        return getMpRepository().getEntityById(id);
     }
 
-    @Override
     default E getByIdOrException(Serializable id) {
-        return getFeignClient().getByIdOrException(id).dataIfSuccessOrException();
+        Assert.notNull(id, "id");
+        return getMpRepository().getByIdOrException(id);
     }
 
-    @Override
     default E getByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteria(criteria).dataIfSuccessOrException();
+        return getMpRepository().getByCriteria(criteria);
     }
 
-    @Override
     default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrWarn(criteria).dataIfSuccessOrException();
+        return getMpRepository().getByCriteriaOrWarn(criteria);
     }
 
-    @Override
     default E getByCriteriaOrException(ICriteria<E, C> criteria) {
-        return getFeignClient().getByCriteriaOrException(criteria).dataIfSuccessOrException();
+        return getMpRepository().getByCriteriaOrException(criteria);
     }
 
-    @Override
     default List<E> findByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findByCriteria(criteria).dataIfSuccessOrException();
+        return getMpRepository().findByCriteria(criteria);
     }
 
-    @Override
     default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().findPageByCriteria(criteria).dataIfSuccessOrException();
+        return getMpRepository().findPageByCriteria(criteria);
     }
 
-    @Override
     default List<E> findAll() {
-        return getFeignClient().findAll().dataIfSuccessOrException();
+        return getMpRepository().findAll();
     }
 
-    @Override
     default Integer countByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().countByCriteria(criteria).dataIfSuccessOrException();
+        return getMpRepository().countByCriteria(criteria);
     }
 
-    @Override
     default Integer countAll() {
-        return getFeignClient().countAll().dataIfSuccessOrException();
+        return getMpRepository().countAll();
     }
 
-    @Override
     default boolean isPresentById(Serializable id) {
-        return getFeignClient().isPresentById(id).dataIfSuccessOrException();
+        return getMpRepository().isPresentById(id);
     }
 
-    @Override
     default boolean isPresentByColumn(String columnName, Object value) {
-        return getFeignClient().isPresentByColumn(columnName, value).dataIfSuccessOrException();
+        return getMpRepository().isPresentByColumn(columnName, value);
     }
 
-    @Override
     default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isPresentByCriteria(criteria).dataIfSuccessOrException();
+        return getMpRepository().isPresentByCriteria(criteria);
     }
 
-    @Override
     default boolean isAbsentByColumn(String columnName, Object value) {
-        return getFeignClient().isAbsentByColumn(columnName, value).dataIfSuccessOrException();
+        return !isPresentByColumn(columnName, value);
     }
 
-    @Override
     default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
-        return getFeignClient().isAbsentByCriteria(criteria).dataIfSuccessOrException();
+        return !isPresentByCriteria(criteria);
     }
 
-    @Override
     default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfPresentByCriteria(criteria).dataIfSuccessOrException();
+        getMpRepository().exceptionIfPresentByCriteria(criteria);
     }
 
-    @Override
     default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
-        getFeignClient().exceptionIfAbsentByCriteria(criteria).dataIfSuccessOrException();
+        getMpRepository().exceptionIfAbsentByCriteria(criteria);
     }
 
 }
