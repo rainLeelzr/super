@@ -167,15 +167,17 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+package vip.isass.core.structure.entity;
 
 /**
- * @author rain
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2DbEntity<E extends IV2Entity<E>, EDB extends IV2DbEntity<E, EDB>>
+    extends IV2Entity<E> {
+
+    @SuppressWarnings("unchecked")
+    default E convertToEntity() {
+        return V2DbEntityConvert.convertToEntity((EDB) this);
+    }
 
 }

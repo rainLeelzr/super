@@ -173,7 +173,6 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vip.isass.core.criteria.ICriteria;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
 
@@ -204,7 +203,7 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.addBatch(entities, batchSize));
     }
 
-    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
+    default E addIfAbsent(E entity, IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.addIfAbsent(entity, criteria));
     }
 
@@ -220,7 +219,7 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.deleteByIds(ids));
     }
 
-    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
+    default Boolean deleteByCriteria(IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.deleteByCriteria(criteria));
     }
 
@@ -240,11 +239,11 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         consume(s -> s.updateByIdOrException(entity));
     }
 
-    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
+    default Boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.updateByCriteria(entity, criteria));
     }
 
-    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
+    default void updateByCriteriaOrException(E entity, IV2Criteria<E, C> criteria) {
         consume(s -> s.updateByCriteriaOrException(entity, criteria));
     }
 
@@ -260,23 +259,23 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.getByIdOrException(id));
     }
 
-    default E getByCriteria(ICriteria<E, C> criteria) {
+    default E getByCriteria(IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.getByCriteria(criteria));
     }
 
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
+    default E getByCriteriaOrWarn(IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.getByCriteriaOrWarn(criteria));
     }
 
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
+    default E getByCriteriaOrException(IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.getByCriteriaOrException(criteria));
     }
 
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
+    default List<E> findByCriteria(IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.findByCriteria(criteria));
     }
 
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
+    default IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.findPageByCriteria(criteria));
     }
 
@@ -284,7 +283,7 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(IV2Service::findAll);
     }
 
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
+    default Integer countByCriteria(IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.countByCriteria(criteria));
     }
 
@@ -300,7 +299,7 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.isPresentByColumn(columnName, value));
     }
 
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
+    default boolean isPresentByCriteria(IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.isPresentByCriteria(criteria));
     }
 
@@ -308,15 +307,15 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.isAbsentByColumn(columnName, value));
     }
 
-    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
+    default boolean isAbsentByCriteria(IV2Criteria<E, C> criteria) {
         return applyUntilNotNull(s -> s.isAbsentByCriteria(criteria));
     }
 
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
+    default void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria) {
         consume(s -> s.exceptionIfPresentByCriteria(criteria));
     }
 
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
+    default void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria) {
         consume(s -> s.exceptionIfAbsentByCriteria(criteria));
     }
 

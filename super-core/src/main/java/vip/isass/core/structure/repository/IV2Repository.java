@@ -173,10 +173,9 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IdEntity;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
+import vip.isass.core.structure.entity.IV2IdEntity;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -193,12 +192,12 @@ public interface IV2Repository<E extends IV2Entity<E>, C extends IV2Criteria<E, 
 
     Map<Class<?>, String> ID_COLUMN_NAMES = new ConcurrentHashMap<>(64);
 
-    default String getColumnName(Class<?> clazz) {
+    default String getIdColumnName(Class<?> clazz) {
         return ID_COLUMN_NAMES.computeIfAbsent(clazz, c -> {
-            if (IV2Entity.class.isAssignableFrom(c)) {
-                IV2Entity entity = null;
+            if (IV2IdEntity.class.isAssignableFrom(c)) {
+                IV2IdEntity entity = null;
                 try {
-                    entity = (IV2Entity) c.newInstance();
+                    entity = (IV2IdEntity) c.newInstance();
                 } catch (Exception e) {
                     LOGGER.error("{}", e.getMessage(), e);
                 }
@@ -236,7 +235,7 @@ public interface IV2Repository<E extends IV2Entity<E>, C extends IV2Criteria<E, 
         throw new UnsupportedOperationException();
     }
 
-    default boolean deleteByCriteria(ICriteria<E, C> criteria) {
+    default boolean deleteByCriteria(IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 
@@ -246,7 +245,7 @@ public interface IV2Repository<E extends IV2Entity<E>, C extends IV2Criteria<E, 
         throw new UnsupportedOperationException();
     }
 
-    default boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
+    default boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 
@@ -260,23 +259,23 @@ public interface IV2Repository<E extends IV2Entity<E>, C extends IV2Criteria<E, 
         throw new UnsupportedOperationException();
     }
 
-    default E getByCriteria(ICriteria<E, C> criteria) {
+    default E getByCriteria(IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
+    default E getByCriteriaOrWarn(IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
+    default E getByCriteriaOrException(IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
+    default List<E> findByCriteria(IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
+    default IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 
@@ -284,7 +283,7 @@ public interface IV2Repository<E extends IV2Entity<E>, C extends IV2Criteria<E, 
         throw new UnsupportedOperationException();
     }
 
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
+    default Integer countByCriteria(IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 
@@ -300,15 +299,15 @@ public interface IV2Repository<E extends IV2Entity<E>, C extends IV2Criteria<E, 
         throw new UnsupportedOperationException();
     }
 
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
+    default boolean isPresentByCriteria(IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
+    default void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
+    default void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria) {
         throw new UnsupportedOperationException();
     }
 

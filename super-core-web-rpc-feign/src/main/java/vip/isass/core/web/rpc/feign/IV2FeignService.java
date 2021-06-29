@@ -171,16 +171,17 @@ package vip.isass.core.web.rpc.feign;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.core.Ordered;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
 import vip.isass.core.structure.service.IV2Service;
-import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
 import vip.isass.core.support.api.ApiOrder;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>> extends IV2Service<E, C>, Ordered {
+public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
+    extends IV2Service<E, C>, Ordered {
 
     IV2FeignClient<E, C> getFeignClient();
 
@@ -207,7 +208,7 @@ public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>
     }
 
     @Override
-    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
+    default E addIfAbsent(E entity, IV2Criteria<E, C> criteria) {
         return getFeignClient().addIfAbsent(entity, criteria).dataIfSuccessOrException();
     }
 
@@ -226,7 +227,7 @@ public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>
     }
 
     @Override
-    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
+    default Boolean deleteByCriteria(IV2Criteria<E, C> criteria) {
         return getFeignClient().deleteByCriteria(criteria).dataIfSuccessOrException();
     }
 
@@ -250,12 +251,12 @@ public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>
     }
 
     @Override
-    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
+    default Boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria) {
         return getFeignClient().updateByCriteria(entity, criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
+    default void updateByCriteriaOrException(E entity, IV2Criteria<E, C> criteria) {
         getFeignClient().updateByCriteriaOrException(entity, criteria).dataIfSuccessOrException();
     }
 
@@ -274,27 +275,27 @@ public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>
     }
 
     @Override
-    default E getByCriteria(ICriteria<E, C> criteria) {
+    default E getByCriteria(IV2Criteria<E, C> criteria) {
         return getFeignClient().getByCriteria(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
+    default E getByCriteriaOrWarn(IV2Criteria<E, C> criteria) {
         return getFeignClient().getByCriteriaOrWarn(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
+    default E getByCriteriaOrException(IV2Criteria<E, C> criteria) {
         return getFeignClient().getByCriteriaOrException(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
+    default List<E> findByCriteria(IV2Criteria<E, C> criteria) {
         return getFeignClient().findByCriteria(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
+    default IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
         return getFeignClient().findPageByCriteria(criteria).dataIfSuccessOrException();
     }
 
@@ -304,7 +305,7 @@ public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>
     }
 
     @Override
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
+    default Integer countByCriteria(IV2Criteria<E, C> criteria) {
         return getFeignClient().countByCriteria(criteria).dataIfSuccessOrException();
     }
 
@@ -324,7 +325,7 @@ public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>
     }
 
     @Override
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
+    default boolean isPresentByCriteria(IV2Criteria<E, C> criteria) {
         return getFeignClient().isPresentByCriteria(criteria).dataIfSuccessOrException();
     }
 
@@ -334,17 +335,17 @@ public interface IV2FeignService<E extends IEntity<E>, C extends ICriteria<E, C>
     }
 
     @Override
-    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
+    default boolean isAbsentByCriteria(IV2Criteria<E, C> criteria) {
         return getFeignClient().isAbsentByCriteria(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
+    default void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria) {
         getFeignClient().exceptionIfPresentByCriteria(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
+    default void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria) {
         getFeignClient().exceptionIfAbsentByCriteria(criteria).dataIfSuccessOrException();
     }
 

@@ -167,15 +167,175 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.database.mybatisplus.plus;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import vip.isass.core.criteria.IPageCriteria;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.criteria.V2WhereCondition;
+import vip.isass.core.structure.criteria.type.IV2SelectColumnCriteria;
+import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
+import vip.isass.core.structure.entity.IV2DbEntity;
+import vip.isass.core.structure.entity.IV2Entity;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * @author rain
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public class V2WrapperUtil {
+
+    /**
+     * 返回 queryWrapper
+     *
+     * @param <C>      criteria
+     * @param <E>      entity
+     * @param criteria criteria
+     * @return query wrapper
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <
+        E extends IV2Entity<E>,
+        C extends IV2Criteria<E, C>> QueryWrapper<E> getQueryWrapper(IV2Criteria<E, C> criteria) {
+        QueryWrapper<E> wrapper = new QueryWrapper<>();
+
+        if (criteria instanceof IV2SelectColumnCriteria) {
+            processSelectColumnsCriteria(wrapper, (IV2SelectColumnCriteria) criteria);
+        }
+
+        if (criteria instanceof IV2WhereConditionCriteria) {
+            processWhereConditionCriteria(wrapper, (IV2WhereConditionCriteria) criteria);
+        }
+
+        if (criteria instanceof IPageCriteria) {
+            processPageCriteria(wrapper, (IPageCriteria) criteria);
+        }
+
+        return wrapper;
+    }
+
+    public static <
+        E extends IV2Entity<E>,
+        EDB extends IV2DbEntity<E, EDB>,
+        C extends IV2Criteria<E, C>> QueryWrapper<EDB> getEdbQueryWrapper(IV2Criteria<E, C> criteria) {
+        return getEdbQueryWrapper(criteria, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <
+        E extends IV2Entity<E>,
+        EDB extends IV2DbEntity<E, EDB>,
+        C extends IV2Criteria<E, C>> QueryWrapper<EDB> getEdbQueryWrapper(IV2Criteria<E, C> criteria, Class<EDB> edbClass) {
+        return (QueryWrapper<EDB>) getQueryWrapper(criteria);
+    }
+
+//    @SuppressWarnings({"unchecked", "rawtypes"})
+//    public static <
+//        E extends IV2Entity<E>,
+//        EDB extends IV2DbEntity<E, EDB>,
+//        C extends IV2Criteria<E, C>> UpdateWrapper<EDB> getEdbUpdateWrapper(IV2Criteria<E, C> criteria) {
+//        UpdateWrapper<EDB> wrapper = new UpdateWrapper<>();
+//
+//        if (criteria instanceof IV2WhereConditionCriteria) {
+//            processWhereConditionCriteria(wrapper, (IV2WhereConditionCriteria) criteria);
+//        }
+//
+//        return wrapper;
+//    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <E extends IV2Entity<E>, C extends IV2Criteria<E, C>> UpdateWrapper<E> getUpdateWrapper(IV2Criteria<E, C> criteria) {
+        UpdateWrapper<E> wrapper = new UpdateWrapper<>();
+
+        if (criteria instanceof IV2WhereConditionCriteria) {
+            processWhereConditionCriteria(wrapper, (IV2WhereConditionCriteria) criteria);
+        }
+
+        return wrapper;
+    }
+
+    private static <
+        E extends IV2Entity<E>,
+        C extends IV2SelectColumnCriteria<E, C>>
+    void processSelectColumnsCriteria(QueryWrapper<E> wrapper, IV2SelectColumnCriteria<E, C> selectColumnCriteria) {
+        Collection<String> selectColumns = selectColumnCriteria.getSelectColumns();
+        if (CollUtil.isNotEmpty(selectColumns)) {
+            wrapper.select(CollUtil.join(selectColumns, ", "));
+        }
+    }
+
+    private static <
+        E extends IV2Entity<E>,
+        C extends IV2WhereConditionCriteria<E, C>>
+    void processWhereConditionCriteria(AbstractWrapper<E, String, ?> wrapper, IV2WhereConditionCriteria<E, C> whereConditionCriteria) {
+        List<V2WhereCondition> whereConditions = whereConditionCriteria.getWhereConditions();
+        if (CollUtil.isNotEmpty(whereConditions)) {
+            whereConditions.forEach(wc -> V2MybatisPlusWhereCondition.apply(wc, wrapper));
+        }
+    }
+
+    private static <
+        E extends IV2Entity<E>,
+        C extends IPageCriteria<E, C>>
+    void processPageCriteria(AbstractWrapper<E, String, ?> wrapper, IPageCriteria<E, C> pageCriteria) {
+        if (StrUtil.isNotBlank(pageCriteria.getOrderBy())) {
+            List<String> ascList = null;
+            List<String> descList = null;
+
+            String[] split = pageCriteria.getOrderBy().split(StrUtil.COMMA);
+            for (String s : split) {
+                if (StrUtil.isBlank(s)) {
+                    continue;
+                }
+
+                s = s.trim().replaceAll(" +", StrUtil.SPACE);
+                String[] orderByArr = parseOrderBy(s);
+                if (orderByArr == null) {
+                    continue;
+                }
+
+                if (orderByArr.length == 1) {
+                    if (ascList == null) {
+                        ascList = new ArrayList<>(split.length);
+                    }
+                    ascList.add(orderByArr[0]);
+                } else if (orderByArr.length == 2) {
+                    if (IPageCriteria.ASC.equalsIgnoreCase(orderByArr[1])) {
+                        if (ascList == null) {
+                            ascList = new ArrayList<>(split.length);
+                        }
+                        ascList.add(orderByArr[0]);
+                    } else if (IPageCriteria.DESC.equalsIgnoreCase(orderByArr[1])) {
+                        if (descList == null) {
+                            descList = new ArrayList<>(split.length);
+                        }
+                        descList.add(orderByArr[0]);
+                    }
+                }
+            }
+            wrapper.orderByAsc(ascList == null ? null : ArrayUtil.toArray(ascList, String.class));
+            wrapper.orderByDesc(descList == null ? null : ArrayUtil.toArray(descList, String.class));
+        }
+    }
+
+    private static String[] parseOrderBy(String orderBy) {
+        String[] strings = orderBy.split(StrUtil.SPACE);
+        if (strings.length == 0) {
+            return null;
+        }
+
+        if (strings.length == 1) {
+            return new String[]{strings[0]};
+        }
+
+        return new String[]{strings[0], strings[1]};
+    }
 
 }

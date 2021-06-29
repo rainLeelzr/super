@@ -169,11 +169,11 @@
 
 package vip.isass.core.web.rpc.feign;
 
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
 import vip.isass.core.structure.entrypoint.IV2EntryPoint;
-import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
 
-public interface IV2FeignClient<E extends IEntity<E>, C extends ICriteria<E, C>>
+public interface IV2FeignClient<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
     extends IV2EntryPoint<E, C> {
 
 }

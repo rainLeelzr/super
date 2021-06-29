@@ -171,11 +171,12 @@ package vip.isass.core.structure.service;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import vip.isass.core.criteria.ICriteria;
+import org.springframework.core.Ordered;
 import vip.isass.core.exception.AbsentException;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
 import vip.isass.core.structure.repository.IV2Repository;
+import vip.isass.core.support.api.ApiOrder;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -185,9 +186,14 @@ import java.util.List;
  * @author rain
  */
 public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
-    extends IV2Service<E, C> {
+    extends IV2Service<E, C>, Ordered {
 
     IV2Repository<E, C> getMpRepository();
+
+    @Override
+    default int getOrder() {
+        return ApiOrder.LOCAL_SERVICE;
+    }
 
     // ****************************** 增 start ******************************
     default E add(E entity) {
@@ -205,7 +211,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return entities;
     }
 
-    default E addIfAbsent(E entity, ICriteria<E, C> criteria) {
+    default E addIfAbsent(E entity, IV2Criteria<E, C> criteria) {
         if (this.isAbsentByCriteria(criteria)) {
             return this.add(entity);
         }
@@ -222,7 +228,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getMpRepository().deleteByIds(ids);
     }
 
-    default Boolean deleteByCriteria(ICriteria<E, C> criteria) {
+    default Boolean deleteByCriteria(IV2Criteria<E, C> criteria) {
         return getMpRepository().deleteByCriteria(criteria);
     }
 
@@ -241,11 +247,11 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         }
     }
 
-    default Boolean updateByCriteria(E entity, ICriteria<E, C> criteria) {
+    default Boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria) {
         return getMpRepository().updateByCriteria(entity, criteria);
     }
 
-    default void updateByCriteriaOrException(E entity, ICriteria<E, C> criteria) {
+    default void updateByCriteriaOrException(E entity, IV2Criteria<E, C> criteria) {
         if (!getMpRepository().updateByCriteria(entity, criteria)) {
             throw new AbsentException("更新失败，记录不存在");
         }
@@ -262,23 +268,23 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getMpRepository().getByIdOrException(id);
     }
 
-    default E getByCriteria(ICriteria<E, C> criteria) {
+    default E getByCriteria(IV2Criteria<E, C> criteria) {
         return getMpRepository().getByCriteria(criteria);
     }
 
-    default E getByCriteriaOrWarn(ICriteria<E, C> criteria) {
+    default E getByCriteriaOrWarn(IV2Criteria<E, C> criteria) {
         return getMpRepository().getByCriteriaOrWarn(criteria);
     }
 
-    default E getByCriteriaOrException(ICriteria<E, C> criteria) {
+    default E getByCriteriaOrException(IV2Criteria<E, C> criteria) {
         return getMpRepository().getByCriteriaOrException(criteria);
     }
 
-    default List<E> findByCriteria(ICriteria<E, C> criteria) {
+    default List<E> findByCriteria(IV2Criteria<E, C> criteria) {
         return getMpRepository().findByCriteria(criteria);
     }
 
-    default IPage<E> findPageByCriteria(ICriteria<E, C> criteria) {
+    default IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
         return getMpRepository().findPageByCriteria(criteria);
     }
 
@@ -286,7 +292,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getMpRepository().findAll();
     }
 
-    default Integer countByCriteria(ICriteria<E, C> criteria) {
+    default Integer countByCriteria(IV2Criteria<E, C> criteria) {
         return getMpRepository().countByCriteria(criteria);
     }
 
@@ -302,7 +308,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getMpRepository().isPresentByColumn(columnName, value);
     }
 
-    default boolean isPresentByCriteria(ICriteria<E, C> criteria) {
+    default boolean isPresentByCriteria(IV2Criteria<E, C> criteria) {
         return getMpRepository().isPresentByCriteria(criteria);
     }
 
@@ -310,15 +316,15 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return !isPresentByColumn(columnName, value);
     }
 
-    default boolean isAbsentByCriteria(ICriteria<E, C> criteria) {
+    default boolean isAbsentByCriteria(IV2Criteria<E, C> criteria) {
         return !isPresentByCriteria(criteria);
     }
 
-    default void exceptionIfPresentByCriteria(ICriteria<E, C> criteria) {
+    default void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria) {
         getMpRepository().exceptionIfPresentByCriteria(criteria);
     }
 
-    default void exceptionIfAbsentByCriteria(ICriteria<E, C> criteria) {
+    default void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria) {
         getMpRepository().exceptionIfAbsentByCriteria(criteria);
     }
 

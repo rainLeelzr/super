@@ -170,25 +170,24 @@
 package vip.isass.core.structure.entrypoint;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import vip.isass.core.criteria.ICriteria;
-import vip.isass.core.entity.IEntity;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
 import vip.isass.core.web.Resp;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public interface IV2EntryPoint<E extends IEntity<E>, C extends ICriteria<E, C>> {
+public interface IV2EntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> {
 
     // region 增
-
     Resp<E> add(E entity);
 
     Resp<Collection<E>> addBatch(Collection<E> entities);
 
     Resp<Collection<E>> addBatch(Collection<E> entities, int batchSize);
 
-    Resp<E> addIfAbsent(E entity, ICriteria<E, C> criteria);
+    Resp<E> addIfAbsent(E entity, IV2Criteria<E, C> criteria);
 
     // endregion
 
@@ -198,7 +197,7 @@ public interface IV2EntryPoint<E extends IEntity<E>, C extends ICriteria<E, C>> 
 
     Resp<Boolean> deleteByIds(Collection<? extends Serializable> ids);
 
-    Resp<Boolean> deleteByCriteria(ICriteria<E, C> criteria);
+    Resp<Boolean> deleteByCriteria(IV2Criteria<E, C> criteria);
 
     // endregion
 
@@ -210,9 +209,9 @@ public interface IV2EntryPoint<E extends IEntity<E>, C extends ICriteria<E, C>> 
 
     Resp<?> updateByIdOrException(E entity);
 
-    Resp<Boolean> updateByCriteria(E entity, ICriteria<E, C> criteria);
+    Resp<Boolean> updateByCriteria(E entity, IV2Criteria<E, C> criteria);
 
-    Resp<?> updateByCriteriaOrException(E entity, ICriteria<E, C> criteria);
+    Resp<?> updateByCriteriaOrException(E entity, IV2Criteria<E, C> criteria);
 
     // endregion
 
@@ -222,19 +221,19 @@ public interface IV2EntryPoint<E extends IEntity<E>, C extends ICriteria<E, C>> 
 
     Resp<E> getByIdOrException(Serializable id);
 
-    Resp<E> getByCriteria(ICriteria<E, C> criteria);
+    Resp<E> getByCriteria(IV2Criteria<E, C> criteria);
 
-    Resp<E> getByCriteriaOrWarn(ICriteria<E, C> criteria);
+    Resp<E> getByCriteriaOrWarn(IV2Criteria<E, C> criteria);
 
-    Resp<E> getByCriteriaOrException(ICriteria<E, C> criteria);
+    Resp<E> getByCriteriaOrException(IV2Criteria<E, C> criteria);
 
-    Resp<List<E>> findByCriteria(ICriteria<E, C> criteria);
+    Resp<List<E>> findByCriteria(IV2Criteria<E, C> criteria);
 
-    Resp<IPage<E>> findPageByCriteria(ICriteria<E, C> criteria);
+    Resp<IPage<E>> findPageByCriteria(IV2Criteria<E, C> criteria);
 
     Resp<List<E>> findAll();
 
-    Resp<Integer> countByCriteria(ICriteria<E, C> criteria);
+    Resp<Integer> countByCriteria(IV2Criteria<E, C> criteria);
 
     Resp<Integer> countAll();
 
@@ -242,15 +241,15 @@ public interface IV2EntryPoint<E extends IEntity<E>, C extends ICriteria<E, C>> 
 
     Resp<Boolean> isPresentByColumn(String columnName, Object value);
 
-    Resp<Boolean> isPresentByCriteria(ICriteria<E, C> criteria);
+    Resp<Boolean> isPresentByCriteria(IV2Criteria<E, C> criteria);
 
     Resp<Boolean> isAbsentByColumn(String columnName, Object value);
 
-    Resp<Boolean> isAbsentByCriteria(ICriteria<E, C> criteria);
+    Resp<Boolean> isAbsentByCriteria(IV2Criteria<E, C> criteria);
 
-    Resp<?> exceptionIfPresentByCriteria(ICriteria<E, C> criteria);
+    Resp<?> exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria);
 
-    Resp<?> exceptionIfAbsentByCriteria(ICriteria<E, C> criteria);
+    Resp<?> exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria);
 
     // endregion
 

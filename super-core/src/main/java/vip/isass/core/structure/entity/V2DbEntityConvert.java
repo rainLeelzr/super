@@ -167,15 +167,104 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.StrUtil;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import vip.isass.core.support.IsassConfig;
+
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
- * @author rain
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+@Slf4j
+@Component
+public class V2DbEntityConvert {
+
+    private static String packageName;
+
+    @Resource
+    public void setPackageName(@Value("${info.package:}") String packageName) {
+        V2DbEntityConvert.packageName = packageName;
+    }
+
+    // key: entity; value: dbEntity
+    private static final Map<Class<?>, Class<?>> DB_ENTITY_MAP = new ConcurrentHashMap<>();
+
+    /**
+     * 把 entity 转换为 dbEntity
+     *
+     * @param <E>    entity
+     * @param <EDB>  db entity
+     * @param entity entity
+     * @return db entity
+     */
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
+    public static <E extends IV2Entity<E>, EDB extends IV2DbEntity<E, EDB>> EDB convertToDbEntity(E entity) {
+        if (entity == null || entity instanceof IV2DbEntity) {
+            return (EDB) entity;
+        }
+
+        Class<EDB> dbEntityClass = (Class<EDB>) getDbEntityClass(entity.getClass());
+        if (dbEntityClass == null) {
+            throw new UnsupportedOperationException(StrUtil.format("entity[{}]没有DbEntity的子类实现", entity.getClass().getName()));
+        }
+
+        return BeanUtil.copyProperties(entity, dbEntityClass);
+        //        return CglibUtil.copy(entity, dbEntityClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <E extends IV2Entity<E>, EDB extends IV2DbEntity<E, EDB>> E convertToEntity(EDB entity) {
+        return (E) entity;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <E extends IV2Entity<E>, EDB extends IV2DbEntity<E, EDB>> List<EDB> convertToEdbEntities(Collection<E> entities) {
+        List<EDB> edbEntities = new ArrayList<>(entities.size());
+        for (E entity : entities) {
+            if (entity instanceof IV2DbEntity) {
+                edbEntities.add((EDB) entity);
+            } else {
+                edbEntities.add(convertToDbEntity(entity));
+            }
+        }
+        return edbEntities;
+    }
+
+    public static <E extends IV2Entity<E>, EDB extends IV2DbEntity<E, EDB>> List<E> convertToEntities(Collection<EDB> entities) {
+        return entities == null
+            ? null
+            : entities.stream()
+            .map(V2DbEntityConvert::convertToEntity)
+            .collect(Collectors.toList());
+    }
+
+    public static Class<?> getDbEntityClass(Class<?> entityClass) {
+        return DB_ENTITY_MAP.computeIfAbsent(entityClass, (k) -> {
+            Set<Class<?>> classes = ClassUtil.scanPackageBySuper(IsassConfig.PACKAGE_NAME, entityClass);
+            if (classes.isEmpty()) {
+                if (StrUtil.isNotBlank(packageName) && !IsassConfig.PACKAGE_NAME.equals(packageName)) {
+                    classes = ClassUtil.scanPackageBySuper(packageName, entityClass);
+                } else {
+                    log.warn("没有配置info.package，db 实体映射可能失败");
+                }
+            }
+            return classes.stream()
+                .filter(IV2DbEntity.class::isAssignableFrom)
+                .findFirst()
+                .orElse(null);
+        });
+    }
 
 }
