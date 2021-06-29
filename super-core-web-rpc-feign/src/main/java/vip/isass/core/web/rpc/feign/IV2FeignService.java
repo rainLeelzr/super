@@ -180,10 +180,13 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
-    extends IV2Service<E, C>, Ordered {
+public interface IV2FeignService<
+    E extends IV2Entity<E>,
+    C extends IV2Criteria<E, C>,
+    F extends IV2FeignClient<E, C>
+    > extends IV2Service<E, C>, Ordered {
 
-    IV2FeignClient<E, C> getFeignClient();
+    F getFeignClient();
 
     @Override
     default int getOrder() {
@@ -208,7 +211,7 @@ public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default E addIfAbsent(E entity, IV2Criteria<E, C> criteria) {
+    default E addIfAbsent(E entity, C criteria) {
         return getFeignClient().addIfAbsent(entity, criteria).dataIfSuccessOrException();
     }
 
@@ -242,7 +245,7 @@ public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default Boolean deleteByCriteria(IV2Criteria<E, C> criteria) {
+    default Boolean deleteByCriteria(C criteria) {
         return getFeignClient().deleteByCriteria(criteria).dataIfSuccessOrException();
     }
 
@@ -266,12 +269,12 @@ public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default Boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria) {
+    default Boolean updateByCriteria(E entity, C criteria) {
         return getFeignClient().updateByCriteria(entity, criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default void updateByCriteriaOrException(E entity, IV2Criteria<E, C> criteria) {
+    default void updateByCriteriaOrException(E entity, C criteria) {
         getFeignClient().updateByCriteriaOrException(entity, criteria).dataIfSuccessOrException();
     }
 
@@ -290,27 +293,27 @@ public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default E getByCriteria(IV2Criteria<E, C> criteria) {
+    default E getByCriteria(C criteria) {
         return getFeignClient().getByCriteria(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default E getByCriteriaOrWarn(IV2Criteria<E, C> criteria) {
+    default E getByCriteriaOrWarn(C criteria) {
         return getFeignClient().getByCriteriaOrWarn(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default E getByCriteriaOrException(IV2Criteria<E, C> criteria) {
+    default E getByCriteriaOrException(C criteria) {
         return getFeignClient().getByCriteriaOrException(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default List<E> findByCriteria(IV2Criteria<E, C> criteria) {
+    default List<E> findByCriteria(C criteria) {
         return getFeignClient().findByCriteria(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
+    default IPage<E> findPageByCriteria(C criteria) {
         return getFeignClient().findPageByCriteria(criteria).dataIfSuccessOrException();
     }
 
@@ -320,7 +323,7 @@ public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default Integer countByCriteria(IV2Criteria<E, C> criteria) {
+    default Integer countByCriteria(C criteria) {
         return getFeignClient().countByCriteria(criteria).dataIfSuccessOrException();
     }
 
@@ -340,7 +343,7 @@ public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default boolean isPresentByCriteria(IV2Criteria<E, C> criteria) {
+    default boolean isPresentByCriteria(C criteria) {
         return getFeignClient().isPresentByCriteria(criteria).dataIfSuccessOrException();
     }
 
@@ -350,17 +353,17 @@ public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default boolean isAbsentByCriteria(IV2Criteria<E, C> criteria) {
+    default boolean isAbsentByCriteria(C criteria) {
         return getFeignClient().isAbsentByCriteria(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria) {
+    default void exceptionIfPresentByCriteria(C criteria) {
         getFeignClient().exceptionIfPresentByCriteria(criteria).dataIfSuccessOrException();
     }
 
     @Override
-    default void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria) {
+    default void exceptionIfAbsentByCriteria(C criteria) {
         getFeignClient().exceptionIfAbsentByCriteria(criteria).dataIfSuccessOrException();
     }
 

@@ -187,7 +187,7 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     Collection<E> addBatch(Collection<E> entities, int batchSize);
 
-    E addIfAbsent(E entity, IV2Criteria<E, C> criteria);
+    E addIfAbsent(E entity, C criteria);
 
     Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns);
 
@@ -203,7 +203,7 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     Boolean deleteByIds(Collection<? extends Serializable> ids);
 
-    Boolean deleteByCriteria(IV2Criteria<E, C> criteria);
+    Boolean deleteByCriteria(C criteria);
 
     // endregion
 
@@ -215,9 +215,9 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     void updateByIdOrException(E entity);
 
-    Boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria);
+    Boolean updateByCriteria(E entity, C criteria);
 
-    void updateByCriteriaOrException(E entity, IV2Criteria<E, C> criteria);
+    void updateByCriteriaOrException(E entity, C criteria);
 
     // endregion
 
@@ -227,19 +227,19 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     E getByIdOrException(Serializable id);
 
-    E getByCriteria(IV2Criteria<E, C> criteria);
+    E getByCriteria(C criteria);
 
-    E getByCriteriaOrWarn(IV2Criteria<E, C> criteria);
+    E getByCriteriaOrWarn(C criteria);
 
-    E getByCriteriaOrException(IV2Criteria<E, C> criteria);
+    E getByCriteriaOrException(C criteria);
 
-    List<E> findByCriteria(IV2Criteria<E, C> criteria);
+    List<E> findByCriteria(C criteria);
 
-    IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria);
+    IPage<E> findPageByCriteria(C criteria);
 
     List<E> findAll();
 
-    Integer countByCriteria(IV2Criteria<E, C> criteria);
+    Integer countByCriteria(C criteria);
 
     Integer countAll();
 
@@ -247,15 +247,15 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     boolean isPresentByColumn(String columnName, Object value);
 
-    boolean isPresentByCriteria(IV2Criteria<E, C> criteria);
+    boolean isPresentByCriteria(C criteria);
 
     boolean isAbsentByColumn(String columnName, Object value);
 
-    boolean isAbsentByCriteria(IV2Criteria<E, C> criteria);
+    boolean isAbsentByCriteria(C criteria);
 
-    void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria);
+    void exceptionIfPresentByCriteria(C criteria);
 
-    void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria);
+    void exceptionIfAbsentByCriteria(C criteria);
 
     // endregion
 

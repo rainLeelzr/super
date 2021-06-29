@@ -203,7 +203,7 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.addBatch(entities, batchSize));
     }
 
-    default E addIfAbsent(E entity, IV2Criteria<E, C> criteria) {
+    default E addIfAbsent(E entity, C criteria) {
         return applyUntilNotNull(s -> s.addIfAbsent(entity, criteria));
     }
 
@@ -234,7 +234,7 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.deleteByIds(ids));
     }
 
-    default Boolean deleteByCriteria(IV2Criteria<E, C> criteria) {
+    default Boolean deleteByCriteria(C criteria) {
         return applyUntilNotNull(s -> s.deleteByCriteria(criteria));
     }
 
@@ -254,11 +254,11 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         consume(s -> s.updateByIdOrException(entity));
     }
 
-    default Boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria) {
+    default Boolean updateByCriteria(E entity, C criteria) {
         return applyUntilNotNull(s -> s.updateByCriteria(entity, criteria));
     }
 
-    default void updateByCriteriaOrException(E entity, IV2Criteria<E, C> criteria) {
+    default void updateByCriteriaOrException(E entity, C criteria) {
         consume(s -> s.updateByCriteriaOrException(entity, criteria));
     }
 
@@ -274,23 +274,23 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.getByIdOrException(id));
     }
 
-    default E getByCriteria(IV2Criteria<E, C> criteria) {
+    default E getByCriteria(C criteria) {
         return applyUntilNotNull(s -> s.getByCriteria(criteria));
     }
 
-    default E getByCriteriaOrWarn(IV2Criteria<E, C> criteria) {
+    default E getByCriteriaOrWarn(C criteria) {
         return applyUntilNotNull(s -> s.getByCriteriaOrWarn(criteria));
     }
 
-    default E getByCriteriaOrException(IV2Criteria<E, C> criteria) {
+    default E getByCriteriaOrException(C criteria) {
         return applyUntilNotNull(s -> s.getByCriteriaOrException(criteria));
     }
 
-    default List<E> findByCriteria(IV2Criteria<E, C> criteria) {
+    default List<E> findByCriteria(C criteria) {
         return applyUntilNotNull(s -> s.findByCriteria(criteria));
     }
 
-    default IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
+    default IPage<E> findPageByCriteria(C criteria) {
         return applyUntilNotNull(s -> s.findPageByCriteria(criteria));
     }
 
@@ -298,7 +298,7 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(IV2Service::findAll);
     }
 
-    default Integer countByCriteria(IV2Criteria<E, C> criteria) {
+    default Integer countByCriteria(C criteria) {
         return applyUntilNotNull(s -> s.countByCriteria(criteria));
     }
 
@@ -314,7 +314,7 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.isPresentByColumn(columnName, value));
     }
 
-    default boolean isPresentByCriteria(IV2Criteria<E, C> criteria) {
+    default boolean isPresentByCriteria(C criteria) {
         return applyUntilNotNull(s -> s.isPresentByCriteria(criteria));
     }
 
@@ -322,15 +322,15 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.isAbsentByColumn(columnName, value));
     }
 
-    default boolean isAbsentByCriteria(IV2Criteria<E, C> criteria) {
+    default boolean isAbsentByCriteria(C criteria) {
         return applyUntilNotNull(s -> s.isAbsentByCriteria(criteria));
     }
 
-    default void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria) {
+    default void exceptionIfPresentByCriteria(C criteria) {
         consume(s -> s.exceptionIfPresentByCriteria(criteria));
     }
 
-    default void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria) {
+    default void exceptionIfAbsentByCriteria(C criteria) {
         consume(s -> s.exceptionIfAbsentByCriteria(criteria));
     }
 

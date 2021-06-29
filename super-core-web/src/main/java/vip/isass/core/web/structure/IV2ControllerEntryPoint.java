@@ -167,202 +167,234 @@
  *
  */
 
-package vip.isass.core.structure.entrypoint;
+package vip.isass.core.web.structure;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springframework.web.bind.annotation.*;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
+import vip.isass.core.structure.entrypoint.IV2EntryPoint;
+import vip.isass.core.structure.service.IV2Service;
 import vip.isass.core.web.Resp;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public interface IV2EntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> {
+public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
+    extends IV2EntryPoint<E, C> {
+
+    IV2Service<E, C> getService();
 
     // region 增
 
-    String ADD_OPERATOR = "POST";
-    String ADD_URI_SECOND_PART = "";
+    @Override
+    @PostMapping(ADD_URI_SECOND_PART)
+    default Resp<E> add(@RequestBody E entity) {
+        return Resp.bizSuccess(getService().add(entity));
+    }
 
-    String ADD_BATCH_OPERATOR = "POST";
-    String ADD_BATCH_URI_SECOND_PART = "/batch";
+    @Override
+    @PostMapping(ADD_BATCH_URI_SECOND_PART)
+    default Resp<Collection<E>> addBatch(@RequestBody Collection<E> entities) {
+        return Resp.bizSuccess(getService().addBatch(entities));
+    }
 
-    String ADD_BATCH_SIZE_OPERATOR = "POST";
-    String ADD_BATCH_SIZE_URI_SECOND_PART = "/batch/batchSize/{batchSize}";
+    @Override
+    @PostMapping(ADD_BATCH_SIZE_URI_SECOND_PART)
+    default Resp<Collection<E>> addBatch(@RequestBody Collection<E> entities, @PathVariable("batchSize") int batchSize) {
+        return Resp.bizSuccess(getService().addBatch(entities, batchSize));
+    }
 
-    String ADD_IF_ABSENT_OPERATOR = "POST";
-    String ADD_IF_ABSENT_URI_SECOND_PART = "/absent";
+    @Override
+    @PostMapping(ADD_IF_ABSENT_URI_SECOND_PART)
+    default Resp<E> addIfAbsent(@RequestBody E entity, @ModelAttribute C criteria) {
+        return Resp.bizSuccess(getService().addIfAbsent(entity, criteria));
+    }
 
-    String ADD_BATCH_IF_ABSENT_OPERATOR = "POST";
-    String ADD_BATCH_IF_ABSENT_URI_SECOND_PART = "/batch/absent/{uniqueColumns}";
+    @Override
+    @PostMapping(ADD_BATCH_IF_ABSENT_URI_SECOND_PART)
+    default Resp<Integer> addBatchIfAbsent(@RequestBody List<E> entities, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
+        return Resp.bizSuccess(getService().addBatchIfAbsent(entities, uniqueColumns));
+    }
 
-    String ADD_OR_UPDATE_OPERATOR = "POST";
-    String ADD_OR_UPDATE_URI_SECOND_PART = "/add-update/{uniqueColumns}";
+    @Override
+    @PostMapping(ADD_OR_UPDATE_URI_SECOND_PART)
+    default Resp<E> addOrUpdate(@RequestBody E entity, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
+        return Resp.bizSuccess(getService().addOrUpdate(entity, uniqueColumns));
+    }
 
-    String ADD_OR_UPDATE_ENTITIES_OPERATOR = "POST";
-    String ADD_OR_UPDATE_ENTITIES_URI_SECOND_PART = "/add-update/batch/{uniqueColumns}";
+    @Override
+    @PostMapping(ADD_OR_UPDATE_ENTITIES_URI_SECOND_PART)
+    default Resp<Integer> addOrUpdateEntities(@RequestBody List<E> entities, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
+        return Resp.bizSuccess(getService().addOrUpdateEntities(entities, uniqueColumns));
+    }
 
     // endregion
 
     //  region 删
 
-    String DELETE_BY_ID_OPERATOR = "DELETE";
-    String DELETE_BY_ID_URI_SECOND_PART = "/id/{id}";
+    @Override
+    @DeleteMapping(DELETE_BY_ID_URI_SECOND_PART)
+    default Resp<Boolean> deleteById(@PathVariable("id") Serializable id) {
+        return Resp.bizSuccess(getService().deleteById(id));
+    }
 
-    String DELETE_BY_IDS_OPERATOR = "DELETE";
-    String DELETE_BY_IDS_URI_SECOND_PART = "/{ids}";
+    @Override
+    @DeleteMapping(DELETE_BY_IDS_URI_SECOND_PART)
+    default Resp<Boolean> deleteByIds(@PathVariable("ids") Collection<? extends Serializable> ids) {
+        return Resp.bizSuccess(getService().deleteByIds(ids));
+    }
 
-    String DELETE_BY_CRITERIA_OPERATOR = "DELETE";
-    String DELETE_BY_CRITERIA_URI_SECOND_PART = "";
-
-    // endregion
-
-    // region 改
-
-    String UPDATE_BY_ID_OPERATOR = "PUT";
-    String UPDATE_BY_ID_URI_SECOND_PART = "";
-
-
-    String UPDATE_ALL_COLUMNS_BY_ID_OPERATOR = "PUT";
-    String UPDATE_ALL_COLUMNS_BY_ID_URI_SECOND_PART = "/allColumns";
-
-    String UPDATE_BY_ID_OR_EXCEPTION_OPERATOR = "PUT";
-    String UPDATE_BY_ID_OR_EXCEPTION_URI_SECOND_PART = "/exception";
-
-    String UPDATE_BY_CRITERIA_OPERATOR = "PUT";
-    String UPDATE_BY_CRITERIA_URI_SECOND_PART = "/criteria";
-
-    String UPDATE_BY_CRITERIA_OR_EXCEPTION_OPERATOR = "PUT";
-    String UPDATE_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART = "/criteria/exception";
-
-    // endregion
-
-    //  region 查
-
-    String GET_BY_ID_OPERATOR = "GET";
-    String GET_BY_ID_URI_SECOND_PART = "/{id}";
-
-    String GET_BY_ID_OR_EXCEPTION_OPERATOR = "GET";
-    String GET_BY_ID_OR_EXCEPTION_URI_SECOND_PART = "/exception/{id}";
-
-    String GET_BY_CRITERIA_OPERATOR = "GET";
-    String GET_BY_CRITERIA_URI_SECOND_PART = "/1";
-
-    String GET_BY_CRITERIA_OR_WARN_OPERATOR = "GET";
-    String GET_BY_CRITERIA_OR_WARN_URI_SECOND_PART = "/warn/criteria";
-
-    String GET_BY_CRITERIA_OR_EXCEPTION_OPERATOR = "GET";
-    String GET_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART = "/exception/criteria";
-
-    String FIND_BY_CRITERIA_OPERATOR = "GET";
-    String FIND_BY_CRITERIA_URI_SECOND_PART = "";
-
-    String FIND_PAGE_BY_CRITERIA_OPERATOR = "GET";
-    String FIND_PAGE_BY_CRITERIA_URI_SECOND_PART = "/page";
-
-    String FIND_ALL_OPERATOR = "GET";
-    String FIND_ALL_URI_SECOND_PART = "/page";
-
-    String COUNT_BY_CRITERIA_OPERATOR = "GET";
-    String COUNT_BY_CRITERIA_URI_SECOND_PART = "/count";
-
-    String COUNT_ALL_OPERATOR = "GET";
-    String COUNT_ALL_URI_SECOND_PART = "/count/all";
-
-    String IS_PRESENT_BY_ID_OPERATOR = "GET";
-    String IS_PRESENT_BY_ID_URI_SECOND_PART = "/present/{id}";
-
-    String IS_PRESENT_BY_COLUMN_OPERATOR = "GET";
-    String IS_PRESENT_BY_COLUMN_URI_SECOND_PART = "/present/{columnName}/{value}";
-
-    String IS_PRESENT_BY_CRITERIA_OPERATOR = "GET";
-    String IS_PRESENT_BY_CRITERIA_URI_SECOND_PART = "/present";
-
-    String IS_ABSENT_BY_COLUMN_OPERATOR = "GET";
-    String IS_ABSENT_BY_COLUMN_URI_SECOND_PART = "/absent/{columnName}/{value}";
-
-    String IS_ABSENT_BY_CRITERIA_OPERATOR = "GET";
-    String IS_ABSENT_BY_CRITERIA_URI_SECOND_PART = "/absent";
-
-    // endregion
-
-    // region 增
-    Resp<E> add(E entity);
-
-    Resp<Collection<E>> addBatch(Collection<E> entities);
-
-    Resp<Collection<E>> addBatch(Collection<E> entities, int batchSize);
-
-    Resp<E> addIfAbsent(E entity, C criteria);
-
-    Resp<Integer> addBatchIfAbsent(List<E> entities, List<String> uniqueColumns);
-
-    Resp<E> addOrUpdate(E entity, List<String> uniqueColumns);
-
-    Resp<Integer> addOrUpdateEntities(List<E> entities, List<String> uniqueColumns);
-
-    // endregion
-
-    //  region 删
-
-    Resp<Boolean> deleteById(Serializable id);
-
-    Resp<Boolean> deleteByIds(Collection<? extends Serializable> ids);
-
-    Resp<Boolean> deleteByCriteria(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> deleteByCriteria(@ModelAttribute C criteria) {
+        return Resp.bizSuccess(getService().deleteByCriteria(criteria));
+    }
 
     // endregion
 
     // region 改
 
-    Resp<Boolean> updateById(E entity);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> updateById(E entity) {
+        return Resp.bizSuccess(getService().updateById(entity));
+    }
 
-    Resp<Boolean> updateAllColumnsById(E entity);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> updateAllColumnsById(E entity) {
+        return Resp.bizSuccess(getService().updateAllColumnsById(entity));
+    }
 
-    Resp<?> updateByIdOrException(E entity);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<?> updateByIdOrException(E entity) {
+        getService().updateByIdOrException(entity);
+        return Resp.bizSuccess();
+    }
 
-    Resp<Boolean> updateByCriteria(E entity, C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> updateByCriteria(E entity, C criteria) {
+        return Resp.bizSuccess(getService().updateByCriteria(entity, criteria));
+    }
 
-    Resp<?> updateByCriteriaOrException(E entity, C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<?> updateByCriteriaOrException(E entity, C criteria) {
+        getService().updateByCriteriaOrException(entity, criteria);
+        return Resp.bizSuccess();
+    }
 
     // endregion
 
     //  region 查
 
-    Resp<E> getById(Serializable id);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<E> getById(Serializable id) {
+        return Resp.bizSuccess(getService().getById(id));
+    }
 
-    Resp<E> getByIdOrException(Serializable id);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<E> getByIdOrException(Serializable id) {
+        return Resp.bizSuccess(getService().getByIdOrException(id));
+    }
 
-    Resp<E> getByCriteria(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<E> getByCriteria(C criteria) {
+        return Resp.bizSuccess(getService().getByCriteria(criteria));
+    }
 
-    Resp<E> getByCriteriaOrWarn(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<E> getByCriteriaOrWarn(C criteria) {
+        return Resp.bizSuccess(getService().getByCriteriaOrWarn(criteria));
+    }
 
-    Resp<E> getByCriteriaOrException(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<E> getByCriteriaOrException(C criteria) {
+        return Resp.bizSuccess(getService().getByCriteriaOrException(criteria));
+    }
 
-    Resp<List<E>> findByCriteria(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<List<E>> findByCriteria(C criteria) {
+        return Resp.bizSuccess(getService().findByCriteria(criteria));
+    }
 
-    Resp<IPage<E>> findPageByCriteria(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<IPage<E>> findPageByCriteria(C criteria) {
+        return Resp.bizSuccess(getService().findPageByCriteria(criteria));
+    }
 
-    Resp<List<E>> findAll();
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<List<E>> findAll() {
+        return Resp.bizSuccess(getService().findAll());
+    }
 
-    Resp<Integer> countByCriteria(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Integer> countByCriteria(C criteria) {
+        return Resp.bizSuccess(getService().countByCriteria(criteria));
+    }
 
-    Resp<Integer> countAll();
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Integer> countAll() {
+        return Resp.bizSuccess(getService().countAll());
+    }
 
-    Resp<Boolean> isPresentById(Serializable id);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> isPresentById(Serializable id) {
+        return Resp.bizSuccess(getService().isPresentById(id));
+    }
 
-    Resp<Boolean> isPresentByColumn(String columnName, Object value);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> isPresentByColumn(String columnName, Object value) {
+        return Resp.bizSuccess(getService().isPresentByColumn(columnName, value));
+    }
 
-    Resp<Boolean> isPresentByCriteria(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> isPresentByCriteria(C criteria) {
+        return Resp.bizSuccess(getService().isPresentByCriteria(criteria));
+    }
 
-    Resp<Boolean> isAbsentByColumn(String columnName, Object value);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> isAbsentByColumn(String columnName, Object value) {
+        return Resp.bizSuccess(getService().isAbsentByColumn(columnName, value));
+    }
 
-    Resp<Boolean> isAbsentByCriteria(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> isAbsentByCriteria(C criteria) {
+        return Resp.bizSuccess(getService().isAbsentByCriteria(criteria));
+    }
 
-    Resp<?> exceptionIfPresentByCriteria(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<?> exceptionIfPresentByCriteria(C criteria) {
+        getService().exceptionIfPresentByCriteria(criteria);
+        return Resp.bizSuccess();
+    }
 
-    Resp<?> exceptionIfAbsentByCriteria(C criteria);
+    @Override
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<?> exceptionIfAbsentByCriteria(C criteria) {
+        getService().exceptionIfAbsentByCriteria(criteria);
+        return Resp.bizSuccess();
+    }
 
     // endregion
 

@@ -211,7 +211,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return entities;
     }
 
-    default E addIfAbsent(E entity, IV2Criteria<E, C> criteria) {
+    default E addIfAbsent(E entity, C criteria) {
         if (this.isAbsentByCriteria(criteria)) {
             return this.add(entity);
         }
@@ -252,7 +252,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getRepository().deleteByIds(ids);
     }
 
-    default Boolean deleteByCriteria(IV2Criteria<E, C> criteria) {
+    default Boolean deleteByCriteria(C criteria) {
         return getRepository().deleteByCriteria(criteria);
     }
 
@@ -271,11 +271,11 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         }
     }
 
-    default Boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria) {
+    default Boolean updateByCriteria(E entity, C criteria) {
         return getRepository().updateByCriteria(entity, criteria);
     }
 
-    default void updateByCriteriaOrException(E entity, IV2Criteria<E, C> criteria) {
+    default void updateByCriteriaOrException(E entity, C criteria) {
         if (!getRepository().updateByCriteria(entity, criteria)) {
             throw new AbsentException("更新失败，记录不存在");
         }
@@ -292,23 +292,23 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getRepository().getByIdOrException(id);
     }
 
-    default E getByCriteria(IV2Criteria<E, C> criteria) {
+    default E getByCriteria(C criteria) {
         return getRepository().getByCriteria(criteria);
     }
 
-    default E getByCriteriaOrWarn(IV2Criteria<E, C> criteria) {
+    default E getByCriteriaOrWarn(C criteria) {
         return getRepository().getByCriteriaOrWarn(criteria);
     }
 
-    default E getByCriteriaOrException(IV2Criteria<E, C> criteria) {
+    default E getByCriteriaOrException(C criteria) {
         return getRepository().getByCriteriaOrException(criteria);
     }
 
-    default List<E> findByCriteria(IV2Criteria<E, C> criteria) {
+    default List<E> findByCriteria(C criteria) {
         return getRepository().findByCriteria(criteria);
     }
 
-    default IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
+    default IPage<E> findPageByCriteria(C criteria) {
         return getRepository().findPageByCriteria(criteria);
     }
 
@@ -316,7 +316,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getRepository().findAll();
     }
 
-    default Integer countByCriteria(IV2Criteria<E, C> criteria) {
+    default Integer countByCriteria(C criteria) {
         return getRepository().countByCriteria(criteria);
     }
 
@@ -332,7 +332,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getRepository().isPresentByColumn(columnName, value);
     }
 
-    default boolean isPresentByCriteria(IV2Criteria<E, C> criteria) {
+    default boolean isPresentByCriteria(C criteria) {
         return getRepository().isPresentByCriteria(criteria);
     }
 
@@ -340,15 +340,15 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return !isPresentByColumn(columnName, value);
     }
 
-    default boolean isAbsentByCriteria(IV2Criteria<E, C> criteria) {
+    default boolean isAbsentByCriteria(C criteria) {
         return !isPresentByCriteria(criteria);
     }
 
-    default void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria) {
+    default void exceptionIfPresentByCriteria(C criteria) {
         getRepository().exceptionIfPresentByCriteria(criteria);
     }
 
-    default void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria) {
+    default void exceptionIfAbsentByCriteria(C criteria) {
         getRepository().exceptionIfAbsentByCriteria(criteria);
     }
 
