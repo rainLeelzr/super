@@ -189,6 +189,12 @@ public interface IV2EntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, 
 
     Resp<E> addIfAbsent(E entity, IV2Criteria<E, C> criteria);
 
+    Resp<Integer> addBatchIfAbsent(List<E> entities, List<String> uniqueColumns);
+
+    Resp<E> addOrUpdate(E entity, List<String> uniqueColumns);
+
+    Resp<Integer> addOrUpdateEntities(List<E> entities, List<String> uniqueColumns);
+
     // endregion
 
     //  region 删
@@ -205,7 +211,7 @@ public interface IV2EntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, 
 
     Resp<Boolean> updateById(E entity);
 
-    Resp<Boolean> updateEntityById(E entity);
+    Resp<Boolean> updateAllColumnsById(E entity);
 
     Resp<?> updateByIdOrException(E entity);
 

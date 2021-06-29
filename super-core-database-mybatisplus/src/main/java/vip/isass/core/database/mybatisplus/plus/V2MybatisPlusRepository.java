@@ -172,6 +172,8 @@ package vip.isass.core.database.mybatisplus.plus;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -184,7 +186,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import vip.isass.core.database.mybatisplus.mapper.IMapper;
-import vip.isass.core.entity.*;
+import vip.isass.core.entity.IdEntity;
+import vip.isass.core.entity.SensitiveDataProperty;
+import vip.isass.core.entity.VersionEntity;
 import vip.isass.core.exception.AbsentException;
 import vip.isass.core.exception.AlreadyPresentException;
 import vip.isass.core.exception.code.StatusMessageEnum;
@@ -194,6 +198,7 @@ import vip.isass.core.structure.entity.*;
 import vip.isass.core.structure.repository.IV2Repository;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -332,7 +337,7 @@ public abstract class V2MybatisPlusRepository<
 
     @Override
     @SuppressWarnings("rawtypes")
-    public boolean updateEntityById(E entity) {
+    public boolean updateById(E entity) {
         IdEntity idEntity = (IdEntity) entity;
         Serializable id = idEntity.getId();
         Assert.notNull(id, "id 不能为null");
@@ -353,6 +358,28 @@ public abstract class V2MybatisPlusRepository<
             versionEntity.setVersion(versionDbEntity.getVersion());
         }
         return b;
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public boolean updateAllColumnsById(E entity) {
+        IdEntity idEntity = (IdEntity) entity;
+        Serializable id = idEntity.getId();
+        Assert.notNull(id, "id 不能为null");
+        if (id instanceof String) {
+            Assert.notBlank((String) id, "id 不能为空");
+        }
+
+        UpdateWrapper<EDB> updateWrapper = new UpdateWrapper<EDB>()
+            .eq(idEntity.getIdColumnName(), idEntity.getId());
+
+        Field[] fields = ReflectUtil.getFieldsDirectly(entity.getClass(), false);
+        if (ArrayUtil.isNotEmpty(fields)) {
+            for (Field field : fields) {
+                updateWrapper.set(field.getName(), ReflectUtil.getFieldValue(entity, field));
+            }
+        }
+        return super.update(updateWrapper);
     }
 
     public boolean updateByWrapper(E entity, Wrapper wrapper) {

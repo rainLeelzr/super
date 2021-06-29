@@ -188,7 +188,7 @@ import java.util.List;
 public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
     extends IV2Service<E, C>, Ordered {
 
-    IV2Repository<E, C> getMpRepository();
+    IV2Repository<E, C> getRepository();
 
     @Override
     default int getOrder() {
@@ -197,17 +197,17 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
 
     // ****************************** 增 start ******************************
     default E add(E entity) {
-        getMpRepository().add(entity);
+        getRepository().add(entity);
         return entity;
     }
 
     default Collection<E> addBatch(Collection<E> entities) {
-        getMpRepository().addBatch(entities);
+        getRepository().addBatch(entities);
         return entities;
     }
 
     default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        getMpRepository().addBatch(entities, batchSize);
+        getRepository().addBatch(entities, batchSize);
         return entities;
     }
 
@@ -218,41 +218,65 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return null;
     }
 
+    @Override
+    default Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns) {
+        int count = 0;
+        for (E entity : entities) {
+            if (getRepository().addIfAbsent(entity, uniqueColumns)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @Override
+    default E addOrUpdate(E entity, List<String> uniqueColumns) {
+        return getRepository().addOrUpdate(entity, uniqueColumns);
+    }
+
+    @Override
+    default Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns) {
+        for (E entity : entities) {
+            getRepository().addOrUpdate(entity, uniqueColumns);
+        }
+        return entities.size();
+    }
+
     // ****************************** 删 start ******************************
 
     default Boolean deleteById(Serializable id) {
-        return getMpRepository().deleteById(id);
+        return getRepository().deleteById(id);
     }
 
     default Boolean deleteByIds(Collection<? extends Serializable> ids) {
-        return getMpRepository().deleteByIds(ids);
+        return getRepository().deleteByIds(ids);
     }
 
     default Boolean deleteByCriteria(IV2Criteria<E, C> criteria) {
-        return getMpRepository().deleteByCriteria(criteria);
+        return getRepository().deleteByCriteria(criteria);
     }
 
     //****************************** 改 start ******************************
     default Boolean updateById(E entity) {
-        return updateEntityById(entity);
+        return getRepository().updateById(entity);
     }
 
-    default Boolean updateEntityById(E entity) {
-        return getMpRepository().updateEntityById(entity);
+    default Boolean updateAllColumnsById(E entity) {
+        return getRepository().updateAllColumnsById(entity);
     }
 
     default void updateByIdOrException(E entity) {
-        if (!updateEntityById(entity)) {
+        if (!updateById(entity)) {
             throw new AbsentException("更新失败，记录不存在");
         }
     }
 
     default Boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria) {
-        return getMpRepository().updateByCriteria(entity, criteria);
+        return getRepository().updateByCriteria(entity, criteria);
     }
 
     default void updateByCriteriaOrException(E entity, IV2Criteria<E, C> criteria) {
-        if (!getMpRepository().updateByCriteria(entity, criteria)) {
+        if (!getRepository().updateByCriteria(entity, criteria)) {
             throw new AbsentException("更新失败，记录不存在");
         }
     }
@@ -260,56 +284,56 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
     // ****************************** 查 start ******************************
     default E getById(Serializable id) {
         Assert.notNull(id, "id");
-        return getMpRepository().getEntityById(id);
+        return getRepository().getEntityById(id);
     }
 
     default E getByIdOrException(Serializable id) {
         Assert.notNull(id, "id");
-        return getMpRepository().getByIdOrException(id);
+        return getRepository().getByIdOrException(id);
     }
 
     default E getByCriteria(IV2Criteria<E, C> criteria) {
-        return getMpRepository().getByCriteria(criteria);
+        return getRepository().getByCriteria(criteria);
     }
 
     default E getByCriteriaOrWarn(IV2Criteria<E, C> criteria) {
-        return getMpRepository().getByCriteriaOrWarn(criteria);
+        return getRepository().getByCriteriaOrWarn(criteria);
     }
 
     default E getByCriteriaOrException(IV2Criteria<E, C> criteria) {
-        return getMpRepository().getByCriteriaOrException(criteria);
+        return getRepository().getByCriteriaOrException(criteria);
     }
 
     default List<E> findByCriteria(IV2Criteria<E, C> criteria) {
-        return getMpRepository().findByCriteria(criteria);
+        return getRepository().findByCriteria(criteria);
     }
 
     default IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
-        return getMpRepository().findPageByCriteria(criteria);
+        return getRepository().findPageByCriteria(criteria);
     }
 
     default List<E> findAll() {
-        return getMpRepository().findAll();
+        return getRepository().findAll();
     }
 
     default Integer countByCriteria(IV2Criteria<E, C> criteria) {
-        return getMpRepository().countByCriteria(criteria);
+        return getRepository().countByCriteria(criteria);
     }
 
     default Integer countAll() {
-        return getMpRepository().countAll();
+        return getRepository().countAll();
     }
 
     default boolean isPresentById(Serializable id) {
-        return getMpRepository().isPresentById(id);
+        return getRepository().isPresentById(id);
     }
 
     default boolean isPresentByColumn(String columnName, Object value) {
-        return getMpRepository().isPresentByColumn(columnName, value);
+        return getRepository().isPresentByColumn(columnName, value);
     }
 
     default boolean isPresentByCriteria(IV2Criteria<E, C> criteria) {
-        return getMpRepository().isPresentByCriteria(criteria);
+        return getRepository().isPresentByCriteria(criteria);
     }
 
     default boolean isAbsentByColumn(String columnName, Object value) {
@@ -321,11 +345,11 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     default void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria) {
-        getMpRepository().exceptionIfPresentByCriteria(criteria);
+        getRepository().exceptionIfPresentByCriteria(criteria);
     }
 
     default void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria) {
-        getMpRepository().exceptionIfAbsentByCriteria(criteria);
+        getRepository().exceptionIfAbsentByCriteria(criteria);
     }
 
 }

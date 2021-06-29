@@ -241,7 +241,11 @@ public interface IV2Repository<E extends IV2Entity<E>, C extends IV2Criteria<E, 
 
     //****************************** 改 start ******************************
 
-    default boolean updateEntityById(E entity) {
+    default boolean updateById(E entity) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean updateAllColumnsById(E entity) {
         throw new UnsupportedOperationException();
     }
 

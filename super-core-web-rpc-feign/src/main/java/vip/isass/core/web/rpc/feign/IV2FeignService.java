@@ -212,6 +212,21 @@ public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getFeignClient().addIfAbsent(entity, criteria).dataIfSuccessOrException();
     }
 
+    @Override
+    default Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns) {
+        return getFeignClient().addBatchIfAbsent(entities, uniqueColumns).dataIfSuccessOrException();
+    }
+
+    @Override
+    default E addOrUpdate(E entity, List<String> uniqueColumns) {
+        return getFeignClient().addOrUpdate(entity, uniqueColumns).dataIfSuccessOrException();
+    }
+
+    @Override
+    default Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns) {
+        return getFeignClient().addOrUpdateEntities(entities, uniqueColumns).dataIfSuccessOrException();
+    }
+
     // endregion
 
     //  region 删
@@ -241,8 +256,8 @@ public interface IV2FeignService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default Boolean updateEntityById(E entity) {
-        return getFeignClient().updateEntityById(entity).dataIfSuccessOrException();
+    default Boolean updateAllColumnsById(E entity) {
+        return getFeignClient().updateAllColumnsById(entity).dataIfSuccessOrException();
     }
 
     @Override

@@ -207,6 +207,21 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.addIfAbsent(entity, criteria));
     }
 
+    @Override
+    default Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns) {
+        return applyUntilNotNull(s -> s.addBatchIfAbsent(entities, uniqueColumns));
+    }
+
+    @Override
+    default E addOrUpdate(E entity, List<String> uniqueColumns) {
+        return applyUntilNotNull(s -> s.addOrUpdate(entity, uniqueColumns));
+    }
+
+    @Override
+    default Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns) {
+        return applyUntilNotNull(s -> s.addOrUpdateEntities(entities, uniqueColumns));
+    }
+
     // endregion
 
     //  region 删
@@ -231,8 +246,8 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.updateById(entity));
     }
 
-    default Boolean updateEntityById(E entity) {
-        return applyUntilNotNull(s -> s.updateEntityById(entity));
+    default Boolean updateAllColumnsById(E entity) {
+        return applyUntilNotNull(s -> s.updateAllColumnsById(entity));
     }
 
     default void updateByIdOrException(E entity) {

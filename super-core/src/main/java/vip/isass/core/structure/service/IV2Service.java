@@ -189,6 +189,12 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     E addIfAbsent(E entity, IV2Criteria<E, C> criteria);
 
+    Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns);
+
+    E addOrUpdate(E entity, List<String> uniqueColumns);
+
+    Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns);
+
     // endregion
 
     //  region 删
@@ -205,7 +211,7 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     Boolean updateById(E entity);
 
-    Boolean updateEntityById(E entity);
+    Boolean updateAllColumnsById(E entity);
 
     void updateByIdOrException(E entity);
 
