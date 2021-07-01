@@ -37,6 +37,7 @@ pipeline {
             echo "[${JOB_NAME}]部署结果[${currentBuild.result}]"
             echo "作者：${AUTHORS}\n内容：${COMMIT_LOGS}"
             deleteDir()
+            sh """curl -X POST -H 'Content-Type: application/json' -d ' {"msgtype": "markdown","markdown": {"content": "jenkins任务：${JOB_NAME}\n> 部署结果：${currentBuild.result}\n> 作者：${AUTHORS}\n> 内容：${COMMIT_LOGS}\n> 变更：${FILE_CHANGES}\n> 链接：[jenkins任务日志链接](${BUILD_URL}console)" } }' https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=8d3aa683-0114-4cce-90d4-508ee755de0b"""
         }
     }
 }
