@@ -170,6 +170,7 @@
 package vip.isass.core.web.structure;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
@@ -190,6 +191,7 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @PostMapping(ADD_URI_SECOND_PART)
+    @ApiOperation(value = "查-根据id-单实体", position = 1)
     default Resp<E> add(@RequestBody E entity) {
         return Resp.bizSuccess(getService().add(entity));
     }
@@ -257,33 +259,33 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
     // region 改
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<Boolean> updateById(E entity) {
+    @PutMapping(UPDATE_BY_ID_URI_SECOND_PART)
+    default Resp<Boolean> updateById(@RequestBody E entity) {
         return Resp.bizSuccess(getService().updateById(entity));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<Boolean> updateAllColumnsById(E entity) {
+    @PutMapping(UPDATE_ALL_COLUMNS_BY_ID_URI_SECOND_PART)
+    default Resp<Boolean> updateAllColumnsById(@RequestBody E entity) {
         return Resp.bizSuccess(getService().updateAllColumnsById(entity));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<?> updateByIdOrException(E entity) {
+    @PutMapping(UPDATE_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
+    default Resp<?> updateByIdOrException(@RequestBody E entity) {
         getService().updateByIdOrException(entity);
         return Resp.bizSuccess();
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<Boolean> updateByCriteria(E entity, C criteria) {
+    @PutMapping(UPDATE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> updateByCriteria(@RequestBody E entity, @ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().updateByCriteria(entity, criteria));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<?> updateByCriteriaOrException(E entity, C criteria) {
+    @PutMapping(UPDATE_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART)
+    default Resp<?> updateByCriteriaOrException(@RequestBody E entity, @ModelAttribute C criteria) {
         getService().updateByCriteriaOrException(entity, criteria);
         return Resp.bizSuccess();
     }
@@ -293,105 +295,105 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
     //  region 查
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<E> getById(Serializable id) {
+    @GetMapping(GET_BY_ID_URI_SECOND_PART)
+    default Resp<E> getById(@PathVariable("id") Serializable id) {
         return Resp.bizSuccess(getService().getById(id));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<E> getByIdOrException(Serializable id) {
+    @GetMapping(GET_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
+    default Resp<E> getByIdOrException(@PathVariable("id") Serializable id) {
         return Resp.bizSuccess(getService().getByIdOrException(id));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<E> getByCriteria(C criteria) {
+    @GetMapping(GET_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<E> getByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().getByCriteria(criteria));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<E> getByCriteriaOrWarn(C criteria) {
+    @GetMapping(GET_BY_CRITERIA_OR_WARN_URI_SECOND_PART)
+    default Resp<E> getByCriteriaOrWarn(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().getByCriteriaOrWarn(criteria));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<E> getByCriteriaOrException(C criteria) {
+    @GetMapping(GET_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART)
+    default Resp<E> getByCriteriaOrException(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().getByCriteriaOrException(criteria));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<List<E>> findByCriteria(C criteria) {
+    @GetMapping(FIND_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<List<E>> findByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().findByCriteria(criteria));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<IPage<E>> findPageByCriteria(C criteria) {
+    @GetMapping(FIND_PAGE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<IPage<E>> findPageByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().findPageByCriteria(criteria));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    @GetMapping(FIND_ALL_URI_SECOND_PART)
     default Resp<List<E>> findAll() {
         return Resp.bizSuccess(getService().findAll());
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<Integer> countByCriteria(C criteria) {
+    @GetMapping(COUNT_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Integer> countByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().countByCriteria(criteria));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    @GetMapping(COUNT_ALL_URI_SECOND_PART)
     default Resp<Integer> countAll() {
         return Resp.bizSuccess(getService().countAll());
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<Boolean> isPresentById(Serializable id) {
+    @GetMapping(IS_PRESENT_BY_ID_URI_SECOND_PART)
+    default Resp<Boolean> isPresentById(@PathVariable("id") Serializable id) {
         return Resp.bizSuccess(getService().isPresentById(id));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<Boolean> isPresentByColumn(String columnName, Object value) {
+    @GetMapping(IS_PRESENT_BY_COLUMN_URI_SECOND_PART)
+    default Resp<Boolean> isPresentByColumn(@PathVariable("columnName") String columnName, @PathVariable("value") Object value) {
         return Resp.bizSuccess(getService().isPresentByColumn(columnName, value));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<Boolean> isPresentByCriteria(C criteria) {
+    @GetMapping(IS_PRESENT_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> isPresentByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().isPresentByCriteria(criteria));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<Boolean> isAbsentByColumn(String columnName, Object value) {
+    @GetMapping(IS_ABSENT_BY_COLUMN_URI_SECOND_PART)
+    default Resp<Boolean> isAbsentByColumn(@PathVariable("columnName") String columnName, @PathVariable("value") Object value) {
         return Resp.bizSuccess(getService().isAbsentByColumn(columnName, value));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<Boolean> isAbsentByCriteria(C criteria) {
+    @GetMapping(IS_ABSENT_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> isAbsentByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().isAbsentByCriteria(criteria));
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<?> exceptionIfPresentByCriteria(C criteria) {
+    @GetMapping(EXCEPTION_IF_PRESENT_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<?> exceptionIfPresentByCriteria(@ModelAttribute C criteria) {
         getService().exceptionIfPresentByCriteria(criteria);
         return Resp.bizSuccess();
     }
 
     @Override
-    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    default Resp<?> exceptionIfAbsentByCriteria(C criteria) {
+    @GetMapping(EXCEPTION_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<?> exceptionIfAbsentByCriteria(@ModelAttribute C criteria) {
         getService().exceptionIfAbsentByCriteria(criteria);
         return Resp.bizSuccess();
     }

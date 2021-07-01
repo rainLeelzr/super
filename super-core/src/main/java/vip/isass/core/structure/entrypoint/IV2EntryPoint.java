@@ -262,7 +262,7 @@ public interface IV2EntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, 
     String FIND_PAGE_BY_CRITERIA_URI_SECOND_PART = "/page";
 
     String FIND_ALL_OPERATOR = "GET";
-    String FIND_ALL_URI_SECOND_PART = "/page";
+    String FIND_ALL_URI_SECOND_PART = "/all";
 
     String COUNT_BY_CRITERIA_OPERATOR = "GET";
     String COUNT_BY_CRITERIA_URI_SECOND_PART = "/count";
@@ -284,6 +284,12 @@ public interface IV2EntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, 
 
     String IS_ABSENT_BY_CRITERIA_OPERATOR = "GET";
     String IS_ABSENT_BY_CRITERIA_URI_SECOND_PART = "/absent";
+
+    String EXCEPTION_IF_PRESENT_BY_CRITERIA_OPERATOR = "GET";
+    String EXCEPTION_IF_PRESENT_BY_CRITERIA_URI_SECOND_PART = "/exception/present";
+
+    String EXCEPTION_IF_ABSENT_BY_CRITERIA_OPERATOR = "GET";
+    String EXCEPTION_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART = "/exception/absent";
 
     // endregion
 
