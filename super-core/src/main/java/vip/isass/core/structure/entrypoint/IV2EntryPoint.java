@@ -203,6 +203,9 @@ public interface IV2EntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, 
     String ADD_OR_UPDATE_ENTITIES_OPERATOR = "POST";
     String ADD_OR_UPDATE_ENTITIES_URI_SECOND_PART = "/add-update/batch/{uniqueColumns}";
 
+    String ADD_OR_UPDATE_BY_CRITERIA_OPERATOR = "POST";
+    String ADD_OR_UPDATE_BY_CRITERIA_URI_SECOND_PART = "/add-update/criteria";
+
     // endregion
 
     //  region 删
@@ -307,6 +310,8 @@ public interface IV2EntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, 
     Resp<E> addOrUpdate(E entity, List<String> uniqueColumns);
 
     Resp<Integer> addOrUpdateEntities(List<E> entities, List<String> uniqueColumns);
+
+    Resp<Boolean> addOrUpdateByCriteria(E entity, C criteria);
 
     // endregion
 

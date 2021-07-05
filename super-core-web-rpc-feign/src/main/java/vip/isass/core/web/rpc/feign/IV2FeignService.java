@@ -230,6 +230,11 @@ public interface IV2FeignService<
         return getFeignClient().addOrUpdateEntities(entities, uniqueColumns).dataIfSuccessOrException();
     }
 
+    @Override
+    default Boolean addOrUpdateByCriteria(E entity, C criteria) {
+        return getFeignClient().addOrUpdateByCriteria(entity, criteria).dataIfSuccessOrException();
+    }
+
     // endregion
 
     //  region 删

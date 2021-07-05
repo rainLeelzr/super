@@ -232,6 +232,12 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
         return Resp.bizSuccess(getService().addOrUpdateEntities(entities, uniqueColumns));
     }
 
+    @Override
+    @PostMapping(ADD_OR_UPDATE_BY_CRITERIA_URI_SECOND_PART)
+    default Resp<Boolean> addOrUpdateByCriteria(@RequestBody E entity, @ModelAttribute C criteria) {
+        return Resp.bizSuccess(getService().addOrUpdateByCriteria(entity, criteria));
+    }
+
     // endregion
 
     //  region 删

@@ -171,9 +171,12 @@ package vip.isass.core.structure.service;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import vip.isass.core.exception.AbsentException;
 import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
 import vip.isass.core.structure.entity.IV2Entity;
 import vip.isass.core.structure.repository.IV2Repository;
 import vip.isass.core.support.api.ApiOrder;
@@ -187,6 +190,8 @@ import java.util.List;
  */
 public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
     extends IV2Service<E, C>, Ordered {
+
+    Logger LOGGER = LoggerFactory.getLogger(IV2LocalService.class);
 
     IV2Repository<E, C> getRepository();
 
@@ -242,6 +247,20 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return entities.size();
     }
 
+    @Override
+    default Boolean addOrUpdateByCriteria(E entity, C criteria) {
+        Assert.isTrue(criteria instanceof IV2WhereConditionCriteria, "criteria 必需实现 IV2WhereConditionCriteria");
+        assert criteria instanceof IV2WhereConditionCriteria;
+        //noinspection rawtypes
+        Assert.notEmpty(((IV2WhereConditionCriteria) criteria).getWhereConditions(),
+            "必需设置更新条件");
+        Boolean update = updateByCriteria(entity, criteria);
+        if (!update) {
+            add(entity);
+        }
+        return true;
+    }
+
     // ****************************** 删 start ******************************
 
     default Boolean deleteById(Serializable id) {
@@ -257,6 +276,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     //****************************** 改 start ******************************
+
     default Boolean updateById(E entity) {
         return getRepository().updateById(entity);
     }

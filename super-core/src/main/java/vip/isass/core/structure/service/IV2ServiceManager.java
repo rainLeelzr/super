@@ -222,6 +222,11 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.addOrUpdateEntities(entities, uniqueColumns));
     }
 
+    @Override
+    default Boolean addOrUpdateByCriteria(E entity, C criteria) {
+        return applyUntilNotNull(s -> s.addOrUpdateByCriteria(entity, criteria));
+    }
+
     // endregion
 
     //  region 删

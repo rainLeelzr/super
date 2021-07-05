@@ -195,6 +195,8 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns);
 
+    Boolean addOrUpdateByCriteria(E entity, C criteria);
+
     // endregion
 
     //  region 删
