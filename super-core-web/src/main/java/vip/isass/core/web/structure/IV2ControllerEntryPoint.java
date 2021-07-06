@@ -170,6 +170,7 @@
 package vip.isass.core.web.structure;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import vip.isass.core.structure.criteria.IV2Criteria;
@@ -191,49 +192,60 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @PostMapping(ADD_URI_SECOND_PART)
-    @ApiOperation(value = "查-根据id-单实体", position = 1)
+    @ApiOperation(value = "增-单实体", notes = "id不需要赋值，会自动生成")
     default Resp<E> add(@RequestBody E entity) {
         return Resp.bizSuccess(getService().add(entity));
     }
 
     @Override
     @PostMapping(ADD_BATCH_URI_SECOND_PART)
+    @ApiOperation(value = "增-批量实体", notes = "id不需要赋值，会自动生成")
     default Resp<Collection<E>> addBatch(@RequestBody Collection<E> entities) {
         return Resp.bizSuccess(getService().addBatch(entities));
     }
 
     @Override
     @PostMapping(ADD_BATCH_SIZE_URI_SECOND_PART)
+    @ApiOperation(value = "增-批量实体-批量数量", notes = "id不需要赋值，会自动生成")
     default Resp<Collection<E>> addBatch(@RequestBody Collection<E> entities, @PathVariable("batchSize") int batchSize) {
         return Resp.bizSuccess(getService().addBatch(entities, batchSize));
     }
 
     @Override
     @PostMapping(ADD_IF_ABSENT_URI_SECOND_PART)
+    @ApiOperation(value = "增-单实体-根据条件-不存在时", notes = "id不需要赋值，会自动生成")
     default Resp<E> addIfAbsent(@RequestBody E entity, @ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().addIfAbsent(entity, criteria));
     }
 
     @Override
     @PostMapping(ADD_BATCH_IF_ABSENT_URI_SECOND_PART)
+    @ApiOperation(value = "增-批量实体-根据字段-不存在时", position = 10)
     default Resp<Integer> addBatchIfAbsent(@RequestBody List<E> entities, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
         return Resp.bizSuccess(getService().addBatchIfAbsent(entities, uniqueColumns));
     }
 
     @Override
     @PostMapping(ADD_OR_UPDATE_URI_SECOND_PART)
-    default Resp<E> addOrUpdate(@RequestBody E entity, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
-        return Resp.bizSuccess(getService().addOrUpdate(entity, uniqueColumns));
+    @ApiOperation(value = "增改-单实体-根据字段", position = 11,
+        notes = "根据 uniqueColumns 字段和 entity 对应的值作为查询条件，如果已存在数据，则更新数据，否则新增数据。")
+    @ApiImplicitParam(name = "uniqueColumns", value = "唯一字段名列表，根据此字段判断需要新增或者修改", required = true)
+    default Resp<E> addOrUpdate1(@RequestBody E entity, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
+        return Resp.bizSuccess(getService().addOrUpdate1(entity, uniqueColumns));
     }
 
     @Override
     @PostMapping(ADD_OR_UPDATE_ENTITIES_URI_SECOND_PART)
+    @ApiOperation(value = "增改-批量实体-根据字段", position = 11,
+        notes = "根据 uniqueColumns 字段和 每个 entity 对应的值作为查询条件，如果已存在数据，则更新数据，否则新增数据。")
+    @ApiImplicitParam(name = "uniqueColumns", value = "唯一字段名列表，根据此字段判断需要新增或者修改", required = true)
     default Resp<Integer> addOrUpdateEntities(@RequestBody List<E> entities, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
         return Resp.bizSuccess(getService().addOrUpdateEntities(entities, uniqueColumns));
     }
 
     @Override
     @PostMapping(ADD_OR_UPDATE_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "增改-单实体-根据条件", position = 10)
     default Resp<Boolean> addOrUpdateByCriteria(@RequestBody E entity, @ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().addOrUpdateByCriteria(entity, criteria));
     }
@@ -244,18 +256,21 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @DeleteMapping(DELETE_BY_ID_URI_SECOND_PART)
+    @ApiOperation(value = "删-根据id", position = 14)
     default Resp<Boolean> deleteById(@PathVariable("id") Serializable id) {
         return Resp.bizSuccess(getService().deleteById(id));
     }
 
     @Override
     @DeleteMapping(DELETE_BY_IDS_URI_SECOND_PART)
-    default Resp<Boolean> deleteByIds(@PathVariable("ids") Collection<? extends Serializable> ids) {
+    @ApiOperation(value = "删-根据批量id", position = 14)
+    default Resp<Boolean> deleteByIds(@PathVariable("ids") Collection<Serializable> ids) {
         return Resp.bizSuccess(getService().deleteByIds(ids));
     }
 
     @Override
     @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "删-根据条件", position = 15)
     default Resp<Boolean> deleteByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().deleteByCriteria(criteria));
     }
@@ -266,18 +281,21 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @PutMapping(UPDATE_BY_ID_URI_SECOND_PART)
+    @ApiOperation(value = "改-根据id-非空字段", position = 13)
     default Resp<Boolean> updateById(@RequestBody E entity) {
         return Resp.bizSuccess(getService().updateById(entity));
     }
 
     @Override
     @PutMapping(UPDATE_ALL_COLUMNS_BY_ID_URI_SECOND_PART)
+    @ApiOperation(value = "改-根据id-全部字段", position = 12)
     default Resp<Boolean> updateAllColumnsById(@RequestBody E entity) {
         return Resp.bizSuccess(getService().updateAllColumnsById(entity));
     }
 
     @Override
     @PutMapping(UPDATE_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
+    @ApiOperation(value = "改-根据id-异常", position = 12)
     default Resp<?> updateByIdOrException(@RequestBody E entity) {
         getService().updateByIdOrException(entity);
         return Resp.bizSuccess();
@@ -285,12 +303,14 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @PutMapping(UPDATE_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "改-根据条件", position = 12)
     default Resp<Boolean> updateByCriteria(@RequestBody E entity, @ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().updateByCriteria(entity, criteria));
     }
 
     @Override
     @PutMapping(UPDATE_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART)
+    @ApiOperation(value = "改-根据条件-异常", position = 12)
     default Resp<?> updateByCriteriaOrException(@RequestBody E entity, @ModelAttribute C criteria) {
         getService().updateByCriteriaOrException(entity, criteria);
         return Resp.bizSuccess();
@@ -302,96 +322,112 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @GetMapping(GET_BY_ID_URI_SECOND_PART)
+    @ApiOperation(value = "查-单实体-根据id", position = 1)
     default Resp<E> getById(@PathVariable("id") Serializable id) {
         return Resp.bizSuccess(getService().getById(id));
     }
 
     @Override
     @GetMapping(GET_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
+    @ApiOperation(value = "查-单实体-根据id-异常", position = 1)
     default Resp<E> getByIdOrException(@PathVariable("id") Serializable id) {
         return Resp.bizSuccess(getService().getByIdOrException(id));
     }
 
     @Override
     @GetMapping(GET_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "查-单实体-根据条件", position = 2)
     default Resp<E> getByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().getByCriteria(criteria));
     }
 
     @Override
     @GetMapping(GET_BY_CRITERIA_OR_WARN_URI_SECOND_PART)
+    @ApiOperation(value = "查-单实体-根据条件-警告", position = 1)
     default Resp<E> getByCriteriaOrWarn(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().getByCriteriaOrWarn(criteria));
     }
 
     @Override
     @GetMapping(GET_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART)
+    @ApiOperation(value = "查-单实体-根据条件-异常", position = 1)
     default Resp<E> getByCriteriaOrException(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().getByCriteriaOrException(criteria));
     }
 
     @Override
     @GetMapping(FIND_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "查-列表-根据条件", position = 4)
     default Resp<List<E>> findByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().findByCriteria(criteria));
     }
 
     @Override
     @GetMapping(FIND_PAGE_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "查-分页列表-根据条件", position = 3)
     default Resp<IPage<E>> findPageByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().findPageByCriteria(criteria));
     }
 
     @Override
     @GetMapping(FIND_ALL_URI_SECOND_PART)
+    @ApiOperation(value = "查-列表-全部", position = 4)
     default Resp<List<E>> findAll() {
         return Resp.bizSuccess(getService().findAll());
     }
 
     @Override
     @GetMapping(COUNT_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "查-实体数量-根据条件", position = 5)
     default Resp<Integer> countByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().countByCriteria(criteria));
     }
 
     @Override
     @GetMapping(COUNT_ALL_URI_SECOND_PART)
+    @ApiOperation(value = "查-实体数量-全部", position = 6)
     default Resp<Integer> countAll() {
         return Resp.bizSuccess(getService().countAll());
     }
 
     @Override
     @GetMapping(IS_PRESENT_BY_ID_URI_SECOND_PART)
+    @ApiOperation(value = "查-是否存在-根据id", position = 7)
     default Resp<Boolean> isPresentById(@PathVariable("id") Serializable id) {
         return Resp.bizSuccess(getService().isPresentById(id));
     }
 
     @Override
     @GetMapping(IS_PRESENT_BY_COLUMN_URI_SECOND_PART)
+    @ApiOperation(value = "查-是否存在-根据字段")
     default Resp<Boolean> isPresentByColumn(@PathVariable("columnName") String columnName, @PathVariable("value") Object value) {
         return Resp.bizSuccess(getService().isPresentByColumn(columnName, value));
     }
 
     @Override
     @GetMapping(IS_PRESENT_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "查-是否存在-根据条件")
     default Resp<Boolean> isPresentByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().isPresentByCriteria(criteria));
     }
 
     @Override
     @GetMapping(IS_ABSENT_BY_COLUMN_URI_SECOND_PART)
+    @ApiOperation(value = "查-是否不存在-根据字段")
     default Resp<Boolean> isAbsentByColumn(@PathVariable("columnName") String columnName, @PathVariable("value") Object value) {
         return Resp.bizSuccess(getService().isAbsentByColumn(columnName, value));
     }
 
     @Override
     @GetMapping(IS_ABSENT_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "查-是否不存在-根据条件")
     default Resp<Boolean> isAbsentByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().isAbsentByCriteria(criteria));
     }
 
     @Override
     @GetMapping(EXCEPTION_IF_PRESENT_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "查-存在时异常-根据条件")
     default Resp<?> exceptionIfPresentByCriteria(@ModelAttribute C criteria) {
         getService().exceptionIfPresentByCriteria(criteria);
         return Resp.bizSuccess();
@@ -399,6 +435,7 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @GetMapping(EXCEPTION_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART)
+    @ApiOperation(value = "查-不存在时异常-根据条件")
     default Resp<?> exceptionIfAbsentByCriteria(@ModelAttribute C criteria) {
         getService().exceptionIfAbsentByCriteria(criteria);
         return Resp.bizSuccess();

@@ -169,6 +169,8 @@
 package feign;
 
 import feign.Request.HttpMethod;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -184,7 +186,8 @@ import static feign.Util.checkState;
 import static feign.Util.emptyToNull;
 
 /**
- * 修改内容：feign 不支持多继承
+ * 参考本链接修改 https://github.com/OpenFeign/feign/commit/4b44215c1bc487bcd7d78bd9b458bc5472acc1f9?branch=4b44215c1bc487bcd7d78bd9b458bc5472acc1f9&diff=split
+ * 支持 feign 多接口继承
  * Defines what annotations and values are valid on interfaces.
  */
 public interface Contract {
@@ -206,8 +209,8 @@ public interface Contract {
         public List<MethodMetadata> parseAndValidateMetadata(Class<?> targetType) {
             checkState(targetType.getTypeParameters().length == 0, "Parameterized types unsupported: %s",
                 targetType.getSimpleName());
-            checkState(targetType.getInterfaces().length <= 1, "Only single inheritance supported: %s",
-                targetType.getSimpleName());
+            //            checkState(targetType.getInterfaces().length <= 1, "Only single inheritance supported: %s",
+            //                targetType.getSimpleName());
 
             Map<String, MethodMetadata> result = new LinkedHashMap<String, MethodMetadata>();
             for (Method method : targetType.getMethods()) {
@@ -216,9 +219,22 @@ public interface Contract {
                     Util.isDefault(method)) {
                     continue;
                 }
+                // 多继承时，有些父接口的方法没有标记RequestMapping，则不应对该方法代理http请求
+                RequestMapping annotation = AnnotationUtils.findAnnotation(method, RequestMapping.class);
+                if (annotation == null) {
+                    continue;
+                }
                 MethodMetadata metadata = parseAndValidateMetadata(targetType, method);
-                checkState(!result.containsKey(metadata.configKey()), "Overrides unsupported: %s",
-                    metadata.configKey());
+                if (result.containsKey(metadata.configKey())) {
+                    MethodMetadata existingMetadata = result.get(metadata.configKey());
+                    Type existingReturnType = existingMetadata.returnType();
+                    Type overridingReturnType = metadata.returnType();
+                    Type resolvedType = Types.resolveReturnType(existingReturnType, overridingReturnType);
+                    if (resolvedType.equals(overridingReturnType)) {
+                        result.put(metadata.configKey(), metadata);
+                    }
+                    continue;
+                }
                 result.put(metadata.configKey(), metadata);
             }
             return new ArrayList<>(result.values());
@@ -242,11 +258,7 @@ public interface Contract {
             data.returnType(Types.resolve(targetType, targetType, method.getGenericReturnType()));
             data.configKey(Feign.configKey(targetType, method));
 
-            if (targetType.getInterfaces().length == 1) {
-                processAnnotationOnClass(data, targetType.getInterfaces()[0]);
-            }
             processAnnotationOnClass(data, targetType);
-
 
             for (Annotation methodAnnotation : method.getAnnotations()) {
                 processAnnotationOnMethod(data, methodAnnotation, method);
@@ -281,7 +293,7 @@ public interface Contract {
                     } else {
                         checkState(data.formParams().isEmpty(),
                             "Body parameters cannot be used with form parameters.");
-//                        checkState(data.bodyIndex() == null, "Method has too many Body parameters: %s", method);
+                        //                        checkState(data.bodyIndex() == null, "Method has too many Body parameters: %s", method);
                         data.bodyIndex(i);
                         data.bodyType(Types.resolve(targetType, targetType, genericParameterTypes[i]));
                     }
@@ -319,14 +331,12 @@ public interface Contract {
                 // raw class, type parameters cannot be inferred directly, but we can scan any extended
                 // interfaces looking for any explict types
                 Type[] interfaces = ((Class) genericType).getGenericInterfaces();
-                if (interfaces != null) {
-                    for (Type extended : interfaces) {
-                        if (ParameterizedType.class.isAssignableFrom(extended.getClass())) {
-                            // use the first extended interface we find.
-                            Type[] parameterTypes = ((ParameterizedType) extended).getActualTypeArguments();
-                            keyClass = (Class<?>) parameterTypes[0];
-                            break;
-                        }
+                for (final Type extended : interfaces) {
+                    if (ParameterizedType.class.isAssignableFrom(extended.getClass())) {
+                        // use the first extended interface we find.
+                        final Type[] parameterTypes = ((ParameterizedType) extended).getActualTypeArguments();
+                        keyClass = (Class<?>) parameterTypes[0];
+                        break;
                     }
                 }
             }

@@ -169,11 +169,140 @@
 
 package vip.isass.core.web.rpc.feign;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springframework.cloud.openfeign.SpringQueryMap;
+import org.springframework.web.bind.annotation.*;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
 import vip.isass.core.structure.entrypoint.IV2EntryPoint;
+import vip.isass.core.web.Resp;
 
-public interface IV2FeignClient<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+
+public interface IV2FeignEntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
     extends IV2EntryPoint<E, C> {
+
+    // region 增
+
+    @PostMapping(ADD_URI_SECOND_PART)
+    Resp<E> add(@RequestBody E entity);
+
+    @PostMapping(ADD_BATCH_URI_SECOND_PART)
+    Resp<Collection<E>> addBatch(@RequestBody Collection<E> entities);
+
+    @PostMapping(ADD_BATCH_SIZE_URI_SECOND_PART)
+    Resp<Collection<E>> addBatch(@RequestBody Collection<E> entities,
+                                 @PathVariable("batchSize") int batchSize);
+
+    @PostMapping(ADD_IF_ABSENT_URI_SECOND_PART)
+    Resp<E> addIfAbsent(@RequestBody E entity,
+                        @SpringQueryMap C criteria);
+
+    @PostMapping(ADD_BATCH_IF_ABSENT_URI_SECOND_PART)
+    Resp<Integer> addBatchIfAbsent(@RequestBody List<E> entities,
+                                   @PathVariable("uniqueColumns") List<String> uniqueColumns);
+
+    @PostMapping(ADD_OR_UPDATE_URI_SECOND_PART)
+    Resp<E> addOrUpdate(@RequestBody E entity,
+                        @PathVariable("uniqueColumns") List<String> uniqueColumns);
+
+    @PostMapping(ADD_OR_UPDATE_ENTITIES_URI_SECOND_PART)
+    Resp<Integer> addOrUpdateEntities(@RequestBody List<E> entities,
+                                      @PathVariable("uniqueColumns") List<String> uniqueColumns);
+
+    @PostMapping(ADD_OR_UPDATE_BY_CRITERIA_URI_SECOND_PART)
+    Resp<Boolean> addOrUpdateByCriteria(@RequestBody E entity,
+                                        @SpringQueryMap C criteria);
+
+    // endregion
+
+    //  region 删
+
+    @DeleteMapping(DELETE_BY_ID_URI_SECOND_PART)
+    Resp<Boolean> deleteById(@PathVariable("id") Serializable id);
+
+    @DeleteMapping(DELETE_BY_IDS_URI_SECOND_PART)
+    Resp<Boolean> deleteByIds(@PathVariable("ids") Collection<Serializable> ids);
+
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    Resp<Boolean> deleteByCriteria(@ModelAttribute C criteria);
+
+    // endregion
+
+    // region 改
+
+    @PutMapping(UPDATE_BY_ID_URI_SECOND_PART)
+    Resp<Boolean> updateById(@RequestBody E entity);
+
+    @PutMapping(UPDATE_ALL_COLUMNS_BY_ID_URI_SECOND_PART)
+    Resp<Boolean> updateAllColumnsById(@RequestBody E entity);
+
+    @PutMapping(UPDATE_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
+    Resp<?> updateByIdOrException(@RequestBody E entity);
+
+    @PutMapping(UPDATE_BY_CRITERIA_URI_SECOND_PART)
+    Resp<Boolean> updateByCriteria(@RequestBody E entity, @SpringQueryMap C criteria);
+
+    @PutMapping(UPDATE_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART)
+    Resp<?> updateByCriteriaOrException(@RequestBody E entity, @SpringQueryMap C criteria);
+
+    // endregion
+
+    //  region 查
+
+    @GetMapping(GET_BY_ID_URI_SECOND_PART)
+    Resp<E> getById(@PathVariable("id") Serializable id);
+
+    @GetMapping(GET_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
+    Resp<E> getByIdOrException(@PathVariable("id") Serializable id);
+
+    @GetMapping(value = GET_BY_CRITERIA_URI_SECOND_PART, headers = FeignEncoder.CONTENT_TYPE_LOCALS_GET)
+    Resp<E> getByCriteria(@ModelAttribute C criteria);
+
+    @GetMapping(value = GET_BY_CRITERIA_OR_WARN_URI_SECOND_PART, headers = FeignEncoder.CONTENT_TYPE_LOCALS_GET)
+    Resp<E> getByCriteriaOrWarn(@ModelAttribute C criteria);
+
+    @GetMapping(value = GET_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART, headers = FeignEncoder.CONTENT_TYPE_LOCALS_GET)
+    Resp<E> getByCriteriaOrException(@ModelAttribute C criteria);
+
+    @GetMapping(value = FIND_BY_CRITERIA_URI_SECOND_PART, headers = FeignEncoder.CONTENT_TYPE_LOCALS_GET)
+    Resp<List<E>> findByCriteria(@ModelAttribute C criteria);
+
+    @GetMapping(value = FIND_PAGE_BY_CRITERIA_URI_SECOND_PART, headers = FeignEncoder.CONTENT_TYPE_LOCALS_GET)
+    Resp<IPage<E>> findPageByCriteria(@ModelAttribute C criteria);
+
+    @GetMapping(FIND_ALL_URI_SECOND_PART)
+    Resp<List<E>> findAll();
+
+    @GetMapping(value = COUNT_BY_CRITERIA_URI_SECOND_PART, headers = FeignEncoder.CONTENT_TYPE_LOCALS_GET)
+    Resp<Integer> countByCriteria(@ModelAttribute C criteria);
+
+    @GetMapping(COUNT_ALL_URI_SECOND_PART)
+    Resp<Integer> countAll();
+
+    @GetMapping(IS_PRESENT_BY_ID_URI_SECOND_PART)
+    Resp<Boolean> isPresentById(@PathVariable("id") Serializable id);
+
+    @GetMapping(IS_PRESENT_BY_COLUMN_URI_SECOND_PART)
+    Resp<Boolean> isPresentByColumn(@PathVariable("columnName") String columnName, @PathVariable("value") Object value);
+
+    @GetMapping(value = IS_PRESENT_BY_CRITERIA_URI_SECOND_PART, headers = FeignEncoder.CONTENT_TYPE_LOCALS_GET)
+    Resp<Boolean> isPresentByCriteria(@ModelAttribute C criteria);
+
+    @GetMapping(IS_ABSENT_BY_COLUMN_URI_SECOND_PART)
+    Resp<Boolean> isAbsentByColumn(@PathVariable("columnName") String columnName, @PathVariable("value") Object value);
+
+    @GetMapping(value = IS_ABSENT_BY_CRITERIA_URI_SECOND_PART, headers = FeignEncoder.CONTENT_TYPE_LOCALS_GET)
+    Resp<Boolean> isAbsentByCriteria(@ModelAttribute C criteria);
+
+    @GetMapping(value = EXCEPTION_IF_PRESENT_BY_CRITERIA_URI_SECOND_PART, headers = FeignEncoder.CONTENT_TYPE_LOCALS_GET)
+    Resp<?> exceptionIfPresentByCriteria(@ModelAttribute C criteria);
+
+    @GetMapping(value = EXCEPTION_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART, headers = FeignEncoder.CONTENT_TYPE_LOCALS_GET)
+    Resp<?> exceptionIfAbsentByCriteria(@ModelAttribute C criteria);
+
+    // endregion
 
 }

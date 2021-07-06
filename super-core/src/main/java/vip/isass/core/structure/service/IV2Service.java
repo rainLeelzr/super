@@ -191,7 +191,7 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns);
 
-    E addOrUpdate(E entity, List<String> uniqueColumns);
+    E addOrUpdate1(E entity, List<String> uniqueColumns);
 
     Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns);
 
@@ -203,7 +203,7 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     Boolean deleteById(Serializable id);
 
-    Boolean deleteByIds(Collection<? extends Serializable> ids);
+    Boolean deleteByIds(Collection<Serializable> ids);
 
     Boolean deleteByCriteria(C criteria);
 

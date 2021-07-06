@@ -235,7 +235,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default E addOrUpdate(E entity, List<String> uniqueColumns) {
+    default E addOrUpdate1(E entity, List<String> uniqueColumns) {
         return getRepository().addOrUpdate(entity, uniqueColumns);
     }
 
@@ -267,7 +267,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getRepository().deleteById(id);
     }
 
-    default Boolean deleteByIds(Collection<? extends Serializable> ids) {
+    default Boolean deleteByIds(Collection<Serializable> ids) {
         return getRepository().deleteByIds(ids);
     }
 
