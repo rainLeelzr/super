@@ -173,6 +173,7 @@ import vip.isass.core.structure.criteria.field.IV2IdCriteria;
 import vip.isass.core.structure.criteria.impl.type.V2FullTypeCriteria;
 import vip.isass.core.structure.entity.IV2IdEntity;
 
+import java.beans.Transient;
 import java.io.Serializable;
 
 /**
@@ -183,6 +184,7 @@ public class V2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK, E>,
     implements IV2IdCriteria<PK, E, C> {
 
     @Override
+    @Transient
     public String getIdColumnName() {
         return IV2IdEntity.ID_COLUMN_NAME;
     }

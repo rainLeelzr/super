@@ -169,6 +169,7 @@
 
 package vip.isass.core.structure.criteria;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -184,10 +185,13 @@ import vip.isass.core.criteria.Condition;
 @AllArgsConstructor
 public class V2WhereCondition {
 
+    @ApiModelProperty(hidden = true)
     private String columnName;
 
+    @ApiModelProperty(hidden = true)
     private Condition condition;
 
+    @ApiModelProperty(hidden = true)
     private Object value;
 
 }

@@ -195,4 +195,8 @@ public class V2WhereConditionCriteria<
         return whereConditions;
     }
 
+    public C setWhereConditions(List<V2WhereCondition> whereConditions) {
+        return IV2WhereConditionCriteria.super.setWhereConditions(whereConditions);
+    }
+
 }

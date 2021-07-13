@@ -170,6 +170,7 @@
 package vip.isass.core.web.structure;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -177,6 +178,7 @@ import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
 import vip.isass.core.structure.entrypoint.IV2EntryPoint;
 import vip.isass.core.structure.service.IV2Service;
+import vip.isass.core.support.JsonUtil;
 import vip.isass.core.web.Resp;
 
 import java.io.Serializable;
@@ -220,23 +222,23 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @PostMapping(ADD_BATCH_IF_ABSENT_URI_SECOND_PART)
-    @ApiOperation(value = "增-批量实体-根据字段-不存在时", position = 10)
+    @ApiOperation(value = "增-批量实体-根据字段-不存在时")
     default Resp<Integer> addBatchIfAbsent(@RequestBody List<E> entities, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
         return Resp.bizSuccess(getService().addBatchIfAbsent(entities, uniqueColumns));
     }
 
     @Override
     @PostMapping(ADD_OR_UPDATE_URI_SECOND_PART)
-    @ApiOperation(value = "增改-单实体-根据字段", position = 11,
+    @ApiOperation(value = "增改-单实体-根据字段",
         notes = "根据 uniqueColumns 字段和 entity 对应的值作为查询条件，如果已存在数据，则更新数据，否则新增数据。")
     @ApiImplicitParam(name = "uniqueColumns", value = "唯一字段名列表，根据此字段判断需要新增或者修改", required = true)
-    default Resp<E> addOrUpdate1(@RequestBody E entity, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
-        return Resp.bizSuccess(getService().addOrUpdate1(entity, uniqueColumns));
+    default Resp<E> addOrUpdate(@RequestBody E entity, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
+        return Resp.bizSuccess(getService().addOrUpdate(entity, uniqueColumns));
     }
 
     @Override
     @PostMapping(ADD_OR_UPDATE_ENTITIES_URI_SECOND_PART)
-    @ApiOperation(value = "增改-批量实体-根据字段", position = 11,
+    @ApiOperation(value = "增改-批量实体-根据字段",
         notes = "根据 uniqueColumns 字段和 每个 entity 对应的值作为查询条件，如果已存在数据，则更新数据，否则新增数据。")
     @ApiImplicitParam(name = "uniqueColumns", value = "唯一字段名列表，根据此字段判断需要新增或者修改", required = true)
     default Resp<Integer> addOrUpdateEntities(@RequestBody List<E> entities, @PathVariable("uniqueColumns") List<String> uniqueColumns) {
@@ -245,9 +247,15 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @PostMapping(ADD_OR_UPDATE_BY_CRITERIA_URI_SECOND_PART)
-    @ApiOperation(value = "增改-单实体-根据条件", position = 10)
+    @ApiOperation(value = "增改-单实体-根据条件")
     default Resp<Boolean> addOrUpdateByCriteria(@RequestBody E entity, @ModelAttribute C criteria) {
-        return Resp.bizSuccess(getService().addOrUpdateByCriteria(entity, criteria));
+        try {
+            System.out.println(JsonUtil.DEFAULT_INSTANCE.writeValueAsString(criteria));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return Resp.bizSuccess(true);
+        //        return Resp.bizSuccess(getService().addOrUpdateByCriteria(entity, criteria));
     }
 
     // endregion
@@ -256,21 +264,21 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @DeleteMapping(DELETE_BY_ID_URI_SECOND_PART)
-    @ApiOperation(value = "删-根据id", position = 14)
+    @ApiOperation(value = "删-根据id")
     default Resp<Boolean> deleteById(@PathVariable("id") Serializable id) {
         return Resp.bizSuccess(getService().deleteById(id));
     }
 
     @Override
     @DeleteMapping(DELETE_BY_IDS_URI_SECOND_PART)
-    @ApiOperation(value = "删-根据批量id", position = 14)
+    @ApiOperation(value = "删-根据批量id")
     default Resp<Boolean> deleteByIds(@PathVariable("ids") Collection<Serializable> ids) {
         return Resp.bizSuccess(getService().deleteByIds(ids));
     }
 
     @Override
     @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
-    @ApiOperation(value = "删-根据条件", position = 15)
+    @ApiOperation(value = "删-根据条件")
     default Resp<Boolean> deleteByCriteria(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().deleteByCriteria(criteria));
     }
@@ -281,21 +289,21 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @PutMapping(UPDATE_BY_ID_URI_SECOND_PART)
-    @ApiOperation(value = "改-根据id-非空字段", position = 13)
+    @ApiOperation(value = "改-根据id-非空字段")
     default Resp<Boolean> updateById(@RequestBody E entity) {
         return Resp.bizSuccess(getService().updateById(entity));
     }
 
     @Override
     @PutMapping(UPDATE_ALL_COLUMNS_BY_ID_URI_SECOND_PART)
-    @ApiOperation(value = "改-根据id-全部字段", position = 12)
+    @ApiOperation(value = "改-根据id-全部字段")
     default Resp<Boolean> updateAllColumnsById(@RequestBody E entity) {
         return Resp.bizSuccess(getService().updateAllColumnsById(entity));
     }
 
     @Override
     @PutMapping(UPDATE_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
-    @ApiOperation(value = "改-根据id-异常", position = 12)
+    @ApiOperation(value = "改-根据id-异常")
     default Resp<?> updateByIdOrException(@RequestBody E entity) {
         getService().updateByIdOrException(entity);
         return Resp.bizSuccess();
@@ -303,14 +311,14 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @PutMapping(UPDATE_BY_CRITERIA_URI_SECOND_PART)
-    @ApiOperation(value = "改-根据条件", position = 12)
+    @ApiOperation(value = "改-根据条件")
     default Resp<Boolean> updateByCriteria(@RequestBody E entity, @ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().updateByCriteria(entity, criteria));
     }
 
     @Override
     @PutMapping(UPDATE_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART)
-    @ApiOperation(value = "改-根据条件-异常", position = 12)
+    @ApiOperation(value = "改-根据条件-异常")
     default Resp<?> updateByCriteriaOrException(@RequestBody E entity, @ModelAttribute C criteria) {
         getService().updateByCriteriaOrException(entity, criteria);
         return Resp.bizSuccess();
@@ -322,14 +330,14 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @GetMapping(GET_BY_ID_URI_SECOND_PART)
-    @ApiOperation(value = "查-单实体-根据id", position = 1)
+    @ApiOperation(value = "查-单实体-根据id")
     default Resp<E> getById(@PathVariable("id") Serializable id) {
         return Resp.bizSuccess(getService().getById(id));
     }
 
     @Override
     @GetMapping(GET_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
-    @ApiOperation(value = "查-单实体-根据id-异常", position = 1)
+    @ApiOperation(value = "查-单实体-根据id-异常")
     default Resp<E> getByIdOrException(@PathVariable("id") Serializable id) {
         return Resp.bizSuccess(getService().getByIdOrException(id));
     }
@@ -343,14 +351,14 @@ public interface IV2ControllerEntryPoint<E extends IV2Entity<E>, C extends IV2Cr
 
     @Override
     @GetMapping(GET_BY_CRITERIA_OR_WARN_URI_SECOND_PART)
-    @ApiOperation(value = "查-单实体-根据条件-警告", position = 1)
+    @ApiOperation(value = "查-单实体-根据条件-警告")
     default Resp<E> getByCriteriaOrWarn(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().getByCriteriaOrWarn(criteria));
     }
 
     @Override
     @GetMapping(GET_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART)
-    @ApiOperation(value = "查-单实体-根据条件-异常", position = 1)
+    @ApiOperation(value = "查-单实体-根据条件-异常")
     default Resp<E> getByCriteriaOrException(@ModelAttribute C criteria) {
         return Resp.bizSuccess(getService().getByCriteriaOrException(criteria));
     }

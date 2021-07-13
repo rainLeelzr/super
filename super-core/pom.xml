@@ -218,6 +218,12 @@
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-annotations</artifactId>
+        </dependency>
+
     </dependencies>
 
     <repositories>

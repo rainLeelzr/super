@@ -169,7 +169,6 @@
 
 package vip.isass.core.structure.criteria.field;
 
-import io.swagger.annotations.ApiModelProperty;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.type.IV2OrderByCriteria;
 import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
@@ -227,10 +226,16 @@ public interface IV2TraceCriteria<
 
     // region createUserId
 
+    @Transient
+    default UPK getCreateUserId() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (UPK) ((IV2WhereConditionCriteria) this).getEquals(getCreateUserIdColumnName())
+            : null;
+    }
+
     // region 所有类型都有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 等于")
     default C setCreateUserId(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).equals(getCreateUserIdColumnName(), userId)
@@ -238,7 +243,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 等于")
     default C setOrCreateUserId(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orEquals(getCreateUserIdColumnName(), userId)
@@ -246,7 +250,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 不等于")
     default C setCreateUserIdNotEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notEquals(getCreateUserIdColumnName(), userId)
@@ -254,7 +257,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 不等于")
     default C setOrCreateUserIdNotEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getCreateUserIdColumnName(), userId)
@@ -262,7 +264,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 所在范围")
     default C createUserIdIn(Collection<UPK> userIds) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).in(getCreateUserIdColumnName(), userIds)
@@ -270,7 +271,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 所在范围")
     default C orCreateUserIdIn(Collection<UPK> userIds) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIn(getCreateUserIdColumnName(), userIds)
@@ -278,7 +278,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 不在范围")
     default C createUserIdNotIn(Collection<UPK> userIds) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notIn(getCreateUserIdColumnName(), userIds)
@@ -286,7 +285,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 不在范围")
     default C orCreateUserIdNotIn(Collection<UPK> userIds) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getCreateUserIdColumnName(), userIds)
@@ -294,7 +292,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 为空")
     default C setCreateUserIdIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNull(getCreateUserIdColumnName())
@@ -302,7 +299,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 为空")
     default C setOrCreateUserIdIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getCreateUserIdColumnName())
@@ -310,7 +306,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 不为空")
     default C setCreateUserIdIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getCreateUserIdColumnName())
@@ -318,7 +313,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 不为空")
     default C setOrCreateUserIdIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getCreateUserIdColumnName())
@@ -330,7 +324,6 @@ public interface IV2TraceCriteria<
     // region 字符串类型字段拥有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 包含字符")
     default C setCreateUserIdLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).like(getCreateUserIdColumnName(), userId)
@@ -338,7 +331,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 包含字符")
     default C setOrCreateUserIdLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLike(getCreateUserIdColumnName(), userId)
@@ -346,7 +338,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 不包含字符")
     default C setCreateUserIdNotLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notLike(getCreateUserIdColumnName(), userId)
@@ -354,7 +345,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 不包含字符")
     default C setOrCreateUserIdNotLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getCreateUserIdColumnName(), userId)
@@ -362,7 +352,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 开始以")
     default C setCreateUserIdStartWith(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).startWith(getCreateUserIdColumnName(), userId)
@@ -370,7 +359,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 开始以")
     default C setOrCreateUserIdStartWith(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getCreateUserIdColumnName(), userId)
@@ -382,7 +370,6 @@ public interface IV2TraceCriteria<
     // region 数字类型字段拥有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 小于")
     default C setCreateUserIdLessThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).lessThan(getCreateUserIdColumnName(), userId)
@@ -390,7 +377,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 小于")
     default C setOrCreateUserIdLessThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getCreateUserIdColumnName(), userId)
@@ -398,7 +384,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 小于等于")
     default C setCreateUserIdLessThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getCreateUserIdColumnName(), userId)
@@ -406,7 +391,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 小于等于")
     default C setOrCreateUserIdLessThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getCreateUserIdColumnName(), userId)
@@ -414,7 +398,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 大于")
     default C setCreateUserIdGreaterThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getCreateUserIdColumnName(), userId)
@@ -422,7 +405,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 大于")
     default C setOrCreateUserIdGreaterThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getCreateUserIdColumnName(), userId)
@@ -430,7 +412,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的 id 大于等于")
     default C setCreateUserIdGreaterThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getCreateUserIdColumnName(), userId)
@@ -438,7 +419,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的 id 大于等于")
     default C setOrCreateUserIdGreaterThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getCreateUserIdColumnName(), userId)
@@ -451,10 +431,16 @@ public interface IV2TraceCriteria<
 
     // region createUserName
 
+    @Transient
+    default String getCreateUserName() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (String) ((IV2WhereConditionCriteria) this).getEquals(getCreateUserNameColumnName())
+            : null;
+    }
+
     // region 所有类型都有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的名称等于")
     default C setCreateUserName(String userName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).equals(getCreateUserNameColumnName(), userName)
@@ -462,7 +448,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的名称等于")
     default C setOrCreateUserName(String userName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orEquals(getCreateUserNameColumnName(), userName)
@@ -470,7 +455,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的名称不等于")
     default C setCreateUserNameNotEqual(String userName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notEquals(getCreateUserNameColumnName(), userName)
@@ -478,7 +462,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的名称不等于")
     default C setOrCreateUserNameNotEqual(String userName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getCreateUserNameColumnName(), userName)
@@ -486,7 +469,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的名称所在范围")
     default C createUserNameIn(Collection<String> userNames) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).in(getCreateUserNameColumnName(), userNames)
@@ -494,7 +476,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的名称所在范围")
     default C orCreateUserNameIn(Collection<String> userNames) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIn(getCreateUserNameColumnName(), userNames)
@@ -502,7 +483,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的名称不在范围")
     default C createUserNameNotIn(Collection<String> userNames) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notIn(getCreateUserNameColumnName(), userNames)
@@ -510,7 +490,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的名称不在范围")
     default C orCreateUserNameNotIn(Collection<String> userNames) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getCreateUserNameColumnName(), userNames)
@@ -518,7 +497,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的名称为空")
     default C setCreateUserNameIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNull(getCreateUserNameColumnName())
@@ -526,7 +504,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的名称为空")
     default C setOrCreateUserNameIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getCreateUserNameColumnName())
@@ -534,7 +511,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的名称不为空")
     default C setCreateUserNameIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getCreateUserNameColumnName())
@@ -542,7 +518,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的名称不为空")
     default C setOrCreateUserNameIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getCreateUserNameColumnName())
@@ -554,7 +529,6 @@ public interface IV2TraceCriteria<
     // region 字符串类型字段拥有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的名称包含字符")
     default C setCreateUserNameLike(String userName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).like(getCreateUserNameColumnName(), userName)
@@ -562,7 +536,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的名称包含字符")
     default C setOrCreateUserNameLike(String userName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLike(getCreateUserNameColumnName(), userName)
@@ -570,7 +543,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的名称不包含字符")
     default C setCreateUserNameNotLike(String userName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notLike(getCreateUserNameColumnName(), userName)
@@ -578,7 +550,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的名称不包含字符")
     default C setOrCreateUserNameNotLike(String userName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getCreateUserNameColumnName(), userName)
@@ -586,7 +557,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建用户的名称开始以")
     default C setCreateUserNameStartWith(String userName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).startWith(getCreateUserNameColumnName(), userName)
@@ -594,7 +564,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建用户的名称开始以")
     default C setOrCreateUserNameStartWith(String userName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getCreateUserNameColumnName(), userName)
@@ -607,10 +576,16 @@ public interface IV2TraceCriteria<
 
     // region createTime
 
+    @Transient
+    default LocalDateTime getCreateTime() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (LocalDateTime) ((IV2WhereConditionCriteria) this).getEquals(getCreatedTimeColumnName())
+            : null;
+    }
+
     // region 所有类型都有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建时间等于")
     default C setCreateTime(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).equals(getCreatedTimeColumnName(), createTime)
@@ -618,7 +593,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建时间等于")
     default C setOrCreateTime(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orEquals(getCreatedTimeColumnName(), createTime)
@@ -626,7 +600,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建时间不等于")
     default C setCreateTimeNotEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notEquals(getCreatedTimeColumnName(), createTime)
@@ -634,7 +607,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建时间不等于")
     default C setOrCreateTimeNotEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getCreatedTimeColumnName(), createTime)
@@ -642,7 +614,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建时间所在范围")
     default C createTimeIn(Collection<LocalDateTime> createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).in(getCreatedTimeColumnName(), createTime)
@@ -650,7 +621,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建时间所在范围")
     default C orCreateTimeIn(Collection<LocalDateTime> createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIn(getCreatedTimeColumnName(), createTime)
@@ -658,7 +628,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建时间不在范围")
     default C createTimeNotIn(Collection<LocalDateTime> createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notIn(getCreatedTimeColumnName(), createTime)
@@ -666,7 +635,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建时间不在范围")
     default C orCreateTimeNotIn(Collection<LocalDateTime> createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getCreatedTimeColumnName(), createTime)
@@ -674,7 +642,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建时间为空")
     default C setCreateTimeIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNull(getCreatedTimeColumnName())
@@ -682,7 +649,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建时间为空")
     default C setOrCreateTimeIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getCreatedTimeColumnName())
@@ -690,7 +656,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建时间不为空")
     default C setCreateTimeIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getCreatedTimeColumnName())
@@ -698,7 +663,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建时间不为空")
     default C setOrCreateTimeIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getCreatedTimeColumnName())
@@ -710,7 +674,6 @@ public interface IV2TraceCriteria<
     // region 数字类型字段拥有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建时间小于")
     default C setCreateTimeLessThan(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).lessThan(getCreatedTimeColumnName(), createTime)
@@ -718,7 +681,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建时间小于")
     default C setOrCreateTimeLessThan(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getCreatedTimeColumnName(), createTime)
@@ -726,7 +688,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建时间小于等于")
     default C setCreateTimeLessThanEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getCreatedTimeColumnName(), createTime)
@@ -734,7 +695,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建时间小于等于")
     default C setOrCreateTimeLessThanEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getCreatedTimeColumnName(), createTime)
@@ -742,7 +702,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建时间大于")
     default C setCreateTimeGreaterThan(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getCreatedTimeColumnName(), createTime)
@@ -750,7 +709,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建时间大于")
     default C setOrCreateTimeGreaterThan(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getCreatedTimeColumnName(), createTime)
@@ -758,7 +716,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("创建时间大于等于")
     default C setCreateTimeGreaterThanEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getCreatedTimeColumnName(), createTime)
@@ -766,7 +723,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者创建时间大于等于")
     default C setOrCreateTimeGreaterThanEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getCreatedTimeColumnName(), createTime)
@@ -779,10 +735,16 @@ public interface IV2TraceCriteria<
 
     // region modifyUserId
 
+    @Transient
+    default UPK getModifyUserId() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (UPK) ((IV2WhereConditionCriteria) this).getEquals(getModifyUserIdColumnName())
+            : null;
+    }
+
     // region 所有类型都有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 等于")
     default C setModifyUserId(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).equals(getModifyUserIdColumnName(), userId)
@@ -790,7 +752,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 等于")
     default C setOrModifyUserId(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orEquals(getModifyUserIdColumnName(), userId)
@@ -798,7 +759,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 不等于")
     default C setModifyUserIdNotEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notEquals(getModifyUserIdColumnName(), userId)
@@ -806,7 +766,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 不等于")
     default C setOrModifyUserIdNotEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getModifyUserIdColumnName(), userId)
@@ -814,7 +773,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 所在范围")
     default C modifyUserIdIn(Collection<UPK> userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).in(getModifyUserIdColumnName(), userId)
@@ -822,7 +780,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 所在范围")
     default C orModifyUserIdIn(Collection<UPK> userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIn(getModifyUserIdColumnName(), userId)
@@ -830,7 +787,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 不在范围")
     default C modifyUserIdNotIn(Collection<UPK> userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notIn(getModifyUserIdColumnName(), userId)
@@ -838,7 +794,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 不在范围")
     default C orModifyUserIdNotIn(Collection<UPK> userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getModifyUserIdColumnName(), userId)
@@ -846,7 +801,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 为空")
     default C setModifyUserIdIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNull(getModifyUserIdColumnName())
@@ -854,7 +808,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 为空")
     default C setOrModifyUserIdIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getModifyUserIdColumnName())
@@ -862,7 +815,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 不为空")
     default C setModifyUserIdIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getModifyUserIdColumnName())
@@ -870,7 +822,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 不为空")
     default C setOrModifyUserIdIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getModifyUserIdColumnName())
@@ -882,7 +833,6 @@ public interface IV2TraceCriteria<
     // region 字符串类型字段拥有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 包含字符")
     default C setModifyUserIdLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).like(getModifyUserIdColumnName(), userId)
@@ -890,7 +840,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 包含字符")
     default C setOrModifyUserIdLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLike(getModifyUserIdColumnName(), userId)
@@ -898,7 +847,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 不包含字符")
     default C setModifyUserIdNotLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notLike(getModifyUserIdColumnName(), userId)
@@ -906,7 +854,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 不包含字符")
     default C setOrModifyUserIdNotLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getModifyUserIdColumnName(), userId)
@@ -914,7 +861,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 开始以")
     default C setModifyUserIdStartWith(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).startWith(getModifyUserIdColumnName(), userId)
@@ -922,7 +868,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 开始以")
     default C setOrModifyUserIdStartWith(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getModifyUserIdColumnName(), userId)
@@ -934,7 +879,6 @@ public interface IV2TraceCriteria<
     // region 数字类型字段拥有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 小于")
     default C setModifyUserIdLessThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).lessThan(getModifyUserIdColumnName(), userId)
@@ -942,7 +886,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 小于")
     default C setOrModifyUserIdLessThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getModifyUserIdColumnName(), userId)
@@ -950,7 +893,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 小于等于")
     default C setModifyUserIdLessThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getModifyUserIdColumnName(), userId)
@@ -958,7 +900,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 小于等于")
     default C setOrModifyUserIdLessThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getModifyUserIdColumnName(), userId)
@@ -966,7 +907,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 大于")
     default C setModifyUserIdGreaterThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getModifyUserIdColumnName(), userId)
@@ -974,7 +914,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 大于")
     default C setOrModifyUserIdGreaterThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getModifyUserIdColumnName(), userId)
@@ -982,7 +921,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的 id 大于等于")
     default C setModifyUserIdGreaterThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getModifyUserIdColumnName(), userId)
@@ -990,7 +928,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的 id 大于等于")
     default C setOrModifyUserIdGreaterThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getModifyUserIdColumnName(), userId)
@@ -1003,10 +940,16 @@ public interface IV2TraceCriteria<
 
     // region modifyUserName
 
+    @Transient
+    default String getModifyUserName() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (String) ((IV2WhereConditionCriteria) this).getEquals(getModifyUserNameColumnName())
+            : null;
+    }
+
     // region 所有类型都有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的名称等于")
     default C setModifyUserName(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).equals(getModifyUserNameColumnName(), modifyUserName)
@@ -1014,7 +957,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的名称等于")
     default C setOrModifyUserName(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orEquals(getModifyUserNameColumnName(), modifyUserName)
@@ -1022,7 +964,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的名称不等于")
     default C setModifyUserNameNotEqual(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notEquals(getModifyUserNameColumnName(), modifyUserName)
@@ -1030,7 +971,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的名称不等于")
     default C setOrModifyUserNameNotEqual(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getModifyUserNameColumnName(), modifyUserName)
@@ -1038,7 +978,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的名称所在范围")
     default C modifyUserNameIn(Collection<String> modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).in(getModifyUserNameColumnName(), modifyUserName)
@@ -1046,7 +985,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的名称所在范围")
     default C orModifyUserNameIn(Collection<String> modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIn(getModifyUserNameColumnName(), modifyUserName)
@@ -1054,7 +992,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的名称不在范围")
     default C modifyUserNameNotIn(Collection<String> modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notIn(getModifyUserNameColumnName(), modifyUserName)
@@ -1062,7 +999,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的名称不在范围")
     default C orModifyUserNameNotIn(Collection<String> modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getModifyUserNameColumnName(), modifyUserName)
@@ -1070,7 +1006,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的名称为空")
     default C setModifyUserNameIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNull(getModifyUserNameColumnName())
@@ -1078,7 +1013,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的名称为空")
     default C setOrModifyUserNameIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getModifyUserNameColumnName())
@@ -1086,7 +1020,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的名称不为空")
     default C setModifyUserNameIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getModifyUserNameColumnName())
@@ -1094,7 +1027,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的名称不为空")
     default C setOrModifyUserNameIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getModifyUserNameColumnName())
@@ -1106,7 +1038,6 @@ public interface IV2TraceCriteria<
     // region 字符串类型字段拥有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的名称包含字符")
     default C setModifyUserNameLike(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).like(getModifyUserNameColumnName(), modifyUserName)
@@ -1114,7 +1045,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的名称包含字符")
     default C setOrModifyUserNameLike(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLike(getModifyUserNameColumnName(), modifyUserName)
@@ -1122,7 +1052,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的名称不包含字符")
     default C setModifyUserNameNotLike(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notLike(getModifyUserNameColumnName(), modifyUserName)
@@ -1130,7 +1059,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的名称不包含字符")
     default C setOrModifyUserNameNotLike(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getModifyUserNameColumnName(), modifyUserName)
@@ -1138,7 +1066,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改用户的名称开始以")
     default C setModifyUserNameStartWith(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).startWith(getModifyUserNameColumnName(), modifyUserName)
@@ -1146,7 +1073,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改用户的名称开始以")
     default C setOrModifyUserNameStartWith(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getModifyUserNameColumnName(), modifyUserName)
@@ -1159,10 +1085,16 @@ public interface IV2TraceCriteria<
 
     // region modifyTime
 
+    @Transient
+    default LocalDateTime getModifyTime() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (LocalDateTime) ((IV2WhereConditionCriteria) this).getEquals(getModifyTimeColumnColumnName())
+            : null;
+    }
+
     // region 所有类型都有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改时间等于")
     default C setModifyTime(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).equals(getModifyTimeColumnColumnName(), modifyTime)
@@ -1170,7 +1102,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改时间等于")
     default C setOrModifyTime(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orEquals(getModifyTimeColumnColumnName(), modifyTime)
@@ -1178,7 +1109,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改时间不等于")
     default C setModifyTimeNotEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notEquals(getModifyTimeColumnColumnName(), modifyTime)
@@ -1186,7 +1116,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改时间不等于")
     default C setOrModifyTimeNotEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getModifyTimeColumnColumnName(), modifyTime)
@@ -1194,7 +1123,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改时间所在范围")
     default C modifyTimeIn(Collection<LocalDateTime> modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).in(getModifyTimeColumnColumnName(), modifyTime)
@@ -1202,7 +1130,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改时间所在范围")
     default C orModifyTimeIn(Collection<LocalDateTime> modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIn(getModifyTimeColumnColumnName(), modifyTime)
@@ -1210,7 +1137,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改时间不在范围")
     default C modifyTimeNotIn(Collection<LocalDateTime> modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notIn(getModifyTimeColumnColumnName(), modifyTime)
@@ -1218,7 +1144,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改时间不在范围")
     default C orModifyTimeNotIn(Collection<LocalDateTime> modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getModifyTimeColumnColumnName(), modifyTime)
@@ -1226,7 +1151,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改时间为空")
     default C setModifyTimeIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNull(getModifyTimeColumnColumnName())
@@ -1234,7 +1158,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改时间为空")
     default C setOrModifyTimeIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getModifyTimeColumnColumnName())
@@ -1242,7 +1165,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改时间不为空")
     default C setModifyTimeIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getModifyTimeColumnColumnName())
@@ -1250,7 +1172,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改时间不为空")
     default C setOrModifyTimeIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getModifyTimeColumnColumnName())
@@ -1262,7 +1183,6 @@ public interface IV2TraceCriteria<
     // region 数字类型字段拥有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改时间小于")
     default C setModifyTimeLessThan(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).lessThan(getModifyTimeColumnColumnName(), modifyTime)
@@ -1270,7 +1190,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改时间小于")
     default C setOrModifyTimeLessThan(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getModifyTimeColumnColumnName(), modifyTime)
@@ -1278,7 +1197,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改时间小于等于")
     default C setModifyTimeLessThanEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getModifyTimeColumnColumnName(), modifyTime)
@@ -1286,7 +1204,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改时间小于等于")
     default C setOrModifyTimeLessThanEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getModifyTimeColumnColumnName(), modifyTime)
@@ -1294,7 +1211,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改时间大于")
     default C setModifyTimeGreaterThan(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getModifyTimeColumnColumnName(), modifyTime)
@@ -1302,7 +1218,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改时间大于")
     default C setOrModifyTimeGreaterThan(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getModifyTimeColumnColumnName(), modifyTime)
@@ -1310,7 +1225,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("修改时间大于等于")
     default C setModifyTimeGreaterThanEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getModifyTimeColumnColumnName(), modifyTime)
@@ -1318,7 +1232,6 @@ public interface IV2TraceCriteria<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者修改时间大于等于")
     default C setOrModifyTimeGreaterThanEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getModifyTimeColumnColumnName(), modifyTime)

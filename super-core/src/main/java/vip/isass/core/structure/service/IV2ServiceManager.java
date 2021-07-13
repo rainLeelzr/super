@@ -213,8 +213,8 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
     }
 
     @Override
-    default E addOrUpdate1(E entity, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addOrUpdate1(entity, uniqueColumns));
+    default E addOrUpdate(E entity, List<String> uniqueColumns) {
+        return applyUntilNotNull(s -> s.addOrUpdate(entity, uniqueColumns));
     }
 
     @Override

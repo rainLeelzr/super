@@ -307,7 +307,7 @@ public interface IV2EntryPoint<E extends IV2Entity<E>, C extends IV2Criteria<E, 
 
     Resp<Integer> addBatchIfAbsent(List<E> entities, List<String> uniqueColumns);
 
-    Resp<E> addOrUpdate1(E entity, List<String> uniqueColumns);
+    Resp<E> addOrUpdate(E entity, List<String> uniqueColumns);
 
     Resp<Integer> addOrUpdateEntities(List<E> entities, List<String> uniqueColumns);
 

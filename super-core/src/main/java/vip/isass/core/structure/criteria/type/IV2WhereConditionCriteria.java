@@ -171,11 +171,10 @@ package vip.isass.core.structure.criteria.type;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import io.swagger.annotations.ApiModelProperty;
+import vip.isass.core.criteria.Condition;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.V2WhereCondition;
 import vip.isass.core.structure.entity.IV2Entity;
-import vip.isass.core.criteria.Condition;
 
 import java.beans.Transient;
 import java.util.Collection;
@@ -194,7 +193,6 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
      *
      * @return where condition list
      */
-    @ApiModelProperty(hidden = true)
     List<V2WhereCondition> getWhereConditions();
 
     @SuppressWarnings("unchecked")
@@ -218,6 +216,11 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
     default C equals(String column, Object value) {
         getWhereConditions().add(new V2WhereCondition(column, Condition.EQUAL, value));
         return (C) this;
+    }
+
+    @Transient
+    default <T> T getEquals(String column) {
+        return getValue(column, Condition.EQUAL);
     }
 
     @Transient
@@ -567,6 +570,16 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
     }
 
     // endregion
+
+    @SuppressWarnings("unchecked")
+    default <T> T getValue(String column, Condition condition) {
+        return getWhereConditions().stream()
+            .filter(c -> condition == c.getCondition())
+            .filter(c -> column.equalsIgnoreCase(c.getColumnName()))
+            .map(c -> (T) c.getValue())
+            .findFirst()
+            .orElse(null);
+    }
 
     @Transient
     @SuppressWarnings("unchecked")

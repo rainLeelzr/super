@@ -195,4 +195,8 @@ public class V2SelectColumnCriteria<
         return selectColumns;
     }
 
+    public C setSelectColumns(Collection<String> selectColumns) {
+        return IV2SelectColumnCriteria.super.setSelectColumns(selectColumns);
+    }
+
 }

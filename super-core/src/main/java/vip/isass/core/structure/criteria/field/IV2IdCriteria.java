@@ -169,7 +169,7 @@
 
 package vip.isass.core.structure.criteria.field;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModel;
 import vip.isass.core.structure.criteria.type.IV2SelectColumnCriteria;
 import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
 import vip.isass.core.structure.entity.IV2IdEntity;
@@ -183,6 +183,7 @@ import java.util.Collection;
  *
  * @author Rain
  */
+@ApiModel
 public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK, E>, C extends IV2IdCriteria<PK, E, C>>
     extends IV2PkCriteria<PK, E, C> {
 
@@ -191,10 +192,16 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
         return IV2IdEntity.ID_COLUMN_NAME;
     }
 
+    @Transient
+    default PK getId() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (PK) ((IV2WhereConditionCriteria) this).getEquals(getIdColumnName())
+            : null;
+    }
+
     // region 所有类型都有的条件
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("id 等于")
     default C setId(PK id) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).equals(getIdColumnName(), id)
@@ -202,7 +209,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者 id 等于")
     default C setOrId(PK id) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orEquals(getIdColumnName(), id)
@@ -210,7 +216,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("id 不等于")
     default C setIdNotEqual(PK id) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notEquals(getIdColumnName(), id)
@@ -218,7 +223,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者 id 不等于")
     default C setOrNotEqual(PK id) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getIdColumnName(), id)
@@ -226,7 +230,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("id 所在范围")
     default C setIdIn(Collection<PK> ids) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).in(getIdColumnName(), ids)
@@ -234,7 +237,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者 id 所在范围")
     default C setOrIdIn(Collection<PK> ids) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIn(getIdColumnName(), ids)
@@ -242,7 +244,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("id 不在范围")
     default C setIdNotIn(Collection<PK> ids) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).notIn(getIdColumnName(), ids)
@@ -250,7 +251,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者 id 不在范围")
     default C setOrIdNotIn(Collection<PK> ids) {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getIdColumnName(), ids)
@@ -258,7 +258,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("id 为空")
     default C setIdIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNull(getIdColumnName())
@@ -266,7 +265,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者 id 为空")
     default C setOrIdIsNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getIdColumnName())
@@ -274,7 +272,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("id 不为空")
     default C setIdIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getIdColumnName())
@@ -282,7 +279,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @ApiModelProperty("或者 id 不为空")
     default C setOrIdIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
             ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getIdColumnName())
@@ -399,7 +395,6 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
 
     // region SelectColumnCriteria
 
-    @Transient
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C selectId() {
         return this instanceof IV2SelectColumnCriteria

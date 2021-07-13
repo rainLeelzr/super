@@ -169,6 +169,7 @@
 
 package vip.isass.core.structure.criteria.impl.type;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import vip.isass.core.structure.criteria.V2WhereCondition;
 import vip.isass.core.structure.criteria.type.IV2OrderByCriteria;
@@ -193,6 +194,7 @@ public class V2FullTypeCriteria<E extends IV2Entity<E>, C extends V2FullTypeCrit
 
     // region selectColumn
 
+    @ApiModelProperty("返回字段，默认返回全部字段。性能考虑，请按需返回")
     private Collection<String> selectColumns;
 
     @Override
@@ -201,6 +203,10 @@ public class V2FullTypeCriteria<E extends IV2Entity<E>, C extends V2FullTypeCrit
             selectColumns = new ArrayList<>(16);
         }
         return selectColumns;
+    }
+
+    public C setSelectColumns(Collection<String> selectColumns) {
+        return IV2SelectColumnCriteria.super.setSelectColumns(selectColumns);
     }
 
     // endregion
@@ -216,6 +222,10 @@ public class V2FullTypeCriteria<E extends IV2Entity<E>, C extends V2FullTypeCrit
         return whereConditions;
     }
 
+    public C setWhereConditions(List<V2WhereCondition> whereConditions) {
+        return IV2WhereConditionCriteria.super.setWhereConditions(whereConditions);
+    }
+
     // endregion
 
     // region page
@@ -223,13 +233,16 @@ public class V2FullTypeCriteria<E extends IV2Entity<E>, C extends V2FullTypeCrit
     /**
      * 分页页码
      */
+    @ApiModelProperty("页码，默认1")
     private Long pageNum;
 
     /**
      * 每页大小
      */
+    @ApiModelProperty("分页大小，默认20")
     private Long pageSize;
 
+    @ApiModelProperty(hidden = true)
     private Boolean searchCountFlag;
 
     @Override
@@ -273,6 +286,7 @@ public class V2FullTypeCriteria<E extends IV2Entity<E>, C extends V2FullTypeCrit
     // region orderBy
 
     @Getter
+    @ApiModelProperty("排序字段")
     private String orderBy;
 
     @Override

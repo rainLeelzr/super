@@ -221,8 +221,8 @@ public interface IV2FeignService<
     }
 
     @Override
-    default E addOrUpdate1(E entity, List<String> uniqueColumns) {
-        return getFeign().addOrUpdate1(entity, uniqueColumns).dataIfSuccessOrException();
+    default E addOrUpdate(E entity, List<String> uniqueColumns) {
+        return getFeign().addOrUpdate(entity, uniqueColumns).dataIfSuccessOrException();
     }
 
     @Override

@@ -200,7 +200,6 @@ public interface IV2PageCriteria<E extends IV2Entity<E>, C extends IV2PageCriter
         return setPageSize(PageConst.MAX_PAGE_SIZE);
     }
 
-    @ApiModelProperty("是否发起 count sql。默认true。当不需要")
     Boolean getSearchCountFlag();
 
     C setSearchCountFlag(Boolean searchCountFlag);

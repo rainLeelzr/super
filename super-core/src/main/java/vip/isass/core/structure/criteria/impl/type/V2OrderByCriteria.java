@@ -169,6 +169,7 @@
 
 package vip.isass.core.structure.criteria.impl.type;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.ToString;
 import vip.isass.core.structure.criteria.type.IV2OrderByCriteria;
@@ -182,6 +183,7 @@ public class V2OrderByCriteria<E extends IV2Entity<E>, C extends V2OrderByCriter
     implements IV2OrderByCriteria<E, C> {
 
     @Getter
+    @ApiModelProperty("排序字段")
     private String orderBy;
 
     @Override
