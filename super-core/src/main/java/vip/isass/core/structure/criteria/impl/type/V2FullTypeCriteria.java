@@ -194,7 +194,6 @@ public class V2FullTypeCriteria<E extends IV2Entity<E>, C extends V2FullTypeCrit
 
     // region selectColumn
 
-    @ApiModelProperty("返回字段，默认返回全部字段。性能考虑，请按需返回")
     private Collection<String> selectColumns;
 
     @Override
@@ -286,7 +285,6 @@ public class V2FullTypeCriteria<E extends IV2Entity<E>, C extends V2FullTypeCrit
     // region orderBy
 
     @Getter
-    @ApiModelProperty("排序字段")
     private String orderBy;
 
     @Override
