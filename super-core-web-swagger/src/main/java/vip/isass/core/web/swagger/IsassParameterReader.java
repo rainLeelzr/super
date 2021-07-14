@@ -174,11 +174,8 @@ import cn.hutool.core.util.ClassUtil;
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.classmate.members.ResolvedField;
+import com.fasterxml.classmate.members.ResolvedMember;
 import com.fasterxml.classmate.members.ResolvedMethod;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
@@ -209,17 +206,18 @@ import vip.isass.core.structure.criteria.type.IV2SelectColumnCriteria;
 import vip.isass.core.structure.entity.IV2IdEntity;
 import vip.isass.core.structure.entity.IV2TraceEntity;
 
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.collect.FluentIterable.from;
-import static com.google.common.collect.Sets.newHashSet;
 import static springfox.documentation.schema.Collections.collectionElementType;
 import static springfox.documentation.schema.Collections.isContainerType;
 import static springfox.documentation.schema.Maps.isMapType;
@@ -255,11 +253,19 @@ public class IsassParameterReader implements OperationBuilderPlugin {
     }
 
     private List<Parameter> readParameters(final OperationContext context) {
-        List<Parameter> list = new ArrayList<>();
+        Optional<List<Parameter>> optionalList = Optional.empty();
+
         for (ResolvedMethodParameter methodParameter : context.getParameters()) {
             ResolvedType alternate = context.alternateFor(methodParameter.getParameterType());
+
             if (ClassUtil.isAssignable(IV2Criteria.class, alternate.getErasedType())) {
-                list.addAll(parseCriteria(methodParameter.getParameterType().getErasedType()));
+                Optional<List<Parameter>> optionalParameters = createCriteriaParameters(methodParameter.getParameterType().getErasedType());
+                if (optionalParameters.isPresent()) {
+                    if (!optionalList.isPresent()) {
+                        optionalList = Optional.of(new ArrayList<>());
+                    }
+                    optionalList.get().addAll(optionalParameters.get());
+                }
                 continue;
             }
 
@@ -268,40 +274,36 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             }
 
             if (shouldExpand(methodParameter, alternate)) {
-                list.addAll(expand(new ExpansionContext("", alternate, context)));
+                Optional<List<Parameter>> optionalParameters = expand(new ExpansionContext("", alternate, context));
+                if (!optionalParameters.isPresent()) {
+                    continue;
+                }
+                if (!optionalList.isPresent()) {
+                    optionalList = Optional.of(new ArrayList<>());
+                }
+                optionalList.ifPresent(l -> l.addAll(optionalParameters.get()));
             }
         }
-        return list;
+
+        return optionalList.orElse(Collections.emptyList());
     }
 
-    private List<Parameter> expand(ExpansionContext context) {
-        List<Parameter> parameters = new ArrayList<>();
+    private Optional<List<Parameter>> expand(ExpansionContext context) {
+        Optional<List<Parameter>> optionalParameters = Optional.empty();
 
-        Set<PropertyDescriptor> propertyDescriptors = propertyDescriptors(context.getParamType().getErasedType());
-        Map<Method, PropertyDescriptor> propertyLookupByGetter
-            = propertyDescriptorsByMethod(context.getParamType().getErasedType(), propertyDescriptors);
-        Iterable<ResolvedMethod> getters = FluentIterable
-            .from(accessors.in(context.getParamType()))
-            .filter(onlyValidGetters(propertyLookupByGetter.keySet()));
-
-        Map<String, ResolvedField> fieldsByName = FluentIterable
-            .from(this.fields.in(context.getParamType()))
-            .uniqueIndex(input -> input.getName());
-
-        final AlternateTypeProvider alternateTypeProvider = context.getDocumentationContext().getAlternateTypeProvider();
-
-        FluentIterable<ModelAttributeField> attributes =
-            allModelAttributes(
-                propertyLookupByGetter,
-                getters,
-                fieldsByName,
-                alternateTypeProvider);
+        List<ModelAttributeField> attributes = getAttributes(context);
 
         for (ModelAttributeField attribute : attributes) {
             ResolvedType resolvedType = attribute.getFieldType();
 
             if (ClassUtil.isAssignable(IV2Criteria.class, resolvedType.getErasedType())) {
-                parameters.addAll(parseCriteria(attribute.getFieldType().getErasedType()));
+                Optional<List<Parameter>> optionalCriteriaParameters = createCriteriaParameters(attribute.getFieldType().getErasedType());
+                if (optionalCriteriaParameters.isPresent()) {
+                    if (!optionalParameters.isPresent()) {
+                        optionalParameters = Optional.of(new ArrayList<>());
+                    }
+                    optionalParameters.get().addAll(optionalCriteriaParameters.get());
+                }
                 continue;
             }
 
@@ -315,7 +317,13 @@ public class IsassParameterReader implements OperationBuilderPlugin {
                 ResolvedType itemType = collectionElementType(resolvedType);
 
                 if (ClassUtil.isAssignable(IV2Criteria.class, itemType.getErasedType())) {
-                    parameters.addAll(parseCriteria(itemType.getErasedType()));
+                    Optional<List<Parameter>> optionalCriteriaParameters = createCriteriaParameters(itemType.getErasedType());
+                    if (optionalCriteriaParameters.isPresent()) {
+                        if (!optionalParameters.isPresent()) {
+                            optionalParameters = Optional.of(new ArrayList<>());
+                        }
+                        optionalParameters.get().addAll(optionalCriteriaParameters.get());
+                    }
                     continue;
                 }
 
@@ -328,7 +336,13 @@ public class IsassParameterReader implements OperationBuilderPlugin {
                     itemType,
                     context.getOperationContext());
                 if (!context.hasSeenType(itemType)) {
-                    parameters.addAll(expand(childContext));
+                    Optional<List<Parameter>> optionalExpandParameters = expand(childContext);
+                    if (optionalExpandParameters.isPresent()) {
+                        if (!optionalParameters.isPresent()) {
+                            optionalParameters = Optional.of(new ArrayList<>());
+                        }
+                        optionalParameters.get().addAll(optionalExpandParameters.get());
+                    }
                 }
             }
 
@@ -337,67 +351,149 @@ public class IsassParameterReader implements OperationBuilderPlugin {
                 resolvedType,
                 context.getOperationContext());
             if (!context.hasSeenType(resolvedType)) {
-                parameters.addAll(expand(childContext));
+                Optional<List<Parameter>> optionalExpandParameters = expand(childContext);
+                if (optionalExpandParameters.isPresent()) {
+                    if (!optionalParameters.isPresent()) {
+                        optionalParameters = Optional.of(new ArrayList<>());
+                    }
+                    optionalParameters.get().addAll(optionalExpandParameters.get());
+                }
             }
         }
-        return parameters;
+        return optionalParameters;
     }
 
-    private List<Parameter> parseCriteria(Class<?> type) {
-        List<Parameter> list = new ArrayList<>();
-        list.addAll(parseIdCriteria(type));
-        list.addAll(parseTraceCriteria(type));
-        list.addAll(parseSelectColumnCriteria(type));
-        list.addAll(parseOrderByCriteria(type));
-        return list;
+    private List<ModelAttributeField> getAttributes(ExpansionContext context) {
+        Map<Method, PropertyDescriptor> propertyLookupByGetter =
+            propertyDescriptors(context.getParamType().getErasedType())
+                .stream()
+                .filter(d -> d.getReadMethod() != null)
+                .filter(d -> !context.getParamType().getErasedType().isAssignableFrom(Collection.class))
+                .filter(d -> !"isEmpty".equals(d.getReadMethod().getName()))
+                .collect(Collectors.toMap(PropertyDescriptor::getReadMethod, Function.identity()));
+
+        List<ResolvedMethod> getters = accessors
+            .in(context.getParamType())
+            .stream()
+            .filter(p -> propertyLookupByGetter.containsKey(p.getRawMember()))
+            .collect(Collectors.toList());
+
+        Map<String, ResolvedField> fieldsByName = StreamSupport.stream(
+            this.fields.in(context.getParamType()).spliterator(),
+            false)
+            .collect(Collectors.toMap(ResolvedMember::getName, Function.identity()));
+
+        final AlternateTypeProvider alternateTypeProvider = context.getDocumentationContext().getAlternateTypeProvider();
+
+        return Stream
+            .concat(
+                getters
+                    .stream()
+                    .map(m -> {
+                        String name = propertyLookupByGetter.get(m.getRawMember()).getName();
+                        return new ModelAttributeField(
+                            alternateTypeProvider.alternateFor(m.getType()),
+                            name,
+                            m,
+                            fieldsByName.get(name));
+                    }),
+                fieldsByName
+                    .values()
+                    .stream()
+                    .filter(ResolvedMember::isPublic)
+                    .map(m -> new ModelAttributeField(
+                        alternateTypeProvider.alternateFor(m.getType()),
+                        m.getName(),
+                        m,
+                        m)
+                    )
+            )
+            .collect(Collectors.toList());
     }
 
-    private List<Parameter> parseSelectColumnCriteria(Class<?> type) {
+    private Optional<List<Parameter>> createCriteriaParameters(Class<?> type) {
+        Optional<List<Parameter>> optionalList = Optional.empty();
+
+        Optional<List<Parameter>> optionalIdCriteriaParameters = parseIdCriteria(type);
+        if (optionalIdCriteriaParameters.isPresent()) {
+            optionalList = Optional.of(new ArrayList<>());
+            optionalList.get().addAll(optionalIdCriteriaParameters.get());
+        }
+
+        Optional<List<Parameter>> optionalTraceCriteriaParameters = parseTraceCriteria(type);
+        if (optionalTraceCriteriaParameters.isPresent()) {
+            if (!optionalList.isPresent()) {
+                optionalList = Optional.of(new ArrayList<>());
+            }
+            optionalList.get().addAll(optionalTraceCriteriaParameters.get());
+        }
+
+        Optional<List<Parameter>> optionalSelectColumnCriteriaParameters = parseSelectColumnCriteria(type);
+        if (optionalSelectColumnCriteriaParameters.isPresent()) {
+            if (!optionalList.isPresent()) {
+                optionalList = Optional.of(new ArrayList<>());
+            }
+            optionalList.get().addAll(optionalSelectColumnCriteriaParameters.get());
+        }
+
+        Optional<List<Parameter>> optionalOrderCriteriaParameters = parseOrderByCriteria(type);
+        if (optionalOrderCriteriaParameters.isPresent()) {
+            if (!optionalList.isPresent()) {
+                optionalList = Optional.of(new ArrayList<>());
+            }
+            optionalList.get().addAll(optionalOrderCriteriaParameters.get());
+        }
+
+        return optionalList;
+    }
+
+    private Optional<List<Parameter>> parseSelectColumnCriteria(Class<?> type) {
         if (!ClassUtil.isAssignable(IV2SelectColumnCriteria.class, type)) {
-            return Collections.emptyList();
+            return Optional.empty();
         }
-        return Collections.singletonList(new ParameterBuilder()
-            .name("selectColumns")
-            .description("返回字段，英文逗号隔开，默认返回全部字段。性能考虑，请按需返回")
-            .parameterType("query")
-            .modelRef(MODEL_REF)
-            .type(resolver.resolve(String.class))
-            .order(1)
-            .build());
+        return Optional.of(Collections.singletonList(
+            new ParameterBuilder()
+                .name("selectColumns")
+                .description("返回字段，英文逗号隔开，默认返回全部字段。性能考虑，请按需返回")
+                .parameterType("query")
+                .modelRef(MODEL_REF)
+                .type(resolver.resolve(String.class))
+                .order(1)
+                .build()));
     }
 
-    private List<Parameter> parseOrderByCriteria(Class<?> type) {
+    private Optional<List<Parameter>> parseOrderByCriteria(Class<?> type) {
         if (!ClassUtil.isAssignable(IV2OrderByCriteria.class, type)) {
-            return Collections.emptyList();
+            return Optional.empty();
         }
-        return Collections.singletonList(new ParameterBuilder()
+        return Optional.of(Collections.singletonList(new ParameterBuilder()
             .name("orderBy")
             .description("排序字段，顺序asc(可不写) 倒序desc。例子：创建时间倒序create_time desc")
             .parameterType("query")
             .modelRef(MODEL_REF)
             .type(resolver.resolve(String.class))
             .order(1)
-            .build());
+            .build()));
     }
 
-    private List<Parameter> parseIdCriteria(Class<?> type) {
+    private Optional<List<Parameter>> parseIdCriteria(Class<?> type) {
         if (!ClassUtil.isAssignable(IV2IdCriteria.class, type)) {
-            return Collections.emptyList();
+            return Optional.empty();
         }
-        return Collections.singletonList(new ParameterBuilder()
+        return Optional.of(Collections.singletonList(new ParameterBuilder()
             .name(IV2IdEntity.ID_PROPERTY)
             .description("主键")
             .parameterType("query")
             .modelRef(MODEL_REF)
             .order(1)
-            .build());
+            .build()));
     }
 
-    private List<Parameter> parseTraceCriteria(Class<?> type) {
+    private Optional<List<Parameter>> parseTraceCriteria(Class<?> type) {
         if (!ClassUtil.isAssignable(IV2TraceCriteria.class, type)) {
-            return Collections.emptyList();
+            return Optional.empty();
         }
-        return CollUtil.newArrayList(
+        return Optional.of(CollUtil.newArrayList(
             new ParameterBuilder()
                 .name(IV2TraceEntity.CREATE_USER_ID_PROPERTY)
                 .description("创建用户的 id")
@@ -440,7 +536,7 @@ public class IsassParameterReader implements OperationBuilderPlugin {
                 .modelRef(MODEL_REF)
                 .order(7)
                 .build()
-        );
+        ));
     }
 
     private boolean shouldExpand(final ResolvedMethodParameter parameter, ResolvedType resolvedParamType) {
@@ -461,95 +557,19 @@ public class IsassParameterReader implements OperationBuilderPlugin {
         if (ignorableParamTypes.contains(resolvedParameterType.getErasedType())) {
             return true;
         }
-        return FluentIterable.from(ignorableParamTypes)
-            .filter(isAnnotation())
-            .filter(parameterIsAnnotatedWithIt(parameter)).size() > 0;
-    }
-
-    private Predicate<Class> isAnnotation() {
-        return Annotation.class::isAssignableFrom;
-    }
-
-    private Predicate<Class> parameterIsAnnotatedWithIt(final ResolvedMethodParameter parameter) {
-        return input -> parameter.hasParameterAnnotation(input);
+        return ignorableParamTypes.stream()
+            .filter(Annotation.class::isAssignableFrom)
+            .anyMatch(parameter::hasParameterAnnotation);
     }
 
     private Set<PropertyDescriptor> propertyDescriptors(final Class<?> clazz) {
         try {
-            return FluentIterable.from(getBeanInfo(clazz).getPropertyDescriptors())
-                .toSet();
+            return Stream.of(Introspector.getBeanInfo(clazz).getPropertyDescriptors())
+                .collect(Collectors.toSet());
         } catch (IntrospectionException e) {
             log.warn("Failed to get bean properties on ({})", clazz, e);
         }
-        return newHashSet();
-    }
-
-    private BeanInfo getBeanInfo(Class<?> clazz) throws IntrospectionException {
-        return Introspector.getBeanInfo(clazz);
-    }
-
-    private Map<Method, PropertyDescriptor> propertyDescriptorsByMethod(
-        final Class<?> clazz,
-        Set<PropertyDescriptor> propertyDescriptors) {
-        return FluentIterable.from(propertyDescriptors)
-            .filter(input -> input.getReadMethod() != null
-                && !clazz.isAssignableFrom(Collection.class)
-                && !"isEmpty".equals(input.getReadMethod().getName()))
-            .uniqueIndex(input -> input.getReadMethod());
-    }
-
-    private Predicate<ResolvedMethod> onlyValidGetters(final Set<Method> methods) {
-        return input -> methods.contains(input.getRawMember());
-    }
-
-    private FluentIterable<ModelAttributeField> allModelAttributes(
-        Map<Method, PropertyDescriptor> propertyLookupByGetter,
-        Iterable<ResolvedMethod> getters,
-        Map<String, ResolvedField> fieldsByName,
-        AlternateTypeProvider alternateTypeProvider) {
-
-        FluentIterable<ModelAttributeField> modelAttributesFromGetters = from(getters)
-            .transform(toModelAttributeField(fieldsByName, propertyLookupByGetter, alternateTypeProvider));
-
-        FluentIterable<ModelAttributeField> modelAttributesFromFields = from(fieldsByName.values())
-            .filter(publicFields())
-            .transform(toModelAttributeField(alternateTypeProvider));
-
-        return FluentIterable.from(Sets.union(
-            modelAttributesFromFields.toSet(),
-            modelAttributesFromGetters.toSet()));
-    }
-
-
-    private Function<ResolvedField, ModelAttributeField> toModelAttributeField(
-        final AlternateTypeProvider alternateTypeProvider) {
-        return input -> new ModelAttributeField(
-            alternateTypeProvider.alternateFor(input.getType()),
-            input.getName(),
-            input,
-            input);
-    }
-
-    private Function<ResolvedMethod, ModelAttributeField> toModelAttributeField(
-        final Map<String, ResolvedField> fieldsByName,
-        final Map<Method, PropertyDescriptor> propertyLookupByGetter,
-        final AlternateTypeProvider alternateTypeProvider) {
-        return input -> {
-            String name = propertyLookupByGetter.get(input.getRawMember()).getName();
-            return new ModelAttributeField(
-                fieldType(alternateTypeProvider, input),
-                name,
-                input,
-                fieldsByName.get(name));
-        };
-    }
-
-    private ResolvedType fieldType(AlternateTypeProvider alternateTypeProvider, ResolvedMethod method) {
-        return alternateTypeProvider.alternateFor(method.getType());
-    }
-
-    private Predicate<ResolvedField> publicFields() {
-        return input -> input.isPublic();
+        return Collections.emptySet();
     }
 
     private String nestedParentName(String parentName, ModelAttributeField attribute) {
