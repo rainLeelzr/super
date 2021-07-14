@@ -178,6 +178,8 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import vip.isass.core.criteria.IPageCriteria;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.V2WhereCondition;
+import vip.isass.core.structure.criteria.type.IV2OrderByCriteria;
+import vip.isass.core.structure.criteria.type.IV2PageCriteria;
 import vip.isass.core.structure.criteria.type.IV2SelectColumnCriteria;
 import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
 import vip.isass.core.structure.entity.IV2DbEntity;
@@ -214,8 +216,12 @@ public class V2WrapperUtil {
             processWhereConditionCriteria(wrapper, (IV2WhereConditionCriteria) criteria);
         }
 
-        if (criteria instanceof IPageCriteria) {
-            processPageCriteria(wrapper, (IPageCriteria) criteria);
+        if (criteria instanceof IV2PageCriteria) {
+            processPageCriteria(wrapper, (IV2PageCriteria) criteria);
+        }
+
+        if (criteria instanceof IV2OrderByCriteria) {
+            processOrderByCriteria(wrapper, (IV2OrderByCriteria) criteria);
         }
 
         return wrapper;
@@ -236,19 +242,19 @@ public class V2WrapperUtil {
         return (QueryWrapper<EDB>) getQueryWrapper(criteria);
     }
 
-//    @SuppressWarnings({"unchecked", "rawtypes"})
-//    public static <
-//        E extends IV2Entity<E>,
-//        EDB extends IV2DbEntity<E, EDB>,
-//        C extends IV2Criteria<E, C>> UpdateWrapper<EDB> getEdbUpdateWrapper(IV2Criteria<E, C> criteria) {
-//        UpdateWrapper<EDB> wrapper = new UpdateWrapper<>();
-//
-//        if (criteria instanceof IV2WhereConditionCriteria) {
-//            processWhereConditionCriteria(wrapper, (IV2WhereConditionCriteria) criteria);
-//        }
-//
-//        return wrapper;
-//    }
+    //    @SuppressWarnings({"unchecked", "rawtypes"})
+    //    public static <
+    //        E extends IV2Entity<E>,
+    //        EDB extends IV2DbEntity<E, EDB>,
+    //        C extends IV2Criteria<E, C>> UpdateWrapper<EDB> getEdbUpdateWrapper(IV2Criteria<E, C> criteria) {
+    //        UpdateWrapper<EDB> wrapper = new UpdateWrapper<>();
+    //
+    //        if (criteria instanceof IV2WhereConditionCriteria) {
+    //            processWhereConditionCriteria(wrapper, (IV2WhereConditionCriteria) criteria);
+    //        }
+    //
+    //        return wrapper;
+    //    }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <E extends IV2Entity<E>, C extends IV2Criteria<E, C>> UpdateWrapper<E> getUpdateWrapper(IV2Criteria<E, C> criteria) {
@@ -283,13 +289,21 @@ public class V2WrapperUtil {
 
     private static <
         E extends IV2Entity<E>,
-        C extends IPageCriteria<E, C>>
-    void processPageCriteria(AbstractWrapper<E, String, ?> wrapper, IPageCriteria<E, C> pageCriteria) {
-        if (StrUtil.isNotBlank(pageCriteria.getOrderBy())) {
+        C extends IV2PageCriteria<E, C>>
+    void processPageCriteria(AbstractWrapper<E, String, ?> wrapper, IV2PageCriteria<E, C> pageCriteria) {
+        // do nothing
+    }
+
+    private static <
+        E extends IV2Entity<E>,
+        C extends IV2OrderByCriteria<E, C>>
+    void processOrderByCriteria(QueryWrapper<E> wrapper,
+                                IV2OrderByCriteria<E, C> criteria) {
+        if (StrUtil.isNotBlank(criteria.getOrderBy())) {
             List<String> ascList = null;
             List<String> descList = null;
 
-            String[] split = pageCriteria.getOrderBy().split(StrUtil.COMMA);
+            String[] split = criteria.getOrderBy().split(StrUtil.COMMA);
             for (String s : split) {
                 if (StrUtil.isBlank(s)) {
                     continue;

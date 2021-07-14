@@ -170,6 +170,7 @@
 package vip.isass.core.converter;
 
 import cn.hutool.core.date.format.FastDateFormat;
+import cn.hutool.core.util.StrUtil;
 import vip.isass.core.support.LocalDateTimeUtil;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -192,6 +193,9 @@ public class StringToLocalDateTimeConverter implements Converter<String, LocalDa
     }
 
     public static LocalDateTime convert0(String source) {
+        if (StrUtil.isBlank(source)) {
+            return null;
+        }
         Long convert = StringDateToMillisConverter.convert0(source);
         return LocalDateTimeUtil.epochMilliToLocalDateTime(convert);
     }
