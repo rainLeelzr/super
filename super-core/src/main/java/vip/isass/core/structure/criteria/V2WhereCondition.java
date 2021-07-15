@@ -167,15 +167,31 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.criteria;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import vip.isass.core.criteria.Condition;
 
 /**
- * @author rain
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class V2WhereCondition {
+
+    @ApiModelProperty(hidden = true)
+    private String columnName;
+
+    @ApiModelProperty(hidden = true)
+    private Condition condition;
+
+    @ApiModelProperty(hidden = true)
+    private Object value;
 
 }

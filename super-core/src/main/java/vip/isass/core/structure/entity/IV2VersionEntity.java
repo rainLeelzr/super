@@ -167,15 +167,55 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import java.beans.Transient;
 
 /**
- * @author rain
+ * 乐观锁版本号
+ *
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2VersionEntity<E extends IV2VersionEntity<E>> extends IV2Entity<E> {
+
+    String VERSION_COLUMN_NAME = "version";
+
+    Integer DEFAULT_VERSION = 1;
+
+    /**
+     * 获取版本号
+     *
+     * @return version
+     */
+    Integer getVersion();
+
+    /**
+     * 设置版本号
+     *
+     * @param version version
+     * @return this object
+     */
+    E setVersion(Integer version);
+
+    @Transient
+    default String getVersionColumnName() {
+        return VERSION_COLUMN_NAME;
+    }
+
+    /**
+     * @return 如果版本号为 null, 则设置版本号为1，并返回版本号
+     */
+    @SuppressWarnings("unchecked")
+    default E computeDefaultVersionIfAbsent() {
+        if (getVersion() == null) {
+            setVersion(DEFAULT_VERSION);
+        }
+        return (E) this;
+    }
+
+    @Override
+    default E randomEntity() {
+        return setVersion(randomInteger());
+    }
 
 }

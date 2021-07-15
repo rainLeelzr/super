@@ -167,15 +167,53 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hutool.core.util.RandomUtil;
+import vip.isass.core.support.LocalDateTimeUtil;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
- * @author rain
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2Entity<E extends IV2Entity<E>> {
+
+    long serialVersionUID = 1L;
+
+    default String randomString() {
+        return RandomUtil.randomString(6);
+    }
+
+    default Byte randomByte() {
+        return (byte) RandomUtil.randomInt(Byte.MAX_VALUE);
+    }
+
+    default Boolean randomBoolean() {
+        return RandomUtil.randomBoolean();
+    }
+
+    default Integer randomInteger() {
+        return RandomUtil.randomInt();
+    }
+
+    default Long randomLong() {
+        return RandomUtil.randomLong();
+    }
+
+    default BigDecimal randomBigDecimal() {
+        return RandomUtil.randomBigDecimal(BigDecimal.TEN);
+    }
+
+    default LocalDateTime randomLocalDateTime() {
+        return LocalDateTimeUtil.now();
+    }
+
+    /**
+     * 生成随机的entity
+     * 所有字段都随机赋值
+     */
+    E randomEntity();
 
 }

@@ -167,15 +167,36 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.criteria.impl.type;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import lombok.ToString;
+import vip.isass.core.structure.criteria.type.IV2SelectColumnCriteria;
+import vip.isass.core.structure.entity.IV2Entity;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
- * @author rain
+ * select 字段查询条件
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+@ToString
+public class V2SelectColumnCriteria<
+    E extends IV2Entity<E>,
+    C extends V2SelectColumnCriteria<E, C>
+    > implements IV2SelectColumnCriteria<E, C> {
+
+    private Collection<String> selectColumns;
+
+    @Override
+    public Collection<String> getSelectColumns() {
+        if (selectColumns == null) {
+            selectColumns = new ArrayList<>(16);
+        }
+        return selectColumns;
+    }
+
+    public C setSelectColumns(Collection<String> selectColumns) {
+        return IV2SelectColumnCriteria.super.setSelectColumns(selectColumns);
+    }
 
 }

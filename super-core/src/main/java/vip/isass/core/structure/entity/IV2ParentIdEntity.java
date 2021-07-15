@@ -167,15 +167,77 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+import java.beans.Transient;
+import java.io.Serializable;
 
 /**
- * @author rain
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2ParentIdEntity<PK extends Serializable, E extends IV2ParentIdEntity<PK, E>>
+    extends IV2IdEntity<PK, E> {
+
+    String PARENT_ID_COLUMN_NAME = "parent_id";
+
+    String TOP_ID_STRING_VALUE = "0";
+
+    Integer TOP_ID_INTEGER_VALUE = 0;
+
+    Long TOP_ID_LONG_VALUE = 0L;
+
+    /**
+     * @return 父 id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    PK getParentId();
+
+    /**
+     * 设置父 id
+     *
+     * @param parentId parent id
+     * @return this object
+     */
+    E setParentId(PK parentId);
+
+    @Transient
+    default String getParentIdColumnName() {
+        return PARENT_ID_COLUMN_NAME;
+    }
+
+    /**
+     * 标记为顶级实体
+     *
+     * @return this object
+     */
+    @SuppressWarnings("unchecked")
+    default E markAsTopEntity() {
+        Class<PK> pkClass = findPkClass();
+        if (pkClass == String.class) {
+            setParentId((PK) TOP_ID_STRING_VALUE);
+        } else if (pkClass == Long.class) {
+            setParentId((PK) TOP_ID_LONG_VALUE);
+        } else if (pkClass == Integer.class) {
+            setParentId((PK) TOP_ID_INTEGER_VALUE);
+        } else {
+            throw new UnsupportedOperationException(StrUtil.format(
+                "未支持自动生成类型为[{}]的 parent_id", pkClass
+            ));
+        }
+        return (E) this;
+    }
+
+    default E randomParentId() {
+        return setParentId(randomPk());
+    }
+
+    @Override
+    default E randomEntity() {
+        return randomParentId();
+    }
 
 }

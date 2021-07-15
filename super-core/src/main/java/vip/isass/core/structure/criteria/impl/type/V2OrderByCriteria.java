@@ -167,15 +167,28 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.criteria.impl.type;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import lombok.Getter;
+import lombok.ToString;
+import vip.isass.core.structure.criteria.type.IV2OrderByCriteria;
+import vip.isass.core.structure.entity.IV2Entity;
 
 /**
- * @author rain
+ * 排序条件
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+@ToString
+public class V2OrderByCriteria<E extends IV2Entity<E>, C extends V2OrderByCriteria<E, C>>
+    implements IV2OrderByCriteria<E, C> {
+
+    @Getter
+    private String orderBy;
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+        return (C) this;
+    }
 
 }

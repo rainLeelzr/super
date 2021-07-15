@@ -167,15 +167,39 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.criteria.type;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hutool.core.util.StrUtil;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
 
 /**
- * @author rain
+ * order by 排序条件接口
+ *
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2OrderByCriteria<E extends IV2Entity<E>, C extends IV2OrderByCriteria<E, C>>
+    extends IV2Criteria<E, C> {
+
+    String ASC = " asc";
+
+    String DESC = " desc";
+
+    String getOrderBy();
+
+    C setOrderBy(String orderBy);
+
+    @SuppressWarnings("unchecked")
+    default C orderByIfBlank(String column, String direction) {
+        if (StrUtil.isBlank(getOrderBy())) {
+            return orderBy(column, direction);
+        }
+        return (C) this;
+    }
+
+    default C orderBy(String column, String direction) {
+        return setOrderBy(column + " " + direction);
+    }
 
 }
+

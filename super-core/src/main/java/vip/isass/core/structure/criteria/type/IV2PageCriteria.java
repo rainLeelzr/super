@@ -167,15 +167,42 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.criteria.type;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import io.swagger.annotations.ApiModelProperty;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
+import vip.isass.core.page.PageConst;
 
 /**
- * @author rain
+ * page 分页条件接口
+ *
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2PageCriteria<E extends IV2Entity<E>, C extends IV2PageCriteria<E, C>>
+    extends IV2Criteria<E, C> {
+
+    Long DEFAULT_PAGE_NUM = 1L;
+
+    Long DEFAULT_PAGE_SIZE = 20L;
+
+    Boolean DEFAULT_SEARCH_COUNT_FLAG = Boolean.TRUE;
+
+    Long getPageNum();
+
+    C setPageNum(Long pageNum);
+
+    Long getPageSize();
+
+    C setPageSize(Long pageSize);
+
+    default C setMaxPageSize() {
+        return setPageSize(PageConst.MAX_PAGE_SIZE);
+    }
+
+    Boolean getSearchCountFlag();
+
+    C setSearchCountFlag(Boolean searchCountFlag);
 
 }
+

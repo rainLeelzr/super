@@ -167,15 +167,133 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.criteria.impl.type;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import vip.isass.core.structure.criteria.V2WhereCondition;
+import vip.isass.core.structure.criteria.type.IV2OrderByCriteria;
+import vip.isass.core.structure.criteria.type.IV2PageCriteria;
+import vip.isass.core.structure.criteria.type.IV2SelectColumnCriteria;
+import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
+import vip.isass.core.structure.entity.IV2Entity;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * @author rain
+ * 聚合了 selectColumn、whereCondition、page、orderBy 查询条件
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public class V2FullTypeCriteria<E extends IV2Entity<E>, C extends V2FullTypeCriteria<E, C>>
+    implements
+    IV2SelectColumnCriteria<E, C>,
+    IV2WhereConditionCriteria<E, C>,
+    IV2PageCriteria<E, C>,
+    IV2OrderByCriteria<E, C> {
+
+    // region selectColumn
+
+    private Collection<String> selectColumns;
+
+    @Override
+    public Collection<String> getSelectColumns() {
+        if (selectColumns == null) {
+            selectColumns = new ArrayList<>(16);
+        }
+        return selectColumns;
+    }
+
+    public C setSelectColumns(Collection<String> selectColumns) {
+        return IV2SelectColumnCriteria.super.setSelectColumns(selectColumns);
+    }
+
+    // endregion
+
+    // region whereCondition
+
+    private List<V2WhereCondition> whereConditions;
+
+    public List<V2WhereCondition> getWhereConditions() {
+        if (whereConditions == null) {
+            whereConditions = new ArrayList<>();
+        }
+        return whereConditions;
+    }
+
+    public C setWhereConditions(List<V2WhereCondition> whereConditions) {
+        return IV2WhereConditionCriteria.super.setWhereConditions(whereConditions);
+    }
+
+    // endregion
+
+    // region page
+
+    /**
+     * 分页页码
+     */
+    @ApiModelProperty("页码，默认1")
+    private Long pageNum;
+
+    /**
+     * 每页大小
+     */
+    @ApiModelProperty("分页大小，默认20")
+    private Long pageSize;
+
+    @ApiModelProperty(hidden = true)
+    private Boolean searchCountFlag;
+
+    @Override
+    public Long getPageNum() {
+        return pageNum == null ? DEFAULT_PAGE_NUM : pageNum < 1L ? 1L : pageNum;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setPageNum(Long pageNum) {
+        this.pageNum = pageNum;
+        return (C) this;
+    }
+
+    @Override
+    public Long getPageSize() {
+        return pageSize == null ? DEFAULT_PAGE_SIZE : pageSize < 1L ? DEFAULT_PAGE_SIZE : pageSize;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setPageSize(Long pageSize) {
+        this.pageSize = pageSize;
+        return (C) this;
+    }
+
+    @Override
+    public Boolean getSearchCountFlag() {
+        return searchCountFlag == null ? DEFAULT_SEARCH_COUNT_FLAG : searchCountFlag;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setSearchCountFlag(Boolean searchCountFlag) {
+        this.searchCountFlag = searchCountFlag;
+        return (C) this;
+    }
+
+    // endregion
+
+    // region orderBy
+
+    @Getter
+    private String orderBy;
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+        return (C) this;
+    }
+
+    // endregion
 
 }

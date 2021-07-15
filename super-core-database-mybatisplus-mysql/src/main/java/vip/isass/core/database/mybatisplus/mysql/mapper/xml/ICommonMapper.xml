@@ -175,26 +175,30 @@
         SELECT t2.*
         FROM
         (
-        SELECT * FROM
-        ( SELECT t1.*,
-        IF (
-        FIND_IN_SET( ${parentIdColumnName}, @pids ) > 0,
-        @pids := CONCAT( @pids, ',', ${idColumnName} ), '0' ) AS ischild
-        FROM
-        ( SELECT * FROM ${tableName} AS t
-        <where>
-            <if test="logicDeleteSql !=null and logicDeleteSql != ''">
-                ${logicDeleteSql}
-            </if>
-        </where>
-        ORDER BY t.${idColumnName} ASC ) t1,
-        ( SELECT @pids := #{id} ) t2
-        ) t3
-        WHERE
-        ischild != '0'
-        <if test="returnIdRecord">
-            OR ${idColumnName} = #{id}
-        </if>
+            SELECT * FROM
+            (
+                SELECT
+                    t1.*,
+                    IF (
+                    FIND_IN_SET( ${parentIdColumnName}, @pids ) > 0,
+                    @pids := CONCAT( @pids, ',', ${idColumnName} ), '0' ) AS ischild
+                FROM
+                (
+                    SELECT * FROM ${tableName} AS t
+                    <where>
+                        <if test="logicDeleteSql != null and logicDeleteSql != ''">
+                            ${logicDeleteSql}
+                        </if>
+                    </where>
+                    ORDER BY t.${idColumnName} ASC
+                ) t1,
+                ( SELECT @pids := #{id} ) t2
+            ) t3
+            WHERE
+                ischild != '0'
+                <if test="returnIdRecord">
+                    OR ${idColumnName} = #{id}
+                </if>
         ) t1
         LEFT JOIN ${tableName} t2 ON t1.${idColumnName} = t2.${idColumnName}
     </select>

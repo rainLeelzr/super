@@ -167,15 +167,98 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.service;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
 
-/**
- * @author rain
- */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+
+public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> {
+
+    // region 增
+
+    E add(E entity);
+
+    Collection<E> addBatch(Collection<E> entities);
+
+    Collection<E> addBatch(Collection<E> entities, int batchSize);
+
+    E addIfAbsent(E entity, C criteria);
+
+    Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns);
+
+    E addOrUpdate(E entity, List<String> uniqueColumns);
+
+    Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns);
+
+    Boolean addOrUpdateByCriteria(E entity, C criteria);
+
+    // endregion
+
+    //  region 删
+
+    Boolean deleteById(Serializable id);
+
+    Boolean deleteByIds(Collection<Serializable> ids);
+
+    Boolean deleteByCriteria(C criteria);
+
+    // endregion
+
+    // region 改
+
+    Boolean updateById(E entity);
+
+    Boolean updateAllColumnsById(E entity);
+
+    void updateByIdOrException(E entity);
+
+    Boolean updateByCriteria(E entity, C criteria);
+
+    void updateByCriteriaOrException(E entity, C criteria);
+
+    // endregion
+
+    //  region 查
+
+    E getById(Serializable id);
+
+    E getByIdOrException(Serializable id);
+
+    E getByCriteria(C criteria);
+
+    E getByCriteriaOrWarn(C criteria);
+
+    E getByCriteriaOrException(C criteria);
+
+    List<E> findByCriteria(C criteria);
+
+    IPage<E> findPageByCriteria(C criteria);
+
+    List<E> findAll();
+
+    Integer countByCriteria(C criteria);
+
+    Integer countAll();
+
+    boolean isPresentById(Serializable id);
+
+    boolean isPresentByColumn(String columnName, Object value);
+
+    boolean isPresentByCriteria(C criteria);
+
+    boolean isAbsentByColumn(String columnName, Object value);
+
+    boolean isAbsentByCriteria(C criteria);
+
+    void exceptionIfPresentByCriteria(C criteria);
+
+    void exceptionIfAbsentByCriteria(C criteria);
+
+    // endregion
 
 }

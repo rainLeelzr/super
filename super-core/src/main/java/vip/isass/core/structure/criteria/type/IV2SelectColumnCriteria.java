@@ -167,15 +167,94 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.criteria.type;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
+
+import java.util.Collection;
 
 /**
- * @author rain
+ * sql 的 select 字段条件接口
+ *
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2SelectColumnCriteria<E extends IV2Entity<E>, C extends IV2SelectColumnCriteria<E, C>>
+    extends IV2Criteria<E, C> {
+
+    String DISTINCT = "DISTINCT ";
+
+    /**
+     * get select columns list
+     *
+     * @return select column list
+     */
+    Collection<String> getSelectColumns();
+
+    default C setSelectColumn(String selectColumn) {
+        getSelectColumns().clear();
+        return addSelectColumn(selectColumn);
+    }
+
+    default C setSelectColumns(Collection<String> selectColumns) {
+        getSelectColumns().clear();
+        return addSelectColumns(selectColumns);
+    }
+
+    default C setSelectColumns(String... selectColumns) {
+        getSelectColumns().clear();
+        return addSelectColumns(selectColumns);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C addSelectColumn(String selectColumn) {
+        if (StrUtil.isNotBlank(selectColumn)) {
+            getSelectColumns().add(selectColumn);
+        }
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C addSelectColumns(Collection<String> selectColumns) {
+        if (CollUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().addAll(selectColumns);
+        }
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C addSelectColumns(String... selectColumns) {
+        if (ArrayUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().addAll(CollUtil.toList(selectColumns));
+        }
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C unSelectColumn(String selectColumn) {
+        if (StrUtil.isNotBlank(selectColumn)) {
+            getSelectColumns().remove(selectColumn);
+        }
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C unSelectColumns(Collection<String> selectColumns) {
+        if (CollUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().removeAll(selectColumns);
+        }
+        return (C) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    default C unSelectColumns(String... selectColumns) {
+        if (ArrayUtil.isNotEmpty(selectColumns)) {
+            getSelectColumns().removeAll(CollUtil.toList(selectColumns));
+        }
+        return (C) this;
+    }
 
 }

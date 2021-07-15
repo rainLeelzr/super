@@ -167,15 +167,165 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import java.beans.Transient;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
- * @author rain
+ * 审计追踪类型实体
+ * UPK: user 的主键类型
+ *
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEntity<UPK, E>>
+    extends IV2PkEntity<UPK, E> {
+
+    String CREATE_USER_ID_COLUMN_NAME = "create_user_id";
+    String CREATE_USER_ID_PROPERTY = "createUserId";
+
+    @Transient
+    default String getCreateUserIdColumnName() {
+        return CREATE_USER_ID_COLUMN_NAME;
+    }
+
+    String CREATE_USER_NAME_COLUMN_NAME = "create_user_name";
+    String CREATE_USER_NAME_PROPERTY = "createUserName";
+
+    @Transient
+    default String getCreateUserNameColumnName() {
+        return CREATE_USER_NAME_COLUMN_NAME;
+    }
+
+    String CREATED_TIME_COLUMN_NAME = "create_time";
+    String CREATED_TIME_PROPERTY = "createTime";
+
+    @Transient
+    default String getCreatedTimeColumnName() {
+        return CREATED_TIME_COLUMN_NAME;
+    }
+
+    String MODIFY_USER_ID_COLUMN_NAME = "modify_user_id";
+    String MODIFY_USER_ID_PROPERTY = "modifyUserId";
+
+    @Transient
+    default String getModifyUserIdColumnName() {
+        return MODIFY_USER_ID_COLUMN_NAME;
+    }
+
+    String MODIFY_USER_NAME_COLUMN_NAME = "modify_user_name";
+    String MODIFY_USER_NAME_PROPERTY = "modifyUserName";
+
+    @Transient
+    default String getModifyUserNameColumnName() {
+        return MODIFY_USER_NAME_COLUMN_NAME;
+    }
+
+    String MODIFY_TIME_COLUMN_NAME = "modify_time";
+    String MODIFY_TIME_PROPERTY = "modifyTime";
+
+    @Transient
+    default String getModifyTimeColumnColumnName() {
+        return MODIFY_TIME_COLUMN_NAME;
+    }
+
+    /**
+     * 获取创建用户的 id
+     *
+     * @return create user id
+     */
+    UPK getCreateUserId();
+
+    /**
+     * 设置创建用户的 id
+     *
+     * @param createUserId create user id
+     * @return this object
+     */
+    E setCreateUserId(UPK createUserId);
+
+    /**
+     * @return 创建用户的用户名
+     */
+    String getCreateUserName();
+
+    /**
+     * 设置创建用户的用户名
+     *
+     * @param createUserName create user name
+     * @return this object
+     */
+    E setCreateUserName(String createUserName);
+
+    /**
+     * 获取创建记录的时间
+     *
+     * @return create time
+     */
+    LocalDateTime getCreateTime();
+
+    /**
+     * 设置创建记录的时间
+     *
+     * @param createTime create time
+     * @return this object
+     */
+    E setCreateTime(LocalDateTime createTime);
+
+    /**
+     * 获取修改用户的 id
+     *
+     * @return modify user id
+     */
+    UPK getModifyUserId();
+
+    /**
+     * 设置修改用户的 id
+     *
+     * @param modifyUserId modify user id
+     * @return this object
+     */
+    E setModifyUserId(UPK modifyUserId);
+
+    /**
+     * 获取修改用户的用户名
+     *
+     * @return modify user name
+     */
+    String getModifyUserName();
+
+    /**
+     * 设置修改用户的用户名
+     *
+     * @param modifyUserName modify user name
+     * @return this object
+     */
+    E setModifyUserName(String modifyUserName);
+
+    /**
+     * 获取修改记录的时间
+     *
+     * @return modify time
+     */
+    LocalDateTime getModifyTime();
+
+    /**
+     * 设置修改记录的时间
+     *
+     * @param modifyTime modify time
+     * @return this object
+     */
+    E setModifyTime(LocalDateTime modifyTime);
+
+    @Override
+    default E randomEntity() {
+        return setCreateUserId(randomPk())
+            .setCreateUserName(randomString())
+            .setCreateTime(randomLocalDateTime())
+            .setModifyUserId(randomPk())
+            .setModifyUserName(randomString())
+            .setModifyTime(randomLocalDateTime());
+    }
 
 }

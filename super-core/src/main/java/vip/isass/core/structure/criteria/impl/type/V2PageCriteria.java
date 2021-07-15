@@ -167,15 +167,68 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.criteria.impl.type;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import lombok.ToString;
+import vip.isass.core.structure.criteria.type.IV2PageCriteria;
+import vip.isass.core.structure.entity.IV2Entity;
 
 /**
- * @author rain
+ * 分页查询条件
+ *
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+@ToString
+public class V2PageCriteria<E extends IV2Entity<E>, C extends V2PageCriteria<E, C>>
+    implements IV2PageCriteria<E, C> {
+
+    /**
+     * 分页页码
+     */
+    private Long pageNum;
+
+    /**
+     * 每页大小
+     */
+    private Long pageSize;
+
+    private Boolean searchCountFlag;
+
+    @Override
+    public Long getPageNum() {
+        return pageNum == null ? DEFAULT_PAGE_NUM : pageNum < 1L ? 1L : pageNum;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setPageNum(Long pageNum) {
+        this.pageNum = pageNum;
+        return (C) this;
+    }
+
+    @Override
+    public Long getPageSize() {
+        return pageSize == null ? DEFAULT_PAGE_SIZE : pageSize < 1L ? DEFAULT_PAGE_SIZE : pageSize;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setPageSize(Long pageSize) {
+        this.pageSize = pageSize;
+        return (C) this;
+    }
+
+    @Override
+    public Boolean getSearchCountFlag() {
+        return searchCountFlag == null ? DEFAULT_SEARCH_COUNT_FLAG : searchCountFlag;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public C setSearchCountFlag(Boolean searchCountFlag) {
+        this.searchCountFlag = searchCountFlag;
+        return (C) this;
+    }
 
 }
+

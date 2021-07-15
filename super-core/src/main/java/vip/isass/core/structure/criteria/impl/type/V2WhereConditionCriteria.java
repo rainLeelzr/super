@@ -167,15 +167,36 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.criteria.impl.type;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import lombok.ToString;
+import vip.isass.core.structure.criteria.V2WhereCondition;
+import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
+import vip.isass.core.structure.entity.IV2Entity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author rain
+ * where 查询条件
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+@ToString
+public class V2WhereConditionCriteria<
+    E extends IV2Entity<E>,
+    C extends V2WhereConditionCriteria<E, C>
+    > implements IV2WhereConditionCriteria<E, C> {
+
+    private List<V2WhereCondition> whereConditions;
+
+    public List<V2WhereCondition> getWhereConditions() {
+        if (whereConditions == null) {
+            whereConditions = new ArrayList<>();
+        }
+        return whereConditions;
+    }
+
+    public C setWhereConditions(List<V2WhereCondition> whereConditions) {
+        return IV2WhereConditionCriteria.super.setWhereConditions(whereConditions);
+    }
 
 }

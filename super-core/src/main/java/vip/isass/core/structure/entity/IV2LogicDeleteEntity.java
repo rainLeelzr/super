@@ -167,15 +167,59 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import java.beans.Transient;
 
 /**
- * @author rain
+ * 逻辑删除
+ *
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2LogicDeleteEntity<E extends IV2LogicDeleteEntity<E>> extends IV2Entity<E> {
+
+    String LOGIC_DELETE_COLUMN_NAME = "delete_flag";
+
+    String LOGIC_DELETE_PROPERTY = "deleteFlag";
+
+    Boolean DEFAULT_LOGIC_DELETE_VALUE = Boolean.FALSE;
+
+    /**
+     * 获取删除标识
+     *
+     * @return LogicDelete
+     */
+    Boolean getLogicDelete();
+
+    /**
+     * 设置删除标识
+     *
+     * @param logicDelete LogicDelete
+     * @return this object
+     */
+    E setLogicDelete(Boolean logicDelete);
+
+    @Transient
+    default String getLogicDeleteColumnName() {
+        return LOGIC_DELETE_COLUMN_NAME;
+    }
+
+    /**
+     * 如果删除标识为 null, 则设置删除标识为 false，并返回删除标识
+     *
+     * @return this object
+     */
+    @SuppressWarnings("unchecked")
+    default E computeDefaultLogicDeleteIfAbsent() {
+        if (getLogicDelete() == null) {
+            setLogicDelete(Boolean.FALSE);
+        }
+        return (E) this;
+    }
+
+    @Override
+    default E randomEntity() {
+        return setLogicDelete(randomBoolean());
+    }
 
 }

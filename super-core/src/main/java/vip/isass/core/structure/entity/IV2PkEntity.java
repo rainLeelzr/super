@@ -167,15 +167,65 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import vip.isass.core.sequence.impl.LongSequence;
+
+import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author rain
+ * 含有主键类型的接口
+ * 主键类型泛型的定义始终放在第一位
+ *
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2PkEntity<PK extends Serializable, E extends IV2PkEntity<PK, E>> extends IV2Entity<E> {
+
+    Map<Class<?>, Class<?>> PK_CLASS_CACHE = new ConcurrentHashMap<>(64);
+
+    @SuppressWarnings("unchecked")
+    default Class<PK> findPkClass() {
+        Class<?> thisClass = this.getClass();
+        return (Class<PK>) PK_CLASS_CACHE.computeIfAbsent(thisClass, c -> {
+            Type[] types = thisClass.getGenericInterfaces();
+            String typeName = types[0].getTypeName();
+            System.out.println(typeName);
+            ParameterizedType parameterizedType = (ParameterizedType) types[0];
+            Type type = parameterizedType.getActualTypeArguments()[0];
+            return (Class<?>) type;
+        });
+    }
+    //
+    //    @SuppressWarnings("unchecked")
+    //    default Class<PK> findPkClass() {
+    //        Type[] types = this.getClass().getGenericInterfaces();
+    //        String typeName = types[0].getTypeName();
+    //        System.out.println(typeName);
+    //        ParameterizedType parameterizedType = (ParameterizedType) types[0];
+    //        Type type = parameterizedType.getActualTypeArguments()[0];
+    //        return (Class<PK>) type;
+    //    }
+
+    @SuppressWarnings("unchecked")
+    default PK randomPk() {
+        Class<PK> pkClass = findPkClass();
+        if (pkClass == String.class) {
+            return (PK) LongSequence.get().toString();
+        } else if (pkClass == Long.class) {
+            return (PK) LongSequence.get();
+        } else if (pkClass == Integer.class) {
+            return (PK) Integer.valueOf(RandomUtil.randomInt());
+        } else {
+            throw new UnsupportedOperationException(StrUtil.format(
+                "未支持自动生成类型为[{}]的主键", pkClass
+            ));
+        }
+    }
 
 }

@@ -167,15 +167,156 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.repository;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.entity.IV2Entity;
+import vip.isass.core.structure.entity.IV2IdEntity;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author rain
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2Repository<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> {
+
+    Logger LOGGER = LoggerFactory.getLogger(IV2Repository.class);
+
+    Map<Class<?>, String> ID_COLUMN_NAMES = new ConcurrentHashMap<>(64);
+
+    default String getIdColumnName(Class<?> clazz) {
+        return ID_COLUMN_NAMES.computeIfAbsent(clazz, c -> {
+            if (IV2IdEntity.class.isAssignableFrom(c)) {
+                IV2IdEntity entity = null;
+                try {
+                    entity = (IV2IdEntity) c.newInstance();
+                } catch (Exception e) {
+                    LOGGER.error("{}", e.getMessage(), e);
+                }
+                return StrUtil.nullToEmpty(entity.getIdColumnName());
+            }
+            return "";
+        });
+    }
+
+    // ****************************** 增 start ******************************
+
+    default boolean add(E entity) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean addBatch(Collection<E> entities) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean addBatch(Collection<E> entities, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    default E addOrUpdate(E entity, List<String> uniqueColumns) {
+        throw new UnsupportedOperationException();
+    }
+
+    // ****************************** 删 start ******************************
+
+    default boolean deleteById(Serializable id) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean deleteByIds(Collection<? extends Serializable> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean deleteByCriteria(IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    //****************************** 改 start ******************************
+
+    default boolean updateById(E entity) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean updateAllColumnsById(E entity) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean updateByCriteria(E entity, IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    // ****************************** 查 start ******************************
+
+    default E getEntityById(Serializable id) {
+        throw new UnsupportedOperationException();
+    }
+
+    default E getByIdOrException(Serializable id) {
+        throw new UnsupportedOperationException();
+    }
+
+    default E getByCriteria(IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    default E getByCriteriaOrWarn(IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    default E getByCriteriaOrException(IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    default List<E> findByCriteria(IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    default IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    default List<E> findAll() {
+        throw new UnsupportedOperationException();
+    }
+
+    default Integer countByCriteria(IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    default Integer countAll() {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean isPresentById(Serializable id) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean isPresentByColumn(String columnName, Object value) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean isPresentByCriteria(IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    default void exceptionIfPresentByCriteria(IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    default void exceptionIfAbsentByCriteria(IV2Criteria<E, C> criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean addIfAbsent(E entity, List<String> uniqueColumns) {
+        throw new UnsupportedOperationException();
+    }
 
 }

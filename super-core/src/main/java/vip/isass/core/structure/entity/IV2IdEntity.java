@@ -167,15 +167,71 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
+import java.beans.Transient;
+import java.io.Serializable;
 
 /**
- * @author rain
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2IdEntity<PK extends Serializable, E extends IV2IdEntity<PK, E>>
+    extends IV2PkEntity<PK, E> {
+
+    //  默认的 id 字段名
+    String ID_COLUMN_NAME = "id";
+
+    //  默认的 id 成员变量名
+    String ID_PROPERTY = "id";
+
+    @Transient
+    default String getIdColumnName() {
+        return ID_COLUMN_NAME;
+    }
+
+    /**
+     * @return id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    PK getId();
+
+    /**
+     * 设置 id
+     *
+     * @param id id
+     * @return this object
+     */
+    E setId(PK id);
+
+    /**
+     * 生成一个随机 id
+     *
+     * @return this object
+     */
+    default E randomId() {
+        return setId(randomPk());
+    }
+
+    /**
+     * 如果 id 为 null, 则生成一个随机 id，并返回 id
+     *
+     * @return this object
+     */
+    @SuppressWarnings("unchecked")
+    default E randomIdIfAbsent() {
+        if (StrUtil.isEmptyIfStr(getId())) {
+            randomId();
+        }
+        return (E) this;
+    }
+
+    @Override
+    default E randomEntity() {
+        return randomId();
+    }
 
 }

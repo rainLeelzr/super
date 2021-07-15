@@ -202,11 +202,14 @@ public class IsassOperationSummaryReader implements OperationBuilderPlugin {
         }
         Api api = apiAnnotation.get();
         String[] tags = api.tags();
+
         if (ArrayUtil.isEmpty(tags)
             || StrUtil.isBlank(tags[0])
-            || !tags[0].startsWith("v1")) {
+            || !(tags[0].startsWith("v1") || tags[0].startsWith("v2"))) {
             return;
         }
+
+        String version = StrUtil.subWithLength(tags[0], 0, 2);
 
         String summary = "";
         Optional<ApiOperation> apiOperationAnnotation = context.findAnnotation(ApiOperation.class);
@@ -218,7 +221,7 @@ public class IsassOperationSummaryReader implements OperationBuilderPlugin {
         }
 
         summary = new StringBuilder(summary)
-            .insert(summary.indexOf("-"), "-" + StrUtil.removePrefix(tags[0], "v1"))
+            .insert(summary.indexOf("-"), "-" + StrUtil.removePrefix(tags[0], version))
             .toString();
         context.operationBuilder().summary(descriptions.resolve(summary));
     }

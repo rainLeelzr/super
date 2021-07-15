@@ -167,15 +167,43 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.entity;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import java.beans.Transient;
+import java.io.Serializable;
 
 /**
- * @author rain
+ * 租户实体
+ *
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2TenantEntity<PK extends Serializable, E extends IV2TenantEntity<PK, E>> extends IV2PkEntity<PK, E> {
+
+    String TENANT_COLUMN_NAME = "tenant_id";
+
+    /**
+     * 获取 租户 id
+     *
+     * @return 租户 id
+     */
+    PK getTenantId();
+
+    /**
+     * 设置租户 id
+     *
+     * @param tenantId 租户 id
+     * @return this object
+     */
+    E setTenantId(PK tenantId);
+
+    @Transient
+    default String getTenantColumnName() {
+        return TENANT_COLUMN_NAME;
+    }
+
+    @Override
+    default E randomEntity() {
+        return setTenantId(randomPk());
+    }
 
 }

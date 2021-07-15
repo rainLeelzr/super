@@ -167,15 +167,15 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.mapper;
+package vip.isass.core.structure.criteria;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import vip.isass.core.structure.entity.IV2Entity;
 
 /**
- * @author rain
+ * 基于mysql的条件
+ *
+ * @author Rain
  */
-@Mapper
-public interface IMapper<EDB> extends BaseMapper<EDB> {
+public interface IV2Criteria<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> {
 
 }
