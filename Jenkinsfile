@@ -6,6 +6,7 @@ pipeline {
         COMMIT_ID = sh(script: "git log -1 --pretty='%h'", returnStdout: true).trim()
         COMMIT_LOGS = sh(script: "git log -1 --pretty='%s'", returnStdout: true).trim()
         AUTHORS = sh(script: "git log --oneline -1 --format=%an", returnStdout: true).trim()
+        FILE_CHANGES = sh(script: "git log -1 --pretty=tformat: --numstat | gawk '{ add += \$1 ; subs += \$2 ;} END { printf \"增加%s行, 删除%s行\",add,subs }'", returnStdout: true).trim()
     }
 
     stages {
@@ -37,6 +38,7 @@ pipeline {
             echo "[${JOB_NAME}]部署结果[${currentBuild.result}]"
             echo "作者：${AUTHORS}\n内容：${COMMIT_LOGS}"
             deleteDir()
+//            sh """curl -X POST -H 'Content-Type: application/json' -d ' {"msgtype": "markdown","markdown": {"content": "jenkins任务：${JOB_NAME}\n> 部署结果：${currentBuild.result}\n> 作者：${AUTHORS}\n> 内容：${COMMIT_LOGS}\n> 变更：${FILE_CHANGES}\n> 链接：[jenkins任务日志链接](${BUILD_URL}console)" } }' https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx"""
         }
     }
 }
