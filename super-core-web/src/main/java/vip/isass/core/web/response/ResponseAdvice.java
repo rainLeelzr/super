@@ -167,228 +167,50 @@
  *
  */
 
-package vip.isass.core.structure.service;
+package vip.isass.core.web.response;
 
-import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import vip.isass.core.structure.criteria.IV2Criteria;
-import vip.isass.core.structure.entity.IV2Entity;
+import lombok.SneakyThrows;
+import org.springframework.core.MethodParameter;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+import vip.isass.core.support.JsonUtil;
+import vip.isass.core.web.Resp;
+import vip.isass.core.web.structure.IV2ControllerEntryPoint;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
+/**
+ * 把 controller 的返回值转换为 resp
+ */
+@RestControllerAdvice
+public class ResponseAdvice implements ResponseBodyAdvice<Object> {
 
-public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria<E, C>, S extends IV2Service<E, C>>
-    extends IV2Service<E, C> {
-
-    Logger LOGGER = LoggerFactory.getLogger(IV2ServiceManager.class);
-
-    List<S> getServices();
-
-    // region 增
-
-    default E add(E entity) {
-        return applyUntilNotNull(s -> s.add(entity));
-    }
-
-    default Collection<E> addBatch(Collection<E> entities) {
-        return applyUntilNotNull(s -> s.addBatch(entities));
-    }
-
-    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        return applyUntilNotNull(s -> s.addBatch(entities, batchSize));
-    }
-
-    default E addIfAbsent(E entity, C criteria) {
-        return applyUntilNotNull(s -> s.addIfAbsent(entity, criteria));
+    @Override
+    public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+        if (returnType.getParameterType() == Resp.class
+            || returnType.getParameterType() == ResponseEntity.class
+            || returnType.getParameterType() == void.class
+            || returnType.getParameterType() == Void.class) {
+            return false;
+        }
+        return IV2ControllerEntryPoint.class.isAssignableFrom(returnType.getContainingClass());
     }
 
     @Override
-    default Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addBatchIfAbsent(entities, uniqueColumns));
+    @SneakyThrows
+    public Object beforeBodyWrite(Object body,
+                                  MethodParameter returnType,
+                                  MediaType selectedContentType,
+                                  Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                                  ServerHttpRequest request,
+                                  ServerHttpResponse response) {
+        Resp<Object> resp = Resp.bizSuccess(body);
+        return body instanceof String
+            ? JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(resp)
+            : resp;
     }
-
-    @Override
-    default E addOrUpdate(E entity, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addOrUpdate(entity, uniqueColumns));
-    }
-
-    @Override
-    default Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addOrUpdateEntities(entities, uniqueColumns));
-    }
-
-    @Override
-    default Boolean addOrUpdateByCriteria(E entity, C criteria) {
-        return applyUntilNotNull(s -> s.addOrUpdateByCriteria(entity, criteria));
-    }
-
-    // endregion
-
-    //  region 删
-
-    default Boolean deleteById(Serializable id) {
-        return applyUntilNotNull(s -> s.deleteById(id));
-    }
-
-    default Boolean deleteByIds(Collection<Serializable> ids) {
-        return applyUntilNotNull(s -> s.deleteByIds(ids));
-    }
-
-    default Boolean deleteByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.deleteByCriteria(criteria));
-    }
-
-    // endregion
-
-    // region 改
-
-    default Boolean updateById(E entity) {
-        return applyUntilNotNull(s -> s.updateById(entity));
-    }
-
-    default Boolean updateAllColumnsById(E entity) {
-        return applyUntilNotNull(s -> s.updateAllColumnsById(entity));
-    }
-
-    default void updateByIdOrException(E entity) {
-        consume(s -> s.updateByIdOrException(entity));
-    }
-
-    default Boolean updateByCriteria(E entity, C criteria) {
-        return applyUntilNotNull(s -> s.updateByCriteria(entity, criteria));
-    }
-
-    default void updateByCriteriaOrException(E entity, C criteria) {
-        consume(s -> s.updateByCriteriaOrException(entity, criteria));
-    }
-
-    // endregion
-
-    //  region 查
-
-    default E getById(Serializable id) {
-        return applyUntilNotNull(s -> s.getById(id));
-    }
-
-    default E getByIdOrException(Serializable id) {
-        return applyUntilNotNull(s -> s.getByIdOrException(id));
-    }
-
-    default E getByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.getByCriteria(criteria));
-    }
-
-    default E getByCriteriaOrWarn(C criteria) {
-        return applyUntilNotNull(s -> s.getByCriteriaOrWarn(criteria));
-    }
-
-    default E getByCriteriaOrException(C criteria) {
-        return applyUntilNotNull(s -> s.getByCriteriaOrException(criteria));
-    }
-
-    default List<E> findByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.findByCriteria(criteria));
-    }
-
-    default IPage<E> findPageByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.findPageByCriteria(criteria));
-    }
-
-    default List<E> findAll() {
-        return applyUntilNotNull(IV2Service::findAll);
-    }
-
-    default Integer countByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.countByCriteria(criteria));
-    }
-
-    default Integer countAll() {
-        return applyUntilNotNull(IV2Service::countAll);
-    }
-
-    default boolean isPresentById(Serializable id) {
-        return applyUntilNotNull(s -> s.isPresentById(id));
-    }
-
-    default boolean isPresentByColumn(String columnName, Object value) {
-        return applyUntilNotNull(s -> s.isPresentByColumn(columnName, value));
-    }
-
-    default boolean isPresentByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.isPresentByCriteria(criteria));
-    }
-
-    default boolean isAbsentByColumn(String columnName, Object value) {
-        return applyUntilNotNull(s -> s.isAbsentByColumn(columnName, value));
-    }
-
-    default boolean isAbsentByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.isAbsentByCriteria(criteria));
-    }
-
-    default void exceptionIfPresentByCriteria(C criteria) {
-        consume(s -> s.exceptionIfPresentByCriteria(criteria));
-    }
-
-    default void exceptionIfAbsentByCriteria(C criteria) {
-        consume(s -> s.exceptionIfAbsentByCriteria(criteria));
-    }
-
-    // endregion
-
-    // region util
-
-    default <V> V applyUntilNotNull(Function<S, V> function) {
-        checkServices();
-
-        for (S service : getServices()) {
-            V value = function.apply(service);
-            if (value != null) {
-                return value;
-            }
-        }
-        return null;
-    }
-
-    default void consume(Consumer<S> consumer) {
-        checkServices();
-
-        for (S service : getServices()) {
-            consumer.accept(service);
-            return;
-        }
-    }
-
-    default void consumeWithoutException(Consumer<S> consumer) {
-        checkServices();
-
-        for (S service : getServices()) {
-            try {
-                consumer.accept(service);
-                return;
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-        }
-    }
-
-    default void checkServices() {
-        if (getServices() == null) {
-            Class<?>[] interfaces = this.getClass().getInterfaces();
-            throw new UnsupportedOperationException(
-                StrUtil.format(
-                    "当前服务没有[{}]的实现类",
-                    interfaces.length > 0
-                        ? interfaces[0].getSimpleName()
-                        : this.getClass().getSimpleName()));
-        }
-    }
-
-    // endregion
 
 }
