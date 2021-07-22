@@ -167,54 +167,63 @@
  *
  */
 
-package vip.isass.core.structure.entity;
+package vip.isass.core.converter.datatime;
 
-import cn.hutool.core.util.RandomUtil;
-import lombok.Builder;
-import vip.isass.core.support.LocalDateTimeUtil;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.format.FastDateFormat;
+import cn.hutool.core.util.StrUtil;
+import org.springframework.stereotype.Component;
+import vip.isass.core.support.Converter;
 
 /**
+ * 把任何表示形式的 string 类型的日期时间，转换成 long 类型的时间戳
+ *
  * @author Rain
  */
-public interface IV2Entity<E extends IV2Entity<E>> {
+@Component
+public class StringDateToMillisConverter implements Converter<String, Long> {
 
-    long serialVersionUID = 1L;
+    private static final String FORMAT = "yyyy/M/dd HH:mm";
 
-    default String randomString() {
-        return RandomUtil.randomString(6);
+    private static final FastDateFormat SDF = FastDateFormat.getInstance(FORMAT);
+
+    @Override
+    public boolean supportSourceType(Object source) {
+        return source instanceof String;
     }
 
-    default Byte randomByte() {
-        return (byte) RandomUtil.randomInt(Byte.MAX_VALUE);
+    @Override
+    public boolean supportTargetClass(Class clazz) {
+        return Long.class.isAssignableFrom(clazz);
     }
 
-    default Boolean randomBoolean() {
-        return RandomUtil.randomBoolean();
+    @Override
+    public Long convert(String source) {
+        return convert0(source);
     }
 
-    default Integer randomInteger() {
-        return RandomUtil.randomInt();
-    }
+    public static Long convert0(String source) {
+        if (StrUtil.isBlank(source)) {
+            return null;
+        }
 
-    default Long randomLong() {
-        return RandomUtil.randomLong();
-    }
+        try {
+            return Long.parseLong(source);
+        } catch (NumberFormatException e) {
+            // do nothing
+        }
 
-    default BigDecimal randomBigDecimal() {
-        return RandomUtil.randomBigDecimal(BigDecimal.TEN);
-    }
+        try {
+            return DateUtil.parse(source).getTime();
+        } catch (Exception e) {
+            // do nothing
+        }
 
-    default LocalDateTime randomLocalDateTime() {
-        return LocalDateTimeUtil.now();
-    }
+        if (source.length() == FORMAT.length() || source.length() == FORMAT.length() + 1) {
+            return DateUtil.parse(source, SDF).getTime();
+        }
 
-    /**
-     * 生成随机的entity
-     * 所有字段都随机赋值
-     */
-    E randomEntity();
+        throw new IllegalArgumentException("StringDateToLong 转换失败：" + source);
+    }
 
 }

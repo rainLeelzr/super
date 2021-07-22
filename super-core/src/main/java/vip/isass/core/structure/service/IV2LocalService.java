@@ -173,7 +173,6 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.Ordered;
 import vip.isass.core.exception.AbsentException;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
@@ -188,8 +187,10 @@ import java.util.List;
 /**
  * @author rain
  */
-public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
-    extends IV2Service<E, C>, Ordered {
+public interface IV2LocalService<
+    E extends IV2Entity<E>,
+    C extends IV2Criteria<E, C>
+    > extends IV2Service<E, C> {
 
     Logger LOGGER = LoggerFactory.getLogger(IV2LocalService.class);
 
@@ -200,7 +201,8 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return ApiOrder.LOCAL_SERVICE;
     }
 
-    // ****************************** 增 start ******************************
+    // region 增
+
     default E add(E entity) {
         getRepository().add(entity);
         return entity;
@@ -211,12 +213,14 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return entities;
     }
 
-    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
+    @Override
+    default Collection<E> addBatchByBatchSize(Collection<E> entities, int batchSize) {
         getRepository().addBatch(entities, batchSize);
         return entities;
     }
 
-    default E addIfAbsent(E entity, C criteria) {
+    @Override
+    default E addIfAbsentByCriteria(E entity, C criteria) {
         if (this.isAbsentByCriteria(criteria)) {
             return this.add(entity);
         }
@@ -224,10 +228,18 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns) {
+    default E addIfAbsentByColumns(E entity, List<String> uniqueColumns) {
+        if (getRepository().addIfAbsentByColumns(entity, uniqueColumns)) {
+            return this.add(entity);
+        }
+        return null;
+    }
+
+    @Override
+    default Integer addBatchIfAbsentByCriteria(List<E> entities, C criteria) {
         int count = 0;
         for (E entity : entities) {
-            if (getRepository().addIfAbsent(entity, uniqueColumns)) {
+            if (getRepository().addIfAbsentByCriteria(entity, criteria)) {
                 count++;
             }
         }
@@ -235,23 +247,21 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
     }
 
     @Override
-    default E addOrUpdate(E entity, List<String> uniqueColumns) {
-        return getRepository().addOrUpdate(entity, uniqueColumns);
-    }
-
-    @Override
-    default Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns) {
+    default Integer addBatchIfAbsentByColumns(List<E> entities, List<String> uniqueColumns) {
+        int count = 0;
         for (E entity : entities) {
-            getRepository().addOrUpdate(entity, uniqueColumns);
+            if (getRepository().addIfAbsentByColumns(entity, uniqueColumns)) {
+                count++;
+            }
         }
-        return entities.size();
+        return count;
     }
 
     @Override
     default Boolean addOrUpdateByCriteria(E entity, C criteria) {
         Assert.isTrue(criteria instanceof IV2WhereConditionCriteria, "criteria 必需实现 IV2WhereConditionCriteria");
-        assert criteria instanceof IV2WhereConditionCriteria;
-        //noinspection rawtypes
+        Assert.isTrue(criteria instanceof IV2WhereConditionCriteria, "criteria 必需是 IV2WhereConditionCriteria 的子类");
+
         Assert.notEmpty(((IV2WhereConditionCriteria) criteria).getWhereConditions(),
             "必需设置更新条件");
         Boolean update = updateByCriteria(entity, criteria);
@@ -261,7 +271,22 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return true;
     }
 
-    // ****************************** 删 start ******************************
+    @Override
+    default E addOrUpdateByColumns(E entity, List<String> uniqueColumns) {
+        return getRepository().addOrUpdate(entity, uniqueColumns);
+    }
+
+    @Override
+    default Integer addOrUpdateBatchByColumns(List<E> entities, List<String> uniqueColumns) {
+        for (E entity : entities) {
+            getRepository().addOrUpdate(entity, uniqueColumns);
+        }
+        return entities.size();
+    }
+
+    // endregion
+
+    //  region 删
 
     default Boolean deleteById(Serializable id) {
         return getRepository().deleteById(id);
@@ -275,7 +300,9 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getRepository().deleteByCriteria(criteria);
     }
 
-    //****************************** 改 start ******************************
+    // endregion
+
+    // region 改
 
     default Boolean updateById(E entity) {
         return getRepository().updateById(entity);
@@ -301,7 +328,10 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         }
     }
 
-    // ****************************** 查 start ******************************
+    // endregion
+
+    //  region 查
+
     default E getById(Serializable id) {
         Assert.notNull(id, "id");
         return getRepository().getEntityById(id);
@@ -344,23 +374,23 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
         return getRepository().countAll();
     }
 
-    default boolean isPresentById(Serializable id) {
+    default Boolean isPresentById(Serializable id) {
         return getRepository().isPresentById(id);
     }
 
-    default boolean isPresentByColumn(String columnName, Object value) {
+    default Boolean isPresentByColumn(String columnName, Object value) {
         return getRepository().isPresentByColumn(columnName, value);
     }
 
-    default boolean isPresentByCriteria(C criteria) {
+    default Boolean isPresentByCriteria(C criteria) {
         return getRepository().isPresentByCriteria(criteria);
     }
 
-    default boolean isAbsentByColumn(String columnName, Object value) {
+    default Boolean isAbsentByColumn(String columnName, Object value) {
         return !isPresentByColumn(columnName, value);
     }
 
-    default boolean isAbsentByCriteria(C criteria) {
+    default Boolean isAbsentByCriteria(C criteria) {
         return !isPresentByCriteria(criteria);
     }
 
@@ -371,5 +401,7 @@ public interface IV2LocalService<E extends IV2Entity<E>, C extends IV2Criteria<E
     default void exceptionIfAbsentByCriteria(C criteria) {
         getRepository().exceptionIfAbsentByCriteria(criteria);
     }
+
+    // endregion
 
 }

@@ -167,35 +167,37 @@
  *
  */
 
-package vip.isass.core.converter;
+package vip.isass.core.converter.datatime;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.converter.Converter;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
-import vip.isass.core.entity.Json;
-import vip.isass.core.exception.UnifiedException;
-import vip.isass.core.exception.code.StatusMessageEnum;
+import vip.isass.core.structure.criteria.V2WhereCondition;
+import vip.isass.core.support.Converter;
+import vip.isass.core.support.JsonUtil;
 
 /**
+ * 把 json 字符串类型的 v2查询条件，转换成 V2WhereCondition
+ *
  * @author Rain
  */
 @Component
-public class StringToJsonConverter implements Converter<Object, Json> {
-
-    @Autowired(required = false)
-    private Json json;
+public class StringToV2WhereConditionConverter implements Converter<String, V2WhereCondition> {
 
     @Override
-    public Json convert(Object source) {
-        if (json == null) {
-            throw new UnsupportedOperationException("当前环境没有json实现");
-        }
-        try {
-            Json temp = this.json.getClass().newInstance();
-            return temp.fromObject(source);
-        } catch (Exception e) {
-            throw new UnifiedException(StatusMessageEnum.FAIL, "反序列化jsonb字段错误：{}" + e.getMessage());
-        }
+    public boolean supportSourceType(Object source) {
+        return source instanceof String;
+    }
+
+    @Override
+    public boolean supportTargetClass(Class clazz) {
+        return V2WhereCondition.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    @SneakyThrows
+    public V2WhereCondition convert(String source) {
+        V2WhereCondition v2WhereCondition = JsonUtil.DEFAULT_INSTANCE.readValue(source, V2WhereCondition.class);
+        return v2WhereCondition;
     }
 
 }

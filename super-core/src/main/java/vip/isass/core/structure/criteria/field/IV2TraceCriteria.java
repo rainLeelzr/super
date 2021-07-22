@@ -193,8 +193,18 @@ public interface IV2TraceCriteria<
     // region 获取字段名方法
 
     @Transient
+    default String getCreateUserIdPropertyName() {
+        return IV2TraceEntity.CREATE_USER_ID_PROPERTY_NAME;
+    }
+
+    @Transient
     default String getCreateUserIdColumnName() {
         return IV2TraceEntity.CREATE_USER_ID_COLUMN_NAME;
+    }
+
+    @Transient
+    default String getCreateUserNamePropertyName() {
+        return IV2TraceEntity.CREATE_USER_NAME_PROPERTY_NAME;
     }
 
     @Transient
@@ -203,8 +213,18 @@ public interface IV2TraceCriteria<
     }
 
     @Transient
+    default String getCreatedTimePropertyName() {
+        return IV2TraceEntity.CREATED_TIME_PROPERTY_NAME;
+    }
+
+    @Transient
     default String getCreatedTimeColumnName() {
         return IV2TraceEntity.CREATED_TIME_COLUMN_NAME;
+    }
+
+    @Transient
+    default String getModifyUserIdPropertyName() {
+        return IV2TraceEntity.MODIFY_USER_ID_PROPERTY_NAME;
     }
 
     @Transient
@@ -213,8 +233,18 @@ public interface IV2TraceCriteria<
     }
 
     @Transient
+    default String getModifyUserNamePropertyName() {
+        return IV2TraceEntity.MODIFY_USER_NAME_PROPERTY_NAME;
+    }
+
+    @Transient
     default String getModifyUserNameColumnName() {
         return IV2TraceEntity.MODIFY_USER_NAME_COLUMN_NAME;
+    }
+
+    @Transient
+    default String getModifyTimeColumnPropertyName() {
+        return IV2TraceEntity.MODIFY_TIME_PROPERTY_NAME;
     }
 
     @Transient
@@ -229,7 +259,7 @@ public interface IV2TraceCriteria<
     @Transient
     default UPK getCreateUserId() {
         return this instanceof IV2WhereConditionCriteria
-            ? (UPK) ((IV2WhereConditionCriteria) this).getEquals(getCreateUserIdColumnName())
+            ? (UPK) ((IV2WhereConditionCriteria) this).getEquals(getCreateUserIdPropertyName())
             : null;
     }
 
@@ -238,84 +268,84 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserId(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).equals(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).equals(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserId(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserIdNotEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserIdNotEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C createUserIdIn(Collection<UPK> userIds) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).in(getCreateUserIdColumnName(), userIds)
+            ? (C) ((IV2WhereConditionCriteria) this).in(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userIds)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orCreateUserIdIn(Collection<UPK> userIds) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIn(getCreateUserIdColumnName(), userIds)
+            ? (C) ((IV2WhereConditionCriteria) this).orIn(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userIds)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C createUserIdNotIn(Collection<UPK> userIds) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notIn(getCreateUserIdColumnName(), userIds)
+            ? (C) ((IV2WhereConditionCriteria) this).notIn(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userIds)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orCreateUserIdNotIn(Collection<UPK> userIds) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getCreateUserIdColumnName(), userIds)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userIds)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserIdIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNull(getCreateUserIdColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNull(getCreateUserIdPropertyName(), getCreateUserIdColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserIdIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getCreateUserIdColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getCreateUserIdPropertyName(), getCreateUserIdColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserIdIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getCreateUserIdColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getCreateUserIdPropertyName(), getCreateUserIdColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserIdIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getCreateUserIdColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getCreateUserIdPropertyName(), getCreateUserIdColumnName())
             : (C) this;
     }
 
@@ -326,42 +356,42 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserIdLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).like(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).like(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserIdLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLike(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orLike(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserIdNotLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notLike(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).notLike(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserIdNotLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserIdStartWith(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).startWith(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).startWith(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserIdStartWith(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
@@ -372,56 +402,56 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserIdLessThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).lessThan(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).lessThan(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserIdLessThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserIdLessThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserIdLessThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserIdGreaterThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserIdGreaterThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserIdGreaterThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserIdGreaterThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getCreateUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getCreateUserIdPropertyName(), getCreateUserIdColumnName(), userId)
             : (C) this;
     }
 
@@ -443,84 +473,84 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserName(String userName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).equals(getCreateUserNameColumnName(), userName)
+            ? (C) ((IV2WhereConditionCriteria) this).equals(getCreateUserNamePropertyName(), getCreateUserNameColumnName(), userName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserName(String userName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getCreateUserNameColumnName(), userName)
+            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getCreateUserNamePropertyName(), getCreateUserNameColumnName(), userName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserNameNotEqual(String userName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getCreateUserNameColumnName(), userName)
+            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getCreateUserNamePropertyName(), getCreateUserNameColumnName(), userName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserNameNotEqual(String userName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getCreateUserNameColumnName(), userName)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getCreateUserNamePropertyName(), getCreateUserNameColumnName(), userName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C createUserNameIn(Collection<String> userNames) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).in(getCreateUserNameColumnName(), userNames)
+            ? (C) ((IV2WhereConditionCriteria) this).in(getCreateUserNamePropertyName(), getCreateUserNameColumnName(), userNames)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orCreateUserNameIn(Collection<String> userNames) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIn(getCreateUserNameColumnName(), userNames)
+            ? (C) ((IV2WhereConditionCriteria) this).orIn(getCreateUserNamePropertyName(), getCreateUserNameColumnName(), userNames)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C createUserNameNotIn(Collection<String> userNames) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notIn(getCreateUserNameColumnName(), userNames)
+            ? (C) ((IV2WhereConditionCriteria) this).notIn(getCreateUserNamePropertyName(), getCreateUserNameColumnName(), userNames)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orCreateUserNameNotIn(Collection<String> userNames) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getCreateUserNameColumnName(), userNames)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getCreateUserNamePropertyName(), getCreateUserNameColumnName(), userNames)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserNameIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNull(getCreateUserNameColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNull(getCreateUserNamePropertyName(), getCreateUserNameColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserNameIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getCreateUserNameColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getCreateUserNamePropertyName(), getCreateUserNameColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserNameIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getCreateUserNameColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getCreateUserNamePropertyName(), getCreateUserNameColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserNameIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getCreateUserNameColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getCreateUserNamePropertyName(), getCreateUserNameColumnName())
             : (C) this;
     }
 
@@ -531,42 +561,42 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserNameLike(String userName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).like(getCreateUserNameColumnName(), userName)
+            ? (C) ((IV2WhereConditionCriteria) this).like(getCreateUserNameColumnName(), getCreateUserNameColumnName(), userName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserNameLike(String userName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLike(getCreateUserNameColumnName(), userName)
+            ? (C) ((IV2WhereConditionCriteria) this).orLike(getCreateUserNameColumnName(), getCreateUserNameColumnName(), userName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserNameNotLike(String userName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notLike(getCreateUserNameColumnName(), userName)
+            ? (C) ((IV2WhereConditionCriteria) this).notLike(getCreateUserNameColumnName(), getCreateUserNameColumnName(), userName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserNameNotLike(String userName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getCreateUserNameColumnName(), userName)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getCreateUserNameColumnName(), getCreateUserNameColumnName(), userName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateUserNameStartWith(String userName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).startWith(getCreateUserNameColumnName(), userName)
+            ? (C) ((IV2WhereConditionCriteria) this).startWith(getCreateUserNameColumnName(), getCreateUserNameColumnName(), userName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateUserNameStartWith(String userName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getCreateUserNameColumnName(), userName)
+            ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getCreateUserNameColumnName(), getCreateUserNameColumnName(), userName)
             : (C) this;
     }
 
@@ -579,7 +609,7 @@ public interface IV2TraceCriteria<
     @Transient
     default LocalDateTime getCreateTime() {
         return this instanceof IV2WhereConditionCriteria
-            ? (LocalDateTime) ((IV2WhereConditionCriteria) this).getEquals(getCreatedTimeColumnName())
+            ? (LocalDateTime) ((IV2WhereConditionCriteria) this).getEquals(getCreatedTimePropertyName())
             : null;
     }
 
@@ -588,84 +618,84 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateTime(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).equals(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).equals(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateTime(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateTimeNotEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateTimeNotEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C createTimeIn(Collection<LocalDateTime> createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).in(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).in(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orCreateTimeIn(Collection<LocalDateTime> createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIn(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orIn(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C createTimeNotIn(Collection<LocalDateTime> createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notIn(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).notIn(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orCreateTimeNotIn(Collection<LocalDateTime> createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateTimeIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNull(getCreatedTimeColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNull(getCreatedTimePropertyName(), getCreatedTimeColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateTimeIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getCreatedTimeColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getCreatedTimePropertyName(), getCreatedTimeColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateTimeIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getCreatedTimeColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getCreatedTimePropertyName(), getCreatedTimeColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateTimeIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getCreatedTimeColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getCreatedTimePropertyName(), getCreatedTimeColumnName())
             : (C) this;
     }
 
@@ -676,56 +706,56 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateTimeLessThan(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).lessThan(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).lessThan(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateTimeLessThan(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateTimeLessThanEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateTimeLessThanEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateTimeGreaterThan(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateTimeGreaterThan(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setCreateTimeGreaterThanEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrCreateTimeGreaterThanEqual(LocalDateTime createTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getCreatedTimeColumnName(), createTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getCreatedTimePropertyName(), getCreatedTimeColumnName(), createTime)
             : (C) this;
     }
 
@@ -738,7 +768,7 @@ public interface IV2TraceCriteria<
     @Transient
     default UPK getModifyUserId() {
         return this instanceof IV2WhereConditionCriteria
-            ? (UPK) ((IV2WhereConditionCriteria) this).getEquals(getModifyUserIdColumnName())
+            ? (UPK) ((IV2WhereConditionCriteria) this).getEquals(getModifyUserIdPropertyName())
             : null;
     }
 
@@ -747,84 +777,84 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserId(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).equals(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).equals(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserId(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserIdNotEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserIdNotEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C modifyUserIdIn(Collection<UPK> userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).in(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).in(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orModifyUserIdIn(Collection<UPK> userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIn(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orIn(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C modifyUserIdNotIn(Collection<UPK> userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notIn(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).notIn(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orModifyUserIdNotIn(Collection<UPK> userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserIdIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNull(getModifyUserIdColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNull(getModifyUserIdPropertyName(), getModifyUserIdColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserIdIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getModifyUserIdColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getModifyUserIdPropertyName(), getModifyUserIdColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserIdIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getModifyUserIdColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getModifyUserIdPropertyName(), getModifyUserIdColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserIdIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getModifyUserIdColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getModifyUserIdPropertyName(), getModifyUserIdColumnName())
             : (C) this;
     }
 
@@ -835,42 +865,42 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserIdLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).like(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).like(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserIdLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLike(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orLike(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserIdNotLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notLike(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).notLike(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserIdNotLike(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserIdStartWith(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).startWith(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).startWith(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserIdStartWith(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
@@ -881,56 +911,56 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserIdLessThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).lessThan(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).lessThan(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserIdLessThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserIdLessThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserIdLessThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserIdGreaterThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserIdGreaterThan(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserIdGreaterThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserIdGreaterThanEqual(UPK userId) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getModifyUserIdColumnName(), userId)
+            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getModifyUserIdPropertyName(), getModifyUserIdColumnName(), userId)
             : (C) this;
     }
 
@@ -943,7 +973,7 @@ public interface IV2TraceCriteria<
     @Transient
     default String getModifyUserName() {
         return this instanceof IV2WhereConditionCriteria
-            ? (String) ((IV2WhereConditionCriteria) this).getEquals(getModifyUserNameColumnName())
+            ? (String) ((IV2WhereConditionCriteria) this).getEquals(getModifyUserNamePropertyName())
             : null;
     }
 
@@ -952,84 +982,84 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserName(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).equals(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).equals(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserName(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserNameNotEqual(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserNameNotEqual(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C modifyUserNameIn(Collection<String> modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).in(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).in(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orModifyUserNameIn(Collection<String> modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIn(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).orIn(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C modifyUserNameNotIn(Collection<String> modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notIn(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).notIn(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orModifyUserNameNotIn(Collection<String> modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserNameIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNull(getModifyUserNameColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNull(getModifyUserNamePropertyName(), getModifyUserNameColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserNameIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getModifyUserNameColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getModifyUserNamePropertyName(), getModifyUserNameColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserNameIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getModifyUserNameColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getModifyUserNamePropertyName(), getModifyUserNameColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserNameIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getModifyUserNameColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getModifyUserNamePropertyName(), getModifyUserNameColumnName())
             : (C) this;
     }
 
@@ -1040,42 +1070,42 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserNameLike(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).like(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).like(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserNameLike(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLike(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).orLike(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserNameNotLike(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notLike(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).notLike(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserNameNotLike(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotLike(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyUserNameStartWith(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).startWith(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).startWith(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyUserNameStartWith(String modifyUserName) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getModifyUserNameColumnName(), modifyUserName)
+            ? (C) ((IV2WhereConditionCriteria) this).orStartWith(getModifyUserNamePropertyName(), getModifyUserNameColumnName(), modifyUserName)
             : (C) this;
     }
 
@@ -1088,7 +1118,7 @@ public interface IV2TraceCriteria<
     @Transient
     default LocalDateTime getModifyTime() {
         return this instanceof IV2WhereConditionCriteria
-            ? (LocalDateTime) ((IV2WhereConditionCriteria) this).getEquals(getModifyTimeColumnColumnName())
+            ? (LocalDateTime) ((IV2WhereConditionCriteria) this).getEquals(getModifyTimeColumnPropertyName())
             : null;
     }
 
@@ -1097,84 +1127,84 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyTime(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).equals(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).equals(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyTime(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyTimeNotEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyTimeNotEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C modifyTimeIn(Collection<LocalDateTime> modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).in(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).in(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orModifyTimeIn(Collection<LocalDateTime> modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIn(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orIn(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C modifyTimeNotIn(Collection<LocalDateTime> modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).notIn(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).notIn(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C orModifyTimeNotIn(Collection<LocalDateTime> modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyTimeIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNull(getModifyTimeColumnColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNull(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyTimeIsNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getModifyTimeColumnColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyTimeIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getModifyTimeColumnColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName())
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyTimeIsNotNull() {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getModifyTimeColumnColumnName())
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName())
             : (C) this;
     }
 
@@ -1185,56 +1215,56 @@ public interface IV2TraceCriteria<
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyTimeLessThan(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).lessThan(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).lessThan(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyTimeLessThan(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyTimeLessThanEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyTimeLessThanEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyTimeGreaterThan(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyTimeGreaterThan(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setModifyTimeGreaterThanEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default C setOrModifyTimeGreaterThanEqual(LocalDateTime modifyTime) {
         return this instanceof IV2WhereConditionCriteria
-            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getModifyTimeColumnColumnName(), modifyTime)
+            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getModifyTimeColumnPropertyName(), getModifyTimeColumnColumnName(), modifyTime)
             : (C) this;
     }
 

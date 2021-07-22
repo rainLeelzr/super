@@ -167,28 +167,19 @@
  *
  */
 
-package vip.isass.core.converter;
+package vip.isass.core.database.mybatisplus.json;
 
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.stereotype.Component;
-import vip.isass.core.support.LocalDateTimeUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.util.StdConverter;
+import vip.isass.core.support.JsonUtil;
 
-import java.time.LocalDate;
-
-/**
- * @author Rain
- */
-@Component
-public class StringToLocalDateConverter implements Converter<String, LocalDate> {
+public class JsonNodeToIPageConvert extends StdConverter<JsonNode, IPage<?>> {
 
     @Override
-    public LocalDate convert(String source) {
-        return convert0(source);
-    }
-
-    public static LocalDate convert0(String source) {
-        Long convert = StringDateToMillisConverter.convert0(source);
-        return LocalDateTimeUtil.epochMilliToLocalDate(convert);
+    public IPage<?> convert(JsonNode value) {
+        return JsonUtil.DEFAULT_INSTANCE.convertValue(value, Page.class);
     }
 
 }

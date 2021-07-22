@@ -167,54 +167,44 @@
  *
  */
 
-package vip.isass.core.structure.entity;
+package vip.isass.core.converter.datatime;
 
-import cn.hutool.core.util.RandomUtil;
-import lombok.Builder;
-import vip.isass.core.support.LocalDateTimeUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import vip.isass.core.support.Converter;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
+ * 把 Collection 类型，转换成 http query string，用逗号拼接
+ *
  * @author Rain
  */
-public interface IV2Entity<E extends IV2Entity<E>> {
+@Component
+public class CollectionToQueryStringConverter implements Converter<Collection, String> {
 
-    long serialVersionUID = 1L;
-
-    default String randomString() {
-        return RandomUtil.randomString(6);
+    @Override
+    public boolean supportSourceType(Object source) {
+        return source instanceof Collection;
     }
 
-    default Byte randomByte() {
-        return (byte) RandomUtil.randomInt(Byte.MAX_VALUE);
+    @Override
+    public boolean supportTargetClass(Class clazz) {
+        return String.class.isAssignableFrom(clazz);
     }
 
-    default Boolean randomBoolean() {
-        return RandomUtil.randomBoolean();
+    @Override
+    public String convert(Collection source) {
+        return convert0(source);
     }
 
-    default Integer randomInteger() {
-        return RandomUtil.randomInt();
+    public static String convert0(Collection source) {
+        return CollUtil.join(source, ",");
     }
-
-    default Long randomLong() {
-        return RandomUtil.randomLong();
-    }
-
-    default BigDecimal randomBigDecimal() {
-        return RandomUtil.randomBigDecimal(BigDecimal.TEN);
-    }
-
-    default LocalDateTime randomLocalDateTime() {
-        return LocalDateTimeUtil.now();
-    }
-
-    /**
-     * 生成随机的entity
-     * 所有字段都随机赋值
-     */
-    E randomEntity();
 
 }

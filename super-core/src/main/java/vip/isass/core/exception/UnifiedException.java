@@ -204,6 +204,10 @@ public class UnifiedException extends RuntimeException implements IStatusMessage
         this(statusCode.getStatus(), msg, args);
     }
 
+    public static UnifiedException newException(IStatusMessage statusCode, Object... args) {
+        return new UnifiedException(statusCode.getStatus(), statusCode.getMsg(), args);
+    }
+
     public UnifiedException(Integer status) {
         this.status = status;
     }

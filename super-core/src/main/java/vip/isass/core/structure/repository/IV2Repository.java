@@ -315,7 +315,11 @@ public interface IV2Repository<E extends IV2Entity<E>, C extends IV2Criteria<E, 
         throw new UnsupportedOperationException();
     }
 
-    default boolean addIfAbsent(E entity, List<String> uniqueColumns) {
+    default boolean addIfAbsentByCriteria(E entity, C criteria) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean addIfAbsentByColumns(E entity, List<String> uniqueColumns) {
         throw new UnsupportedOperationException();
     }
 

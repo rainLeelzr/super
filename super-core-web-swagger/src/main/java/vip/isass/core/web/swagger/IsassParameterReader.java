@@ -481,7 +481,7 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             return Optional.empty();
         }
         return Optional.of(Collections.singletonList(new ParameterBuilder()
-            .name(IV2IdEntity.ID_PROPERTY)
+            .name(IV2IdEntity.ID_PROPERTY_NAME)
             .description("主键")
             .parameterType("query")
             .modelRef(MODEL_REF)
@@ -495,42 +495,42 @@ public class IsassParameterReader implements OperationBuilderPlugin {
         }
         return Optional.of(CollUtil.newArrayList(
             new ParameterBuilder()
-                .name(IV2TraceEntity.CREATE_USER_ID_PROPERTY)
+                .name(IV2TraceEntity.CREATE_USER_ID_PROPERTY_NAME)
                 .description("创建用户的 id")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
                 .order(2)
                 .build(),
             new ParameterBuilder()
-                .name(IV2TraceEntity.CREATE_USER_NAME_PROPERTY)
+                .name(IV2TraceEntity.CREATE_USER_NAME_PROPERTY_NAME)
                 .description("创建用户的用户名")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
                 .order(3)
                 .build(),
             new ParameterBuilder()
-                .name(IV2TraceEntity.CREATED_TIME_PROPERTY)
+                .name(IV2TraceEntity.CREATED_TIME_PROPERTY_NAME)
                 .description("创建时间(支持时间戳(推荐)或yyyy-MM-dd HH:mm:ss)")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
                 .order(4)
                 .build(),
             new ParameterBuilder()
-                .name(IV2TraceEntity.MODIFY_USER_ID_PROPERTY)
+                .name(IV2TraceEntity.MODIFY_USER_ID_PROPERTY_NAME)
                 .description("修改用户的 id")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
                 .order(5)
                 .build(),
             new ParameterBuilder()
-                .name(IV2TraceEntity.MODIFY_USER_NAME_PROPERTY)
+                .name(IV2TraceEntity.MODIFY_USER_NAME_PROPERTY_NAME)
                 .description("修改用户的用户名")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
                 .order(6)
                 .build(),
             new ParameterBuilder()
-                .name(IV2TraceEntity.MODIFY_TIME_PROPERTY)
+                .name(IV2TraceEntity.MODIFY_TIME_PROPERTY_NAME)
                 .description("修改时间(支持时间戳(推荐)或yyyy-MM-dd HH:mm:ss)")
                 .parameterType("query")
                 .modelRef(MODEL_REF)

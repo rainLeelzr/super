@@ -207,40 +207,57 @@ public class FeignEncoder implements Encoder {
 
     private Encoder springEncoder;
 
-    private final List<Converter<String>> converters;
+    private final List<Converter<?, String>> converters;
 
     public FeignEncoder() {
-        converters = CollUtil.newArrayList(new Converter<String>() {
+        converters = CollUtil.newArrayList(new Converter<Collection, String>() {
+
             @Override
-            public boolean supports(Object o) {
-                return ClassUtils.isAssignableValue(Collection.class, o);
+            public boolean supportSourceType(Object source) {
+                return ClassUtils.isAssignableValue(Collection.class, source);
             }
 
             @Override
-            @SuppressWarnings({"unchecked", "rawtypes"})
-            public String convert(Object collection) {
-                return CollUtil.join((Collection) collection, ",");
-            }
-        }, new Converter<String>() {
-            @Override
-            public boolean supports(Object o) {
-                return ClassUtils.isAssignableValue(Date.class, o);
+            public boolean supportTargetClass(Class clazz) {
+                return String.class.isAssignableFrom(clazz);
             }
 
             @Override
-            public String convert(Object o) {
-
-                return String.valueOf(((Date) o).getTime());
+            @SuppressWarnings({"unchecked"})
+            public String convert(Collection collection) {
+                return CollUtil.join(collection, ",");
             }
-        }, new Converter<String>() {
-            @Override
-            public boolean supports(Object o) {
-                return ClassUtils.isAssignableValue(LocalDateTime.class, o);
-            }
+        }, new Converter<Date, String>() {
 
             @Override
-            public String convert(Object o) {
-                return LocalDateTimeUtil.localDateTimeToEpochMilli((LocalDateTime) o) + "";
+            public boolean supportSourceType(Object source) {
+                return ClassUtils.isAssignableValue(Date.class, source);
+            }
+
+            @Override
+            public boolean supportTargetClass(Class clazz) {
+                return String.class.isAssignableFrom(clazz);
+            }
+
+            @Override
+            public String convert(Date source) {
+                return source.getTime() + "";
+            }
+        }, new Converter<LocalDateTime, String>() {
+
+            @Override
+            public boolean supportSourceType(Object source) {
+                return ClassUtils.isAssignableValue(LocalDateTime.class, source);
+            }
+
+            @Override
+            public boolean supportTargetClass(Class clazz) {
+                return String.class.isAssignableFrom(clazz);
+            }
+
+            @Override
+            public String convert(LocalDateTime source) {
+                return LocalDateTimeUtil.localDateTimeToEpochMilli(source) + "";
             }
         });
     }
@@ -281,9 +298,9 @@ public class FeignEncoder implements Encoder {
                         }
 
                         String convert = null;
-                        for (Converter<String> converter : converters) {
-                            if (converter.supports(value)) {
-                                convert = converter.convert(value);
+                        for (Converter converter : converters) {
+                            if (converter.supportSourceType(value)) {
+                                convert = (String) converter.convert(value);
                                 break;
                             }
                         }

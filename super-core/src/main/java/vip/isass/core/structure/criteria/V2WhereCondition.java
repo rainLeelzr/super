@@ -174,7 +174,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vip.isass.core.criteria.Condition;
+import vip.isass.core.structure.criteria.impl.type.V2Condition;
 
 /**
  * @author Rain
@@ -185,12 +185,27 @@ import vip.isass.core.criteria.Condition;
 @AllArgsConstructor
 public class V2WhereCondition {
 
+    /**
+     * java 对象属性名
+     */
+    @ApiModelProperty(hidden = true)
+    private String propertyName;
+
+    /**
+     * 数据库字段名
+     */
     @ApiModelProperty(hidden = true)
     private String columnName;
 
+    /**
+     * 条件，例如：大于，小于，等于
+     */
     @ApiModelProperty(hidden = true)
-    private Condition condition;
+    private V2Condition condition;
 
+    /**
+     * 比较的值
+     */
     @ApiModelProperty(hidden = true)
     private Object value;
 

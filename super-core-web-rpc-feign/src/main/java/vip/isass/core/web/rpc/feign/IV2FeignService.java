@@ -170,7 +170,8 @@
 package vip.isass.core.web.rpc.feign;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.springframework.core.Ordered;
+import org.springframework.cloud.openfeign.SpringQueryMap;
+import org.springframework.web.bind.annotation.*;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
 import vip.isass.core.structure.service.IV2Service;
@@ -182,11 +183,8 @@ import java.util.List;
 
 public interface IV2FeignService<
     E extends IV2Entity<E>,
-    C extends IV2Criteria<E, C>,
-    F extends IV2FeignEntryPoint<E, C>
-    > extends IV2Service<E, C>, Ordered {
-
-    F getFeign();
+    C extends IV2Criteria<E, C>
+    > extends IV2Service<E, C> {
 
     @Override
     default int getOrder() {
@@ -195,181 +193,127 @@ public interface IV2FeignService<
 
     // region 增
 
-    @Override
-    default E add(E entity) {
-        return getFeign().add(entity).dataIfSuccessOrException();
-    }
+    @PostMapping(ADD_URI_SECOND_PART)
+    E add(@RequestBody E entity);
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities) {
-        return getFeign().addBatch(entities).dataIfSuccessOrException();
-    }
+    @PostMapping(ADD_BATCH_URI_SECOND_PART)
+    Collection<E> addBatch(@RequestBody Collection<E> entities);
 
-    @Override
-    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        return getFeign().addBatch(entities, batchSize).dataIfSuccessOrException();
-    }
+    @PostMapping(ADD_BATCH_BY_BATCH_SIZE_URI_SECOND_PART)
+    Collection<E> addBatchByBatchSize(@RequestBody Collection<E> entities, @PathVariable("batchSize") int batchSize);
 
-    @Override
-    default E addIfAbsent(E entity, C criteria) {
-        return getFeign().addIfAbsent(entity, criteria).dataIfSuccessOrException();
-    }
+    @PostMapping(ADD_IF_ABSENT_BY_COLUMNS_URI_SECOND_PART)
+    E addIfAbsentByColumns(@RequestBody E entity,
+                           @PathVariable("uniqueColumns") List<String> uniqueColumns);
 
-    @Override
-    default Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns) {
-        return getFeign().addBatchIfAbsent(entities, uniqueColumns).dataIfSuccessOrException();
-    }
+    @PostMapping(ADD_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART)
+    E addIfAbsentByCriteria(@RequestBody E entity, @SpringQueryMap C criteria);
 
-    @Override
-    default E addOrUpdate(E entity, List<String> uniqueColumns) {
-        return getFeign().addOrUpdate(entity, uniqueColumns).dataIfSuccessOrException();
-    }
+    @PostMapping(ADD_BATCH_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART)
+    Integer addBatchIfAbsentByCriteria(@RequestBody List<E> entities, @SpringQueryMap C criteria);
 
-    @Override
-    default Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns) {
-        return getFeign().addOrUpdateEntities(entities, uniqueColumns).dataIfSuccessOrException();
-    }
+    @PostMapping(ADD_BATCH_IF_ABSENT_BY_COLUMNS_URI_SECOND_PART)
+    Integer addBatchIfAbsentByColumns(@RequestBody List<E> entities,
+                                      @PathVariable("uniqueColumns") List<String> uniqueColumns);
 
-    @Override
-    default Boolean addOrUpdateByCriteria(E entity, C criteria) {
-        return getFeign().addOrUpdateByCriteria(entity, criteria).dataIfSuccessOrException();
-    }
+    @PostMapping(ADD_OR_UPDATE_BY_CRITERIA_URI_SECOND_PART)
+    Boolean addOrUpdateByCriteria(@RequestBody E entity, @SpringQueryMap C criteria);
+
+    @PostMapping(ADD_OR_UPDATE_BY_COLUMNS_URI_SECOND_PART)
+    E addOrUpdateByColumns(@RequestBody E entity,
+                           @PathVariable("uniqueColumns") List<String> uniqueColumns);
+
+    @PostMapping(ADD_OR_UPDATE_BATCH_BY_COLUMNS_URI_SECOND_PART)
+    Integer addOrUpdateBatchByColumns(@RequestBody List<E> entities,
+                                      @PathVariable("uniqueColumns") List<String> uniqueColumns);
 
     // endregion
 
     //  region 删
 
-    @Override
-    default Boolean deleteById(Serializable id) {
-        return getFeign().deleteById(id).dataIfSuccessOrException();
-    }
+    @DeleteMapping(DELETE_BY_ID_URI_SECOND_PART)
+    Boolean deleteById(@PathVariable("id") Serializable id);
 
-    @Override
-    default Boolean deleteByIds(Collection<Serializable> ids) {
-        return getFeign().deleteByIds(ids).dataIfSuccessOrException();
-    }
+    @DeleteMapping(DELETE_BY_IDS_URI_SECOND_PART)
+    Boolean deleteByIds(@PathVariable("ids") Collection<Serializable> ids);
 
-    @Override
-    default Boolean deleteByCriteria(C criteria) {
-        return getFeign().deleteByCriteria(criteria).dataIfSuccessOrException();
-    }
+    @DeleteMapping(DELETE_BY_CRITERIA_URI_SECOND_PART)
+    Boolean deleteByCriteria(@SpringQueryMap C criteria);
 
     // endregion
 
     // region 改
 
-    @Override
-    default Boolean updateById(E entity) {
-        return getFeign().updateById(entity).dataIfSuccessOrException();
-    }
+    @PutMapping(UPDATE_BY_ID_URI_SECOND_PART)
+    Boolean updateById(@RequestBody E entity);
 
-    @Override
-    default Boolean updateAllColumnsById(E entity) {
-        return getFeign().updateAllColumnsById(entity).dataIfSuccessOrException();
-    }
+    @PutMapping(UPDATE_ALL_COLUMNS_BY_ID_URI_SECOND_PART)
+    Boolean updateAllColumnsById(@RequestBody E entity);
 
-    @Override
-    default void updateByIdOrException(E entity) {
-        getFeign().updateByIdOrException(entity).dataIfSuccessOrException();
-    }
+    @PutMapping(UPDATE_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
+    void updateByIdOrException(@RequestBody E entity);
 
-    @Override
-    default Boolean updateByCriteria(E entity, C criteria) {
-        return getFeign().updateByCriteria(entity, criteria).dataIfSuccessOrException();
-    }
+    @PutMapping(UPDATE_BY_CRITERIA_URI_SECOND_PART)
+    Boolean updateByCriteria(@RequestBody E entity, @SpringQueryMap C criteria);
 
-    @Override
-    default void updateByCriteriaOrException(E entity, C criteria) {
-        getFeign().updateByCriteriaOrException(entity, criteria).dataIfSuccessOrException();
-    }
+    @PutMapping(UPDATE_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART)
+    void updateByCriteriaOrException(@RequestBody E entity, @SpringQueryMap C criteria);
 
     // endregion
 
     //  region 查
 
-    @Override
-    default E getById(Serializable id) {
-        return getFeign().getById(id).dataIfSuccessOrException();
-    }
+    @GetMapping(GET_BY_ID_URI_SECOND_PART)
+    E getById(@PathVariable("id") Serializable id);
 
-    @Override
-    default E getByIdOrException(Serializable id) {
-        return getFeign().getByIdOrException(id).dataIfSuccessOrException();
-    }
+    @GetMapping(GET_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
+    E getByIdOrException(@PathVariable("id") Serializable id);
 
-    @Override
-    default E getByCriteria(C criteria) {
-        return getFeign().getByCriteria(criteria).dataIfSuccessOrException();
-    }
+    @GetMapping(GET_BY_CRITERIA_URI_SECOND_PART)
+    E getByCriteria(@SpringQueryMap C criteria);
 
-    @Override
-    default E getByCriteriaOrWarn(C criteria) {
-        return getFeign().getByCriteriaOrWarn(criteria).dataIfSuccessOrException();
-    }
+    @GetMapping(GET_BY_CRITERIA_OR_WARN_URI_SECOND_PART)
+    E getByCriteriaOrWarn(@SpringQueryMap C criteria);
 
-    @Override
-    default E getByCriteriaOrException(C criteria) {
-        return getFeign().getByCriteriaOrException(criteria).dataIfSuccessOrException();
-    }
+    @GetMapping(GET_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART)
+    E getByCriteriaOrException(@SpringQueryMap C criteria);
 
-    @Override
-    default List<E> findByCriteria(C criteria) {
-        return getFeign().findByCriteria(criteria).dataIfSuccessOrException();
-    }
+    @GetMapping(FIND_BY_CRITERIA_URI_SECOND_PART)
+    List<E> findByCriteria(@SpringQueryMap C criteria);
 
-    @Override
-    default IPage<E> findPageByCriteria(C criteria) {
-        return getFeign().findPageByCriteria(criteria).dataIfSuccessOrException();
-    }
+    @GetMapping(FIND_PAGE_BY_CRITERIA_URI_SECOND_PART)
+    IPage<E> findPageByCriteria(@SpringQueryMap C criteria);
 
-    @Override
-    default List<E> findAll() {
-        return getFeign().findAll().dataIfSuccessOrException();
-    }
+    @GetMapping(FIND_ALL_URI_SECOND_PART)
+    List<E> findAll();
 
-    @Override
-    default Integer countByCriteria(C criteria) {
-        return getFeign().countByCriteria(criteria).dataIfSuccessOrException();
-    }
+    @GetMapping(COUNT_BY_CRITERIA_URI_SECOND_PART)
+    Integer countByCriteria(@SpringQueryMap C criteria);
 
-    @Override
-    default Integer countAll() {
-        return getFeign().countAll().dataIfSuccessOrException();
-    }
+    @GetMapping(COUNT_ALL_URI_SECOND_PART)
+    Integer countAll();
 
-    @Override
-    default boolean isPresentById(Serializable id) {
-        return getFeign().isPresentById(id).dataIfSuccessOrException();
-    }
+    @GetMapping(IS_PRESENT_BY_ID_URI_SECOND_PART)
+    Boolean isPresentById(@PathVariable("id") Serializable id);
 
-    @Override
-    default boolean isPresentByColumn(String columnName, Object value) {
-        return getFeign().isPresentByColumn(columnName, value).dataIfSuccessOrException();
-    }
+    @GetMapping(IS_PRESENT_BY_COLUMN_URI_SECOND_PART)
+    Boolean isPresentByColumn(@PathVariable("columnName") String columnName, @PathVariable("value") Object value);
 
-    @Override
-    default boolean isPresentByCriteria(C criteria) {
-        return getFeign().isPresentByCriteria(criteria).dataIfSuccessOrException();
-    }
+    @GetMapping(IS_PRESENT_BY_CRITERIA_URI_SECOND_PART)
+    Boolean isPresentByCriteria(@SpringQueryMap C criteria);
 
-    @Override
-    default boolean isAbsentByColumn(String columnName, Object value) {
-        return getFeign().isAbsentByColumn(columnName, value).dataIfSuccessOrException();
-    }
+    @GetMapping(IS_ABSENT_BY_COLUMN_URI_SECOND_PART)
+    Boolean isAbsentByColumn(@PathVariable("columnName") String columnName, @PathVariable("value") Object value);
 
-    @Override
-    default boolean isAbsentByCriteria(C criteria) {
-        return getFeign().isAbsentByCriteria(criteria).dataIfSuccessOrException();
-    }
+    @GetMapping(IS_ABSENT_BY_CRITERIA_URI_SECOND_PART)
+    Boolean isAbsentByCriteria(@SpringQueryMap C criteria);
 
-    @Override
-    default void exceptionIfPresentByCriteria(C criteria) {
-        getFeign().exceptionIfPresentByCriteria(criteria).dataIfSuccessOrException();
-    }
+    @GetMapping(EXCEPTION_IF_PRESENT_BY_CRITERIA_URI_SECOND_PART)
+    void exceptionIfPresentByCriteria(@SpringQueryMap C criteria);
 
-    @Override
-    default void exceptionIfAbsentByCriteria(C criteria) {
-        getFeign().exceptionIfAbsentByCriteria(criteria).dataIfSuccessOrException();
-    }
+    @GetMapping(EXCEPTION_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART)
+    void exceptionIfAbsentByCriteria(@SpringQueryMap C criteria);
+
+    // endregion
 
 }

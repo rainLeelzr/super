@@ -173,8 +173,10 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
+import vip.isass.core.support.api.ApiOrder;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -182,10 +184,19 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria<E, C>, S extends IV2Service<E, C>>
-    extends IV2Service<E, C> {
+@Primary
+public interface IV2ServiceManager<
+    E extends IV2Entity<E>,
+    C extends IV2Criteria<E, C>,
+    S extends IV2Service<E, C>
+    > extends IV2Service<E, C> {
 
     Logger LOGGER = LoggerFactory.getLogger(IV2ServiceManager.class);
+
+    @Override
+    default int getOrder() {
+        return ApiOrder.SERVER_MANAGER;
+    }
 
     List<S> getServices();
 
@@ -199,32 +210,41 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(s -> s.addBatch(entities));
     }
 
-    default Collection<E> addBatch(Collection<E> entities, int batchSize) {
-        return applyUntilNotNull(s -> s.addBatch(entities, batchSize));
+    default Collection<E> addBatchByBatchSize(Collection<E> entities, int batchSize) {
+        return applyUntilNotNull(s -> s.addBatchByBatchSize(entities, batchSize));
     }
 
-    default E addIfAbsent(E entity, C criteria) {
-        return applyUntilNotNull(s -> s.addIfAbsent(entity, criteria));
+    default E addIfAbsentByCriteria(E entity, C criteria) {
+        return applyUntilNotNull(s -> s.addIfAbsentByCriteria(entity, criteria));
     }
 
-    @Override
-    default Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addBatchIfAbsent(entities, uniqueColumns));
-    }
-
-    @Override
-    default E addOrUpdate(E entity, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addOrUpdate(entity, uniqueColumns));
+    default E addIfAbsentByColumns(E entity, List<String> uniqueColumns) {
+        return applyUntilNotNull(s -> s.addIfAbsentByColumns(entity, uniqueColumns));
     }
 
     @Override
-    default Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addOrUpdateEntities(entities, uniqueColumns));
+    default Integer addBatchIfAbsentByCriteria(List<E> entities, C criteria) {
+        return applyUntilNotNull(s -> s.addBatchIfAbsentByCriteria(entities, criteria));
+    }
+
+    @Override
+    default Integer addBatchIfAbsentByColumns(List<E> entities, List<String> uniqueColumns) {
+        return applyUntilNotNull(s -> s.addBatchIfAbsentByColumns(entities, uniqueColumns));
     }
 
     @Override
     default Boolean addOrUpdateByCriteria(E entity, C criteria) {
         return applyUntilNotNull(s -> s.addOrUpdateByCriteria(entity, criteria));
+    }
+
+    @Override
+    default E addOrUpdateByColumns(E entity, List<String> uniqueColumns) {
+        return applyUntilNotNull(s -> s.addOrUpdateByColumns(entity, uniqueColumns));
+    }
+
+    @Override
+    default Integer addOrUpdateBatchByColumns(List<E> entities, List<String> uniqueColumns) {
+        return applyUntilNotNull(s -> s.addOrUpdateBatchByColumns(entities, uniqueColumns));
     }
 
     // endregion
@@ -311,23 +331,23 @@ public interface IV2ServiceManager<E extends IV2Entity<E>, C extends IV2Criteria
         return applyUntilNotNull(IV2Service::countAll);
     }
 
-    default boolean isPresentById(Serializable id) {
+    default Boolean isPresentById(Serializable id) {
         return applyUntilNotNull(s -> s.isPresentById(id));
     }
 
-    default boolean isPresentByColumn(String columnName, Object value) {
+    default Boolean isPresentByColumn(String columnName, Object value) {
         return applyUntilNotNull(s -> s.isPresentByColumn(columnName, value));
     }
 
-    default boolean isPresentByCriteria(C criteria) {
+    default Boolean isPresentByCriteria(C criteria) {
         return applyUntilNotNull(s -> s.isPresentByCriteria(criteria));
     }
 
-    default boolean isAbsentByColumn(String columnName, Object value) {
+    default Boolean isAbsentByColumn(String columnName, Object value) {
         return applyUntilNotNull(s -> s.isAbsentByColumn(columnName, value));
     }
 
-    default boolean isAbsentByCriteria(C criteria) {
+    default Boolean isAbsentByCriteria(C criteria) {
         return applyUntilNotNull(s -> s.isAbsentByCriteria(criteria));
     }
 

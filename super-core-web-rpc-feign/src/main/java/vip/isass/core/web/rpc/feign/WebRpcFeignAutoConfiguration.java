@@ -169,16 +169,21 @@
 
 package vip.isass.core.web.rpc.feign;
 
+import feign.Logger;
+import feign.codec.Decoder;
 import feign.form.spring.converter.SpringManyMultipartFilesReader;
+import feign.optionals.OptionalDecoder;
+import feign.querymap.BeanQueryMapEncoder;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.multipart.MultipartFile;
-import vip.isass.core.web.interceptor.RestTemplateInterceptor;
-
-import javax.annotation.Resource;
 
 /**
  * @author Rain
@@ -188,12 +193,29 @@ import javax.annotation.Resource;
 @EnableFeignClients(basePackages = "vip.isass")
 public class WebRpcFeignAutoConfiguration {
 
-    @Resource
-    private RestTemplateInterceptor restTemplateInterceptor;
+    @Autowired
+    private ObjectFactory<HttpMessageConverters> messageConverters;
 
     @Bean
     public HttpMessageConverter<MultipartFile[]> springManyMultipartFilesReader() {
         return new SpringManyMultipartFilesReader(4096);
+    }
+
+    @Bean
+    Logger.Level feignLoggerLevel() {
+        return Logger.Level.FULL;
+    }
+
+    @Bean
+    public Decoder feignDecoder() {
+        return new OptionalDecoder(
+            new ResponseEntityDecoder(
+                new V2FeignDecoder(this.messageConverters.getObject().getConverters())));
+    }
+
+    @Bean
+    public IsassV2QueryMapEncoder isassBeanQueryMapEncoder() {
+        return new IsassV2QueryMapEncoder(new BeanQueryMapEncoder());
     }
 
 }

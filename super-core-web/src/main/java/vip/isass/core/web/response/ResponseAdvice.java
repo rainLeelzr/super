@@ -180,7 +180,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import vip.isass.core.support.JsonUtil;
 import vip.isass.core.web.Resp;
-import vip.isass.core.web.structure.IV2ControllerEntryPoint;
+import vip.isass.core.web.structure.IV2Controller;
 
 /**
  * 把 controller 的返回值转换为 resp
@@ -191,12 +191,10 @@ public class ResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         if (returnType.getParameterType() == Resp.class
-            || returnType.getParameterType() == ResponseEntity.class
-            || returnType.getParameterType() == void.class
-            || returnType.getParameterType() == Void.class) {
+            || returnType.getParameterType() == ResponseEntity.class) {
             return false;
         }
-        return IV2ControllerEntryPoint.class.isAssignableFrom(returnType.getContainingClass());
+        return IV2Controller.class.isAssignableFrom(returnType.getContainingClass());
     }
 
     @Override

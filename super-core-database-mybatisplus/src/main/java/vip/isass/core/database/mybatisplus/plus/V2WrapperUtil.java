@@ -185,7 +185,6 @@ import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
 import vip.isass.core.structure.entity.IV2DbEntity;
 import vip.isass.core.structure.entity.IV2Entity;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -299,57 +298,39 @@ public class V2WrapperUtil {
         C extends IV2OrderByCriteria<E, C>>
     void processOrderByCriteria(QueryWrapper<E> wrapper,
                                 IV2OrderByCriteria<E, C> criteria) {
-        if (StrUtil.isNotBlank(criteria.getOrderBy())) {
-            List<String> ascList = null;
-            List<String> descList = null;
+        if (StrUtil.isBlank(criteria.getOrderBy())) {
+            return;
+        }
 
-            String[] split = criteria.getOrderBy().split(StrUtil.COMMA);
-            for (String s : split) {
-                if (StrUtil.isBlank(s)) {
-                    continue;
-                }
-
-                s = s.trim().replaceAll(" +", StrUtil.SPACE);
-                String[] orderByArr = parseOrderBy(s);
-                if (orderByArr == null) {
-                    continue;
-                }
-
-                if (orderByArr.length == 1) {
-                    if (ascList == null) {
-                        ascList = new ArrayList<>(split.length);
-                    }
-                    ascList.add(orderByArr[0]);
-                } else if (orderByArr.length == 2) {
-                    if (IPageCriteria.ASC.equalsIgnoreCase(orderByArr[1])) {
-                        if (ascList == null) {
-                            ascList = new ArrayList<>(split.length);
-                        }
-                        ascList.add(orderByArr[0]);
-                    } else if (IPageCriteria.DESC.equalsIgnoreCase(orderByArr[1])) {
-                        if (descList == null) {
-                            descList = new ArrayList<>(split.length);
-                        }
-                        descList.add(orderByArr[0]);
-                    }
-                }
+        String[] orderByColumns = criteria.getOrderBy().split(StrUtil.COMMA);
+        for (String orderByColumn : orderByColumns) {
+            if (StrUtil.isBlank(orderByColumn)) {
+                continue;
             }
-            wrapper.orderByAsc(ascList == null ? null : ArrayUtil.toArray(ascList, String.class));
-            wrapper.orderByDesc(descList == null ? null : ArrayUtil.toArray(descList, String.class));
-        }
-    }
 
-    private static String[] parseOrderBy(String orderBy) {
-        String[] strings = orderBy.split(StrUtil.SPACE);
-        if (strings.length == 0) {
-            return null;
-        }
+            orderByColumn = orderByColumn.trim().replaceAll(" +", StrUtil.SPACE);
+            String[] orderByColumnArr = orderByColumn.split(StrUtil.SPACE);
+            if (ArrayUtil.isEmpty(orderByColumnArr)) {
+                continue;
+            }
 
-        if (strings.length == 1) {
-            return new String[]{strings[0]};
+            switch (orderByColumnArr.length) {
+                case 1:
+                    wrapper.orderByAsc(orderByColumnArr[0]);
+                    break;
+                case 2:
+                    if (IPageCriteria.ASC.equalsIgnoreCase(orderByColumnArr[1])) {
+                        wrapper.orderByAsc(orderByColumnArr[0]);
+                    } else if (IPageCriteria.DESC.equalsIgnoreCase(orderByColumnArr[1])) {
+                        wrapper.orderByDesc(orderByColumnArr[0]);
+                    } else {
+                        throw new IllegalArgumentException("orderBy 参数错误：" + orderByColumn);
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("orderBy 参数错误：" + orderByColumn);
+            }
         }
-
-        return new String[]{strings[0], strings[1]};
     }
 
 }

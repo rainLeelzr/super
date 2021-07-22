@@ -167,54 +167,38 @@
  *
  */
 
-package vip.isass.core.structure.entity;
+package vip.isass.core.converter.datatime;
 
-import cn.hutool.core.util.RandomUtil;
-import lombok.Builder;
-import vip.isass.core.support.LocalDateTimeUtil;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import org.springframework.stereotype.Component;
+import vip.isass.core.entity.Json;
+import vip.isass.core.exception.UnifiedException;
+import vip.isass.core.exception.code.StatusMessageEnum;
+import vip.isass.core.support.Converter;
+import vip.isass.core.support.json.DefaultJson;
 
 /**
  * @author Rain
  */
-public interface IV2Entity<E extends IV2Entity<E>> {
+@Component
+public class StringToJsonConverter implements Converter<Object, Json> {
 
-    long serialVersionUID = 1L;
-
-    default String randomString() {
-        return RandomUtil.randomString(6);
+    @Override
+    public boolean supportSourceType(Object source) {
+        return true;
     }
 
-    default Byte randomByte() {
-        return (byte) RandomUtil.randomInt(Byte.MAX_VALUE);
+    @Override
+    public boolean supportTargetClass(Class clazz) {
+        return Json.class.isAssignableFrom(clazz);
     }
 
-    default Boolean randomBoolean() {
-        return RandomUtil.randomBoolean();
+    @Override
+    public Json convert(Object source) {
+        try {
+            return new DefaultJson().fromObject(source);
+        } catch (Exception e) {
+            throw new UnifiedException(StatusMessageEnum.FAIL, "反序列化Json字段错误：{}" + e.getMessage());
+        }
     }
-
-    default Integer randomInteger() {
-        return RandomUtil.randomInt();
-    }
-
-    default Long randomLong() {
-        return RandomUtil.randomLong();
-    }
-
-    default BigDecimal randomBigDecimal() {
-        return RandomUtil.randomBigDecimal(BigDecimal.TEN);
-    }
-
-    default LocalDateTime randomLocalDateTime() {
-        return LocalDateTimeUtil.now();
-    }
-
-    /**
-     * 生成随机的entity
-     * 所有字段都随机赋值
-     */
-    E randomEntity();
 
 }

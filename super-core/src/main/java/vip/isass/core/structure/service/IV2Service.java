@@ -170,6 +170,7 @@
 package vip.isass.core.structure.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springframework.core.Ordered;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
 
@@ -177,7 +178,129 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> {
+public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>> extends Ordered {
+
+    // region 增
+
+    String ADD_OPERATOR = "POST";
+    String ADD_URI_SECOND_PART = "/v2";
+
+    String ADD_BATCH_OPERATOR = "POST";
+    String ADD_BATCH_URI_SECOND_PART = "/v2/batch";
+
+    String ADD_BATCH_BY_BATCH_SIZE_OPERATOR = "POST";
+    String ADD_BATCH_BY_BATCH_SIZE_URI_SECOND_PART = "/v2/batch/batchSize/{batchSize}";
+
+    String ADD_IF_ABSENT_BY_CRITERIA_OPERATOR = "POST";
+    String ADD_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART = "/v2/absent/criteria";
+
+    String ADD_IF_ABSENT_BY_COLUMNS_OPERATOR = "POST";
+    String ADD_IF_ABSENT_BY_COLUMNS_URI_SECOND_PART = "/v2/absent/{uniqueColumns}";
+
+    String ADD_BATCH_IF_ABSENT_BY_COLUMNS_OPERATOR = "POST";
+    String ADD_BATCH_IF_ABSENT_BY_COLUMNS_URI_SECOND_PART = "/v2/batch/absent/{uniqueColumns}";
+
+    String ADD_BATCH_IF_ABSENT_BY_CRITERIA_OPERATOR = "POST";
+    String ADD_BATCH_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART = "/v2/batch/absent/criteria";
+
+    String ADD_OR_UPDATE_BY_CRITERIA_OPERATOR = "POST";
+    String ADD_OR_UPDATE_BY_CRITERIA_URI_SECOND_PART = "/v2/add-update/criteria";
+
+    String ADD_OR_UPDATE_BY_COLUMNS_OPERATOR = "POST";
+    String ADD_OR_UPDATE_BY_COLUMNS_URI_SECOND_PART = "/v2/add-update/{uniqueColumns}";
+
+    String ADD_OR_UPDATE_BATCH_BY_COLUMNS_OPERATOR = "POST";
+    String ADD_OR_UPDATE_BATCH_BY_COLUMNS_URI_SECOND_PART = "/v2/add-update/batch/{uniqueColumns}";
+
+    // endregion
+
+    //  region 删
+
+    String DELETE_BY_ID_OPERATOR = "DELETE";
+    String DELETE_BY_ID_URI_SECOND_PART = "/v2/id/{id}";
+
+    String DELETE_BY_IDS_OPERATOR = "DELETE";
+    String DELETE_BY_IDS_URI_SECOND_PART = "/v2/{ids}";
+
+    String DELETE_BY_CRITERIA_OPERATOR = "DELETE";
+    String DELETE_BY_CRITERIA_URI_SECOND_PART = "/v2/criteria";
+
+    // endregion
+
+    // region 改
+
+    String UPDATE_BY_ID_OPERATOR = "PUT";
+    String UPDATE_BY_ID_URI_SECOND_PART = "/v2";
+
+
+    String UPDATE_ALL_COLUMNS_BY_ID_OPERATOR = "PUT";
+    String UPDATE_ALL_COLUMNS_BY_ID_URI_SECOND_PART = "/v2/allColumns";
+
+    String UPDATE_BY_ID_OR_EXCEPTION_OPERATOR = "PUT";
+    String UPDATE_BY_ID_OR_EXCEPTION_URI_SECOND_PART = "/v2/exception";
+
+    String UPDATE_BY_CRITERIA_OPERATOR = "PUT";
+    String UPDATE_BY_CRITERIA_URI_SECOND_PART = "/v2/criteria";
+
+    String UPDATE_BY_CRITERIA_OR_EXCEPTION_OPERATOR = "PUT";
+    String UPDATE_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART = "/v2/criteria/exception";
+
+    // endregion
+
+    //  region 查
+
+    String GET_BY_ID_OPERATOR = "GET";
+    String GET_BY_ID_URI_SECOND_PART = "/v2/{id}";
+
+    String GET_BY_ID_OR_EXCEPTION_OPERATOR = "GET";
+    String GET_BY_ID_OR_EXCEPTION_URI_SECOND_PART = "/v2/exception/{id}";
+
+    String GET_BY_CRITERIA_OPERATOR = "GET";
+    String GET_BY_CRITERIA_URI_SECOND_PART = "/v2/1/criteria";
+
+    String GET_BY_CRITERIA_OR_WARN_OPERATOR = "GET";
+    String GET_BY_CRITERIA_OR_WARN_URI_SECOND_PART = "/v2/warn/criteria";
+
+    String GET_BY_CRITERIA_OR_EXCEPTION_OPERATOR = "GET";
+    String GET_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART = "/v2/exception/criteria";
+
+    String FIND_BY_CRITERIA_OPERATOR = "GET";
+    String FIND_BY_CRITERIA_URI_SECOND_PART = "/v2/criteria";
+
+    String FIND_PAGE_BY_CRITERIA_OPERATOR = "GET";
+    String FIND_PAGE_BY_CRITERIA_URI_SECOND_PART = "/v2/page";
+
+    String FIND_ALL_OPERATOR = "GET";
+    String FIND_ALL_URI_SECOND_PART = "/v2/all";
+
+    String COUNT_BY_CRITERIA_OPERATOR = "GET";
+    String COUNT_BY_CRITERIA_URI_SECOND_PART = "/v2/count/criteria";
+
+    String COUNT_ALL_OPERATOR = "GET";
+    String COUNT_ALL_URI_SECOND_PART = "/v2/count/all";
+
+    String IS_PRESENT_BY_ID_OPERATOR = "GET";
+    String IS_PRESENT_BY_ID_URI_SECOND_PART = "/v2/present/{id}";
+
+    String IS_PRESENT_BY_COLUMN_OPERATOR = "GET";
+    String IS_PRESENT_BY_COLUMN_URI_SECOND_PART = "/v2/present/{columnName}/{value}";
+
+    String IS_PRESENT_BY_CRITERIA_OPERATOR = "GET";
+    String IS_PRESENT_BY_CRITERIA_URI_SECOND_PART = "/v2/present/criteria";
+
+    String IS_ABSENT_BY_COLUMN_OPERATOR = "GET";
+    String IS_ABSENT_BY_COLUMN_URI_SECOND_PART = "/v2/absent/{columnName}/{value}";
+
+    String IS_ABSENT_BY_CRITERIA_OPERATOR = "GET";
+    String IS_ABSENT_BY_CRITERIA_URI_SECOND_PART = "/v2/absent/criteria";
+
+    String EXCEPTION_IF_PRESENT_BY_CRITERIA_OPERATOR = "GET";
+    String EXCEPTION_IF_PRESENT_BY_CRITERIA_URI_SECOND_PART = "/v2/exception-if-present/criteria";
+
+    String EXCEPTION_IF_ABSENT_BY_CRITERIA_OPERATOR = "GET";
+    String EXCEPTION_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART = "/v2/exception-if-absent/criteria";
+
+    // endregion
 
     // region 增
 
@@ -185,17 +308,21 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     Collection<E> addBatch(Collection<E> entities);
 
-    Collection<E> addBatch(Collection<E> entities, int batchSize);
+    Collection<E> addBatchByBatchSize(Collection<E> entities, int batchSize);
 
-    E addIfAbsent(E entity, C criteria);
+    E addIfAbsentByCriteria(E entity, C criteria);
 
-    Integer addBatchIfAbsent(List<E> entities, List<String> uniqueColumns);
+    E addIfAbsentByColumns(E entity, List<String> uniqueColumns);
 
-    E addOrUpdate(E entity, List<String> uniqueColumns);
+    Integer addBatchIfAbsentByCriteria(List<E> entities, C criteria);
 
-    Integer addOrUpdateEntities(List<E> entities, List<String> uniqueColumns);
+    Integer addBatchIfAbsentByColumns(List<E> entities, List<String> uniqueColumns);
 
     Boolean addOrUpdateByCriteria(E entity, C criteria);
+
+    E addOrUpdateByColumns(E entity, List<String> uniqueColumns);
+
+    Integer addOrUpdateBatchByColumns(List<E> entities, List<String> uniqueColumns);
 
     // endregion
 
@@ -245,15 +372,15 @@ public interface IV2Service<E extends IV2Entity<E>, C extends IV2Criteria<E, C>>
 
     Integer countAll();
 
-    boolean isPresentById(Serializable id);
+    Boolean isPresentById(Serializable id);
 
-    boolean isPresentByColumn(String columnName, Object value);
+    Boolean isPresentByColumn(String columnName, Object value);
 
-    boolean isPresentByCriteria(C criteria);
+    Boolean isPresentByCriteria(C criteria);
 
-    boolean isAbsentByColumn(String columnName, Object value);
+    Boolean isAbsentByColumn(String columnName, Object value);
 
-    boolean isAbsentByCriteria(C criteria);
+    Boolean isAbsentByCriteria(C criteria);
 
     void exceptionIfPresentByCriteria(C criteria);
 

@@ -167,54 +167,99 @@
  *
  */
 
-package vip.isass.core.structure.entity;
+package vip.isass.core.web.rpc.feign;
 
-import cn.hutool.core.util.RandomUtil;
-import lombok.Builder;
-import vip.isass.core.support.LocalDateTimeUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import feign.QueryMapEncoder;
+import feign.codec.EncodeException;
+import vip.isass.core.converter.datatime.CollectionToQueryStringConverter;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.criteria.impl.type.V2Condition;
+import vip.isass.core.support.JsonUtil;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Rain
- */
-public interface IV2Entity<E extends IV2Entity<E>> {
+public class IsassV2QueryMapEncoder implements QueryMapEncoder {
 
-    long serialVersionUID = 1L;
+    private final QueryMapEncoder queryMapEncoder;
 
-    default String randomString() {
-        return RandomUtil.randomString(6);
+    public IsassV2QueryMapEncoder(QueryMapEncoder queryMapEncoder) {
+        this.queryMapEncoder = queryMapEncoder;
     }
 
-    default Byte randomByte() {
-        return (byte) RandomUtil.randomInt(Byte.MAX_VALUE);
+    @Override
+    public Map<String, Object> encode(Object object) throws EncodeException {
+        if (!(object instanceof IV2Criteria)) {
+            return queryMapEncoder.encode(object);
+        }
+
+        return convertToMap((IV2Criteria) object);
     }
 
-    default Boolean randomBoolean() {
-        return RandomUtil.randomBoolean();
+    private Map<String, Object> convertToMap(IV2Criteria object) {
+        Map<String, ?> map = JsonUtil.NOT_NULL_INSTANCE.convertValue(object, HashMap.class);
+        Map<String, Object> queries = MapUtil.newHashMap(map.size());
+
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value == null) {
+                continue;
+            }
+            String key = entry.getKey();
+
+            if ("whereConditions".equals(key)) {
+                Map<String, Object> whereConditionMap = parseWhereConditionsToQueryString((List<Map<String, Object>>) value);
+                if (!whereConditionMap.isEmpty()) {
+                    queries.putAll(whereConditionMap);
+                }
+                continue;
+            }
+
+            String convert = null;
+            if (value instanceof Collection) {
+                convert = CollectionToQueryStringConverter.convert0((Collection) value);
+            }
+            String s = StrUtil.nullToDefault(convert, value.toString());
+            if (s.length() != 0) {
+                queries.put(key, s);
+            }
+        }
+        return queries;
     }
 
-    default Integer randomInteger() {
-        return RandomUtil.randomInt();
-    }
+    private Map<String, Object> parseWhereConditionsToQueryString(List<Map<String, Object>> whereConditionCriteria) {
+        if (CollUtil.isEmpty(whereConditionCriteria)) {
+            return Collections.emptyMap();
+        }
 
-    default Long randomLong() {
-        return RandomUtil.randomLong();
-    }
+        Map<String, Object> whereConditionMap = CollUtil.newHashMap(whereConditionCriteria.size());
+        AtomicBoolean lastLoopIsOrCondition = new AtomicBoolean(false);
 
-    default BigDecimal randomBigDecimal() {
-        return RandomUtil.randomBigDecimal(BigDecimal.TEN);
-    }
+        for (Map<String, Object> criteria : whereConditionCriteria) {
+            V2Condition v2Condition = V2Condition.valueOf((String) criteria.get("condition"));
+            if (v2Condition == V2Condition.OR) {
+                Assert.isFalse(
+                    lastLoopIsOrCondition.get(),
+                    "v2WhereCondition逻辑错误，本次循环是or条件，但上一次循环也是or条件");
+                lastLoopIsOrCondition.set(true);
+                continue;
+            }
 
-    default LocalDateTime randomLocalDateTime() {
-        return LocalDateTimeUtil.now();
+            String key;
+            String propertyName = (String) criteria.get("propertyName");
+            if (lastLoopIsOrCondition.get()) {
+                key = "or" + StrUtil.upperFirst(propertyName) + v2Condition.getPropertyNameSuffix();
+                lastLoopIsOrCondition.set(false);
+            } else {
+                key = propertyName + v2Condition.getPropertyNameSuffix();
+            }
+            whereConditionMap.put(key, criteria.get("value"));
+        }
+        return whereConditionMap;
     }
-
-    /**
-     * 生成随机的entity
-     * 所有字段都随机赋值
-     */
-    E randomEntity();
 
 }

@@ -182,48 +182,48 @@ import java.time.LocalDateTime;
 public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEntity<UPK, E>>
     extends IV2PkEntity<UPK, E> {
 
+    String CREATE_USER_ID_PROPERTY_NAME = "createUserId";
     String CREATE_USER_ID_COLUMN_NAME = "create_user_id";
-    String CREATE_USER_ID_PROPERTY = "createUserId";
 
     @Transient
     default String getCreateUserIdColumnName() {
         return CREATE_USER_ID_COLUMN_NAME;
     }
 
+    String CREATE_USER_NAME_PROPERTY_NAME = "createUserName";
     String CREATE_USER_NAME_COLUMN_NAME = "create_user_name";
-    String CREATE_USER_NAME_PROPERTY = "createUserName";
 
     @Transient
     default String getCreateUserNameColumnName() {
         return CREATE_USER_NAME_COLUMN_NAME;
     }
 
+    String CREATED_TIME_PROPERTY_NAME = "createTime";
     String CREATED_TIME_COLUMN_NAME = "create_time";
-    String CREATED_TIME_PROPERTY = "createTime";
 
     @Transient
     default String getCreatedTimeColumnName() {
         return CREATED_TIME_COLUMN_NAME;
     }
 
+    String MODIFY_USER_ID_PROPERTY_NAME = "modifyUserId";
     String MODIFY_USER_ID_COLUMN_NAME = "modify_user_id";
-    String MODIFY_USER_ID_PROPERTY = "modifyUserId";
 
     @Transient
     default String getModifyUserIdColumnName() {
         return MODIFY_USER_ID_COLUMN_NAME;
     }
 
+    String MODIFY_USER_NAME_PROPERTY_NAME = "modifyUserName";
     String MODIFY_USER_NAME_COLUMN_NAME = "modify_user_name";
-    String MODIFY_USER_NAME_PROPERTY = "modifyUserName";
 
     @Transient
     default String getModifyUserNameColumnName() {
         return MODIFY_USER_NAME_COLUMN_NAME;
     }
 
+    String MODIFY_TIME_PROPERTY_NAME = "modifyTime";
     String MODIFY_TIME_COLUMN_NAME = "modify_time";
-    String MODIFY_TIME_PROPERTY = "modifyTime";
 
     @Transient
     default String getModifyTimeColumnColumnName() {
@@ -241,9 +241,8 @@ public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEnti
      * 设置创建用户的 id
      *
      * @param createUserId create user id
-     * @return this object
      */
-    E setCreateUserId(UPK createUserId);
+    void setCreateUserId(UPK createUserId);
 
     /**
      * @return 创建用户的用户名
@@ -254,9 +253,8 @@ public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEnti
      * 设置创建用户的用户名
      *
      * @param createUserName create user name
-     * @return this object
      */
-    E setCreateUserName(String createUserName);
+    void setCreateUserName(String createUserName);
 
     /**
      * 获取创建记录的时间
@@ -269,9 +267,8 @@ public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEnti
      * 设置创建记录的时间
      *
      * @param createTime create time
-     * @return this object
      */
-    E setCreateTime(LocalDateTime createTime);
+    void setCreateTime(LocalDateTime createTime);
 
     /**
      * 获取修改用户的 id
@@ -284,9 +281,8 @@ public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEnti
      * 设置修改用户的 id
      *
      * @param modifyUserId modify user id
-     * @return this object
      */
-    E setModifyUserId(UPK modifyUserId);
+    void setModifyUserId(UPK modifyUserId);
 
     /**
      * 获取修改用户的用户名
@@ -299,9 +295,8 @@ public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEnti
      * 设置修改用户的用户名
      *
      * @param modifyUserName modify user name
-     * @return this object
      */
-    E setModifyUserName(String modifyUserName);
+    void setModifyUserName(String modifyUserName);
 
     /**
      * 获取修改记录的时间
@@ -314,18 +309,19 @@ public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEnti
      * 设置修改记录的时间
      *
      * @param modifyTime modify time
-     * @return this object
      */
-    E setModifyTime(LocalDateTime modifyTime);
+    void setModifyTime(LocalDateTime modifyTime);
 
     @Override
+    @SuppressWarnings("unckecked")
     default E randomEntity() {
-        return setCreateUserId(randomPk())
-            .setCreateUserName(randomString())
-            .setCreateTime(randomLocalDateTime())
-            .setModifyUserId(randomPk())
-            .setModifyUserName(randomString())
-            .setModifyTime(randomLocalDateTime());
+        setCreateUserId(randomPk());
+        setCreateUserName(randomString());
+        setCreateTime(randomLocalDateTime());
+        setModifyUserId(randomPk());
+        setModifyUserName(randomString());
+        setModifyTime(randomLocalDateTime());
+        return (E) this;
     }
 
 }

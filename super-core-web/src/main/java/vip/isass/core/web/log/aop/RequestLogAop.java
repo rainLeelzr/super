@@ -190,7 +190,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -203,6 +203,8 @@ import vip.isass.core.support.JsonUtil;
 import vip.isass.core.support.SystemClock;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -214,7 +216,7 @@ import java.util.*;
 @Slf4j
 @Aspect
 @Configuration
-@ConfigurationProperties("core.web.log.request-log")
+@ConditionalOnProperty(value = "core.web.log.request-log.enable", havingValue = "true", matchIfMissing = true)
 public class RequestLogAop {
 
     private static final int LENGTH_LIMIT = 5000;
@@ -223,12 +225,6 @@ public class RequestLogAop {
 
     @Value("${spring.application.name:unknown}")
     private String appName;
-
-    /**
-     * 请求日志总开关
-     */
-    @Setter
-    private boolean enable = true;
 
     /**
      * 不记录请求日志的url
@@ -253,9 +249,6 @@ public class RequestLogAop {
 
     @Around("execution(* *..*Controller.*(..))")
     public Object requestLog(ProceedingJoinPoint pjp) throws Throwable {
-        if (!enable) {
-            return pjp.proceed();
-        }
         return handle(pjp);
     }
 
@@ -325,7 +318,11 @@ public class RequestLogAop {
             Object[] args = pjp.getArgs();
             for (int i = 0; i < parameterNames.length; i++) {
                 Object arg = args[i];
-                Object value = BeanUtil.isBean(arg.getClass())
+                Object value = arg instanceof ServletRequest
+                    ? "..."
+                    : arg instanceof ServletResponse
+                    ? "..."
+                    : BeanUtil.isBean(arg.getClass())
                     ? JSONUtil.toJsonStr(arg)
                     : ObjectUtil.toString(arg);
                 map.put(parameterNames[i], value);

@@ -167,32 +167,35 @@
  *
  */
 
-package vip.isass.core.converter;
+package vip.isass.core.converter.datatime;
 
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+import vip.isass.core.support.Converter;
+import vip.isass.core.support.LocalDateTimeUtil;
+
+import java.time.LocalDateTime;
 
 /**
+ * 把 Date 类型，转换成 String 类型的时间戳
+ *
  * @author Rain
  */
 @Component
-public class StringToClassConverter implements Converter<String, Class> {
-
-    private static final String PREFIX = "class ";
+public class LocalDateTimeToStringTimestampConverter implements Converter<LocalDateTime, String> {
 
     @Override
-    public Class convert(String source) {
-        if (source == null) {
-            return null;
-        }
-        if (source.startsWith(PREFIX)) {
-            source = source.replaceFirst("class ", "");
-        }
-        try {
-            return Class.forName(source);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(e);
-        }
+    public boolean supportSourceType(Object source) {
+        return source instanceof LocalDateTime;
+    }
+
+    @Override
+    public boolean supportTargetClass(Class clazz) {
+        return String.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public String convert(LocalDateTime source) {
+        return LocalDateTimeUtil.localDateTimeToEpochMilli(source) + "";
     }
 
 }

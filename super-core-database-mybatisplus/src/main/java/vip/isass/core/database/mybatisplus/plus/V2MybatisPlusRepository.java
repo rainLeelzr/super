@@ -230,12 +230,12 @@ public abstract class V2MybatisPlusRepository<
         if (entity instanceof IV2TraceEntity) {
             IV2TraceEntity traceEntity = (IV2TraceEntity) entity;
             IV2TraceEntity traceDbEntity = (IV2TraceEntity) edb;
-            traceEntity.setCreateTime(traceDbEntity.getCreateTime())
-                .setCreateUserId(traceDbEntity.getCreateUserId())
-                .setCreateUserName(traceDbEntity.getCreateUserName())
-                .setModifyTime(traceDbEntity.getModifyTime())
-                .setModifyUserId(traceDbEntity.getModifyUserId())
-                .setModifyUserName(traceDbEntity.getModifyUserName());
+            traceEntity.setCreateTime(traceDbEntity.getCreateTime());
+            traceEntity.setCreateUserId(traceDbEntity.getCreateUserId());
+            traceEntity.setCreateUserName(traceDbEntity.getCreateUserName());
+            traceEntity.setModifyTime(traceDbEntity.getModifyTime());
+            traceEntity.setModifyUserId(traceDbEntity.getModifyUserId());
+            traceEntity.setModifyUserName(traceDbEntity.getModifyUserName());
         }
         if (entity instanceof IV2ParentIdEntity) {
             IV2ParentIdEntity parentIdEntity = (IV2ParentIdEntity) entity;
@@ -275,17 +275,8 @@ public abstract class V2MybatisPlusRepository<
     }
 
     @Override
-    public boolean addIfAbsent(E entity, List<String> uniqueColumns) {
-        Assert.notEmpty(uniqueColumns, "uniqueColumns");
-        QueryWrapper<EDB> wrapper = new QueryWrapper<>();
-        Map<String, Object> map = BeanUtil.beanToMap(entity);
-        for (String uniqueColumn : uniqueColumns) {
-            Object value = map.get(StrUtil.toCamelCase(uniqueColumn));
-            Assert.notNull(value, "uniqueColumn[{}]必填", uniqueColumn);
-            wrapper.eq(uniqueColumn, value);
-        }
-
-        if (isPresentByWrapper(wrapper)) {
+    public boolean addIfAbsentByCriteria(E entity, C criteria) {
+        if (isPresentByCriteria(criteria)) {
             return false;
         }
         add(entity);

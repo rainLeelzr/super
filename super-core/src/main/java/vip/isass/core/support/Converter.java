@@ -169,32 +169,32 @@
 
 package vip.isass.core.support;
 
-import cn.hutool.core.util.ObjectUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Rain
  */
-public interface Converter<T> {
+public interface Converter<S, T> extends
+    org.springframework.core.convert.converter.Converter<S, T>,
+    cn.hutool.core.convert.Converter<T> {
+
+    Logger log = LoggerFactory.getLogger(Converter.class);
 
     /**
-     * 默认返回 false
-     * 若需要使用本方法，请实现类复写此方法。
+     * source 源对象是否支持被本转换器转换
      *
-     * @param o the object if support or not
+     * @param source the object if support or not
      * @return support if true
      */
-    default boolean supports(Object o) {
-        return false;
-    }
+    boolean supportSourceType(Object source);
 
-    /**
-     * 转换方法
-     * 将类型为 S 的对象转换为 类型为 T 的对象
-     *
-     * @param source source
-     * @return converted object
-     */
-    T convert(Object source);
+    boolean supportTargetClass(Class clazz);
+
+    @SuppressWarnings("unchecked")
+    default T convert(Object value, T defaultValue) {
+        return defaultIfException((S) value, defaultValue);
+    }
 
     /**
      * 将 S 转换为 T ,若转换过程抛出异常，则返回默认值
@@ -203,7 +203,7 @@ public interface Converter<T> {
      * @param defaultValue the default value to be return when convert source object throw an exception
      * @return converted object
      */
-    default T defaultIfException(Object source, T defaultValue) {
+    default T defaultIfException(S source, T defaultValue) {
         try {
             return convert(source);
         } catch (Exception e) {
@@ -222,13 +222,12 @@ public interface Converter<T> {
      * @param defaultValue default value
      * @return return converted object
      */
-    default T defaultIfNull(Object source, T defaultValue) {
+    default T defaultIfNull(S source, T defaultValue) {
         if (source == null) {
             return defaultValue;
         }
-        return ObjectUtil.defaultIfNull(defaultValue, defaultIfException(source, defaultValue));
-        // throw new UnsupportedOperationException(
-        //     StrUtil.format("此转换器[{}]不支持参数类型[{}]的转换", this.getClass().getName(), source.getClass().getName()));
+        T convert = convert(source);
+        return convert == null ? defaultValue : convert;
     }
 
 }

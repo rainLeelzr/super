@@ -182,11 +182,12 @@ import java.io.Serializable;
 public interface IV2IdEntity<PK extends Serializable, E extends IV2IdEntity<PK, E>>
     extends IV2PkEntity<PK, E> {
 
+    //  默认的 id 成员变量名
+    String ID_PROPERTY_NAME = "id";
+
     //  默认的 id 字段名
     String ID_COLUMN_NAME = "id";
 
-    //  默认的 id 成员变量名
-    String ID_PROPERTY = "id";
 
     @Transient
     default String getIdColumnName() {
@@ -203,17 +204,18 @@ public interface IV2IdEntity<PK extends Serializable, E extends IV2IdEntity<PK, 
      * 设置 id
      *
      * @param id id
-     * @return this object
      */
-    E setId(PK id);
+    void setId(PK id);
 
     /**
      * 生成一个随机 id
      *
      * @return this object
      */
+    @SuppressWarnings("unchecked")
     default E randomId() {
-        return setId(randomPk());
+        setId(randomPk());
+        return (E) this;
     }
 
     /**

@@ -179,6 +179,7 @@ import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
 import vip.isass.core.support.JsonUtil;
 import vip.isass.core.web.Resp;
+import vip.isass.core.web.exception.WebStatusMapping;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -195,7 +196,7 @@ public class FeignErrorDecoder implements ErrorDecoder {
     public Exception decode(String methodKey, Response response) {
         HttpStatus httpStatus = HttpStatus.resolve(response.status());
         if (httpStatus == HttpStatus.NOT_FOUND) {
-            throw new UnifiedException(StatusMessageEnum.NOT_FOUND_404);
+            throw UnifiedException.newException(WebStatusMapping.WebStatusEnum.FEIGN_URL_NOT_FOUND, methodKey);
         } else if (httpStatus.is2xxSuccessful()) {
             try (Reader reader = response.body().asReader(StandardCharsets.UTF_8)) {
                 String read = IoUtil.read(reader);

@@ -177,4 +177,8 @@ public interface ApiOrder {
 
     int FEIGN_SERVICE = 30;
 
+    int CONTROLLER = 100;
+
+    int SERVER_MANAGER = Integer.MIN_VALUE;
+
 }

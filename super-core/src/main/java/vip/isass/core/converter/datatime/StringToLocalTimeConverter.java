@@ -167,54 +167,37 @@
  *
  */
 
-package vip.isass.core.structure.entity;
+package vip.isass.core.converter.datatime;
 
-import cn.hutool.core.util.RandomUtil;
-import lombok.Builder;
+import org.springframework.stereotype.Component;
+import vip.isass.core.support.Converter;
 import vip.isass.core.support.LocalDateTimeUtil;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
+ * 把任何表示形式的 string 类型的日期时间，转换成 LocalTime
+ *
  * @author Rain
  */
-public interface IV2Entity<E extends IV2Entity<E>> {
+@Component
+public class StringToLocalTimeConverter implements Converter<String, LocalTime> {
 
-    long serialVersionUID = 1L;
-
-    default String randomString() {
-        return RandomUtil.randomString(6);
+    @Override
+    public boolean supportSourceType(Object source) {
+        return source instanceof String;
     }
 
-    default Byte randomByte() {
-        return (byte) RandomUtil.randomInt(Byte.MAX_VALUE);
+    @Override
+    public boolean supportTargetClass(Class clazz) {
+        return LocalTime.class.isAssignableFrom(clazz);
     }
 
-    default Boolean randomBoolean() {
-        return RandomUtil.randomBoolean();
+    @Override
+    public LocalTime convert(String source) {
+        Long timestamp = StringDateToMillisConverter.convert0(source);
+        return timestamp == null ? null : LocalDateTimeUtil.epochMilliToLocalTime(timestamp);
     }
-
-    default Integer randomInteger() {
-        return RandomUtil.randomInt();
-    }
-
-    default Long randomLong() {
-        return RandomUtil.randomLong();
-    }
-
-    default BigDecimal randomBigDecimal() {
-        return RandomUtil.randomBigDecimal(BigDecimal.TEN);
-    }
-
-    default LocalDateTime randomLocalDateTime() {
-        return LocalDateTimeUtil.now();
-    }
-
-    /**
-     * 生成随机的entity
-     * 所有字段都随机赋值
-     */
-    E randomEntity();
 
 }

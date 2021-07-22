@@ -167,54 +167,37 @@
  *
  */
 
-package vip.isass.core.structure.entity;
+package vip.isass.core.converter.datatime;
 
-import cn.hutool.core.util.RandomUtil;
-import lombok.Builder;
-import vip.isass.core.support.LocalDateTimeUtil;
+import lombok.SneakyThrows;
+import org.springframework.stereotype.Component;
+import vip.isass.core.support.Converter;
+import vip.isass.core.support.JsonUtil;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
+ * 把 Map 类型，转换成 json 字符串
+ *
  * @author Rain
  */
-public interface IV2Entity<E extends IV2Entity<E>> {
+@Component
+public class MapToJsonConverter implements Converter<Map, String> {
 
-    long serialVersionUID = 1L;
-
-    default String randomString() {
-        return RandomUtil.randomString(6);
+    @Override
+    public boolean supportSourceType(Object source) {
+        return source instanceof Map;
     }
 
-    default Byte randomByte() {
-        return (byte) RandomUtil.randomInt(Byte.MAX_VALUE);
+    @Override
+    public boolean supportTargetClass(Class clazz) {
+        return String.class.isAssignableFrom(clazz);
     }
 
-    default Boolean randomBoolean() {
-        return RandomUtil.randomBoolean();
+    @Override
+    @SneakyThrows
+    public String convert(Map source) {
+        return JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(source);
     }
-
-    default Integer randomInteger() {
-        return RandomUtil.randomInt();
-    }
-
-    default Long randomLong() {
-        return RandomUtil.randomLong();
-    }
-
-    default BigDecimal randomBigDecimal() {
-        return RandomUtil.randomBigDecimal(BigDecimal.TEN);
-    }
-
-    default LocalDateTime randomLocalDateTime() {
-        return LocalDateTimeUtil.now();
-    }
-
-    /**
-     * 生成随机的entity
-     * 所有字段都随机赋值
-     */
-    E randomEntity();
 
 }

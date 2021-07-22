@@ -167,37 +167,37 @@
  *
  */
 
-package vip.isass.core.converter;
+package vip.isass.core.converter.datatime;
 
-import cn.hutool.core.date.format.FastDateFormat;
-import cn.hutool.core.util.StrUtil;
-import vip.isass.core.support.LocalDateTimeUtil;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+import vip.isass.core.entity.Json;
+import vip.isass.core.support.Converter;
+import vip.isass.core.support.LocalDateTimeUtil;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
+ * 把任何表示形式的 string 类型的日期时间，转换成 LocalDate
+ *
  * @author Rain
  */
 @Component
-public class StringToLocalDateTimeConverter implements Converter<String, LocalDateTime> {
-
-    private static final String FORMAT = "yyyy/M/dd HH:mm";
-
-    private static final FastDateFormat SDF = FastDateFormat.getInstance(FORMAT);
+public class StringToLocalDateConverter implements Converter<String, LocalDate> {
 
     @Override
-    public LocalDateTime convert(String source) {
-        return convert0(source);
+    public boolean supportSourceType(Object source) {
+        return source instanceof String;
     }
 
-    public static LocalDateTime convert0(String source) {
-        if (StrUtil.isBlank(source)) {
-            return null;
-        }
-        Long convert = StringDateToMillisConverter.convert0(source);
-        return LocalDateTimeUtil.epochMilliToLocalDateTime(convert);
+    @Override
+    public boolean supportTargetClass(Class clazz) {
+        return LocalDate.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public LocalDate convert(String source) {
+        Long timestamp = StringDateToMillisConverter.convert0(source);
+        return timestamp == null ? null : LocalDateTimeUtil.epochMilliToLocalDate(timestamp);
     }
 
 }

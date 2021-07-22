@@ -167,54 +167,52 @@
  *
  */
 
-package vip.isass.core.structure.entity;
+package vip.isass.core.structure.criteria.impl.type;
 
-import cn.hutool.core.util.RandomUtil;
-import lombok.Builder;
-import vip.isass.core.support.LocalDateTimeUtil;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import lombok.Getter;
 
 /**
  * @author Rain
  */
-public interface IV2Entity<E extends IV2Entity<E>> {
+public enum V2Condition {
 
-    long serialVersionUID = 1L;
+    // 条件之间的关系
+    OR(""),
 
-    default String randomString() {
-        return RandomUtil.randomString(6);
-    }
+    // 通用类型
+    EQUAL(""),
+    NOT_EQUAL("NotEqual"),
 
-    default Byte randomByte() {
-        return (byte) RandomUtil.randomInt(Byte.MAX_VALUE);
-    }
+    IN("In"),
+    NOT_IN("NotIn"),
 
-    default Boolean randomBoolean() {
-        return RandomUtil.randomBoolean();
-    }
+    IS_NULL("IsNull"),
+    IS_NOT_NULL("IsNotNull"),
 
-    default Integer randomInteger() {
-        return RandomUtil.randomInt();
-    }
+    // 数字类型
+    GREATER_THAN("GreaterThan"),
+    GREATER_THAN_EQUAL("GreaterThanEqual"),
+    LESS_THAN("LessThan"),
+    LESS_THAN_EQUAL("LessThanEqual"),
 
-    default Long randomLong() {
-        return RandomUtil.randomLong();
-    }
+    // 字符串类型
+    START_WITH("StartWith"),
+    LIKE("Like"),
+    NOT_LIKE("NotLike"),
 
-    default BigDecimal randomBigDecimal() {
-        return RandomUtil.randomBigDecimal(BigDecimal.TEN);
-    }
-
-    default LocalDateTime randomLocalDateTime() {
-        return LocalDateTimeUtil.now();
-    }
+    // 数组类型
+    CONTAINS_ALL("ContainsAll"),
+    CONTAINS_ANY("ContainsAny");
 
     /**
-     * 生成随机的entity
-     * 所有字段都随机赋值
+     * 属性名后缀
      */
-    E randomEntity();
+    @Getter
+    private String propertyNameSuffix;
+
+    V2Condition(String propertyNameSuffix) {
+        this.propertyNameSuffix = propertyNameSuffix;
+    }
 
 }
