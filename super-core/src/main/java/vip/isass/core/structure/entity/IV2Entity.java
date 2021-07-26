@@ -170,11 +170,11 @@
 package vip.isass.core.structure.entity;
 
 import cn.hutool.core.util.RandomUtil;
-import lombok.Builder;
 import vip.isass.core.support.LocalDateTimeUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Rain
@@ -201,6 +201,14 @@ public interface IV2Entity<E extends IV2Entity<E>> {
 
     default Long randomLong() {
         return RandomUtil.randomLong();
+    }
+
+    default Float randomFloat() {
+        return ThreadLocalRandom.current().nextFloat();
+    }
+
+    default Double randomDouble() {
+        return RandomUtil.randomDouble();
     }
 
     default BigDecimal randomBigDecimal() {
