@@ -167,41 +167,22 @@
  *
  */
 
-package vip.isass.core.converter.datatime;
+package vip.isass.core.support.json;
 
-import org.springframework.stereotype.Component;
-import vip.isass.core.support.Converter;
-import vip.isass.core.support.LocalDateTimeUtil;
+import com.fasterxml.jackson.databind.util.StdConverter;
+import vip.isass.core.converter.datatime.StringToLocalDateConverter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 /**
- * 把任何表示形式的 string 类型的日期时间，转换成 LocalTime
- *
  * @author Rain
  */
-@Component
-public class StringToLocalTimeConverter implements Converter<String, LocalTime> {
+public class StringToLocalDateConvert extends StdConverter<String, LocalDate> {
 
     @Override
-    public boolean supportSourceType(Object source) {
-        return source instanceof String;
-    }
-
-    @Override
-    public boolean supportTargetClass(Class clazz) {
-        return LocalTime.class.isAssignableFrom(clazz);
-    }
-
-    @Override
-    public LocalTime convert(String source) {
-        return convert0(source);
-    }
-
-    public static LocalTime convert0(String source) {
-        Long timestamp = StringDateToMillisConverter.convert0(source);
-        return timestamp == null ? null : LocalDateTimeUtil.epochMilliToLocalTime(timestamp);
+    public LocalDate convert(String value) {
+        return StringToLocalDateConverter.convert0(value);
     }
 
 }

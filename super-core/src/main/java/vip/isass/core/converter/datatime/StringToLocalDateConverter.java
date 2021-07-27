@@ -196,6 +196,10 @@ public class StringToLocalDateConverter implements Converter<String, LocalDate> 
 
     @Override
     public LocalDate convert(String source) {
+        return convert0(source);
+    }
+
+    public static LocalDate convert0(String source) {
         Long timestamp = StringDateToMillisConverter.convert0(source);
         return timestamp == null ? null : LocalDateTimeUtil.epochMilliToLocalDate(timestamp);
     }
