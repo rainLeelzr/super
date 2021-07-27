@@ -170,6 +170,7 @@
 package vip.isass.core.web.swagger;
 
 import cn.hutool.core.collection.CollUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
@@ -190,10 +191,15 @@ import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import vip.isass.core.entity.Json;
 import vip.isass.core.web.security.authentication.jwt.JwtConst;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Rain
@@ -221,6 +227,11 @@ public class WebSwaggerAutoConfiguration {
         loggingSystem.setLogLevel(CachingOperationNameGenerator.class.getName(), LogLevel.WARN);
         return new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(apiInfo())
+            .directModelSubstitute(LocalDateTime.class, Long.class)
+            .directModelSubstitute(LocalDate.class, Long.class)
+            .directModelSubstitute(LocalTime.class, Long.class)
+            .directModelSubstitute(Json.class, Map.class)
+            .directModelSubstitute(JsonNode.class, Map.class)
             .select()
             // .apis(RequestHandlerSelectors.any())
             .apis(Predicates.or(
