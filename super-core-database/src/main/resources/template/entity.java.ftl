@@ -124,7 +124,7 @@ public class ${entity} implements
      * 数据库字段名: ${field.name}
      * 数据库字段类型: ${field.type}
      */
-<#if swagger2 || field.propertyType == "Json">    @ApiModelProperty(value = "<#if field.comment??>${field.comment}<#else>${field.propertyName?cap_first}</#if>"<#if field.propertyType == "Json">, dataType = "java.util.HashMap"</#if>)</#if>
+<#if swagger2 || field.propertyType == "Json">    @ApiModelProperty(value = "<#if field.comment??>${field.comment}<#else>${field.propertyName?cap_first}</#if>")</#if>
     private <#if field.comment!?contains("${enumStart}")>${field.propertyName?cap_first} <#else>${field.propertyType} </#if>${field.propertyName};
 
 </#list>
