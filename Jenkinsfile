@@ -6,7 +6,7 @@ pipeline {
         COMMIT_ID = sh(script: "git log -1 --pretty='%h'", returnStdout: true).trim()
         COMMIT_LOGS = sh(script: "git log -1 --pretty='%s'", returnStdout: true).trim()
         AUTHORS = sh(script: "git log --oneline -1 --format=%an", returnStdout: true).trim()
-        FILE_CHANGES = sh(script: "git log -1 --pretty=tformat: --numstat | gawk '{ add += \$1 ; subs += \$2 ;} END { printf \"增加%s行, 删除%s行\",add,subs }'", returnStdout: true).trim()
+        FILE_CHANGES = sh(script: "source /etc/profile && git log -1 --pretty=tformat: --numstat | gawk '{ add += \$1 ; subs += \$2 ;} END { printf \"增加%s行, 删除%s行\",add,subs }'", returnStdout: true).trim()
     }
 
     stages {
