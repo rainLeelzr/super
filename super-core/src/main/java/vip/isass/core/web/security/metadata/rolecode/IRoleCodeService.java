@@ -167,16 +167,31 @@
  *
  */
 
-package vip.isass.core.support;
+package vip.isass.core.web.security.metadata.rolecode;
 
-public interface IsassConfig {
+import vip.isass.core.support.api.ApiService;
 
-    String PACKAGE_NAME = "vip.isass";
+import java.util.Collection;
 
-    String ISASS_CORE_VERSION = "super.3.1.1-SNAPSHOT";
+/**
+ * 角色编码服务
+ *
+ * @author Rain
+ */
+public interface IRoleCodeService extends ApiService {
 
-    String ISASS_API_VERSION = "isass-api.3.1.1-SNAPSHOT";
+    Collection<String> findRoleCodesByUri(UriRoleCodesReq roleCodesReq);
 
-    String NEW_PROJECT_VERSION = "1.0.0-SNAPSHOT";
+    void setRoleCodesByUserIdCache(String userId, Collection<String> roleCodes);
+
+    void setRoleCodesByUriCache(String uri, Collection<String> roleCodes);
+
+    /**
+     * 获取指定用户拥有的角色
+     *
+     * @param userId user id
+     * @return role codes
+     */
+    Collection<String> findRoleCodesByUserId(String userId);
 
 }

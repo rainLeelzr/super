@@ -167,16 +167,40 @@
  *
  */
 
-package vip.isass.core.support;
+package vip.isass.core.web.security.metadata.rolecode;
 
-public interface IsassConfig {
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
-    String PACKAGE_NAME = "vip.isass";
+import java.util.Collection;
+import java.util.List;
 
-    String ISASS_CORE_VERSION = "super.3.1.1-SNAPSHOT";
+@Primary
+@Service
+public class RoleCodeServiceManager implements IRoleCodeService {
 
-    String ISASS_API_VERSION = "isass-api.3.1.1-SNAPSHOT";
+    @Autowired(required = false)
+    private List<IRoleCodeService> services;
 
-    String NEW_PROJECT_VERSION = "1.0.0-SNAPSHOT";
+    @Override
+    public Collection<String> findRoleCodesByUri(UriRoleCodesReq roleCodesReq) {
+        return apply(services, s -> s.findRoleCodesByUri(roleCodesReq));
+    }
+
+    @Override
+    public void setRoleCodesByUserIdCache(String userId, Collection<String> roleCodes) {
+        consume(services, s -> s.setRoleCodesByUserIdCache(userId, roleCodes));
+    }
+
+    @Override
+    public void setRoleCodesByUriCache(String uri, Collection<String> roleCodes) {
+        consume(services, s -> setRoleCodesByUriCache(uri, roleCodes));
+    }
+
+    @Override
+    public Collection<String> findRoleCodesByUserId(String userId) {
+        return apply(services, s -> s.findRoleCodesByUserId(userId));
+    }
 
 }

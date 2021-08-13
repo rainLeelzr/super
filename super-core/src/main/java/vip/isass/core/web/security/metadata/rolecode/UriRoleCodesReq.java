@@ -167,28 +167,28 @@
  *
  */
 
-package vip.isass.core.web.res;
+package vip.isass.core.web.security.metadata.rolecode;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.List;
+import vip.isass.core.support.JsonUtil;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 
 /**
  * @author Rain
  */
-@Primary
-@Service
-public class ResRegisterServiceManager implements IResRegisterService {
+@Getter
+@Setter
+@Accessors(chain = true)
+public class UriRoleCodesReq {
 
-    @Autowired(required = false)
-    private List<IResRegisterService> services;
+    private String uri;
 
     @Override
-    public void register(Collection<HttpApiResource> resources) {
-        consume(services, s -> s.register(resources));
+    @SneakyThrows
+    public String toString() {
+        return JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(this);
     }
 
 }

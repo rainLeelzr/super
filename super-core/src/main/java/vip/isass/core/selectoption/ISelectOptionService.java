@@ -167,50 +167,14 @@
  *
  */
 
-package vip.isass.core.web.res;
+package vip.isass.core.selectoption;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import java.util.List;
 
-import java.util.Objects;
+public interface ISelectOptionService<T> {
 
-/**
- * @author Rain
- */
-@Accessors(chain = true)
-public class HttpApiResource {
+    String getKey();
 
-    @Getter
-    @Setter
-    private String serviceName;
-
-    /**
-     * 名称
-     */
-    @Getter
-    @Setter
-    private String name;
-
-    /**
-     * 资源标识
-     */
-    @Getter
-    @Setter
-    private String uri;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        HttpApiResource that = (HttpApiResource) o;
-        return Objects.equals(name, that.name) &&
-            Objects.equals(uri, that.uri);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, uri);
-    }
+    List<SelectOption<T>> getSelectOptions();
 
 }

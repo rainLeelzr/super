@@ -167,21 +167,7 @@
  *
  */
 
-package vip.isass.core.web.res;
+package vip.isass.core.selectoption;
 
-import vip.isass.core.support.api.ApiService;
-
-import java.util.Collection;
-
-public interface IResRegisterService extends ApiService {
-
-    /**
-     * 将一个集合的资源全部进行注册
-     * <p>记录入数据库</p>
-     * SessionManager
-     *
-     * @param resources resources
-     */
-    void register(Collection<HttpApiResource> resources);
-
+public interface HardCodeSelectOptionService<T> extends ISelectOptionService<T> {
 }

@@ -167,16 +167,40 @@
  *
  */
 
-package vip.isass.core.support;
+package vip.isass.core.web.security.metadata;
 
-public interface IsassConfig {
+import org.springframework.stereotype.Component;
+import vip.isass.core.web.security.metadata.rolecode.IRoleCodeService;
+import vip.isass.core.web.security.metadata.rolecode.UriRoleCodesReq;
 
-    String PACKAGE_NAME = "vip.isass";
+import javax.annotation.Resource;
+import java.util.Collection;
 
-    String ISASS_CORE_VERSION = "super.3.1.1-SNAPSHOT";
+/**
+ * 获取权限元数据
+ *
+ * @author Rain
+ */
+@Component
+public class DefaultSecurityMetadataSourceProvider implements SecurityMetadataSourceProvider {
 
-    String ISASS_API_VERSION = "isass-api.3.1.1-SNAPSHOT";
+    @Resource
+    private IRoleCodeService roleCodeService;
 
-    String NEW_PROJECT_VERSION = "1.0.0-SNAPSHOT";
+    /**
+     * 获取指定用户拥有的角色
+     */
+    @Override
+    public Collection<String> findRoleCodesByUserId(String userId) {
+        return roleCodeService.findRoleCodesByUserId(userId);
+    }
+
+    /**
+     * 获取访问指定 uri 需要的角色
+     */
+    @Override
+    public Collection<String> findRoleCodesByUri(String uri) {
+        return roleCodeService.findRoleCodesByUri(new UriRoleCodesReq().setUri(uri));
+    }
 
 }

@@ -167,16 +167,31 @@
  *
  */
 
-package vip.isass.core.support;
+package vip.isass.core.selectoption;
 
-public interface IsassConfig {
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-    String PACKAGE_NAME = "vip.isass";
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-    String ISASS_CORE_VERSION = "super.3.1.1-SNAPSHOT";
+@Service
+public class SelectOptionServiceManager {
 
-    String ISASS_API_VERSION = "isass-api.3.1.1-SNAPSHOT";
+    @Getter
+    private Map<String, ISelectOptionService<?>> selectOptionServices = Collections.emptyMap();
 
-    String NEW_PROJECT_VERSION = "1.0.0-SNAPSHOT";
+    @Autowired(required = false)
+    public void setSelectOptionServices(List<ISelectOptionService<?>> selectOptionServices) {
+        this.selectOptionServices = selectOptionServices == null
+                ? Collections.emptyMap()
+                : selectOptionServices
+                .stream()
+                .collect(Collectors.toMap(ISelectOptionService::getKey, Function.identity()));
+    }
 
 }

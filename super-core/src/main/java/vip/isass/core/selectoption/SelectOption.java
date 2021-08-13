@@ -167,16 +167,24 @@
  *
  */
 
-package vip.isass.core.support;
+package vip.isass.core.selectoption;
 
-public interface IsassConfig {
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-    String PACKAGE_NAME = "vip.isass";
+@Getter
+@Setter
+@Accessors(chain = true)
+@ApiModel
+public class SelectOption<T> {
 
-    String ISASS_CORE_VERSION = "super.3.1.1-SNAPSHOT";
+    @ApiModelProperty("选项名")
+    private String name;
 
-    String ISASS_API_VERSION = "isass-api.3.1.1-SNAPSHOT";
-
-    String NEW_PROJECT_VERSION = "1.0.0-SNAPSHOT";
+    @ApiModelProperty("选项值")
+    private T value;
 
 }
