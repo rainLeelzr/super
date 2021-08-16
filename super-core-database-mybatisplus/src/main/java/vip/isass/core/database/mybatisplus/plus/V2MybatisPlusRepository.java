@@ -186,9 +186,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import vip.isass.core.database.mybatisplus.mapper.IMapper;
-import vip.isass.core.entity.IdEntity;
 import vip.isass.core.entity.SensitiveDataProperty;
-import vip.isass.core.entity.VersionEntity;
 import vip.isass.core.exception.AbsentException;
 import vip.isass.core.exception.AlreadyPresentException;
 import vip.isass.core.exception.code.StatusMessageEnum;
@@ -329,7 +327,7 @@ public abstract class V2MybatisPlusRepository<
     @Override
     @SuppressWarnings("rawtypes")
     public boolean updateById(E entity) {
-        IdEntity idEntity = (IdEntity) entity;
+        IV2IdEntity idEntity = (IV2IdEntity) entity;
         Serializable id = idEntity.getId();
         Assert.notNull(id, "id 不能为null");
         if (id instanceof String) {
@@ -338,14 +336,14 @@ public abstract class V2MybatisPlusRepository<
         EDB edb = V2DbEntityConvert.convertToDbEntity(entity);
 
         String idColumnName = idEntity.getIdColumnName();
-        boolean b = IdEntity.ID_COLUMN_NAME.equalsIgnoreCase(idColumnName)
+        boolean b = IV2IdEntity.ID_COLUMN_NAME.equalsIgnoreCase(idColumnName)
             ? super.updateById(edb)
             : super.update(edb, new UpdateWrapper<EDB>().eq(idColumnName, idEntity.getId()));
 
         // 回写版本字段到 entity
-        if (entity instanceof VersionEntity) {
-            VersionEntity versionEntity = (VersionEntity) entity;
-            VersionEntity versionDbEntity = (VersionEntity) edb;
+        if (entity instanceof IV2VersionEntity) {
+            IV2VersionEntity versionEntity = (IV2VersionEntity) entity;
+            IV2VersionEntity versionDbEntity = (IV2VersionEntity) edb;
             versionEntity.setVersion(versionDbEntity.getVersion());
         }
         return b;
@@ -354,7 +352,7 @@ public abstract class V2MybatisPlusRepository<
     @Override
     @SuppressWarnings("rawtypes")
     public boolean updateAllColumnsById(E entity) {
-        IdEntity idEntity = (IdEntity) entity;
+        IV2IdEntity idEntity = (IV2IdEntity) entity;
         Serializable id = idEntity.getId();
         Assert.notNull(id, "id 不能为null");
         if (id instanceof String) {
@@ -376,9 +374,9 @@ public abstract class V2MybatisPlusRepository<
     public boolean updateByWrapper(E entity, Wrapper wrapper) {
         EDB edb = V2DbEntityConvert.convertToDbEntity(entity);
         boolean b = this.update(edb, wrapper);
-        if (entity instanceof VersionEntity) {
-            VersionEntity versionEntity = (VersionEntity) entity;
-            VersionEntity versionDbEntity = (VersionEntity) edb;
+        if (entity instanceof IV2VersionEntity) {
+            IV2VersionEntity versionEntity = (IV2VersionEntity) entity;
+            IV2VersionEntity versionDbEntity = (IV2VersionEntity) edb;
             versionEntity.setVersion(versionDbEntity.getVersion());
         }
         return b;
@@ -405,7 +403,7 @@ public abstract class V2MybatisPlusRepository<
             }
         }
 
-        if (IdEntity.class.isAssignableFrom(edbClass)) {
+        if (IV2IdEntity.class.isAssignableFrom(edbClass)) {
             String IdColumnName = getIdColumnName(edbClass);
             if (StrUtil.isNotBlank(IdColumnName)) {
                 return getByWrapper(new QueryWrapper<EDB>().eq(IdColumnName, realId));
@@ -437,7 +435,11 @@ public abstract class V2MybatisPlusRepository<
     public E getOrWarnByWrapper(Wrapper<EDB> wrapper) {
         E t = getByWrapper(wrapper);
         if (t == null) {
-            log.warn(StatusMessageEnum.ABSENT.getMsg() + ": " + currentModelClass().getSimpleName() + ": " + wrapper.getSqlSegment());
+            log.warn(
+                "{}: {}: {}",
+                StatusMessageEnum.ABSENT.getMsg(),
+                currentModelClass().getSimpleName(),
+                wrapper.getSqlSegment());
         }
         return t;
     }
@@ -465,8 +467,12 @@ public abstract class V2MybatisPlusRepository<
 
     public List<E> findByWrapper(Wrapper<EDB> wrapper) {
         // 如果没有设置 select 条件，则过滤掉敏感字段
-        if (wrapper != null && !Optional.ofNullable(wrapper.getSqlSelect()).isPresent() && wrapper instanceof QueryWrapper) {
-            ((QueryWrapper<EDB>) wrapper).select(currentModelClass(), i -> !SensitiveDataProperty.PROPERTIES.contains(i.getProperty()));
+        if (wrapper != null
+            && !Optional.ofNullable(wrapper.getSqlSelect()).isPresent()
+            && wrapper instanceof QueryWrapper) {
+            ((QueryWrapper<EDB>) wrapper).select(
+                currentModelClass(),
+                i -> !SensitiveDataProperty.PROPERTIES.contains(i.getProperty()));
         }
         return this.list(wrapper).stream().map(V2DbEntityConvert::convertToEntity).collect(Collectors.toList());
     }
@@ -481,8 +487,12 @@ public abstract class V2MybatisPlusRepository<
     }
 
     public IPage<E> findPageByWrapper(IPage<E> page, Wrapper<EDB> wrapper) {
-        if (wrapper != null && !Optional.ofNullable(wrapper.getSqlSelect()).isPresent() && wrapper instanceof QueryWrapper) {
-            ((QueryWrapper<EDB>) wrapper).select(currentModelClass(), i -> !SensitiveDataProperty.PROPERTIES.contains(i.getProperty()));
+        if (wrapper != null
+            && !Optional.ofNullable(wrapper.getSqlSelect()).isPresent()
+            && wrapper instanceof QueryWrapper) {
+            ((QueryWrapper<EDB>) wrapper).select(
+                currentModelClass(),
+                i -> !SensitiveDataProperty.PROPERTIES.contains(i.getProperty()));
         }
         return this.page(
             new Page<EDB>(page.getCurrent(), page.getSize(), page.isSearchCount())
@@ -494,7 +504,11 @@ public abstract class V2MybatisPlusRepository<
     @Override
     public IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
         IV2PageCriteria pageCriteria = (IV2PageCriteria) criteria;
-        return findPageByWrapper(pageCriteria.getPageNum(), pageCriteria.getPageSize(), pageCriteria.getSearchCountFlag(), V2WrapperUtil.getEdbQueryWrapper(criteria));
+        return findPageByWrapper(
+            pageCriteria.getPageNum(),
+            pageCriteria.getPageSize(),
+            pageCriteria.getSearchCountFlag(),
+            V2WrapperUtil.getEdbQueryWrapper(criteria));
     }
 
     @Override
@@ -523,7 +537,7 @@ public abstract class V2MybatisPlusRepository<
             Assert.notBlank((String) id, "id");
         }
 
-        return isPresentByWrapper(Wrappers.<EDB>query().eq(IdEntity.ID_COLUMN_NAME, id));
+        return isPresentByWrapper(Wrappers.<EDB>query().eq(IV2IdEntity.ID_COLUMN_NAME, id));
     }
 
     @Override

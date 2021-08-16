@@ -177,6 +177,7 @@ import vip.isass.core.exception.AbsentException;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
 import vip.isass.core.structure.entity.IV2Entity;
+import vip.isass.core.structure.entity.IV2IdEntity;
 import vip.isass.core.structure.repository.IV2Repository;
 import vip.isass.core.support.api.ApiOrder;
 
@@ -305,6 +306,7 @@ public interface IV2LocalService<
     // region 改
 
     default Boolean updateById(E entity) {
+        Assert.isTrue(entity instanceof IV2IdEntity, "不支持非id类型的对象执行'根据id更新'的操作");
         return getRepository().updateById(entity);
     }
 

@@ -169,12 +169,29 @@
 
 package vip.isass.core.support;
 
-public interface IsassConfig {
+import cn.hutool.core.lang.Assert;
 
-    String PACKAGE_NAME = "vip.isass";
+import javax.activation.MimetypesFileTypeMap;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
-    String ISASS_CORE_VERSION = "super.3.1.1-SNAPSHOT";
+public class FileUtil {
 
-    String NEW_PROJECT_VERSION = "1.0.0-SNAPSHOT";
+    public static String getContentType(File file) {
+        Assert.notNull(file);
+        //利用nio提供的类判断文件ContentType
+        String contentType = null;
+        try {
+            contentType = Files.probeContentType(file.toPath());
+        } catch (IOException e) {
+            // do nothing
+        }
+        //若失败则调用另一个方法进行判断
+        if (contentType == null) {
+            contentType = new MimetypesFileTypeMap().getContentType(file);
+        }
+        return contentType;
+    }
 
 }

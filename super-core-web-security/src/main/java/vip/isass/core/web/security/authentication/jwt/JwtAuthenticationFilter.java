@@ -253,7 +253,6 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
     }
 
     private boolean processTerminal(DefaultLoginUser defaultLoginUser) {
-        // 如果 jwtCacheService 没初始化，则当前环境没有依赖 isass-api-cache，则不检查多端登录
         if (jwtService == null) {
             return true;
         }

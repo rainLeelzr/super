@@ -167,14 +167,125 @@
  *
  */
 
-package vip.isass.core.support;
+package vip.isass.core.web.security.authentication.jwt;
 
-public interface IsassConfig {
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
-    String PACKAGE_NAME = "vip.isass";
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-    String ISASS_CORE_VERSION = "super.3.1.1-SNAPSHOT";
+/**
+ * @author Rain
+ */
+@Slf4j
+@Service
+public class JwtCacheService implements IJwtService {
 
-    String NEW_PROJECT_VERSION = "1.0.0-SNAPSHOT";
+    /**
+     * 登录的最大版本号
+     */
+    private static final String MAX_VERSION_KEY = "jwt:{userId}:maxVersion";
+
+    /**
+     * 当被验证的 token 的 version 小于等于本值时，被验证的 token 强制失效
+     */
+    private static final String FORCE_OFFLINE_VERSION_KEY = "jwt:{userId}:forceOfflineVersion";
+
+    /**
+     * 各终端最大的 version
+     */
+    private static final String TERMINAL_ONLINE_MAX_VERSION_KEY = "jwt:{userId}:{terminal}:maxVersion";
+
+    @Resource
+    private RedisTemplate<String, Integer> redisTemplate;
+
+    @Override
+    public Integer increaseVersionByTerminal(String userId, String terminal) {
+        String maxVersionKey = formatMaxVersionKey(userId);
+
+        Long increment = redisTemplate.opsForValue().increment(maxVersionKey, 1);
+        int nextVersion = increment == null ? 1 : increment.intValue();
+
+        redisTemplate.expire(maxVersionKey, ChronoUnit.WEEKS.getDuration().getSeconds(), TimeUnit.SECONDS);
+
+        redisTemplate.opsForValue().set(
+                formatTerminalOnlineMaxVersionKey(userId, terminal),
+                nextVersion,
+                ChronoUnit.WEEKS.getDuration().getSeconds(),
+                TimeUnit.SECONDS);
+
+        return nextVersion;
+    }
+
+    public Integer getMaxVersion(String userId) {
+        return redisTemplate.opsForValue().get(formatMaxVersionKey(userId));
+    }
+
+    @Override
+    public Integer getForceOfflineVersion(String userId) {
+        return redisTemplate.opsForValue().get(formatForceOfflineVersionKey(userId));
+    }
+
+    @Override
+    public Integer getVersionByTerminal(String userId, String terminal) {
+        Assert.notBlank(userId);
+        Assert.notBlank(terminal);
+        return redisTemplate.opsForValue().get(formatTerminalOnlineMaxVersionKey(userId, terminal));
+    }
+
+    /**
+     * 根据终端列表获取 version
+     */
+    @Override
+    public Map<String, Integer> getVersionByTerminals(String userId, List<String> terminals) {
+        Assert.notBlank(userId);
+        Assert.notEmpty(terminals);
+        List<String> keys = new ArrayList<>(terminals.size());
+        for (String terminal : terminals) {
+            Assert.notBlank(terminal, "终端名称必填");
+            keys.add(formatTerminalOnlineMaxVersionKey(userId, terminal));
+        }
+        List<Integer> version = redisTemplate.opsForValue().multiGet(keys);
+
+        Map<String, Integer> result = CollUtil.newHashMap(terminals.size());
+
+        for (int i = 0; i < keys.size(); i++) {
+            if (version == null) {
+                result.put(terminals.get(i), null);
+            } else {
+                result.put(terminals.get(i), version.get(i));
+            }
+        }
+
+        return result;
+    }
+
+    private String formatMaxVersionKey(String userId) {
+        return MAX_VERSION_KEY.replace("{userId}", userId);
+    }
+
+    private String formatForceOfflineVersionKey(String userId) {
+        return FORCE_OFFLINE_VERSION_KEY.replace("{userId}", userId);
+    }
+
+    private String formatTerminalOnlineMaxVersionKey(String userId, String terminal) {
+        return TERMINAL_ONLINE_MAX_VERSION_KEY.replace("{userId}", userId).replace("{terminal}", terminal);
+    }
+
+    @PostConstruct
+    public void init() {
+        if (redisTemplate == null) {
+            log.warn("当前环境没有依赖 redis，所有自定义多端登录配置将失效，系统将不进行多端登录检查！");
+        }
+    }
 
 }
