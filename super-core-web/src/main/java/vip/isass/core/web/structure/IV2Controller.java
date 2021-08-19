@@ -170,17 +170,13 @@
 package vip.isass.core.web.structure;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import vip.isass.core.structure.criteria.IV2Criteria;
-import vip.isass.core.structure.criteria.impl.type.V2FullTypeCriteria;
-import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
 import vip.isass.core.structure.entity.IV2Entity;
 import vip.isass.core.structure.service.IV2LocalService;
 import vip.isass.core.structure.service.IV2Service;
-import vip.isass.core.support.JsonUtil;
 import vip.isass.core.support.api.ApiOrder;
 
 import java.io.Serializable;
@@ -392,16 +388,6 @@ public interface IV2Controller<
     @GetMapping(FIND_PAGE_BY_CRITERIA_URI_SECOND_PART)
     @ApiOperation(value = "查-分页列表-根据条件")
     default IPage<E> findPageByCriteria(@ModelAttribute C criteria) {
-        try {
-
-            String json = JsonUtil.DEFAULT_INSTANCE.writeValueAsString(criteria);
-            System.out.println(json);
-            V2FullTypeCriteria v2PageCriteria = JsonUtil.DEFAULT_INSTANCE.readValue(json, V2FullTypeCriteria.class);
-            System.out.println(JsonUtil.DEFAULT_INSTANCE.writeValueAsString(v2PageCriteria));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        IV2WhereConditionCriteria whereConditionCriteria = (IV2WhereConditionCriteria) criteria;
         return getService().findPageByCriteria(criteria);
     }
 
