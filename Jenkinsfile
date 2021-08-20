@@ -28,7 +28,7 @@ pipeline {
                 }
             }
             steps {
-                sh "mvn -T 1C -U -am clean deploy -DskipTests -Pisass-deploy"
+                sh "mvn -q -T 1C -U -am clean deploy -DskipTests -Pisass-deploy"
             }
         }
     }
