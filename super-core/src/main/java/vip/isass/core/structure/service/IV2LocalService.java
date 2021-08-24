@@ -174,6 +174,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vip.isass.core.exception.AbsentException;
+import vip.isass.core.exception.AlreadyPresentException;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
 import vip.isass.core.structure.entity.IV2Entity;
@@ -231,18 +232,27 @@ public interface IV2LocalService<
     @Override
     default E addIfAbsentByColumns(E entity, List<String> uniqueColumns) {
         if (getRepository().addIfAbsentByColumns(entity, uniqueColumns)) {
-            return this.add(entity);
+            return entity;
         }
-        return null;
+        throw new AlreadyPresentException("添加失败，记录已存在");
     }
 
     @Override
     default Integer addBatchIfAbsentByCriteria(List<E> entities, C criteria) {
         int count = 0;
-        for (E entity : entities) {
-            if (getRepository().addIfAbsentByCriteria(entity, criteria)) {
-                count++;
-            }
+        if (!(criteria instanceof IV2WhereConditionCriteria)) {
+            throw new UnsupportedOperationException("criteria不是WhereConditionCriteria，请检查代码");
+        }
+        if (!((IV2WhereConditionCriteria) criteria).hasConditions()) {
+            throw new IllegalArgumentException("请至少设置1个条件");
+        }
+
+        if (this.isPresentByCriteria(criteria)) {
+            return 0;
+        }
+
+        if (getRepository().addBatch(entities)) {
+            count++;
         }
         return count;
     }

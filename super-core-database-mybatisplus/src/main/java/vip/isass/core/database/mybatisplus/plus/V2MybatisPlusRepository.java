@@ -172,8 +172,6 @@ package vip.isass.core.database.mybatisplus.plus;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -196,7 +194,6 @@ import vip.isass.core.structure.entity.*;
 import vip.isass.core.structure.repository.IV2Repository;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -300,6 +297,23 @@ public abstract class V2MybatisPlusRepository<
         return entity;
     }
 
+    public boolean addIfAbsentByColumns(E entity, List<String> uniqueColumns) {
+        Assert.notEmpty(uniqueColumns, "uniqueColumns");
+        QueryWrapper<EDB> wrapper = new QueryWrapper<>();
+        Map<String, Object> map = BeanUtil.beanToMap(entity);
+        for (String uniqueColumn : uniqueColumns) {
+            Object value = map.get(StrUtil.toCamelCase(uniqueColumn));
+            Assert.notNull(value, "uniqueColumn[{}]必填", uniqueColumn);
+            wrapper.eq(uniqueColumn, value);
+        }
+
+        if (isPresentByWrapper(wrapper)) {
+            return false;
+        }
+        add(entity);
+        return true;
+    }
+
     // ****************************** 删 start ******************************
 
     @Override
@@ -362,13 +376,11 @@ public abstract class V2MybatisPlusRepository<
         UpdateWrapper<EDB> updateWrapper = new UpdateWrapper<EDB>()
             .eq(idEntity.getIdColumnName(), idEntity.getId());
 
-        Field[] fields = ReflectUtil.getFieldsDirectly(entity.getClass(), false);
-        if (ArrayUtil.isNotEmpty(fields)) {
-            for (Field field : fields) {
-                updateWrapper.set(field.getName(), ReflectUtil.getFieldValue(entity, field));
-            }
-        }
-        return super.update(updateWrapper);
+        EDB edb = V2DbEntityConvert.convertToDbEntity(entity);
+        // updateByWrapper不能走填充策略，只有entity才能填充
+        // 参考连接 https://www.shangmayuan.com/a/3a4189a6a4424846aa96eb61.html
+
+        return super.update(edb, updateWrapper);
     }
 
     public boolean updateByWrapper(E entity, Wrapper wrapper) {

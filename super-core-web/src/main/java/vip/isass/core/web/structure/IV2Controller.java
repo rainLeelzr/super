@@ -235,7 +235,7 @@ public interface IV2Controller<
 
     @Override
     @PostMapping(ADD_BATCH_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART)
-    @ApiOperation(value = "增-批量实体-根据字段-不存在时")
+    @ApiOperation(value = "增-批量实体-根据条件-不存在时")
     default Integer addBatchIfAbsentByCriteria(@RequestBody List<E> entities, @ModelAttribute C criteria) {
         return getService().addBatchIfAbsentByCriteria(entities, criteria);
     }
