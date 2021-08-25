@@ -194,10 +194,7 @@ import vip.isass.core.structure.entity.*;
 import vip.isass.core.structure.repository.IV2Repository;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -549,7 +546,7 @@ public abstract class V2MybatisPlusRepository<
             Assert.notBlank((String) id, "id");
         }
 
-        return isPresentByWrapper(Wrappers.<EDB>query().eq(IV2IdEntity.ID_COLUMN_NAME, id));
+        return isPresentByWrapper(Wrappers.<EDB>query().eq(IV2IdEntity.ID_COLUMN_NAME, id).last("limit 1"));
     }
 
     @Override

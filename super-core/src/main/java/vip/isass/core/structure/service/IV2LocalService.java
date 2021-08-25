@@ -270,11 +270,6 @@ public interface IV2LocalService<
 
     @Override
     default Boolean addOrUpdateByCriteria(E entity, C criteria) {
-        Assert.isTrue(criteria instanceof IV2WhereConditionCriteria, "criteria 必需实现 IV2WhereConditionCriteria");
-        Assert.isTrue(criteria instanceof IV2WhereConditionCriteria, "criteria 必需是 IV2WhereConditionCriteria 的子类");
-
-        Assert.notEmpty(((IV2WhereConditionCriteria) criteria).getWhereConditions(),
-            "必需设置更新条件");
         Boolean update = updateByCriteria(entity, criteria);
         if (!update) {
             add(entity);
@@ -308,6 +303,7 @@ public interface IV2LocalService<
     }
 
     default Boolean deleteByCriteria(C criteria) {
+        exceptionIfHaveNoCondition(criteria);
         return getRepository().deleteByCriteria(criteria);
     }
 
@@ -331,6 +327,7 @@ public interface IV2LocalService<
     }
 
     default Boolean updateByCriteria(E entity, C criteria) {
+        exceptionIfHaveNoCondition(criteria);
         return getRepository().updateByCriteria(entity, criteria);
     }
 
@@ -416,4 +413,12 @@ public interface IV2LocalService<
 
     // endregion
 
+    default void exceptionIfHaveNoCondition(C criteria) {
+        if (!(criteria instanceof IV2WhereConditionCriteria)) {
+            throw new UnsupportedOperationException("criteria不是WhereConditionCriteria，请检查代码");
+        }
+        if (!((IV2WhereConditionCriteria) criteria).hasConditions()) {
+            throw new IllegalArgumentException("请至少设置1个条件");
+        }
+    }
 }

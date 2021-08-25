@@ -213,7 +213,7 @@ public interface IV2Controller<
 
     @Override
     @PostMapping(ADD_BATCH_BY_BATCH_SIZE_URI_SECOND_PART)
-    @ApiOperation(value = "增-批量实体-批量数量", notes = "id不需要赋值，会自动生成")
+    @ApiOperation(value = "增-批量实体-批量数量", notes = "id不需要赋值，会自动生成", hidden = true)
     default Collection<E> addBatchByBatchSize(@RequestBody Collection<E> entities,
                                               @PathVariable("batchSize") int batchSize) {
         return getService().addBatchByBatchSize(entities, batchSize);
@@ -319,7 +319,7 @@ public interface IV2Controller<
 
     @Override
     @PutMapping(UPDATE_BY_ID_OR_EXCEPTION_URI_SECOND_PART)
-    @ApiOperation(value = "改-根据id-异常")
+    @ApiOperation(value = "改-根据id-异常", hidden = true)
     default void updateByIdOrException(@RequestBody E entity) {
         getService().updateByIdOrException(entity);
     }
@@ -333,7 +333,7 @@ public interface IV2Controller<
 
     @Override
     @PutMapping(UPDATE_BY_CRITERIA_OR_EXCEPTION_URI_SECOND_PART)
-    @ApiOperation(value = "改-根据条件-异常")
+    @ApiOperation(value = "改-根据条件-异常", hidden = true)
     default void updateByCriteriaOrException(@RequestBody E entity, @ModelAttribute C criteria) {
         getService().updateByCriteriaOrException(entity, criteria);
     }
@@ -365,7 +365,7 @@ public interface IV2Controller<
 
     @Override
     @GetMapping(GET_BY_CRITERIA_OR_WARN_URI_SECOND_PART)
-    @ApiOperation(value = "查-单实体-根据条件-警告")
+    @ApiOperation(value = "查-单实体-根据条件-警告", hidden = true)
     default E getByCriteriaOrWarn(@ModelAttribute C criteria) {
         return getService().getByCriteriaOrWarn(criteria);
     }
@@ -451,14 +451,14 @@ public interface IV2Controller<
 
     @Override
     @GetMapping(EXCEPTION_IF_PRESENT_BY_CRITERIA_URI_SECOND_PART)
-    @ApiOperation(value = "查-存在时异常-根据条件")
+    @ApiOperation(value = "查-存在时异常-根据条件", hidden = true)
     default void exceptionIfPresentByCriteria(@ModelAttribute C criteria) {
         getService().exceptionIfPresentByCriteria(criteria);
     }
 
     @Override
     @GetMapping(EXCEPTION_IF_ABSENT_BY_CRITERIA_URI_SECOND_PART)
-    @ApiOperation(value = "查-不存在时异常-根据条件")
+    @ApiOperation(value = "查-不存在时异常-根据条件", hidden = true)
     default void exceptionIfAbsentByCriteria(@ModelAttribute C criteria) {
         getService().exceptionIfAbsentByCriteria(criteria);
     }
