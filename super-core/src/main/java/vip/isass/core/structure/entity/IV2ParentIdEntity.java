@@ -180,7 +180,9 @@ import java.io.Serializable;
  * @author Rain
  */
 public interface IV2ParentIdEntity<PK extends Serializable, E extends IV2ParentIdEntity<PK, E>>
-    extends IV2IdEntity<PK, E> {
+    extends IV2PkEntity<PK, E> {
+
+    String PARENT_ID_PROPERTY_NAME = "parentId";
 
     String PARENT_ID_COLUMN_NAME = "parent_id";
 
@@ -200,9 +202,8 @@ public interface IV2ParentIdEntity<PK extends Serializable, E extends IV2ParentI
      * 设置父 id
      *
      * @param parentId parent id
-     * @return this object
      */
-    E setParentId(PK parentId);
+    void setParentId(PK parentId);
 
     @Transient
     default String getParentIdColumnName() {
@@ -231,8 +232,10 @@ public interface IV2ParentIdEntity<PK extends Serializable, E extends IV2ParentI
         return (E) this;
     }
 
+    @SuppressWarnings("unchecked")
     default E randomParentId() {
-        return setParentId(randomPk());
+        setParentId(randomPk());
+        return (E) this;
     }
 
     @Override

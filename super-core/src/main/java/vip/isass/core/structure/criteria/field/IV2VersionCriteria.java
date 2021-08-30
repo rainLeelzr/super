@@ -167,211 +167,73 @@
  *
  */
 
-package vip.isass.core.criteria;
+package vip.isass.core.structure.criteria.field;
 
-import cn.hutool.core.collection.CollUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.experimental.Accessors;
-import vip.isass.core.entity.IdEntity;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.criteria.type.IV2SelectColumnCriteria;
+import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
+import vip.isass.core.structure.entity.IV2VersionEntity;
 
-import java.io.Serializable;
-import java.util.Collection;
+import java.beans.Transient;
 
 /**
- * 基于mysql的条件
+ * 乐观锁版本号 类型条件接口
  *
  * @author Rain
  */
-@Getter
-@Accessors(chain = true)
-public class IdCriteria<
-    C extends IdCriteria<C, E, PK>,
-    E extends IdEntity<PK, E>,
-    PK extends Serializable>
-    extends AbstractCriteria<E, C> {
+public interface IV2VersionCriteria<
+    E extends IV2VersionEntity<E>,
+    C extends IV2VersionCriteria<E, C>
+    > extends IV2Criteria<E, C> {
 
-    //************************************************** id **************************************************//
-
-    @ApiModelProperty("id等于")
-    private PK id;
-
-    @ApiModelProperty(hidden = true, value = "或者id等于")
-    private PK orId;
-
-    @ApiModelProperty(hidden = true, value = "id不等于")
-    private PK idNotEqual;
-
-    @ApiModelProperty(hidden = true, value = "或者id不等于")
-    private PK orIdNotEqual;
-
-    @ApiModelProperty(hidden = true, value = "id所在范围")
-    private Collection<PK> idIn;
-
-    @ApiModelProperty(hidden = true, value = "或者id所在范围")
-    private Collection<PK> orIdIn;
-
-    @ApiModelProperty(hidden = true, value = "id不在范围")
-    private Collection<PK> idNotIn;
-
-    @ApiModelProperty(hidden = true, value = "或者id不在范围")
-    private Collection<PK> orIdNotIn;
-
-    @ApiModelProperty(hidden = true, value = "id包含字符")
-    private String idLike;
-
-    @ApiModelProperty(hidden = true, value = "或者id包含字符")
-    private String orIdLike;
-
-    @ApiModelProperty(hidden = true, value = "id不包含字符")
-    private String idNotLike;
-
-    @ApiModelProperty(hidden = true, value = "或者id不包含字符")
-    private String orIdNotLike;
-
-    @ApiModelProperty(hidden = true, value = "id开始以")
-    private String idStartWith;
-
-    @ApiModelProperty(hidden = true, value = "或者id开始以")
-    private String orIdStartWith;
-
-    //************************************************** id setter **************************************************//
-
-    @SuppressWarnings("unchecked")
-    public C setId(PK id) {
-        this.id = id;
-        equals(IdEntity.ID_COLUMN_NAME, this.id);
-        return (C) this;
+    @Transient
+    default String getVersionColumnName() {
+        return IV2VersionEntity.VERSION_COLUMN_NAME;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrId(PK id) {
-        this.orId = id;
-        orEquals(IdEntity.ID_COLUMN_NAME, this.orId);
-        return (C) this;
+    @Transient
+    default String getVersionPropertyName() {
+        return IV2VersionEntity.VERSION_PROPERTY_NAME;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setIdNotEqual(PK id) {
-        this.id = id;
-        notEquals(IdEntity.ID_COLUMN_NAME, this.id);
-        return (C) this;
+    @Transient
+    @SuppressWarnings({"rawtypes"})
+    default Integer getVersion() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (Integer) ((IV2WhereConditionCriteria) this).getEquals(getVersionColumnName())
+            : null;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotEqual(PK id) {
-        this.orId = id;
-        orNotEquals(IdEntity.ID_COLUMN_NAME, this.orId);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setVersion(Integer id) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).equals(getVersionPropertyName(), getVersionColumnName(), id)
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setIdIn(Collection<PK> ids) {
-        this.idIn = ids;
-        in(IdEntity.ID_COLUMN_NAME, this.idIn);
-        return (C) this;
+    // region SelectColumnCriteria
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C selectVersion() {
+        return this instanceof IV2SelectColumnCriteria
+            ? (C) ((IV2SelectColumnCriteria) this).setSelectColumn(getVersionColumnName())
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrIdIn(Collection<PK> ids) {
-        this.orIdIn = ids;
-        orIn(IdEntity.ID_COLUMN_NAME, this.orIdIn);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C addSelectVersion() {
+        return this instanceof IV2SelectColumnCriteria
+            ? (C) ((IV2SelectColumnCriteria) this).addSelectColumn(getVersionColumnName())
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setIdNotIn(Collection<PK> ids) {
-        this.idNotIn = ids;
-        notIn(IdEntity.ID_COLUMN_NAME, this.idNotIn);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C unSelectVersion() {
+        return this instanceof IV2SelectColumnCriteria
+            ? (C) ((IV2SelectColumnCriteria) this).unSelectColumn(getVersionColumnName())
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotIn(Collection<PK> ids) {
-        this.orIdNotIn = ids;
-        orNotIn(IdEntity.ID_COLUMN_NAME, this.orIdNotIn);
-        return (C) this;
-    }
-
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setIdIn(PK... ids) {
-        this.idIn = CollUtil.newHashSet(ids);
-        in(IdEntity.ID_COLUMN_NAME, this.idIn);
-        return (C) this;
-    }
-
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setOrIdIn(PK... ids) {
-        this.orIdIn = CollUtil.newHashSet(ids);
-        orIn(IdEntity.ID_COLUMN_NAME, this.orIdIn);
-        return (C) this;
-    }
-
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setIdNotIn(PK... ids) {
-        this.idNotIn = CollUtil.newHashSet(ids);
-        notIn(IdEntity.ID_COLUMN_NAME, this.idNotIn);
-        return (C) this;
-    }
-
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotIn(PK... ids) {
-        this.orIdNotIn = CollUtil.newHashSet(ids);
-        orNotIn(IdEntity.ID_COLUMN_NAME, this.orIdNotIn);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setIdLike(String idLike) {
-        this.idLike = idLike;
-        like(IdEntity.ID_COLUMN_NAME, this.idLike);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setOrIdLike(String orIdLike) {
-        this.orIdLike = orIdLike;
-        orLike(IdEntity.ID_COLUMN_NAME, this.orIdLike);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setIdNotLike(String idNotLike) {
-        this.idNotLike = idNotLike;
-        notLike(IdEntity.ID_COLUMN_NAME, this.idNotLike);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotLike(String orIdNotLike) {
-        this.orIdNotLike = orIdNotLike;
-        orNotLike(IdEntity.ID_COLUMN_NAME, this.orIdNotLike);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setIdStartWith(String idStartWith) {
-        this.idStartWith = idStartWith;
-        startWith(IdEntity.ID_COLUMN_NAME, idStartWith);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C setOrIdStartWith(String orIdStartWith) {
-        this.orIdStartWith = orIdStartWith;
-        orStartWith(IdEntity.ID_COLUMN_NAME, orIdStartWith);
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public C selectId() {
-        this.setSelectColumns(IdEntity.ID_COLUMN_NAME);
-        return (C) this;
-    }
+    // endregion
 
 }

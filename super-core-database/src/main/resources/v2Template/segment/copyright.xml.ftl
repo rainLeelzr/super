@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~                    GNU LESSER GENERAL PUBLIC LICENSE
   ~                        Version 3, 29 June 2007
   ~
-  ~  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org />
+  ~  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
   ~  Everyone is permitted to copy and distribute verbatim copies
   ~  of this license document, but changing it is not allowed.
   ~
@@ -167,61 +166,3 @@
   ~ Library.
   ~
   -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <!-- 父项目信息 -->
-    <parent>
-        <groupId>vip.isass</groupId>
-        <artifactId>super</artifactId>
-        <version>super.3.1.1-SNAPSHOT</version>
-    </parent>
-
-    <!-- 本项目信息 -->
-    <artifactId>super-core-database</artifactId>
-    <version>super.3.1.1-SNAPSHOT</version>
-
-    <dependencies>
-        <dependency>
-            <groupId>vip.isass</groupId>
-            <artifactId>super-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-json</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-annotation</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-generator</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-        </dependency>
-    </dependencies>
-</project>

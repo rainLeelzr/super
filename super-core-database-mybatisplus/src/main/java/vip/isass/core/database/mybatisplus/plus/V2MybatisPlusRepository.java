@@ -237,7 +237,7 @@ public abstract class V2MybatisPlusRepository<
         if (entity instanceof IV2LogicDeleteEntity) {
             IV2LogicDeleteEntity logicDeleteEntity = (IV2LogicDeleteEntity) entity;
             IV2LogicDeleteEntity logicDeleteDbEntity = (IV2LogicDeleteEntity) edb;
-            logicDeleteEntity.setLogicDelete(logicDeleteDbEntity.getLogicDelete());
+            logicDeleteEntity.setDeleteFlag(logicDeleteDbEntity.getDeleteFlag());
         }
         if (entity instanceof IV2VersionEntity) {
             IV2VersionEntity versionEntity = (IV2VersionEntity) entity;

@@ -167,211 +167,217 @@
  *
  */
 
-package vip.isass.core.criteria;
+package vip.isass.core.structure.criteria.field;
 
-import cn.hutool.core.collection.CollUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.experimental.Accessors;
-import vip.isass.core.entity.IdEntity;
+import vip.isass.core.structure.criteria.IV2Criteria;
+import vip.isass.core.structure.criteria.type.IV2SelectColumnCriteria;
+import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
+import vip.isass.core.structure.entity.IV2TenantEntity;
 
+import java.beans.Transient;
 import java.io.Serializable;
 import java.util.Collection;
 
 /**
- * 基于mysql的条件
+ * 租户 类型条件接口
  *
  * @author Rain
  */
-@Getter
-@Accessors(chain = true)
-public class IdCriteria<
-    C extends IdCriteria<C, E, PK>,
-    E extends IdEntity<PK, E>,
-    PK extends Serializable>
-    extends AbstractCriteria<E, C> {
+public interface IV2TenantCriteria<
+    TPK extends Serializable,
+    E extends IV2TenantEntity<TPK, E>,
+    C extends IV2TenantCriteria<TPK, E, C>
+    > extends IV2Criteria<E, C> {
 
-    //************************************************** id **************************************************//
-
-    @ApiModelProperty("id等于")
-    private PK id;
-
-    @ApiModelProperty(hidden = true, value = "或者id等于")
-    private PK orId;
-
-    @ApiModelProperty(hidden = true, value = "id不等于")
-    private PK idNotEqual;
-
-    @ApiModelProperty(hidden = true, value = "或者id不等于")
-    private PK orIdNotEqual;
-
-    @ApiModelProperty(hidden = true, value = "id所在范围")
-    private Collection<PK> idIn;
-
-    @ApiModelProperty(hidden = true, value = "或者id所在范围")
-    private Collection<PK> orIdIn;
-
-    @ApiModelProperty(hidden = true, value = "id不在范围")
-    private Collection<PK> idNotIn;
-
-    @ApiModelProperty(hidden = true, value = "或者id不在范围")
-    private Collection<PK> orIdNotIn;
-
-    @ApiModelProperty(hidden = true, value = "id包含字符")
-    private String idLike;
-
-    @ApiModelProperty(hidden = true, value = "或者id包含字符")
-    private String orIdLike;
-
-    @ApiModelProperty(hidden = true, value = "id不包含字符")
-    private String idNotLike;
-
-    @ApiModelProperty(hidden = true, value = "或者id不包含字符")
-    private String orIdNotLike;
-
-    @ApiModelProperty(hidden = true, value = "id开始以")
-    private String idStartWith;
-
-    @ApiModelProperty(hidden = true, value = "或者id开始以")
-    private String orIdStartWith;
-
-    //************************************************** id setter **************************************************//
-
-    @SuppressWarnings("unchecked")
-    public C setId(PK id) {
-        this.id = id;
-        equals(IdEntity.ID_COLUMN_NAME, this.id);
-        return (C) this;
+    @Transient
+    default String getTenantIdColumnName() {
+        return IV2TenantEntity.TENANT_ID_COLUMN_NAME;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrId(PK id) {
-        this.orId = id;
-        orEquals(IdEntity.ID_COLUMN_NAME, this.orId);
-        return (C) this;
+    @Transient
+    default String getTenantIdPropertyName() {
+        return IV2TenantEntity.TENANT_ID_PROPERTY_NAME;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setIdNotEqual(PK id) {
-        this.id = id;
-        notEquals(IdEntity.ID_COLUMN_NAME, this.id);
-        return (C) this;
+    @Transient
+    @SuppressWarnings({"rawtypes"})
+    default Long getTenantId() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (Long) ((IV2WhereConditionCriteria) this).getEquals(getTenantIdColumnName())
+            : null;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotEqual(PK id) {
-        this.orId = id;
-        orNotEquals(IdEntity.ID_COLUMN_NAME, this.orId);
-        return (C) this;
+    // region 所有类型都有的条件
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setTenantId(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).equals(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setIdIn(Collection<PK> ids) {
-        this.idIn = ids;
-        in(IdEntity.ID_COLUMN_NAME, this.idIn);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setOrTenantId(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).orEquals(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrIdIn(Collection<PK> ids) {
-        this.orIdIn = ids;
-        orIn(IdEntity.ID_COLUMN_NAME, this.orIdIn);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setTenantIdNotEqual(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).notEquals(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setIdNotIn(Collection<PK> ids) {
-        this.idNotIn = ids;
-        notIn(IdEntity.ID_COLUMN_NAME, this.idNotIn);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setOrTenantIdNotEqual(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).orNotEquals(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotIn(Collection<PK> ids) {
-        this.orIdNotIn = ids;
-        orNotIn(IdEntity.ID_COLUMN_NAME, this.orIdNotIn);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setTenantIdIn(Collection<Long> tenantIds) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).in(getTenantIdPropertyName(), getTenantIdColumnName(), tenantIds)
+            : (C) this;
     }
 
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setIdIn(PK... ids) {
-        this.idIn = CollUtil.newHashSet(ids);
-        in(IdEntity.ID_COLUMN_NAME, this.idIn);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setOrTenantIdIn(Collection<Long> tenantIds) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).orIn(getTenantIdPropertyName(), getTenantIdColumnName(), tenantIds)
+            : (C) this;
     }
 
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setOrIdIn(PK... ids) {
-        this.orIdIn = CollUtil.newHashSet(ids);
-        orIn(IdEntity.ID_COLUMN_NAME, this.orIdIn);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setTenantIdNotIn(Collection<Long> tenantIds) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).notIn(getTenantIdPropertyName(), getTenantIdColumnName(), tenantIds)
+            : (C) this;
     }
 
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setIdNotIn(PK... ids) {
-        this.idNotIn = CollUtil.newHashSet(ids);
-        notIn(IdEntity.ID_COLUMN_NAME, this.idNotIn);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setOrTenantIdNotIn(Collection<Long> tenantIds) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).orNotIn(getTenantIdPropertyName(), getTenantIdColumnName(), tenantIds)
+            : (C) this;
     }
 
-    @JsonIgnore
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotIn(PK... ids) {
-        this.orIdNotIn = CollUtil.newHashSet(ids);
-        orNotIn(IdEntity.ID_COLUMN_NAME, this.orIdNotIn);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setTenantIdIsNull() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).isNull(getTenantIdColumnName(), getTenantIdColumnName())
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setIdLike(String idLike) {
-        this.idLike = idLike;
-        like(IdEntity.ID_COLUMN_NAME, this.idLike);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setOrTenantIdIsNull() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNull(getTenantIdColumnName(), getTenantIdColumnName())
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrIdLike(String orIdLike) {
-        this.orIdLike = orIdLike;
-        orLike(IdEntity.ID_COLUMN_NAME, this.orIdLike);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setTenantIdIsNotNull() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).isNotNull(getTenantIdColumnName(), getTenantIdColumnName())
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setIdNotLike(String idNotLike) {
-        this.idNotLike = idNotLike;
-        notLike(IdEntity.ID_COLUMN_NAME, this.idNotLike);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setOrTenantIdIsNotNull() {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).orIsNotNull(getTenantIdColumnName(), getTenantIdColumnName())
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrIdNotLike(String orIdNotLike) {
-        this.orIdNotLike = orIdNotLike;
-        orNotLike(IdEntity.ID_COLUMN_NAME, this.orIdNotLike);
-        return (C) this;
+    // endregion
+
+    // region 数字类型字段拥有的条件
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setTenantIdLessThan(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).lessThan(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setIdStartWith(String idStartWith) {
-        this.idStartWith = idStartWith;
-        startWith(IdEntity.ID_COLUMN_NAME, idStartWith);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setOrTenantIdLessThan(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).orLessThan(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C setOrIdStartWith(String orIdStartWith) {
-        this.orIdStartWith = orIdStartWith;
-        orStartWith(IdEntity.ID_COLUMN_NAME, orIdStartWith);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setTenantIdLessThanEqual(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).lessThanEqual(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public C selectId() {
-        this.setSelectColumns(IdEntity.ID_COLUMN_NAME);
-        return (C) this;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setOrTenantIdLessThanEqual(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).orLessThanEqual(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
     }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setTenantIdGreaterThan(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).greaterThan(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setOrTenantIdGreaterThan(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThan(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setTenantIdGreaterThanEqual(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).greaterThanEqual(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C setOrTenantIdGreaterThanEqual(Long tenantId) {
+        return this instanceof IV2WhereConditionCriteria
+            ? (C) ((IV2WhereConditionCriteria) this).orGreaterThanEqual(getTenantIdPropertyName(), getTenantIdColumnName(), tenantId)
+            : (C) this;
+    }
+
+    // endregion
+
+    // region SelectColumnCriteria
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C selectTenantId() {
+        return this instanceof IV2SelectColumnCriteria
+            ? (C) ((IV2SelectColumnCriteria) this).setSelectColumn(getTenantIdColumnName())
+            : (C) this;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C addSelectTenantId() {
+        return this instanceof IV2SelectColumnCriteria
+            ? (C) ((IV2SelectColumnCriteria) this).addSelectColumn(getTenantIdColumnName())
+            : (C) this;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default C unSelectTenantId() {
+        return this instanceof IV2SelectColumnCriteria
+            ? (C) ((IV2SelectColumnCriteria) this).unSelectColumn(getTenantIdColumnName())
+            : (C) this;
+    }
+
+    // endregion
 
 }

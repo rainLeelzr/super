@@ -177,33 +177,37 @@ import java.io.Serializable;
  *
  * @author Rain
  */
-public interface IV2TenantEntity<PK extends Serializable, E extends IV2TenantEntity<PK, E>> extends IV2PkEntity<PK, E> {
+public interface IV2TenantEntity<TPK extends Serializable, E extends IV2TenantEntity<TPK, E>> extends IV2Entity<E> {
 
-    String TENANT_COLUMN_NAME = "tenant_id";
+    String TENANT_ID_COLUMN_NAME = "tenant_id";
+
+    String TENANT_ID_PROPERTY_NAME = "tenantId";
 
     /**
      * 获取 租户 id
      *
      * @return 租户 id
      */
-    PK getTenantId();
+    TPK getTenantId();
 
     /**
      * 设置租户 id
      *
      * @param tenantId 租户 id
-     * @return this object
      */
-    E setTenantId(PK tenantId);
+    void setTenantId(TPK tenantId);
 
     @Transient
-    default String getTenantColumnName() {
-        return TENANT_COLUMN_NAME;
+    default String getTenantIdColumnName() {
+        return TENANT_ID_COLUMN_NAME;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     default E randomEntity() {
-        return setTenantId(randomPk());
+        // todo 如何获取到TPK类型
+        // setTenantId(randomPk());
+        return (E) this;
     }
 
 }

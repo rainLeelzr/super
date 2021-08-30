@@ -188,7 +188,6 @@ public interface IV2IdEntity<PK extends Serializable, E extends IV2IdEntity<PK, 
     //  默认的 id 字段名
     String ID_COLUMN_NAME = "id";
 
-
     @Transient
     default String getIdColumnName() {
         return ID_COLUMN_NAME;

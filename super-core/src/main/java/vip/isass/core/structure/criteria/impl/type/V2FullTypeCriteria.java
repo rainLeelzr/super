@@ -171,6 +171,7 @@ package vip.isass.core.structure.criteria.impl.type;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
+import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.V2WhereCondition;
 import vip.isass.core.structure.criteria.type.IV2OrderByCriteria;
 import vip.isass.core.structure.criteria.type.IV2PageCriteria;
@@ -190,7 +191,8 @@ public class V2FullTypeCriteria<E extends IV2Entity<E>, C extends V2FullTypeCrit
     IV2SelectColumnCriteria<E, C>,
     IV2WhereConditionCriteria<E, C>,
     IV2PageCriteria<E, C>,
-    IV2OrderByCriteria<E, C> {
+    IV2OrderByCriteria<E, C>,
+    IV2Criteria<E, C> {
 
     // region selectColumn
 

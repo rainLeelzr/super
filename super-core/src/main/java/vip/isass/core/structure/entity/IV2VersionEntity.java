@@ -178,6 +178,8 @@ import java.beans.Transient;
  */
 public interface IV2VersionEntity<E extends IV2VersionEntity<E>> extends IV2Entity<E> {
 
+    String VERSION_PROPERTY_NAME = "version";
+
     String VERSION_COLUMN_NAME = "version";
 
     Integer DEFAULT_VERSION = 1;
@@ -193,9 +195,8 @@ public interface IV2VersionEntity<E extends IV2VersionEntity<E>> extends IV2Enti
      * 设置版本号
      *
      * @param version version
-     * @return this object
      */
-    E setVersion(Integer version);
+    void setVersion(Integer version);
 
     @Transient
     default String getVersionColumnName() {
@@ -214,8 +215,10 @@ public interface IV2VersionEntity<E extends IV2VersionEntity<E>> extends IV2Enti
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     default E randomEntity() {
-        return setVersion(randomInteger());
+        setVersion(randomInteger());
+        return (E) this;
     }
 
 }

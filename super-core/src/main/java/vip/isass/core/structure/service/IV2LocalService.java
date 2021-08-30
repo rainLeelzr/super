@@ -198,6 +198,8 @@ public interface IV2LocalService<
 
     IV2Repository<E, C> getRepository();
 
+    IV2Service<E, C> getService();
+
     @Override
     default int getOrder() {
         return ApiOrder.LOCAL_SERVICE;

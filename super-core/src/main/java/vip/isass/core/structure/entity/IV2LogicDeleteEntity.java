@@ -178,30 +178,29 @@ import java.beans.Transient;
  */
 public interface IV2LogicDeleteEntity<E extends IV2LogicDeleteEntity<E>> extends IV2Entity<E> {
 
-    String LOGIC_DELETE_COLUMN_NAME = "delete_flag";
+    String DELETE_FLAG_PROPERTY_NAME = "deleteFlag";
 
-    String LOGIC_DELETE_PROPERTY = "deleteFlag";
+    String DELETE_FLAG_COLUMN_NAME = "delete_flag";
 
-    Boolean DEFAULT_LOGIC_DELETE_VALUE = Boolean.FALSE;
+    Boolean DEFAULT_DELETE_FLAG_VALUE = Boolean.FALSE;
 
     /**
      * 获取删除标识
      *
-     * @return LogicDelete
+     * @return deleteFlag
      */
-    Boolean getLogicDelete();
+    Boolean getDeleteFlag();
 
     /**
      * 设置删除标识
      *
-     * @param logicDelete LogicDelete
-     * @return this object
+     * @param deleteFlag deleteFlag
      */
-    E setLogicDelete(Boolean logicDelete);
+    void setDeleteFlag(Boolean deleteFlag);
 
     @Transient
-    default String getLogicDeleteColumnName() {
-        return LOGIC_DELETE_COLUMN_NAME;
+    default String getDeleteFlagColumnName() {
+        return DELETE_FLAG_COLUMN_NAME;
     }
 
     /**
@@ -210,16 +209,18 @@ public interface IV2LogicDeleteEntity<E extends IV2LogicDeleteEntity<E>> extends
      * @return this object
      */
     @SuppressWarnings("unchecked")
-    default E computeDefaultLogicDeleteIfAbsent() {
-        if (getLogicDelete() == null) {
-            setLogicDelete(Boolean.FALSE);
+    default E computeDefaultDeleteFlagIfAbsent() {
+        if (getDeleteFlag() == null) {
+            setDeleteFlag(Boolean.FALSE);
         }
         return (E) this;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     default E randomEntity() {
-        return setLogicDelete(randomBoolean());
+        setDeleteFlag(randomBoolean());
+        return (E) this;
     }
 
 }

@@ -169,6 +169,8 @@
 
 package vip.isass.core.structure.entity;
 
+import vip.isass.core.sequence.impl.LongSequence;
+
 import java.beans.Transient;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -180,7 +182,7 @@ import java.time.LocalDateTime;
  * @author Rain
  */
 public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEntity<UPK, E>>
-    extends IV2PkEntity<UPK, E> {
+    extends IV2Entity<E> {
 
     String CREATE_USER_ID_PROPERTY_NAME = "createUserId";
     String CREATE_USER_ID_COLUMN_NAME = "create_user_id";
@@ -230,95 +232,122 @@ public interface IV2TraceEntity<UPK extends Serializable, E extends IV2TraceEnti
         return MODIFY_TIME_COLUMN_NAME;
     }
 
+    // 允许数据库表只包含其中1个审计字段，所以 get set 方法均添加默认实现，避免实现类报错
+
     /**
      * 获取创建用户的 id
      *
      * @return create user id
      */
-    UPK getCreateUserId();
+    default UPK getCreateUserId() {
+        return null;
+    }
 
     /**
      * 设置创建用户的 id
      *
      * @param createUserId create user id
      */
-    void setCreateUserId(UPK createUserId);
+    default void setCreateUserId(UPK createUserId) {
+
+    }
 
     /**
      * @return 创建用户的用户名
      */
-    String getCreateUserName();
+    default String getCreateUserName() {
+        return null;
+    }
 
     /**
      * 设置创建用户的用户名
      *
      * @param createUserName create user name
      */
-    void setCreateUserName(String createUserName);
+    default void setCreateUserName(String createUserName) {
+
+    }
 
     /**
      * 获取创建记录的时间
      *
      * @return create time
      */
-    LocalDateTime getCreateTime();
+    default LocalDateTime getCreateTime() {
+        return null;
+    }
 
     /**
      * 设置创建记录的时间
      *
      * @param createTime create time
      */
-    void setCreateTime(LocalDateTime createTime);
+    default void setCreateTime(LocalDateTime createTime) {
+
+    }
 
     /**
      * 获取修改用户的 id
      *
      * @return modify user id
      */
-    UPK getModifyUserId();
+    default UPK getModifyUserId() {
+        return null;
+    }
 
     /**
      * 设置修改用户的 id
      *
      * @param modifyUserId modify user id
      */
-    void setModifyUserId(UPK modifyUserId);
+    default void setModifyUserId(UPK modifyUserId) {
+
+    }
 
     /**
      * 获取修改用户的用户名
      *
      * @return modify user name
      */
-    String getModifyUserName();
+    default String getModifyUserName() {
+        return null;
+    }
 
     /**
      * 设置修改用户的用户名
      *
      * @param modifyUserName modify user name
      */
-    void setModifyUserName(String modifyUserName);
+    default void setModifyUserName(String modifyUserName) {
+
+    }
 
     /**
      * 获取修改记录的时间
      *
      * @return modify time
      */
-    LocalDateTime getModifyTime();
+    default LocalDateTime getModifyTime() {
+        return null;
+    }
 
     /**
      * 设置修改记录的时间
      *
      * @param modifyTime modify time
      */
-    void setModifyTime(LocalDateTime modifyTime);
+    default void setModifyTime(LocalDateTime modifyTime) {
+
+    }
 
     @Override
-    @SuppressWarnings("unckecked")
+    @SuppressWarnings("unchecked")
     default E randomEntity() {
-        setCreateUserId(randomPk());
+        // 在 isass 3.x.x 版本，用户id是字符串，现在只能写死类型强转
+        setCreateUserId((UPK) LongSequence.get().toString());
         setCreateUserName(randomString());
         setCreateTime(randomLocalDateTime());
-        setModifyUserId(randomPk());
+        setModifyUserId((UPK) LongSequence.get().toString());
         setModifyUserName(randomString());
         setModifyTime(randomLocalDateTime());
         return (E) this;

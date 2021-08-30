@@ -171,9 +171,12 @@ package vip.isass.core.structure.entity;
 
 import cn.hutool.core.util.RandomUtil;
 import vip.isass.core.support.LocalDateTimeUtil;
+import vip.isass.core.support.SystemClock;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -217,6 +220,18 @@ public interface IV2Entity<E extends IV2Entity<E>> {
 
     default LocalDateTime randomLocalDateTime() {
         return LocalDateTimeUtil.now();
+    }
+
+    default LocalDate randomLocalDate() {
+        return LocalDateTimeUtil.nowLocalDate();
+    }
+
+    default LocalTime randomLocalTime() {
+        return LocalDateTimeUtil.nowLocalTime();
+    }
+
+    default Long randomLongTimestamp() {
+        return SystemClock.now() - randomInteger();
     }
 
     /**
