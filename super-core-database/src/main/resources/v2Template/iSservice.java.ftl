@@ -1,13 +1,13 @@
 <#include "./segment/copyright.ftl">
 
-package ${cfg.servicePackageName};
+package ${cfg.package}.${cfg.moduleName}.api.service;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import ${cfg.package}.api.model.criteria.${entity}Criteria;
-import ${cfg.package}.api.model.entity.${table.serviceName};
+import ${cfg.criteriaPackageName}.V2${entity}Criteria;
+import ${cfg.entityPackageName}.V2${entity};
 import vip.isass.core.structure.service.IV2Service;
 import vip.isass.core.structure.service.IV2ServiceManager;
 
@@ -20,9 +20,9 @@ import java.util.List;
  *
  * @author ${author}
  */
-public interface ${table.serviceName} extends IV2Service<${entity}, ${entity}Criteria> {
+public interface ${table.serviceName} extends IV2Service<V2${entity}, V2${entity}Criteria> {
 
-    String URI_FIRST_PART = "/${cfg.controllerPrefix}/${entity}";
+    String URI_FIRST_PART = "${cfg.controllerPrefix}/${entity?uncap_first}";
 
     // region 增
 
@@ -145,15 +145,23 @@ public interface ${table.serviceName} extends IV2Service<${entity}, ${entity}Cri
 
     // endregion
 
-    @Service
+    // region 新业务方法
+
+    // endregion
+
     @Primary
-    class ${table.serviceImplName}Manager implements
+    @Service
+    class V2${table.serviceImplName}Manager implements
             ${table.serviceName},
-            IV2ServiceManager<${entity}, V2${entity}Criteria, ${table.serviceImplName}> {
+            IV2ServiceManager<V2${entity}, V2${entity}Criteria, ${table.serviceName}> {
 
         @Getter
         @Autowired(required = false)
         private List<${table.serviceName}> services;
+
+        // region 新业务方法
+
+        // endregion
 
     }
 

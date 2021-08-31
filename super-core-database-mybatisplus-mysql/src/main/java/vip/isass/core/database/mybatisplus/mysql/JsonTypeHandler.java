@@ -185,7 +185,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * 处理字段类型为 Jsonb 的数据库映射关系
+ * 处理字段类型为 Json 的数据库映射关系
  *
  * @author Rain
  */

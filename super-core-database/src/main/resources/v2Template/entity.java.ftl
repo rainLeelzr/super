@@ -38,7 +38,7 @@ import vip.isass.core.structure.entity.IV2ParentIdEntity;
 <#if isTenantEntity>
 import vip.isass.core.structure.entity.IV2TenantEntity;
 </#if>
-<#if isTracedEntity>
+<#if isTraceEntity>
 import vip.isass.core.structure.entity.IV2TraceEntity;
 </#if>
 <#if isVersionEntity>
@@ -49,8 +49,8 @@ import vip.isass.core.support.JsonUtil;
 <#if (field.propertyType == "LocalDate"
 || field.propertyType == "LocalTime"
 || field.propertyType == "LocalDateTime")
-&& field.name != cfg.tracedEntity.CREATED_TIME_COLUMN_NAME
-&& field.name != cfg.tracedEntity.MODIFY_TIME_COLUMN_NAME>
+&& field.name != cfg.traceEntity.CREATED_TIME_COLUMN_NAME
+&& field.name != cfg.traceEntity.MODIFY_TIME_COLUMN_NAME>
 import vip.isass.core.support.LocalDateTimeUtil;
 <#break>
 </#if>
@@ -119,7 +119,7 @@ public class V2${entity} implements
 <#if isLogicDeleteEntity>
         IV2LogicDeleteEntity<V2${entity}>,
 </#if>
-<#if isTracedEntity>
+<#if isTraceEntity>
         IV2TraceEntity<String, V2${entity}>,
 </#if>
         IV2Entity<V2${entity}> {
@@ -247,7 +247,7 @@ public class V2${entity} implements
 <#if isLogicDeleteEntity>
         IV2LogicDeleteEntity.super.randomEntity();
 </#if>
-<#if isTracedEntity>
+<#if isTraceEntity>
         IV2TraceEntity.super.randomEntity();
 </#if>
 <#list table.fields as field>

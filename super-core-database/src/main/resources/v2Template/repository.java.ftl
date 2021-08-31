@@ -3,20 +3,24 @@
 package ${cfg.package}.${cfg.moduleName}.db.repository;
 
 import org.springframework.stereotype.Repository;
-import ${cfg.criteriaPackageName}.${entity}Criteria;
-import ${cfg.entityPackageName}.${entity};
-import ${cfg.mapperPackageName}.${entity}Mapper;
-import ${cfg.entityDbPackageName}.${entity}Db;
-import vip.isass.core.database.mybatisplus.plus.MybatisPlusRepository;
+import ${cfg.criteriaPackageName}.V2${entity}Criteria;
+import ${cfg.entityPackageName}.V2${entity};
+import ${cfg.mapperPackageName}.V2${entity}Mapper;
+import ${cfg.entityDbPackageName}.V2${entity}Db;
+import vip.isass.core.database.mybatisplus.plus.V2MybatisPlusRepository;
 
 /**
  * <p>
- * <#if table.comment??>${table.comment!} </#if>数据仓库
+ * <#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if> 数据仓库
  * </p>
  *
  * @author ${author}
  */
 @Repository
-public class ${entity}Repository extends MybatisPlusRepository<${entity}, ${entity}Db, ${entity}Criteria, ${entity}Mapper> {
+public class V2${entity}Repository extends V2MybatisPlusRepository<
+        V2${entity},
+        V2${entity}Db,
+        V2${entity}Criteria,
+        V2${entity}Mapper> {
 
 }

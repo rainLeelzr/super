@@ -2,16 +2,16 @@
 
 package ${cfg.mapperPackageName};
 
-import ${cfg.entityDbPackageName}.${entity}Db;
+import ${cfg.entityDbPackageName}.V2${entity}Db;
 import vip.isass.core.database.mybatisplus.mapper.IMapper;
 
 /**
  * <p>
- * <#if table.comment??>${table.comment!} </#if>Mapper
+ * <#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if>
  * </p>
  *
  * @author ${author}
  */
-public interface ${table.mapperName} extends IMapper<${entity}Db> {
+public interface V2${table.mapperName} extends IMapper<V2${entity}Db> {
 
 }

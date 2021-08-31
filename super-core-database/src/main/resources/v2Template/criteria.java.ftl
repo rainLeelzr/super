@@ -16,7 +16,7 @@ import vip.isass.core.structure.criteria.field.IV2ParentIdCriteria;
 <#if isTenantEntity>
 import vip.isass.core.structure.criteria.field.IV2TenantCriteria;
 </#if>
-<#if isTracedEntity>
+<#if isTraceEntity>
 import vip.isass.core.structure.criteria.field.IV2TraceCriteria;
 </#if>
 <#if isVersionEntity>
@@ -73,7 +73,7 @@ public class V2${entity}Criteria
 <#if isTenantEntity>
         IV2TenantCriteria<${tenantIdEntityPropertyType}, V2${entity}, V2${entity}Criteria>,
 </#if>
-<#if isTracedEntity>
+<#if isTraceEntity>
         IV2TraceCriteria<String, V2${entity}, V2${entity}Criteria>,
 </#if>
         IV2Criteria<V2${entity}, V2${entity}Criteria> {

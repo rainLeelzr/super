@@ -3,12 +3,12 @@ cfg.idEntity.ID_COLUMN_NAME,
 cfg.parentIdEntity.PARENT_ID_COLUMN_NAME,
 cfg.logicDeleteEntity.DELETE_FLAG_COLUMN_NAME,
 cfg.tenantEntity.TENANT_ID_COLUMN_NAME,
-cfg.tracedEntity.CREATE_USER_ID_COLUMN_NAME,
-cfg.tracedEntity.CREATE_USER_NAME_COLUMN_NAME,
-cfg.tracedEntity.CREATED_TIME_COLUMN_NAME,
-cfg.tracedEntity.MODIFY_USER_ID_COLUMN_NAME,
-cfg.tracedEntity.MODIFY_USER_NAME_COLUMN_NAME,
-cfg.tracedEntity.MODIFY_TIME_COLUMN_NAME,
+cfg.traceEntity.CREATE_USER_ID_COLUMN_NAME,
+cfg.traceEntity.CREATE_USER_NAME_COLUMN_NAME,
+cfg.traceEntity.CREATED_TIME_COLUMN_NAME,
+cfg.traceEntity.MODIFY_USER_ID_COLUMN_NAME,
+cfg.traceEntity.MODIFY_USER_NAME_COLUMN_NAME,
+cfg.traceEntity.MODIFY_TIME_COLUMN_NAME,
 cfg.versionEntity.VERSION_COLUMN_NAME
 ]>
 <#------------ BEGIN IdEntity ------------>
@@ -52,20 +52,20 @@ cfg.versionEntity.VERSION_COLUMN_NAME
     <#assign isTenantEntity = false>
 </#list>
 <#------------ END TenantEntity ------------>
-<#------------ BEGIN TracedEntity ------------>
+<#------------ BEGIN TraceEntity ------------>
 <#list table.fields as field>
-<#if field.name?lower_case == cfg.tracedEntity.CREATE_USER_ID_COLUMN_NAME
-|| field.name?lower_case == cfg.tracedEntity.CREATE_USER_NAME_COLUMN_NAME
-|| field.name?lower_case == cfg.tracedEntity.CREATED_TIME_COLUMN_NAME
-|| field.name?lower_case == cfg.tracedEntity.MODIFY_USER_ID_COLUMN_NAME
-|| field.name?lower_case == cfg.tracedEntity.MODIFY_USER_NAME_COLUMN_NAME
-|| field.name?lower_case == cfg.tracedEntity.MODIFY_TIME_COLUMN_NAME>
-<#assign isTracedEntity = true>
+<#if field.name?lower_case == cfg.traceEntity.CREATE_USER_ID_COLUMN_NAME
+|| field.name?lower_case == cfg.traceEntity.CREATE_USER_NAME_COLUMN_NAME
+|| field.name?lower_case == cfg.traceEntity.CREATED_TIME_COLUMN_NAME
+|| field.name?lower_case == cfg.traceEntity.MODIFY_USER_ID_COLUMN_NAME
+|| field.name?lower_case == cfg.traceEntity.MODIFY_USER_NAME_COLUMN_NAME
+|| field.name?lower_case == cfg.traceEntity.MODIFY_TIME_COLUMN_NAME>
+<#assign isTraceEntity = true>
 <#break>
 </#if>
-<#assign isTracedEntity = false>
+<#assign isTraceEntity = false>
 </#list>
-<#------------ END tracedEntity ------------>
+<#------------ END traceEntity ------------>
 <#------------ BEGIN VersionEntity ------------>
 <#list table.fields as field>
 <#if field.name?lower_case == cfg.versionEntity.VERSION_COLUMN_NAME>

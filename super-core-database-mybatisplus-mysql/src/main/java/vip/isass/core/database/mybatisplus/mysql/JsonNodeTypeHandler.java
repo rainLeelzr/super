@@ -167,135 +167,65 @@
  *
  */
 
-package vip.isass.core.serialization;
+package vip.isass.core.database.mybatisplus.mysql;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.SerializerFactory;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedJdbcTypes;
+import org.apache.ibatis.type.MappedTypes;
+import org.springframework.stereotype.Component;
 import vip.isass.core.support.JsonUtil;
-import org.springframework.cache.support.NullValue;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
-import java.io.IOException;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
- * todo 去掉此类
+ * 处理字段类型为 Json 的数据库映射关系
  *
- * @author Christoph Strobl
- * @since 1.6
+ * @author Rain
  */
-public class GenericJackson {
+@Slf4j
+@Component
+@MappedJdbcTypes(JdbcType.JAVA_OBJECT)
+@MappedTypes({JsonNode.class})
+public class JsonNodeTypeHandler extends BaseTypeHandler<JsonNode> {
 
-    private final ObjectMapper mapper;
-
-    private static final byte[] EMPTY_ARRAY = new byte[0];
-
-    public GenericJackson() {
-        this((String) null);
-    }
-
-    public static final GenericJackson INSTANCE = new GenericJackson();
-
-    public GenericJackson(@Nullable String classPropertyTypeName) {
-
-        this(new ObjectMapper());
-
-        // simply setting {@code mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)} does not help here since we need
-        // the type hint embedded for deserialization using the default typing feature.
-        mapper.registerModule(new SimpleModule().addSerializer(new NullValueSerializer(classPropertyTypeName)))
-            .registerModule(JsonUtil.simpleModule);
-
-        if (StringUtils.hasText(classPropertyTypeName)) {
-            mapper.enableDefaultTypingAsProperty(DefaultTyping.NON_FINAL, classPropertyTypeName);
-        } else {
-            mapper.enableDefaultTyping(DefaultTyping.NON_FINAL, As.PROPERTY);
-        }
-    }
-
-    /**
-     * Setting a custom-configured {@link ObjectMapper} is one way to take further control of the JSON serialization
-     * process. For example, an extended {@link SerializerFactory} can be configured that provides custom serializers for
-     * specific types.
-     *
-     * @param mapper must not be {@literal null}.
-     */
-    public GenericJackson(ObjectMapper mapper) {
-
-        Assert.notNull(mapper, "ObjectMapper must not be null!");
-        this.mapper = mapper;
-    }
-
-    public byte[] serialize(@Nullable Object source) {
-
-        if (source == null) {
-            return EMPTY_ARRAY;
-        }
-
+    @Override
+    public void setNonNullParameter(PreparedStatement ps, int i, JsonNode parameter, JdbcType jdbcType) throws SQLException {
         try {
-            return mapper.writeValueAsBytes(source);
+            ps.setString(i, JsonUtil.DEFAULT_INSTANCE.writeValueAsString(parameter));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Could not write JSON: " + e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 
-    public Object deserialize(@Nullable byte[] source) {
-        return deserialize(source, Object.class);
+    @Override
+    public JsonNode getNullableResult(ResultSet rs, String columnName) throws SQLException {
+        return getJson(rs.getString(columnName));
     }
 
-    @Nullable
-    public <T> T deserialize(@Nullable byte[] source, Class<T> type) {
+    @Override
+    public JsonNode getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+        return getJson(rs.getString(columnIndex));
+    }
 
-        Assert.notNull(type,
-            "Deserialization type must not be null! Pleaes provide Object.class to make use of Jackson2 default typing.");
+    @Override
+    public JsonNode getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+        return getJson(cs.getString(columnIndex));
+    }
 
-        if (isEmpty(source)) {
+    @SneakyThrows
+    private JsonNode getJson(String value) {
+        if (value == null) {
             return null;
         }
-
-        try {
-            return mapper.readValue(source, type);
-        } catch (Exception ex) {
-            throw new RuntimeException("Could not read JSON: " + ex.getMessage(), ex);
-        }
+        return JsonUtil.DEFAULT_INSTANCE.readTree(value);
     }
 
-    private class NullValueSerializer extends StdSerializer<NullValue> {
-
-        private static final long serialVersionUID = 1999052150548658808L;
-        private final String classIdentifier;
-
-        /**
-         * @param classIdentifier can be {@literal null} and will be defaulted to {@code @class}.
-         */
-        NullValueSerializer(@Nullable String classIdentifier) {
-
-            super(NullValue.class);
-            this.classIdentifier = StringUtils.hasText(classIdentifier) ? classIdentifier : "@class";
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see com.fasterxml.jackson.databind.ser.std.StdSerializer#serialize(java.lang.Object, com.fasterxml.jackson.core.JsonGenerator, com.fasterxml.jackson.databind.SerializerProvider)
-         */
-        @Override
-        public void serialize(NullValue value, JsonGenerator jgen, SerializerProvider provider)
-            throws IOException {
-
-            jgen.writeStartObject();
-            jgen.writeStringField(classIdentifier, NullValue.class.getName());
-            jgen.writeEndObject();
-        }
-    }
-
-    static boolean isEmpty(@Nullable byte[] data) {
-        return (data == null || data.length == 0);
-    }
 }

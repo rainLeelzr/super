@@ -167,97 +167,68 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.plus.handler;
+package vip.isass.core.database.mybatisplus.postgresql;
 
-import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import org.apache.ibatis.reflection.MetaObject;
-import vip.isass.core.entity.LogicDeleteEntity;
-import vip.isass.core.entity.TimeTracedEntity;
-import vip.isass.core.entity.UserTracedEntity;
-import vip.isass.core.entity.VersionEntity;
-import vip.isass.core.login.LoginUser;
-import vip.isass.core.login.LoginUserUtil;
-import vip.isass.core.support.LocalDateTimeUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedJdbcTypes;
+import org.apache.ibatis.type.MappedTypes;
+import org.postgresql.util.PGobject;
+import org.springframework.stereotype.Component;
+import vip.isass.core.support.JsonUtil;
+
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
+ * 处理字段类型为 Jsonb 的数据库映射关系
+ *
  * @author Rain
  */
-public class MybatisPlusMetaObjectHandler implements MetaObjectHandler {
+@Slf4j
+@Component
+@MappedJdbcTypes(JdbcType.JAVA_OBJECT)
+@MappedTypes({JsonNode.class})
+public class JsonbToJsonNodeTypeHandler extends BaseTypeHandler<JsonNode> {
 
     @Override
-    public void insertFill(MetaObject metaObject) {
-        // version
-        Object version = getFieldValByName(VersionEntity.VERSION, metaObject);
-        if (version == null) {
-            setFieldValByName(VersionEntity.VERSION, VersionEntity.DEFAULT_VERSION, metaObject);
+    public void setNonNullParameter(PreparedStatement ps, int i, JsonNode parameter, JdbcType jdbcType) throws SQLException {
+        try {
+            PGobject pGobject = new PGobject();
+            pGobject.setValue(JsonUtil.DEFAULT_INSTANCE.writeValueAsString(parameter));
+            ps.setObject(i, pGobject);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
-
-        LoginUser loginUser = LoginUserUtil.getLoginUser();
-
-        // createUserId
-        setFieldValByName(
-            UserTracedEntity.CREATE_USER_ID_PROPERTY,
-            loginUser == null
-                ? ""
-                : StrUtil.nullToEmpty(loginUser.getUserId()),
-            metaObject);
-
-        // createUserName
-        setFieldValByName(
-            UserTracedEntity.CREATE_USER_NAME_PROPERTY,
-            loginUser == null
-                ? StrUtil.subPre(Thread.currentThread().getName(), 32)
-                : StrUtil.nullToEmpty(StrUtil.subPre(loginUser.getNickName(), 32)),
-            metaObject);
-
-        // modifyUserId
-        setFieldValByName(UserTracedEntity.MODIFY_USER_ID_PROPERTY,
-            loginUser == null
-                ? ""
-                : StrUtil.nullToEmpty(loginUser.getUserId()),
-            metaObject);
-
-        // modifyUserName
-        setFieldValByName(UserTracedEntity.MODIFY_USER_NAME_PROPERTY,
-            loginUser == null
-                ? StrUtil.subPre(Thread.currentThread().getName(), 32)
-                : StrUtil.nullToEmpty(StrUtil.subPre(loginUser.getNickName(), 32)),
-            metaObject);
-
-        // createTime
-        Object createTime = getFieldValByName(TimeTracedEntity.MODIFY_TIME_PROPERTY, metaObject);
-        if (createTime == null) {
-            setFieldValByName(TimeTracedEntity.CREATED_TIME_PROPERTY, LocalDateTimeUtil.now(), metaObject);
-        }
-
-        // modifyTime
-        setFieldValByName(TimeTracedEntity.MODIFY_TIME_PROPERTY, LocalDateTimeUtil.now(), metaObject);
-
-        // delete_flag
-        setFieldValByName(LogicDeleteEntity.DELETE_FLAG_PROPERTY, LogicDeleteEntity.DEFAULT_DELETE_FLAG, metaObject);
     }
 
     @Override
-    public void updateFill(MetaObject metaObject) {
-        LoginUser loginUser = LoginUserUtil.getLoginUser();
-
-        // modifyUserId
-        setFieldValByName(UserTracedEntity.MODIFY_USER_ID_PROPERTY,
-            loginUser == null
-                ? ""
-                : StrUtil.nullToEmpty(loginUser.getUserId()),
-            metaObject);
-
-        // modifyUserName
-        setFieldValByName(UserTracedEntity.MODIFY_USER_NAME_PROPERTY,
-            loginUser == null
-                ? StrUtil.subPre(Thread.currentThread().getName(), 32)
-                : StrUtil.nullToEmpty(loginUser.getNickName()),
-            metaObject);
-
-        // modifyTime
-        setFieldValByName(TimeTracedEntity.MODIFY_TIME_PROPERTY, LocalDateTimeUtil.now(), metaObject);
-
+    public JsonNode getNullableResult(ResultSet rs, String columnName) throws SQLException {
+        return getJson(rs.getString(columnName));
     }
+
+    @Override
+    public JsonNode getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+        return getJson(rs.getString(columnIndex));
+    }
+
+    @Override
+    public JsonNode getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+        return getJson(cs.getString(columnIndex));
+    }
+
+    @SneakyThrows
+    private JsonNode getJson(String value) {
+        if (value == null) {
+            return null;
+        }
+        return JsonUtil.DEFAULT_INSTANCE.readTree(value);
+    }
+
 }
