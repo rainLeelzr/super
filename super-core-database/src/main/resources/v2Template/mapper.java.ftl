@@ -7,7 +7,7 @@ import vip.isass.core.database.mybatisplus.mapper.IMapper;
 
 /**
  * <p>
- * <#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if>
+ * <#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if> mapper
  * </p>
  *
  * @author ${author}

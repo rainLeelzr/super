@@ -91,7 +91,7 @@ import java.util.Collection;
 <#------------ BEGIN 定义类名 ------------>
 /**
  * <p>
- * <#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if>
+ * <#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if> 实体
  * </p>
  *
  * @author ${author}

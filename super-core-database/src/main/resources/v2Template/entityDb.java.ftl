@@ -49,7 +49,7 @@ import java.time.LocalTime;
 <#------------ BEGIN 定义类名 ------------>
 /**
  * <p>
- * <#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if>
+ * <#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if> 数据库实体
  * </p>
  *
  * @author ${author}
