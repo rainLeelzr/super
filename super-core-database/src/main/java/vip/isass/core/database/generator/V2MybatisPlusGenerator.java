@@ -452,7 +452,7 @@ public class V2MybatisPlusGenerator {
                         "/" + meta.getModuleName() + "/api/feign/";
                     return path + "V2" + tableInfo.getEntityName() + "FeignService.java";
                 }
-            }, new FileOutConfig("/v2Template/Controller.java.ftl") {
+            }, new FileOutConfig("/v2Template/controller.java.ftl") {
                 @Override
                 public String outputFile(TableInfo tableInfo) {
                     // 自定义输入文件名称
