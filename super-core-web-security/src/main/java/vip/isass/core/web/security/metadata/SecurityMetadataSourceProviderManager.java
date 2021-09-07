@@ -171,6 +171,7 @@ package vip.isass.core.web.security.metadata;
 
 import org.springframework.stereotype.Service;
 import vip.isass.core.support.FunctionUtil;
+import vip.isass.core.web.security.config.UrlAccessSecurityStrategy;
 import vip.isass.core.web.security.config.WebSecurityConfig;
 
 import javax.annotation.Resource;
@@ -192,7 +193,7 @@ public class SecurityMetadataSourceProviderManager {
     }
 
     public Collection<String> findRoleCodesByUri(String uri) {
-        return webSecurityConfig.isEnable()
+        return webSecurityConfig.getUrlAccessSecurityStrategy() == UrlAccessSecurityStrategy.ROLE
             ? FunctionUtil.getFirstNotNullValueFromCollection(providers, service -> service.findRoleCodesByUri(uri))
             : Collections.emptyList();
     }

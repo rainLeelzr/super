@@ -180,6 +180,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -233,8 +234,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private TerminalOnlineConfiguration terminalOnlineConfiguration;
 
     @Getter
-    @Value("${security.enable:true}")
-    private boolean enable;
+    @Value("${security.urlAccessSecurityStrategy:NONE}")
+    private UrlAccessSecurityStrategy urlAccessSecurityStrategy;
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -248,7 +249,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        log.info("spring security enable: {}", enable);
+        log.info("urlAccessSecurityStrategy: {}", urlAccessSecurityStrategy);
 
         Collection<String> permitUrls = permitUrlConfiguration.getPermitUrls();
 
@@ -295,10 +296,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // 允许匿名用户机制
             .anonymous();
 
-        if (enable) {
-            http
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry =
+            http.authorizeRequests();
+        if (urlAccessSecurityStrategy == UrlAccessSecurityStrategy.NONE) {
+            registry
+                .anyRequest()
+                .permitAll();
+        } else {
+            registry
                 // 允许 actuator 的请求
-                .authorizeRequests()
                 .requestMatchers(EndpointRequest.toAnyEndpoint())
                 .permitAll()
 
@@ -307,20 +313,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 允许自定义配置的 url 的请求
                 .authorizeRequests()
                 .antMatchers(permitUrls.toArray(new String[]{}))
-                .permitAll()
+                .permitAll();
 
-                // 添加自定义角色获取器
-                .withObjectPostProcessor(filterSecurityInterceptorSourcePostProcessor)
-                .withObjectPostProcessor(affirmativeBasedPostProcessor);
-        } else {
-            http.authorizeRequests()
-                .anyRequest()
-                .permitAll()
-
-                // 添加自定义角色获取器
-                .withObjectPostProcessor(filterSecurityInterceptorSourcePostProcessor)
-                .withObjectPostProcessor(affirmativeBasedPostProcessor);
+            if (urlAccessSecurityStrategy == UrlAccessSecurityStrategy.AUTHENTICATED) {
+                registry.anyRequest()
+                    .authenticated();
+            }
         }
+
+        // 添加自定义角色获取器
+        registry.withObjectPostProcessor(filterSecurityInterceptorSourcePostProcessor)
+            .withObjectPostProcessor(affirmativeBasedPostProcessor);
     }
 
 }
