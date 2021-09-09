@@ -207,7 +207,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Rain
@@ -247,7 +252,7 @@ public class RequestLogAop {
     @Autowired(required = false)
     private IRequestLogService requestLogService;
 
-    @Around("execution(* *..*Controller.*(..))")
+    @Around("execution(* *..*Controller.*(..)) && !execution(public * getService()) && !execution(public * getOrder())")
     public Object requestLog(ProceedingJoinPoint pjp) throws Throwable {
         return handle(pjp);
     }
