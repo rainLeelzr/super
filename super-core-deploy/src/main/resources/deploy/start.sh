@@ -16,5 +16,6 @@ echo '5秒后将自动打印日志，ctrl+c 可退出日志，且不会关闭正
 
 sleep 5
 
-tail -f -n 100 ./logs/@service-name@/*.log
-
+cd ./logs/@service-name@
+filename=`ls -t |head -n1|awk '{print $0}'`
+tail -f -n 100 $filename
