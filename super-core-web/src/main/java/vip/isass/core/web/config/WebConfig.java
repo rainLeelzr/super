@@ -169,6 +169,8 @@
 
 package vip.isass.core.web.config;
 
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -191,6 +193,27 @@ public class WebConfig implements WebMvcConfigurer {
     @Resource
     private UriMappingInterceptor uriMappingInterceptor;
 
+    /**
+     * 允许跨域的域名，*表示允许任何域名使用
+     */
+    @Getter
+    @Value("${core.web.allowedOrigins:*}")
+    private String allowedOrigins;
+
+    /**
+     * 允许的方法
+     */
+    @Getter
+    @Value("${core.web.allowedMethods:*}")
+    private String allowedMethods;
+
+    /**
+     * 允许的请求头
+     */
+    @Getter
+    @Value("${core.web.allowedHeaders:*}")
+    private String allowedHeaders;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(traceIdInterceptor).addPathPatterns("/**");
@@ -202,10 +225,10 @@ public class WebConfig implements WebMvcConfigurer {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").
-                    allowedOrigins("*"). //允许跨域的域名，可以用*表示允许任何域名使用
-                    allowedMethods("*"). //允许任何方法（post、get等）
-                    allowedHeaders("*");//允许任何请求头
+                registry.addMapping("/**")
+                    .allowedOrigins(allowedOrigins)
+                    .allowedMethods(allowedMethods)
+                    .allowedHeaders(allowedHeaders);
             }
         };
     }
