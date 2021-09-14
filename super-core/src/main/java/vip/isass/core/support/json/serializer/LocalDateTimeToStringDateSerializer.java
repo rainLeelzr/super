@@ -167,96 +167,21 @@
  *
  */
 
-package vip.isass.core.structure.criteria.type;
+package vip.isass.core.support.json.serializer;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
-import vip.isass.core.structure.criteria.IV2Criteria;
-import vip.isass.core.structure.entity.IV2Entity;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import vip.isass.core.converter.datatime.LocalDateTimeToStringDateConverter;
 
-import java.util.Collection;
+import java.io.IOException;
+import java.time.LocalDateTime;
 
-/**
- * sql 的 select 字段条件接口
- *
- * @author Rain
- */
-public interface IV2SelectColumnCriteria<E extends IV2Entity<E>, C extends IV2SelectColumnCriteria<E, C>>
-    extends IV2Criteria<E, C> {
+public class LocalDateTimeToStringDateSerializer extends JsonSerializer<LocalDateTime> {
 
-    String DISTINCT = "DISTINCT ";
-
-    /**
-     * get select columns list
-     *
-     * @return select column list
-     */
-    Collection<String> getSelectColumns();
-
-    default C setSelectColumn(String selectColumn) {
-        getSelectColumns().clear();
-        return addSelectColumn(selectColumn);
-    }
-
-    default C setSelectColumns(Collection<String> selectColumns) {
-        getSelectColumns().clear();
-        return addSelectColumns(selectColumns);
-    }
-
-    default C setSelectColumns(String... selectColumns) {
-        getSelectColumns().clear();
-        return addSelectColumns(selectColumns);
-    }
-
-    @SuppressWarnings("unchecked")
-    default C addSelectColumn(String selectColumn) {
-        if (StrUtil.isNotBlank(selectColumn)) {
-            if (!getSelectColumns().contains(selectColumn)) {
-                getSelectColumns().add(selectColumn);
-            }
-        }
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default C addSelectColumns(Collection<String> selectColumns) {
-        if (CollUtil.isNotEmpty(selectColumns)) {
-            getSelectColumns().addAll(selectColumns);
-        }
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default C addSelectColumns(String... selectColumns) {
-        if (ArrayUtil.isNotEmpty(selectColumns)) {
-            getSelectColumns().addAll(CollUtil.toList(selectColumns));
-        }
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default C unSelectColumn(String selectColumn) {
-        if (StrUtil.isNotBlank(selectColumn)) {
-            getSelectColumns().remove(selectColumn);
-        }
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default C unSelectColumns(Collection<String> selectColumns) {
-        if (CollUtil.isNotEmpty(selectColumns)) {
-            getSelectColumns().removeAll(selectColumns);
-        }
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default C unSelectColumns(String... selectColumns) {
-        if (ArrayUtil.isNotEmpty(selectColumns)) {
-            getSelectColumns().removeAll(CollUtil.toList(selectColumns));
-        }
-        return (C) this;
+    @Override
+    public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        gen.writeString(LocalDateTimeToStringDateConverter.convert0(value));
     }
 
 }

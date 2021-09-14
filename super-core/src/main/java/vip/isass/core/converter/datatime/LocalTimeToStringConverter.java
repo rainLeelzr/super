@@ -167,96 +167,41 @@
  *
  */
 
-package vip.isass.core.structure.criteria.type;
+package vip.isass.core.converter.datatime;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
-import vip.isass.core.structure.criteria.IV2Criteria;
-import vip.isass.core.structure.entity.IV2Entity;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import vip.isass.core.support.Converter;
+import vip.isass.core.support.LocalDateTimeUtil;
 
-import java.util.Collection;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
- * sql 的 select 字段条件接口
+ * 把 LocalTime 类型的日期时间，转换成 HH:mm:ss
  *
  * @author Rain
  */
-public interface IV2SelectColumnCriteria<E extends IV2Entity<E>, C extends IV2SelectColumnCriteria<E, C>>
-    extends IV2Criteria<E, C> {
+public class LocalTimeToStringConverter implements Converter<LocalTime, String> {
 
-    String DISTINCT = "DISTINCT ";
-
-    /**
-     * get select columns list
-     *
-     * @return select column list
-     */
-    Collection<String> getSelectColumns();
-
-    default C setSelectColumn(String selectColumn) {
-        getSelectColumns().clear();
-        return addSelectColumn(selectColumn);
+    @Override
+    public boolean supportSourceType(Object source) {
+        return source instanceof LocalTime;
     }
 
-    default C setSelectColumns(Collection<String> selectColumns) {
-        getSelectColumns().clear();
-        return addSelectColumns(selectColumns);
+    @Override
+    public boolean supportTargetClass(Class clazz) {
+        return String.class.isAssignableFrom(clazz);
     }
 
-    default C setSelectColumns(String... selectColumns) {
-        getSelectColumns().clear();
-        return addSelectColumns(selectColumns);
+    @Override
+    public String convert(LocalTime source) {
+        return convert0(source);
     }
 
-    @SuppressWarnings("unchecked")
-    default C addSelectColumn(String selectColumn) {
-        if (StrUtil.isNotBlank(selectColumn)) {
-            if (!getSelectColumns().contains(selectColumn)) {
-                getSelectColumns().add(selectColumn);
-            }
-        }
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default C addSelectColumns(Collection<String> selectColumns) {
-        if (CollUtil.isNotEmpty(selectColumns)) {
-            getSelectColumns().addAll(selectColumns);
-        }
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default C addSelectColumns(String... selectColumns) {
-        if (ArrayUtil.isNotEmpty(selectColumns)) {
-            getSelectColumns().addAll(CollUtil.toList(selectColumns));
-        }
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default C unSelectColumn(String selectColumn) {
-        if (StrUtil.isNotBlank(selectColumn)) {
-            getSelectColumns().remove(selectColumn);
-        }
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default C unSelectColumns(Collection<String> selectColumns) {
-        if (CollUtil.isNotEmpty(selectColumns)) {
-            getSelectColumns().removeAll(selectColumns);
-        }
-        return (C) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    default C unSelectColumns(String... selectColumns) {
-        if (ArrayUtil.isNotEmpty(selectColumns)) {
-            getSelectColumns().removeAll(CollUtil.toList(selectColumns));
-        }
-        return (C) this;
+    public static String convert0(LocalTime source) {
+        LocalDateTime localDateTime = LocalDateTimeUtil.localTimeToLocalDateTime(source);
+        return DateUtil.format(localDateTime, DatePattern.NORM_TIME_PATTERN);
     }
 
 }

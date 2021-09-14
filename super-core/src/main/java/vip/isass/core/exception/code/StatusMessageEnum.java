@@ -207,7 +207,8 @@ public enum StatusMessageEnum implements IStatusMessage {
 
     URI_PARSE_ERROR(1003, "uri解析错误"),
     HTTP_METHOD_PARSE_ERROR(1004, "http method 解析错误"),
-    VERIFICATION_CODE_ERROR(1006, "验证码错误");
+    VERIFICATION_CODE_ERROR(1006, "验证码错误"),
+    ASSOCIATED_DATA(1007, "存在关联数据");
 
     private Integer status;
 

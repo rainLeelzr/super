@@ -4,9 +4,9 @@
 <#include "./segment/EntityType.ftl">
 package ${cfg.entityPackageName};
 
-import cn.hutool.core.util.RandomUtil;
 <#list table.fields as field>
 <#if field.comment!?contains("${enumStart}")>
+import cn.hutool.core.util.RandomUtil;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 </#if>
@@ -24,7 +24,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import lombok.ToString;
 import vip.isass.core.structure.entity.IV2Entity;
 <#if isIdEntity>
 import vip.isass.core.structure.entity.IV2IdEntity;
@@ -99,7 +98,6 @@ import java.util.Collection;
 @Getter
 @Setter
 @Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel("v2<#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if>")

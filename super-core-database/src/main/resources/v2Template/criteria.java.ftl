@@ -98,8 +98,9 @@ public class V2${entity}Criteria
 <#include "./segment/criteria_setter_number.java.ftl">
 <#---------- 集合字段类型都有的 setter 方法 ------------>
 <#include "./segment/criteria_setter_collection.java.ftl">
-</#list>
     // endregion
+
+</#list>
 
 <#---------- END 添加 getter setter 方法 ------------>
 }

@@ -271,4 +271,9 @@ public class LocalDateTimeUtil {
         }
         return dateToLocalDateTime(DateUtil.parse(date));
     }
+
+    public static LocalDateTime localTimeToLocalDateTime(LocalTime localTime) {
+        return epochMilliToLocalDateTime(localTimeToEpochMilli(localTime));
+    }
+
 }
