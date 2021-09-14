@@ -185,10 +185,15 @@ import vip.isass.core.support.JsonUtil;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties(prefix = "json.object-mapper")
+@ConfigurationProperties(prefix = "core.json.object-mapper")
 public class ObjectMapperConfiguration {
 
-    private boolean usingNotNullObjectMapper = false;
+    /**
+     * 不能设置为 false，会导致 bug
+     * 例如 UserMobile 是idEntity ,但是没有id字段，在转为json时，{"userId":"1296279169555202049","mobile":"15949388631","id":null}
+     * 会有 ”id“:null，导致翻序列化时，userId被id=null 覆盖，最终实体的userId没有值
+     */
+    private boolean usingNotNullObjectMapper = true;
 
     @Bean
     @Primary
