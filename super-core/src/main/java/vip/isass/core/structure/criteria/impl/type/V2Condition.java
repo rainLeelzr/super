@@ -206,7 +206,9 @@ public enum V2Condition {
     CONTAINS_ANY("ContainsAny"),
 
     // mysql json 数组
-    MYSQL_JSON_ARRAY_CONTAINS("MysqlJsonArrayContains");
+    MYSQL_JSON_ARRAY_CONTAINS("MysqlJsonArrayContains"),
+    MYSQL_JSON_ARRAY_CONTAINS_ANY("MysqlJsonArrayContainsAny"),
+    ;
 
     /**
      * 属性名后缀

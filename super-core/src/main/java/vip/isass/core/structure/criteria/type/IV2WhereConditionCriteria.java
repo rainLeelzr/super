@@ -571,6 +571,11 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
         return (C) this;
     }
 
+    @Transient
+    default <T> T getCollectionContainsAny(String propertyName, Class<T> clazz) {
+        return getValue(propertyName, V2Condition.CONTAINS_ANY, clazz);
+    }
+
     @SuppressWarnings("unchecked")
     default C mysqlJsonArrayContains(String propertyName, String columnName, Object value) {
         Assert.notBlank(propertyName, "propertyName 不能为空");
@@ -581,8 +586,22 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
     }
 
     @Transient
-    default <T> T getCollectionContainsAny(String propertyName, Class<T> clazz) {
-        return getValue(propertyName, V2Condition.CONTAINS_ANY, clazz);
+    default <T> T getMysqlJsonArrayContains(String propertyName, Class<T> clazz) {
+        return getValue(propertyName, V2Condition.MYSQL_JSON_ARRAY_CONTAINS, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    default C mysqlJsonArrayContainsAny(String propertyName, String columnName, Collection<?> value) {
+        Assert.notBlank(propertyName, "propertyName 不能为空");
+        Assert.notBlank(columnName, "columnName 不能为空");
+        Assert.notEmpty(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(propertyName, columnName, V2Condition.MYSQL_JSON_ARRAY_CONTAINS_ANY, value));
+        return (C) this;
+    }
+
+    @Transient
+    default <T> Collection<T> getMysqlJsonArrayContainsAny(String propertyName) {
+        return getValue(propertyName, V2Condition.MYSQL_JSON_ARRAY_CONTAINS_ANY);
     }
 
     // endregion

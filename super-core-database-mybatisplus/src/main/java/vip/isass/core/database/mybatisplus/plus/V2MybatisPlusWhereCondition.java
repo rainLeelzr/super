@@ -276,6 +276,20 @@ public class V2MybatisPlusWhereCondition {
                     throw new RuntimeException(e);
                 }
                 break;
+            case MYSQL_JSON_ARRAY_CONTAINS_ANY:
+                try {
+                    wrapper.apply(
+                        whereCondition.getValue() != null,
+                        StrUtil.format(
+                            "JSON_CONTAINS({},'{}')",
+                            whereCondition.getColumnName(),
+                            JsonUtil.DEFAULT_INSTANCE.writeValueAsString(whereCondition.getValue())
+                        )
+                    );
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+                break;
             default:
                 throw new UnsupportedOperationException(StrUtil.format("不支持的[{}]条件转换成mybatis plus wrapper", whereCondition.getCondition()));
         }
