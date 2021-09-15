@@ -176,8 +176,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import vip.isass.core.structure.criteria.V2WhereCondition;
 import vip.isass.core.support.JsonUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Rain
@@ -263,28 +265,36 @@ public class V2MybatisPlusWhereCondition {
                         CollUtil.join((Collection) whereCondition.getValue(), ",")));
                 break;
             case MYSQL_JSON_ARRAY_CONTAINS:
+                if (whereCondition.getValue() == null) {
+                    return;
+                }
                 try {
                     wrapper.apply(
-                        whereCondition.getValue() != null,
-                        StrUtil.format(
-                            "JSON_CONTAINS({},'{}')",
-                            whereCondition.getColumnName(),
-                            JsonUtil.DEFAULT_INSTANCE.writeValueAsString(Collections.singletonList(whereCondition.getValue()))
-                        )
+                        StrUtil.format("JSON_CONTAINS({},{0})", whereCondition.getColumnName()),
+                        JsonUtil.DEFAULT_INSTANCE.writeValueAsString(Collections.singletonList(whereCondition.getValue()))
                     );
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
                 break;
             case MYSQL_JSON_ARRAY_CONTAINS_ANY:
+                Collection<?> containsAnyValues = (Collection<?>) whereCondition.getValue();
+                if (CollUtil.isEmpty(containsAnyValues)) {
+                    return;
+                }
                 try {
+                    List<String> sqlFragments = new ArrayList<>(containsAnyValues.size());
+                    Object[] valueArr = new Object[containsAnyValues.size()];
+                    int i = 0;
+                    for (Object o : containsAnyValues) {
+                        sqlFragments.add(StrUtil.format("JSON_CONTAINS({},{{}})", whereCondition.getColumnName(), i));
+                        valueArr[i] = JsonUtil.DEFAULT_INSTANCE.writeValueAsString(o);
+                        i++;
+                    }
+                    String whereSql = CollUtil.join(sqlFragments, " OR ");
                     wrapper.apply(
-                        whereCondition.getValue() != null,
-                        StrUtil.format(
-                            "JSON_CONTAINS({},'{}')",
-                            whereCondition.getColumnName(),
-                            JsonUtil.DEFAULT_INSTANCE.writeValueAsString(whereCondition.getValue())
-                        )
+                        whereSql,
+                        valueArr
                     );
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
