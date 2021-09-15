@@ -172,9 +172,12 @@ package vip.isass.core.database.mybatisplus.plus;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import vip.isass.core.structure.criteria.V2WhereCondition;
+import vip.isass.core.support.JsonUtil;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Rain
@@ -258,6 +261,20 @@ public class V2MybatisPlusWhereCondition {
                     StrUtil.format("{} && '{{}}'",
                         whereCondition.getColumnName(),
                         CollUtil.join((Collection) whereCondition.getValue(), ",")));
+                break;
+            case MYSQL_JSON_ARRAY_CONTAINS:
+                try {
+                    wrapper.apply(
+                        whereCondition.getValue() != null,
+                        StrUtil.format(
+                            "JSON_CONTAINS({},'{}')",
+                            whereCondition.getColumnName(),
+                            JsonUtil.DEFAULT_INSTANCE.writeValueAsString(Collections.singletonList(whereCondition.getValue()))
+                        )
+                    );
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             default:
                 throw new UnsupportedOperationException(StrUtil.format("不支持的[{}]条件转换成mybatis plus wrapper", whereCondition.getCondition()));

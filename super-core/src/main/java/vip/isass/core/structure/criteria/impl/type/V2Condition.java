@@ -203,7 +203,10 @@ public enum V2Condition {
 
     // 数组类型
     CONTAINS_ALL("ContainsAll"),
-    CONTAINS_ANY("ContainsAny");
+    CONTAINS_ANY("ContainsAny"),
+
+    // mysql json 数组
+    MYSQL_JSON_ARRAY_CONTAINS("MysqlJsonArrayContains");
 
     /**
      * 属性名后缀

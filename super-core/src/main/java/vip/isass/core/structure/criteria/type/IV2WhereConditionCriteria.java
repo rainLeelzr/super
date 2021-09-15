@@ -571,6 +571,15 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
         return (C) this;
     }
 
+    @SuppressWarnings("unchecked")
+    default C mysqlJsonArrayContains(String propertyName, String columnName, Object value) {
+        Assert.notBlank(propertyName, "propertyName 不能为空");
+        Assert.notBlank(columnName, "columnName 不能为空");
+        Assert.notNull(value, "value不能为空");
+        getWhereConditions().add(new V2WhereCondition(propertyName, columnName, V2Condition.MYSQL_JSON_ARRAY_CONTAINS, value));
+        return (C) this;
+    }
+
     @Transient
     default <T> T getCollectionContainsAny(String propertyName, Class<T> clazz) {
         return getValue(propertyName, V2Condition.CONTAINS_ANY, clazz);
