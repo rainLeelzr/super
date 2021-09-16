@@ -273,7 +273,7 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         MybatisSqlSessionFactoryBean sqlSessionFactory = new MybatisSqlSessionFactoryBean();
         sqlSessionFactory.setDataSource(dataSource);
         sqlSessionFactory.setMapperLocations(ArrayUtil.toArray(mapperResources, org.springframework.core.io.Resource.class));
-        sqlSessionFactory.setTypeEnumsPackage("vip.isass.api.**");
+        sqlSessionFactory.setTypeEnumsPackage("vip.isass.**");
 
         MybatisConfiguration configuration = new MybatisConfiguration();
         configuration.setMapUnderscoreToCamelCase(true);
