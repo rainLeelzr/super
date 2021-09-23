@@ -171,6 +171,8 @@ package vip.isass.core.support.api;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -188,7 +190,18 @@ public interface ApiService {
             throw new UnsupportedOperationException("当前环境没有" + this.getClass().getSimpleName());
         }
 
+        boolean hasLocalService = false;
         for (S service : services) {
+            // 如果有本地服务，则无需执行 feign 服务
+            Order order = AnnotationUtils.findAnnotation(service.getClass(), Order.class);
+            if (order != null && order.value() == ApiOrder.LOCAL_SERVICE) {
+                hasLocalService = true;
+            }
+
+            if (order != null && order.value() == ApiOrder.FEIGN_SERVICE && hasLocalService) {
+                continue;
+            }
+
             V value = function.apply(service);
             if (value != null) {
                 return value;
