@@ -174,6 +174,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.entity.IV2Entity;
 import vip.isass.core.support.api.ApiOrder;
@@ -366,7 +367,16 @@ public interface IV2ServiceManager<
     default <V> V applyUntilNotNull(Function<S, V> function) {
         checkServices();
 
+        boolean hasLocalService = false;
         for (S service : getServices()) {
+            // 如果有本地服务，则无需执行 feign 服务
+            if (service instanceof IV2LocalService) {
+                hasLocalService = true;
+            }
+            if (hasLocalService && ((Order) service).value() == ApiOrder.FEIGN_SERVICE) {
+                continue;
+            }
+
             V value = function.apply(service);
             if (value != null) {
                 return value;
