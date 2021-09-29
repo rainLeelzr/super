@@ -172,6 +172,7 @@ package vip.isass.core.support;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -180,7 +181,15 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.NumberSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer;
 import vip.isass.core.entity.Json;
-import vip.isass.core.support.json.*;
+import vip.isass.core.support.json.DefaultJson;
+import vip.isass.core.support.json.LocalDateTimeToLongConvert;
+import vip.isass.core.support.json.LocalDateToLongConvert;
+import vip.isass.core.support.json.LocalTimeToLongConvert;
+import vip.isass.core.support.json.LongToLocalDateTimeConvert;
+import vip.isass.core.support.json.ObjectToJsonConvert;
+import vip.isass.core.support.json.StringToLocalDateConvert;
+import vip.isass.core.support.json.StringToLocalDateTimeConvert;
+import vip.isass.core.support.json.StringToLocalTimeConvert;
 import vip.isass.core.support.json.serializer.DoubleSerializer;
 import vip.isass.core.support.json.serializer.FloatSerializer;
 
@@ -188,6 +197,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Rain
@@ -200,10 +213,10 @@ public class JsonUtil {
         .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new LongToLocalDateTimeConvert()))
         .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new StringToLocalDateTimeConvert()))
         .addSerializer(LocalDate.class, new StdDelegatingSerializer(new LocalDateToLongConvert()))
-//        .addDeserializer(LocalDate.class, new StdDelegatingDeserializer<>(new LongToLocalDateConvert()))
+        //        .addDeserializer(LocalDate.class, new StdDelegatingDeserializer<>(new LongToLocalDateConvert()))
         .addDeserializer(LocalDate.class, new StdDelegatingDeserializer<>(new StringToLocalDateConvert()))
         .addSerializer(LocalTime.class, new StdDelegatingSerializer(new LocalTimeToLongConvert()))
-//        .addDeserializer(LocalTime.class, new StdDelegatingDeserializer<>(new LongToLocalTimeConvert()))
+        //        .addDeserializer(LocalTime.class, new StdDelegatingDeserializer<>(new LongToLocalTimeConvert()))
         .addDeserializer(LocalTime.class, new StdDelegatingDeserializer<>(new StringToLocalTimeConvert()))
         .addDeserializer(Json.class, new StdDelegatingDeserializer<>(new ObjectToJsonConvert()))
         .addSerializer(BigDecimal.class, (JsonSerializer<BigDecimal>) NumberSerializer.bigDecimalAsStringSerializer())
@@ -247,6 +260,36 @@ public class JsonUtil {
 
     public static Json fromObject(Object object) {
         return new DefaultJson().fromObject(object);
+    }
+
+    public static <T> List<T> convertArrayNodeToSimpleObjectList(JsonNode jsonNode, Class<T> clazz) {
+        if (jsonNode == null || !jsonNode.isArray()) {
+            return Collections.emptyList();
+        }
+
+        List<T> list = new ArrayList<>(jsonNode.size());
+        Iterator<JsonNode> elements = jsonNode.elements();
+        while (elements.hasNext()) {
+            JsonNode next = elements.next();
+            if (clazz == String.class) {
+                list.add((T) next.asText());
+            } else if (clazz == Integer.class) {
+                list.add((T) Integer.valueOf(next.asInt()));
+            } else if (clazz == Long.class) {
+                list.add((T) Long.valueOf(next.asLong()));
+            } else if (clazz == Byte.class) {
+                list.add((T) Boolean.valueOf(next.asBoolean()));
+            } else if (clazz == BigDecimal.class) {
+                list.add((T) new BigDecimal(next.asText()));
+            } else if (clazz == Float.class) {
+                list.add((T) Float.valueOf(next.floatValue()));
+            } else if (clazz == Double.class) {
+                list.add((T) Double.valueOf(next.asDouble()));
+            } else {
+                throw new UnsupportedOperationException("不支持的类型转换：" + clazz.getName());
+            }
+        }
+        return list;
     }
 
 }
