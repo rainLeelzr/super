@@ -23,6 +23,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.SneakyThrows;
 import vip.isass.core.structure.entity.IV2Entity;
 <#if isIdEntity>
@@ -98,6 +99,7 @@ import java.util.Collection;
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel("v2<#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if>")
