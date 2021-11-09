@@ -300,6 +300,29 @@ public class V2MybatisPlusWhereCondition {
                     throw new RuntimeException(e);
                 }
                 break;
+            case MYSQL_JSON_ARRAY_CONTAINS_ALL:
+                Collection<?> containsAllValues = (Collection<?>) whereCondition.getValue();
+                if (CollUtil.isEmpty(containsAllValues)) {
+                    return;
+                }
+                try {
+                    List<String> sqlFragments = new ArrayList<>(containsAllValues.size());
+                    Object[] valueArr = new Object[containsAllValues.size()];
+                    int i = 0;
+                    for (Object o : containsAllValues) {
+                        sqlFragments.add(StrUtil.format("JSON_CONTAINS({},{{}})", whereCondition.getColumnName(), i));
+                        valueArr[i] = JsonUtil.DEFAULT_INSTANCE.writeValueAsString(o);
+                        i++;
+                    }
+                    String whereSql = CollUtil.join(sqlFragments, " AND ");
+                    wrapper.apply(
+                        whereSql,
+                        valueArr
+                    );
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+                break;
             default:
                 throw new UnsupportedOperationException(StrUtil.format("不支持的[{}]条件转换成mybatis plus wrapper", whereCondition.getCondition()));
         }
