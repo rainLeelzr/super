@@ -171,6 +171,8 @@ package vip.isass.core.web.swagger;
 
 import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
@@ -232,6 +234,8 @@ public class WebSwaggerAutoConfiguration {
             .directModelSubstitute(LocalTime.class, Long.class)
             .directModelSubstitute(Json.class, Map.class)
             .directModelSubstitute(JsonNode.class, Map.class)
+            .directModelSubstitute(ObjectNode.class, Map.class)
+            .directModelSubstitute(ArrayNode.class, List.class)
             .directModelSubstitute(org.springframework.core.io.Resource.class, Void.class)
             .select()
             // .apis(RequestHandlerSelectors.any())
