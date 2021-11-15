@@ -200,10 +200,12 @@ import springfox.documentation.spring.web.readers.parameter.ExpansionContext;
 import springfox.documentation.spring.web.readers.parameter.ModelAttributeField;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.field.IV2IdCriteria;
+import vip.isass.core.structure.criteria.field.IV2ParentIdCriteria;
 import vip.isass.core.structure.criteria.field.IV2TraceCriteria;
 import vip.isass.core.structure.criteria.type.IV2OrderByCriteria;
 import vip.isass.core.structure.criteria.type.IV2SelectColumnCriteria;
 import vip.isass.core.structure.entity.IV2IdEntity;
+import vip.isass.core.structure.entity.IV2ParentIdEntity;
 import vip.isass.core.structure.entity.IV2TraceEntity;
 
 import java.beans.IntrospectionException;
@@ -211,7 +213,13 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -420,6 +428,14 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             optionalList.get().addAll(optionalIdCriteriaParameters.get());
         }
 
+        Optional<List<Parameter>> optionalParentCriteriaParameters = parseParentIdCriteria(type);
+        if (optionalParentCriteriaParameters.isPresent()) {
+            if (!optionalList.isPresent()) {
+                optionalList = Optional.of(new ArrayList<>());
+            }
+            optionalList.get().addAll(optionalParentCriteriaParameters.get());
+        }
+
         Optional<List<Parameter>> optionalTraceCriteriaParameters = parseTraceCriteria(type);
         if (optionalTraceCriteriaParameters.isPresent()) {
             if (!optionalList.isPresent()) {
@@ -472,7 +488,7 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             .parameterType("query")
             .modelRef(MODEL_REF)
             .type(resolver.resolve(String.class))
-            .order(1)
+            .order(2)
             .build()));
     }
 
@@ -485,7 +501,20 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             .description("主键")
             .parameterType("query")
             .modelRef(MODEL_REF)
-            .order(1)
+            .order(3)
+            .build()));
+    }
+
+    private Optional<List<Parameter>> parseParentIdCriteria(Class<?> type) {
+        if (!ClassUtil.isAssignable(IV2ParentIdCriteria.class, type)) {
+            return Optional.empty();
+        }
+        return Optional.of(Collections.singletonList(new ParameterBuilder()
+            .name(IV2ParentIdEntity.PARENT_ID_PROPERTY_NAME)
+            .description("父id")
+            .parameterType("query")
+            .modelRef(MODEL_REF)
+            .order(4)
             .build()));
     }
 
@@ -499,42 +528,42 @@ public class IsassParameterReader implements OperationBuilderPlugin {
                 .description("创建用户的 id")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
-                .order(2)
+                .order(Integer.MAX_VALUE - 5)
                 .build(),
             new ParameterBuilder()
                 .name(IV2TraceEntity.CREATE_USER_NAME_PROPERTY_NAME)
                 .description("创建用户的用户名")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
-                .order(3)
+                .order(Integer.MAX_VALUE - 4)
                 .build(),
             new ParameterBuilder()
                 .name(IV2TraceEntity.CREATED_TIME_PROPERTY_NAME)
                 .description("创建时间(支持时间戳(推荐)或yyyy-MM-dd HH:mm:ss)")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
-                .order(4)
+                .order(Integer.MAX_VALUE - 3)
                 .build(),
             new ParameterBuilder()
                 .name(IV2TraceEntity.MODIFY_USER_ID_PROPERTY_NAME)
                 .description("修改用户的 id")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
-                .order(5)
+                .order(Integer.MAX_VALUE - 2)
                 .build(),
             new ParameterBuilder()
                 .name(IV2TraceEntity.MODIFY_USER_NAME_PROPERTY_NAME)
                 .description("修改用户的用户名")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
-                .order(6)
+                .order(Integer.MAX_VALUE - 1)
                 .build(),
             new ParameterBuilder()
                 .name(IV2TraceEntity.MODIFY_TIME_PROPERTY_NAME)
                 .description("修改时间(支持时间戳(推荐)或yyyy-MM-dd HH:mm:ss)")
                 .parameterType("query")
                 .modelRef(MODEL_REF)
-                .order(7)
+                .order(Integer.MAX_VALUE)
                 .build()
         ));
     }
