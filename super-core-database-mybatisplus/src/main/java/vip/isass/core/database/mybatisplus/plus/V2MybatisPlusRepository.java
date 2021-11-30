@@ -181,6 +181,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import vip.isass.core.database.mybatisplus.mapper.IMapper;
@@ -190,11 +191,22 @@ import vip.isass.core.exception.AlreadyPresentException;
 import vip.isass.core.exception.code.StatusMessageEnum;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.type.IV2PageCriteria;
-import vip.isass.core.structure.entity.*;
+import vip.isass.core.structure.entity.IV2DbEntity;
+import vip.isass.core.structure.entity.IV2Entity;
+import vip.isass.core.structure.entity.IV2IdEntity;
+import vip.isass.core.structure.entity.IV2LogicDeleteEntity;
+import vip.isass.core.structure.entity.IV2ParentIdEntity;
+import vip.isass.core.structure.entity.IV2TenantEntity;
+import vip.isass.core.structure.entity.IV2TraceEntity;
+import vip.isass.core.structure.entity.IV2VersionEntity;
+import vip.isass.core.structure.entity.V2DbEntityConvert;
 import vip.isass.core.structure.repository.IV2Repository;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -215,7 +227,39 @@ public abstract class V2MybatisPlusRepository<
     public boolean add(E entity) {
         EDB edb = V2DbEntityConvert.convertToDbEntity(entity);
         super.save(edb);
-        // 保存到数据库后，自动赋值的字段，被赋值在 edb 中，需要复制到 entity 中
+        fillV2EntityProperties(entity, edb);
+        return true;
+    }
+
+    @Override
+    public boolean addBatch(Collection<E> entities) {
+        return addBatch(entities, IService.DEFAULT_BATCH_SIZE);
+    }
+
+    @Override
+    public boolean addBatch(Collection<E> entities, int batchSize) {
+        if (CollUtil.isEmpty(entities)) {
+            return false;
+        }
+        List<EDB> edbs = V2DbEntityConvert.convertToEdbEntities(entities);
+        super.saveBatch(edbs, batchSize);
+
+        int i = 0;
+        for (E entity : entities) {
+            fillV2EntityProperties(entity, edbs.get(i));
+            i++;
+        }
+
+        return true;
+    }
+
+    /**
+     * 保存到数据库后，自动赋值的字段，被赋值在 edb 中，需要复制到 entity 中
+     *
+     * @param entity entity
+     * @param edb    edb
+     */
+    private void fillV2EntityProperties(E entity, EDB edb) {
         if (entity instanceof IV2IdEntity) {
             ((IV2IdEntity) entity).setId(((IV2IdEntity) edb).getId());
         }
@@ -249,21 +293,6 @@ public abstract class V2MybatisPlusRepository<
             IV2TenantEntity tenantDbEntity = (IV2TenantEntity) edb;
             tenantEntity.setTenantId(tenantDbEntity.getTenantId());
         }
-
-        return true;
-    }
-
-    @Override
-    public boolean addBatch(Collection<E> entities) {
-        if (CollUtil.isEmpty(entities)) {
-            return false;
-        }
-        return super.saveBatch(V2DbEntityConvert.convertToEdbEntities(entities));
-    }
-
-    @Override
-    public boolean addBatch(Collection<E> entities, int batchSize) {
-        return super.saveBatch(V2DbEntityConvert.convertToEdbEntities(entities), batchSize);
     }
 
     @Override
