@@ -170,12 +170,18 @@
 package vip.isass.core.support;
 
 import cn.hutool.core.lang.Assert;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Iterator;
 
+@Slf4j
 public class FileUtil {
 
     public static String getContentType(File file) {
@@ -192,6 +198,17 @@ public class FileUtil {
             contentType = new MimetypesFileTypeMap().getContentType(file);
         }
         return contentType;
+    }
+
+    public static boolean isImage(File file) {
+        boolean isImage = false;
+        try (ImageInputStream iis = ImageIO.createImageInputStream(file)) {
+            Iterator<ImageReader> iter = ImageIO.getImageReaders(iis);
+            isImage = iter.hasNext();
+        } catch (IOException e) {
+            log.error("文件[{}]是否图片判断失败", file.getName());
+        }
+        return isImage;
     }
 
 }
