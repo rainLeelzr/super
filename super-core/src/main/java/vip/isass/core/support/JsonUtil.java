@@ -171,6 +171,8 @@ package vip.isass.core.support;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -201,11 +203,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Rain
  */
 public class JsonUtil {
+
+    public static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
+    };
+
+    public static final TypeReference<List<Map<String, Object>>> LIST_MAP_TYPE_REFERENCE = new TypeReference<List<Map<String, Object>>>() {
+    };
 
     @SuppressWarnings("unchecked")
     public static SimpleModule simpleModule = new SimpleModule()
@@ -290,6 +299,14 @@ public class JsonUtil {
             }
         }
         return list;
+    }
+
+    public static Map<String, Object> readMap(String json) throws JsonProcessingException {
+        return DEFAULT_INSTANCE.readValue(json, MAP_TYPE_REFERENCE);
+    }
+
+    public static List<Map<String, Object>> readListMap(String json) throws JsonProcessingException {
+        return DEFAULT_INSTANCE.readValue(json, LIST_MAP_TYPE_REFERENCE);
     }
 
 }
