@@ -182,6 +182,8 @@ import java.util.List;
 
 /**
  * sql 的 where 条件接口
+ * 设置条件时，value 必需做校验不能为空，否则在 update 或 delete 时，因为业务传了 null 过来，而被忽略的话，会导致全表数据被修改。
+ * todo 以后可做优化，在给 wrapper 赋值时，可判断 wrapper 类型，如果是 queryWrapper，可忽略 null 值，如果是 updateWrapper，则不能为 null
  *
  * @author Rain
  */

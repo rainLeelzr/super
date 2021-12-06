@@ -301,6 +301,12 @@ public interface IV1Controller<
         return Resp.bizSuccess(getService().updateEntityById(entity));
     }
 
+    @PutMapping("/criteria")
+    @ApiOperation(value = "改-根据条件")
+    default Resp<Boolean> updateByCriteria(@RequestBody E entity, @ModelAttribute C criteria) {
+        return Resp.bizSuccess(getService().updateByCriteria(entity, criteria));
+    }
+
     @DeleteMapping("/{ids}")
     @ApiOperation(value = "删-根据批量id", position = 14)
     default Resp<Boolean> deleteByIds(@PathVariable("ids") @ApiParam(value = "ids,用英文逗号,隔开") List<String> ids) {
