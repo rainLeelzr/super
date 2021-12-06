@@ -16,6 +16,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
 </#if>
 </#list>
+<#list table.fields as field>
+<#if field.propertyName!?ends_with("Id") && field.propertyType == "Long">
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+<#break>
+</#if>
+</#list>
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -24,7 +31,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.SneakyThrows;
 import vip.isass.core.structure.entity.IV2Entity;
 <#if isIdEntity>
 import vip.isass.core.structure.entity.IV2IdEntity;
@@ -44,7 +50,6 @@ import vip.isass.core.structure.entity.IV2TraceEntity;
 <#if isVersionEntity>
 import vip.isass.core.structure.entity.IV2VersionEntity;
 </#if>
-import vip.isass.core.support.JsonUtil;
 <#list table.fields as field>
 <#if (field.propertyType == "LocalDate"
 || field.propertyType == "LocalTime"
@@ -146,7 +151,8 @@ public class V2${entity} implements
      * 数据库字段名: ${field.name}
      * 数据库字段类型: ${field.type}
      */
-    @ApiModelProperty("<#if (field.comment?trim?length > 0)>${field.comment}<#else>${field.propertyName}</#if>")
+    @ApiModelProperty("<#if (field.comment?trim?length > 0)>${field.comment}<#else>${field.propertyName}</#if>")<#if field.propertyName!?ends_with("Id") && field.propertyType == "Long">
+    @JsonSerialize(using = ToStringSerializer.class)</#if>
     private <#if field.comment!?contains("${enumStart}")>${field.propertyName?cap_first}<#elseif field.propertyType == "Json">JsonNode<#else>${field.propertyType}</#if> ${field.propertyName};
 
 </#list>
@@ -274,14 +280,6 @@ public class V2${entity} implements
     }
 
 <#---------- END 添加Entity的randomEntity方法 ---------->
-<#---------- START 添加toString方法 ---------->
-    @Override
-    @SneakyThrows
-    public String toString() {
-        return JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(this);
-    }
-
-<#---------- END 添加toString方法 ---------->
     public static void main(String[] args) {
         System.out.println(new V2${entity}().randomEntity());
     }
