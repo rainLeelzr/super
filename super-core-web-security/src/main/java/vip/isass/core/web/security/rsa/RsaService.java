@@ -5,11 +5,13 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Service
 public class RsaService {
 
@@ -62,7 +64,11 @@ public class RsaService {
     public String decrypt(String id, String cipherText) {
         Assert.notBlank(cipherText, "cipherText 必填");
         try {
-            return loadKey(id).getRsa().decryptStr(cipherText, KeyType.PrivateKey);
+            return SecureUtil
+                .rsa(
+                    loadKey(id).getRsa().getPrivateKey().getEncoded(),
+                    null)
+                .decryptStr(cipherText, KeyType.PrivateKey);
         } catch (Exception e) {
             throw new RuntimeException("无法解密密文，密文格式错误或秘钥不匹配");
         }
