@@ -64,7 +64,7 @@ public class RsaService {
         try {
             return loadKey(id).getRsa().decryptStr(cipherText, KeyType.PrivateKey);
         } catch (Exception e) {
-            throw new RuntimeException("解密失败，密文错误或秘钥不匹配");
+            throw new RuntimeException("无法解密密文，密文格式错误或秘钥不匹配");
         }
     }
 
