@@ -172,14 +172,12 @@ package vip.isass.core.database.mybatisplus;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import vip.isass.core.database.mybatisplus.json.JsonNodeToIPageConvert;
 import vip.isass.core.support.JsonUtil;
 
 /**
  * @author Rain
  */
-@Configuration
 @ComponentScan
 public class DatabaseMybatisplusAutoConfiguration {
 

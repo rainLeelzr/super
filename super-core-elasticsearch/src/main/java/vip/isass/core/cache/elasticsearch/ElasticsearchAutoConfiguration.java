@@ -170,12 +170,10 @@
 package vip.isass.core.cache.elasticsearch;
 
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Rain
  */
-@Configuration
 @ComponentScan
 public class ElasticsearchAutoConfiguration {
 

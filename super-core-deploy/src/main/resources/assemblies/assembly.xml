@@ -176,20 +176,7 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <dependencySets>
-        <dependencySet>
-            <outputDirectory>${project.artifactId}</outputDirectory>
-            <includes>
-                <include>vip.isass:super-core-deploy-springcloud</include>
-            </includes>
-            <unpack>true</unpack>
-            <unpackOptions>
-                <includes>
-                    <include>deploy/bootstrap.properties</include>
-                </includes>
-                <filtered>true</filtered>
-            </unpackOptions>
-        </dependencySet>
-
+        <!-- 把 super-core-deploy 项目的 resources/deploy 目录文件复制到压缩包中 -->
         <dependencySet>
             <outputDirectory>${project.artifactId}</outputDirectory>
             <includes>
@@ -201,11 +188,14 @@
                     <include>deploy/deploy.md</include>
                     <include>deploy/logback-spring.xml</include>
                     <include>deploy/winstart.bat</include>
+                    <include>deploy/application.properties</include>
+                    <include>deploy/bootstrap.properties</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>
         </dependencySet>
 
+        <!-- 把 super-core-deploy 项目的 start.sh 目录文件复制到压缩包中，并赋予可执行权限 -->
         <dependencySet>
             <outputDirectory>${project.artifactId}</outputDirectory>
             <includes>
@@ -223,6 +213,7 @@
     </dependencySets>
 
     <fileSets>
+        <!-- 把项目中 resources/deploy 目录的文件复制到压缩包中（除了 *.sh） -->
         <fileSet>
             <directory>${project.build.outputDirectory}/deploy</directory>
             <outputDirectory>${project.artifactId}/deploy</outputDirectory>
@@ -231,6 +222,7 @@
             </excludes>
         </fileSet>
 
+        <!-- 把项目中 resources/deploy 目录的 *.sh 文件复制到压缩包中 -->
         <fileSet>
             <directory>${project.build.outputDirectory}/deploy</directory>
             <outputDirectory>${project.artifactId}/deploy</outputDirectory>
@@ -241,14 +233,25 @@
             </includes>
         </fileSet>
 
+        <!-- 把项目中 spring-boot-maven-plugin 插件编译出来的可执行 jar 包复制到压缩包中 -->
         <fileSet>
             <directory>${project.build.directory}</directory>
             <outputDirectory>${project.artifactId}/deploy</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>*-exec.jar</include>
             </includes>
         </fileSet>
 
+        <!-- 把项目中 lib 目录的文件复制到压缩包中 -->
+        <fileSet>
+            <directory>${project.build.directory}/lib</directory>
+            <outputDirectory>${project.artifactId}/deploy/lib</outputDirectory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+        </fileSet>
+
+        <!-- 把项目中 git 版本文件复制到压缩包中 -->
         <fileSet>
             <directory>${project.build.outputDirectory}</directory>
             <outputDirectory>${project.artifactId}/deploy</outputDirectory>

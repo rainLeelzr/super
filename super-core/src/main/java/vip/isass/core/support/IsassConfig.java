@@ -173,7 +173,7 @@ public interface IsassConfig {
 
     String PACKAGE_NAME = "vip.isass";
 
-    String ISASS_CORE_VERSION = "super.3.1.1-SNAPSHOT";
+    String ISASS_CORE_VERSION = "super.3.2.1-SNAPSHOT";
 
     String NEW_PROJECT_VERSION = "1.0.0-SNAPSHOT";
 

@@ -187,7 +187,6 @@ import java.util.Collections;
 /**
  * @author Rain
  */
-@Configuration
 @ComponentScan
 public class WebAutoConfiguration {
 
