@@ -211,7 +211,6 @@ import java.util.List;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan(basePackages = {"vip.isass.**.mapper"})
 public class SqlSessionConfig implements TransactionManagementConfigurer {
 
     @Resource
