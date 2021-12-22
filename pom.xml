@@ -205,7 +205,6 @@
         <module>super-core-deploy</module>
         <module>super-core-web</module>
         <module>super-core-web-security</module>
-        <module>super-core-web-res</module>
         <module>super-core-web-swagger</module>
         <module>super-core-web-rpc-feign</module>
         <module>super-core-net-netty</module>
@@ -383,12 +382,6 @@
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>super-core-web-security</artifactId>
-                <version>${super-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>vip.isass</groupId>
-                <artifactId>super-core-web-res</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 

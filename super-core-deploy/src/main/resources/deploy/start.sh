@@ -8,7 +8,7 @@ java \
 -XX:MetaspaceSize=256M \
 -XX:MaxMetaspaceSize=256M \
 -jar \
-@project.artifactId@.jar \
+@project.artifactId@-exec.jar \
 1>/dev/null 2>&1 &
 
 echo 'starting...'

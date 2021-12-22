@@ -169,11 +169,13 @@
 
 package vip.isass.core.database.mybatisplus.mysql;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author Rain
  */
 @ComponentScan
+@MapperScan(basePackages = "vip.isass.core.database.mybatisplus.mysql.mapper")
 public class DatabaseMybatisplusMysqlAutoConfiguration {
 }
