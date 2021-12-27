@@ -259,6 +259,7 @@ public abstract class V2MybatisPlusRepository<
      * @param entity entity
      * @param edb    edb
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private void fillV2EntityProperties(E entity, EDB edb) {
         if (entity instanceof IV2IdEntity) {
             ((IV2IdEntity) entity).setId(((IV2IdEntity) edb).getId());
@@ -409,6 +410,7 @@ public abstract class V2MybatisPlusRepository<
         return super.update(edb, updateWrapper);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public boolean updateByWrapper(E entity, Wrapper wrapper) {
         EDB edb = V2DbEntityConvert.convertToDbEntity(entity);
         boolean b = this.update(edb, wrapper);
@@ -540,6 +542,7 @@ public abstract class V2MybatisPlusRepository<
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public IPage<E> findPageByCriteria(IV2Criteria<E, C> criteria) {
         IV2PageCriteria pageCriteria = (IV2PageCriteria) criteria;
         return findPageByWrapper(

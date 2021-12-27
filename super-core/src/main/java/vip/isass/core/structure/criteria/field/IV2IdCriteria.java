@@ -198,6 +198,7 @@ public interface IV2IdCriteria<PK extends Serializable, E extends IV2IdEntity<PK
     }
 
     @Transient
+    @SuppressWarnings({"rawtypes", "unchecked"})
     default PK getId() {
         return this instanceof IV2WhereConditionCriteria
             ? (PK) ((IV2WhereConditionCriteria) this).getEquals(getIdColumnName())

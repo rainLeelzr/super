@@ -170,15 +170,10 @@
 package vip.isass.core.converter.datatime;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import vip.isass.core.support.Converter;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 把 Collection 类型，转换成 http query string，用逗号拼接
@@ -186,6 +181,7 @@ import java.util.stream.Collectors;
  * @author Rain
  */
 @Component
+@SuppressWarnings("rawtypes")
 public class CollectionToQueryStringConverter implements Converter<Collection, String> {
 
     @Override
@@ -203,6 +199,7 @@ public class CollectionToQueryStringConverter implements Converter<Collection, S
         return convert0(source);
     }
 
+    @SuppressWarnings("unchecked")
     public static String convert0(Collection source) {
         return CollUtil.join(source, ",");
     }

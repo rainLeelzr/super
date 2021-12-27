@@ -192,6 +192,7 @@ public class IsassV2QueryMapEncoder implements QueryMapEncoder {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Map<String, Object> encode(Object object) throws EncodeException {
         if (!(object instanceof IV2Criteria)) {
             return queryMapEncoder.encode(object);
@@ -200,6 +201,7 @@ public class IsassV2QueryMapEncoder implements QueryMapEncoder {
         return convertToMap((IV2Criteria) object);
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private Map<String, Object> convertToMap(IV2Criteria object) {
         Map<String, ?> map = JsonUtil.NOT_NULL_INSTANCE.convertValue(object, HashMap.class);
         Map<String, Object> queries = MapUtil.newHashMap(map.size());

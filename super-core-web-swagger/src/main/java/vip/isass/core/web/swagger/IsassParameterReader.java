@@ -578,6 +578,7 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             && !isMapType(resolvedParamType);
     }
 
+    @SuppressWarnings("rawtypes")
     private boolean shouldIgnore(
         final ResolvedMethodParameter parameter,
         ResolvedType resolvedParameterType,

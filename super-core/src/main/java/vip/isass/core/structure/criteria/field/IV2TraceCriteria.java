@@ -257,6 +257,7 @@ public interface IV2TraceCriteria<
     // region createUserId
 
     @Transient
+    @SuppressWarnings({"rawtypes", "unchecked"})
     default UPK getCreateUserId() {
         return this instanceof IV2WhereConditionCriteria
             ? (UPK) ((IV2WhereConditionCriteria) this).getEquals(getCreateUserIdPropertyName())

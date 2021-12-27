@@ -186,7 +186,16 @@ import lombok.extern.slf4j.Slf4j;
 import vip.isass.core.criteria.ICriteria;
 import vip.isass.core.criteria.IPageCriteria;
 import vip.isass.core.database.mybatisplus.mapper.IMapper;
-import vip.isass.core.entity.*;
+import vip.isass.core.entity.ChainedEntity;
+import vip.isass.core.entity.DbEntity;
+import vip.isass.core.entity.DbEntityConvert;
+import vip.isass.core.entity.IEntity;
+import vip.isass.core.entity.IdEntity;
+import vip.isass.core.entity.LogicDeleteEntity;
+import vip.isass.core.entity.SensitiveDataProperty;
+import vip.isass.core.entity.TimeTracedEntity;
+import vip.isass.core.entity.UserTracedEntity;
+import vip.isass.core.entity.VersionEntity;
 import vip.isass.core.exception.AbsentException;
 import vip.isass.core.exception.AlreadyPresentException;
 import vip.isass.core.exception.code.StatusMessageEnum;
@@ -214,6 +223,7 @@ public abstract class MybatisPlusRepository<
 
     // ****************************** 增 start ******************************
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public boolean add(E entity) {
         EDB edb = DbEntityConvert.convertToDbEntity(entity);
         super.save(edb);
@@ -352,6 +362,7 @@ public abstract class MybatisPlusRepository<
         return b;
     }
 
+    @SuppressWarnings("rawtypes")
     public boolean updateByWrapper(E entity, Wrapper<EDB> wrapper) {
         EDB edb = DbEntityConvert.convertToDbEntity(entity);
         boolean b = this.update(edb, wrapper);

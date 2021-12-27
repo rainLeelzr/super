@@ -181,6 +181,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import vip.isass.core.mq.MessageType;
 import vip.isass.core.mq.core.MqMessageContext;
 import vip.isass.core.mq.core.producer.MqProducer;
@@ -206,7 +207,7 @@ public class Kafka011Producer implements MqProducer {
     @Setter
     private ProducerConfiguration producerConfiguration;
 
-    private Producer producer;
+    private Producer<String, String> producer;
 
     //    private OrderProducer orderProducer;
 
@@ -221,7 +222,7 @@ public class Kafka011Producer implements MqProducer {
             getTopic(mqMessageContext), "", getBody(mqMessageContext));
 
         try {
-            Future send = producer.send(record);
+            Future<RecordMetadata> send = producer.send(record);
         } catch (Exception e) {
             log.error("mq发送失败,topic[{}], messageKey[{}]", mqMessageContext.getTopic(), mqMessageContext.getKey());
             throw e;
@@ -276,7 +277,7 @@ public class Kafka011Producer implements MqProducer {
         if (CollUtil.isNotEmpty(producerConfiguration.getProperties())) {
             kafkaProps.putAll(producerConfiguration.getProperties());
         }
-        producer = new KafkaProducer<String, String>(kafkaProps);
+        producer = new KafkaProducer<>(kafkaProps);
         return this;
     }
 

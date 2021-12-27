@@ -172,8 +172,6 @@ package vip.isass.core.web.rpc.feign;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import vip.isass.core.support.Converter;
-import vip.isass.core.support.LocalDateTimeUtil;
 import feign.RequestTemplate;
 import feign.codec.EncodeException;
 import feign.codec.Encoder;
@@ -185,10 +183,18 @@ import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
+import vip.isass.core.support.Converter;
+import vip.isass.core.support.LocalDateTimeUtil;
 
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 解决GET的Ctrl传对象会自动转为POST的问题
@@ -197,6 +203,7 @@ import java.util.*;
  * @author Rain
  */
 @Component
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class FeignEncoder implements Encoder {
 
     private static final String FEIGN_GET = "feign/get";
