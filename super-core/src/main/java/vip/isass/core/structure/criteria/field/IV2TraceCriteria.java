@@ -463,6 +463,7 @@ public interface IV2TraceCriteria<
     // region createUserName
 
     @Transient
+    @SuppressWarnings("rawtypes")
     default String getCreateUserName() {
         return this instanceof IV2WhereConditionCriteria
             ? (String) ((IV2WhereConditionCriteria) this).getEquals(getCreateUserNameColumnName())
