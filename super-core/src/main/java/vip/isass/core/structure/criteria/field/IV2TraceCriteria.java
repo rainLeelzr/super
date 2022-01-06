@@ -973,6 +973,7 @@ public interface IV2TraceCriteria<
     // region modifyUserName
 
     @Transient
+    @SuppressWarnings({"unchecked", "rawtypes"})
     default String getModifyUserName() {
         return this instanceof IV2WhereConditionCriteria
             ? (String) ((IV2WhereConditionCriteria) this).getEquals(getModifyUserNamePropertyName())
