@@ -1,3 +1,4 @@
+
 :: Spring Boot :: ${spring-boot.formatted-version}${AnsiColor.BRIGHT_YELLOW}
 /////////////////////////////////////////////////////////////////////
                   ___           ___           ___           ___
