@@ -231,11 +231,11 @@
 
         <tomcat.version>9.0.48</tomcat.version>
 
-        <!-- start isass-core -->
+        <!-- region isass-core -->
 
         <super-core.version>super.3.2.1-SNAPSHOT</super-core.version>
 
-        <!-- end isass-core -->
+        <!-- endregion -->
 
         <!-- spring -->
         <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
