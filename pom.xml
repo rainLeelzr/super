@@ -303,6 +303,7 @@
 
         <geotools.version>25.2</geotools.version>
         <jts.version>1.18.1</jts.version>
+        <coordtransform4j.version>1.0.2</coordtransform4j.version>
         <sqlite-jdbc.version>3.34.0</sqlite-jdbc.version>
     </properties>
 
