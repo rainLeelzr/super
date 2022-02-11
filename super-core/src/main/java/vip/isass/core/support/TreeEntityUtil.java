@@ -186,13 +186,20 @@ import java.util.function.Function;
  */
 public class TreeEntityUtil {
 
-    private static <PK, R extends ChildrenEntity<R>> List<R> convertToTree(List<Tree<PK>> treeNodes,
-                                                                           Function<Tree<PK>, R> function) {
+    /**
+     * @param treeNodes treeNodes
+     * @param function  function
+     * @param <TE>      tree entity
+     * @param <R>       return entity
+     * @return List of R entity
+     */
+    private static <TE, R extends ChildrenEntity<R>> List<R> convertToTree(List<Tree<TE>> treeNodes,
+                                                                           Function<Tree<TE>, R> function) {
         if (CollUtil.isEmpty(treeNodes)) {
             return Collections.emptyList();
         }
         List<R> list = new ArrayList<>(treeNodes.size());
-        for (Tree<PK> treeNode : treeNodes) {
+        for (Tree<TE> treeNode : treeNodes) {
             R r = function.apply(treeNode);
             r.setChildren(convertToTree(treeNode.getChildren(), function));
             list.add(r);
@@ -200,20 +207,41 @@ public class TreeEntityUtil {
         return list;
     }
 
-    public static <PK, E, R extends ChildrenEntity<R>> List<R> convertToTree(List<E> entities,
-                                                                             PK parentId,
+    /**
+     * @param entities                 entities
+     * @param parentId                 parentId
+     * @param treeNodeConfig           treeNodeConfig
+     * @param entityToTreeNode         entityToTreeNode
+     * @param treeNodeToChildrenEntity treeNodeToChildrenEntity
+     * @param <TE>                     tree entity
+     * @param <E>                      source entity
+     * @param <R>                      return entity
+     * @return List of R entity
+     */
+    public static <TE, E, R extends ChildrenEntity<R>> List<R> convertToTree(List<E> entities,
+                                                                             TE parentId,
                                                                              TreeNodeConfig treeNodeConfig,
-                                                                             NodeParser<E, PK> entityToTreeNode,
-                                                                             Function<Tree<PK>, R> treeNodeToChildrenEntity) {
+                                                                             NodeParser<E, TE> entityToTreeNode,
+                                                                             Function<Tree<TE>, R> treeNodeToChildrenEntity) {
 
-        List<Tree<PK>> trees = TreeUtil.build(entities, parentId, treeNodeConfig, entityToTreeNode);
+        List<Tree<TE>> trees = TreeUtil.build(entities, parentId, treeNodeConfig, entityToTreeNode);
         return convertToTree(trees, treeNodeToChildrenEntity);
     }
 
-    public static <PK, E, R extends ChildrenEntity<R>> List<R> convertToTree(List<E> entities,
-                                                                             PK parentId,
-                                                                             NodeParser<E, PK> entityToTreeNode,
-                                                                             Function<Tree<PK>, R> treeNodeToChildrenEntity) {
+    /**
+     * @param entities                 entities
+     * @param parentId                 parentId
+     * @param entityToTreeNode         entityToTreeNode
+     * @param treeNodeToChildrenEntity treeNodeToChildrenEntity
+     * @param <TE>                     tree entity
+     * @param <E>                      source entity
+     * @param <R>                      return entity
+     * @return List of R entity
+     */
+    public static <TE, E, R extends ChildrenEntity<R>> List<R> convertToTree(List<E> entities,
+                                                                             TE parentId,
+                                                                             NodeParser<E, TE> entityToTreeNode,
+                                                                             Function<Tree<TE>, R> treeNodeToChildrenEntity) {
 
         return convertToTree(entities, parentId, TreeNodeConfig.DEFAULT_CONFIG, entityToTreeNode, treeNodeToChildrenEntity);
     }
