@@ -195,7 +195,7 @@
             </unpackOptions>
         </dependencySet>
 
-        <!-- 把 super-core-deploy 项目的 start.sh 目录文件复制到压缩包中，并赋予可执行权限 -->
+        <!-- 把 super-core-deploy 项目的 run.sh 目录文件复制到压缩包中，并赋予可执行权限 -->
         <dependencySet>
             <outputDirectory>${project.artifactId}</outputDirectory>
             <includes>
@@ -205,7 +205,7 @@
             <unpack>true</unpack>
             <unpackOptions>
                 <includes>
-                    <include>deploy/start.sh</include>
+                    <include>deploy/run.sh</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>

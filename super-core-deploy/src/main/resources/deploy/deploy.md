@@ -40,7 +40,7 @@ spring.datasource.mysql.master.database=@service-name@
 
 ## 启动服务
 
-- linux系统 ./start.sh
+- linux系统 ./run.sh
 - windows系统 双击winstart.bat
 
 ## 查看日志
