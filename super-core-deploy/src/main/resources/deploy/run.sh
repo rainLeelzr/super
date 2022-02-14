@@ -5,10 +5,10 @@
 #-------------------------------------------------------------------
 
 # 模块名
-PROJECT_NAME="isass-service-apidoc-service"
+PROJECT_NAME="@project.artifactId@"
 
 # 运行包名
-PROJECT_JAR="isass-service-apidoc-service-exec.jar"
+PROJECT_JAR="@project.artifactId@-exec.jar"
 
 # 默认JVM内存参数，如果设置了环境变量JVM_DEFAULT_MEMORY_ENV，则会被环境变量覆盖
 JVM_DEFAULT_MEMORY_VARS=" -Xms6G -Xmx6G -Xmn3G -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=256M "
@@ -17,7 +17,7 @@ JVM_DEFAULT_MEMORY_VARS=" -Xms6G -Xmx6G -Xmn3G -XX:MetaspaceSize=256M -XX:MaxMet
 JVM_DEFAULT_VARS=" -server -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:+PrintCommandLineFlags -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintCommandLineFlags "
 
 # 日志输出目录
-LOG_PATH="./logs/apidoc-service"
+LOG_PATH="./logs/@service-name@"
 
 #-------------------------------------------------------------------
 # 以下内容请不要修改
