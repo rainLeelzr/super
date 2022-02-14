@@ -10,10 +10,10 @@ PROJECT_NAME="@project.artifactId@"
 # 运行包名
 PROJECT_JAR="@project.artifactId@-exec.jar"
 
-# 默认JVM内存参数，如果设置了环境变量JVM_DEFAULT_MEMORY_ENV，则会被环境变量覆盖
+# 默认JVM内存参数，如果设置了环境变量 JVM_MEMORY_VARS，则会被环境变量覆盖
 JVM_DEFAULT_MEMORY_VARS=" -Xms6G -Xmx6G -Xmn3G -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=256M "
 
-# 默认JVM非内存参数，如果设置了环境变量JVM_DEFAULT_ENV，则会被环境变量覆盖
+# 默认JVM非内存参数，如果设置了环境变量 JVM_VARS，则会被环境变量覆盖
 JVM_DEFAULT_VARS=" -server -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:+PrintCommandLineFlags -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintCommandLineFlags "
 
 # 日志输出目录
@@ -58,8 +58,27 @@ start() {
         fi
 
         echo "try to start ${PROJECT_NAME} ..."
+        echo ""
 
-        nohup java ${JVM_DEFAULT_VARS} ${JVM_DEFAULT_MEMORY_VARS} -jar ${PROJECT_JAR} 1>/dev/null 2>&1 &
+        JVM_VARS_TEMP=''
+        if [ -n "$JVM_VARS" ]; then
+                echo "found env var: JVM_VARS=${JVM_VARS}"
+                JVM_VARS_TEMP=$JVM_VARS
+        else
+                JVM_VARS_TEMP=${JVM_DEFAULT_VARS}
+        fi
+
+        JVM_MEMORY_VARS_TEMP=''
+        if [ -n "$JVM_MEMORY_VARS" ]; then
+                echo "found env var: JVM_MEMORY_VARS=$JVM_MEMORY_VARS"
+                JVM_MEMORY_VARS_TEMP=$JVM_MEMORY_VARS
+        else
+                JVM_MEMORY_VARS_TEMP=${JVM_DEFAULT_MEMORY_VARS}
+        fi
+        echo ""
+        echo "executing cmd: java ${JVM_VARS_TEMP} ${JVM_MEMORY_VARS_TEMP} -jar ${PROJECT_JAR} 1>/dev/null 2>&1 &"
+
+        nohup java ${JVM_VARS_TEMP} ${JVM_MEMORY_VARS_TEMP} -jar ${PROJECT_JAR} 1>/dev/null 2>&1 &
 
         echo ''
         echo 'log will printing after 5 second using command "tail -f -n 500" automatic.'
