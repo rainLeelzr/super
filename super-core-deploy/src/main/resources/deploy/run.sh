@@ -19,6 +19,9 @@ JVM_DEFAULT_VARS=" -server -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:+P
 # 日志输出目录
 LOG_PATH="./logs/@service-name@"
 
+# 启动后是否自动打印日志，如果设置了环境变量 AUTO_PRINT_LOG，则会被环境变量覆盖
+AUTO_PRINT_LOG_DEFAULT="true"
+
 #-------------------------------------------------------------------
 # 以下内容请不要修改
 #-------------------------------------------------------------------
@@ -39,7 +42,7 @@ get_pid() {
                 echo "file 'application.pid' not found."
                 PID=''
         else
-                PID=`head -n +1 application.pid`
+                PID=`head -n 1 application.pid`
                 echo "found pid[${PID}] in file './application.pid'"
                 PID="${PID}"
         fi
@@ -81,13 +84,30 @@ start() {
         nohup java ${JVM_VARS_TEMP} ${JVM_MEMORY_VARS_TEMP} -jar ${PROJECT_JAR} 1>/dev/null 2>&1 &
 
         echo ''
-        echo 'log will printing after 5 second using command "tail -f -n 500" automatic.'
-        echo 'you can use "ctrl+c" to exit log printing, and will not close the application.'
-        echo ''
 
         sleep 5
 
-        print_log
+        AUTO_PRINT_LOG_TEMP=''
+        if [ -n "$AUTO_PRINT_LOG" ]; then
+                AUTO_PRINT_LOG_TEMP=$AUTO_PRINT_LOG
+        else
+                AUTO_PRINT_LOG_TEMP=${AUTO_PRINT_LOG_DEFAULT}
+        fi
+
+        if [ $AUTO_PRINT_LOG_TEMP = "true" ]; then
+            echo 'log will printing after 5 second using command "tail -f -n 500" automatic.'
+            echo 'you can use "ctrl+c" to exit log printing, and will not close the application.'
+            echo ''
+
+            print_log
+        else
+            echo "app started, use './run.sh status' to check status"
+        fi
+
+
+        if [ -n "$KEEP_RUNNING" ]; then
+            tail -f /dev/null
+        fi
 }
 
 stop() {
