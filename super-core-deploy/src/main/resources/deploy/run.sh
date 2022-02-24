@@ -14,7 +14,7 @@ PROJECT_JAR="@project.artifactId@-exec.jar"
 JVM_DEFAULT_MEMORY_VARS=" -Xms6G -Xmx6G -Xmn3G -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=256M "
 
 # 默认JVM非内存参数，如果设置了环境变量 JVM_VARS，则会被环境变量覆盖
-JVM_DEFAULT_VARS=" -server -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:+PrintCommandLineFlags -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintCommandLineFlags "
+JVM_DEFAULT_VARS=" -server -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:+PrintCommandLineFlags -XX:+PrintGC -XX:+PrintGCDetails "
 
 # 日志输出目录
 LOG_PATH="./logs/@service-name@"
