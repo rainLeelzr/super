@@ -16,6 +16,7 @@ jvm_memory_vars=${JVM_MEMORY_VARS="-Xms6G -Xmx6G -Xmn3G -XX:MetaspaceSize=256M -
 # 默认JVM非内存参数，如果设置了环境变量 JVM_VARS ，则会被环境变量覆盖
 jvm_vars=${JVM_VARS="-server -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:+PrintCommandLineFlags"}
 
+# 是否打印gc信息
 jvm_print_gc=${JVM_PRINT_GC="false"}
 
 # 日志输出目录
