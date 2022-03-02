@@ -36,10 +36,10 @@ pipeline {
 
     post {
         always {
-            echo "[${JOB_NAME}]部署结果[${currentBuild.result}]"
-            echo "作者：${AUTHORS}\n内容：${COMMIT_LOGS}"
-            deleteDir()
-            sh """curl -X POST -H 'Content-Type: application/json' -d '{"msgtype": "markdown","markdown": {"content": "jenkins：${JOB_NAME}\n> 结果：${currentBuild.result}\n> 作者：${AUTHORS}\n> 内容：${COMMIT_LOGS}\n> 变更：${FILE_CHANGES}\n> 链接：[jenkins](${BUILD_URL}console)"}}' https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=${WECHAT_TOKEN}"""
+                deleteDir()
+                echo "[${JOB_NAME}]部署结果[${currentBuild.result}]"
+                echo "作者：${AUTHORS}\n内容：${COMMIT_LOGS}\n变更：${FILE_CHANGES}"
+                sh """curl -X POST -H 'Content-Type: application/json' -d '{"msgtype": "markdown","markdown": {"content": "jenkins：${JOB_NAME}(${currentBuild.result})\\n> 作者：${AUTHORS}\\n> 内容：${COMMIT_LOGS}\\n> 变更：${FILE_CHANGES}\\n> 链接：[jenkins](${BUILD_URL}console)"}}' https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=${WECHAT_TOKEN}"""
         }
     }
 }

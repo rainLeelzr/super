@@ -176,6 +176,21 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <dependencySets>
+        <!-- 把 super-core 项目的指定文件复制到压缩包中 -->
+        <dependencySet>
+            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
+            <includes>
+                <include>vip.isass:super-core</include>
+            </includes>
+            <unpack>true</unpack>
+            <unpackOptions>
+                <includes>
+                    <include>logback-spring.xml</include>
+                </includes>
+                <filtered>true</filtered>
+            </unpackOptions>
+        </dependencySet>
+
         <!-- 把 super-core-deploy 项目的 resources/deploy 目录文件复制到压缩包中 -->
         <dependencySet>
             <outputDirectory>${project.artifactId}</outputDirectory>
@@ -186,7 +201,6 @@
             <unpackOptions>
                 <includes>
                     <include>deploy/deploy.md</include>
-                    <include>deploy/logback-spring.xml</include>
                     <include>deploy/winstart.bat</include>
                     <include>deploy/application.properties</include>
                     <include>deploy/bootstrap.properties</include>
@@ -206,6 +220,8 @@
             <unpackOptions>
                 <includes>
                     <include>deploy/run.sh</include>
+                    <include>deploy/stop.sh</include>
+                    <include>deploy/printlog.sh</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>
