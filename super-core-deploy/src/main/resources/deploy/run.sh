@@ -79,13 +79,12 @@ start() {
         eval $cmd
         echo ""
 
-        sleep 5
-
         if [ $auto_tail_log = "true" ]; then
             echo 'log will printing after 5 second using command "tail -f -n 500" automatic.'
             echo 'you can use "ctrl+c" to exit log printing, and will not close the application.'
             echo ''
 
+            sleep 5
             print_log
         else
             echo "app started, use './run.sh status' to check status"
