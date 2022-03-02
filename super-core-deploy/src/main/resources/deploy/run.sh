@@ -11,10 +11,12 @@ project_name="@project.artifactId@"
 project_jar="@project.artifactId@-exec.jar"
 
 # 默认JVM内存参数，如果设置了环境变量 JVM_MEMORY_VARS ，则会被环境变量覆盖
-jvm_memory_vars=${JVM_MEMORY_VARS=" -Xms6G -Xmx6G -Xmn3G -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=256M "}
+jvm_memory_vars=${JVM_MEMORY_VARS="-Xms6G -Xmx6G -Xmn3G -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=256M"}
 
 # 默认JVM非内存参数，如果设置了环境变量 JVM_VARS ，则会被环境变量覆盖
-jvm_vars=${JVM_VARS=" -server -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:+PrintCommandLineFlags -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintCommandLineFlags "}
+jvm_vars=${JVM_VARS="-server -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:+PrintCommandLineFlags"}
+
+jvm_print_gc=${JVM_PRINT_GC="false"}
 
 # 日志输出目录
 log_path="./logs/"
@@ -69,7 +71,12 @@ start() {
         echo "try to start ${project_name} ..."
         echo ""
 
-        cmd="java ${jvm_vars} ${jvm_memory_vars} -jar ${project_jar}"
+        jvm_params="${jvm_vars} ${jvm_memory_vars}"
+        if [ $jvm_print_gc = "true" ]; then
+            jvm_params="${jvm_params} -XX:+PrintGC -XX:+PrintGCDetails"
+        fi
+
+        cmd="java ${jvm_params} -jar ${project_jar}"
         if [ $run_as_nohup = "true" ]; then
             cmd="nohup $cmd 1>/dev/null 2>&1 &"
         fi
