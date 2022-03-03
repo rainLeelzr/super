@@ -203,7 +203,6 @@
                     <include>deploy/deploy.md</include>
                     <include>deploy/winstart.bat</include>
                     <include>deploy/application.properties</include>
-                    <include>deploy/bootstrap.properties</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>

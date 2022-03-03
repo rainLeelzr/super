@@ -56,5 +56,8 @@ Started MessageSpringbootApp in 20.82 seconds (JVM running for 21.431)
 
 ## 停止服务
 
-- linux系统 直接 `ps -ef|grep java` 找到对应的进程，再 kill 即可。使用 `jps -l` 可更加快地找到程序进程号
+- linux系统 `./stop.sh`
 - windows系统 关闭命令行窗口即可
+
+## 环境变量
+- 在容器环境中，可以通过环境变量来改变 java
