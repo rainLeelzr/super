@@ -6,13 +6,11 @@
 ## 前置条件
 
 - 已安装 jdk8 或以上
-
 - 已有 mysql5.7 或以上
 
 ## 创建数据库
 
 - 启动服务时，程序会自动判断数据库是否存在，不存在则自动创建数据库。数据库名读取 `spring.datasource.mysql.master.database` 的配置
-
 - 如需更改数据库名，请修改参数 `spring.datasource.mysql.master.database`
 
 ## 拷贝文件
@@ -30,7 +28,7 @@
 
 > vi application.properties
 
-``` properties
+```properties
 spring.datasource.mysql.master.host=127.0.0.1
 spring.datasource.mysql.master.port=3306
 spring.datasource.mysql.master.username=root
@@ -46,10 +44,9 @@ spring.datasource.mysql.master.database=@service-name@
 ## 查看日志
 
 - linux 环境启动服务后，会自动使用 tail 命令打开日志
-
 - 输出以下日志，视为启动成功
 
-``` text
+```text
 Tomcat started on port(s): 20000 (http) with context path ''
 Started MessageSpringbootApp in 20.82 seconds (JVM running for 21.431)
 ```
@@ -60,4 +57,31 @@ Started MessageSpringbootApp in 20.82 seconds (JVM running for 21.431)
 - windows系统 关闭命令行窗口即可
 
 ## 环境变量
-- 在容器环境中，可以通过环境变量来改变 java
+
+> 在jar包直接运行时，改变 `run.sh` 的变量值, 或在 docker 环境运行时设置环境变量，可实现不同功能
+
+### 变量列表
+
+
+| 变量                | 默认值                                                                            | 说明                                                                                                   |
+| --------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| JVM_VARS            | -server -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:+PrintCommandLineFlags | JVM非内存参数                                                                                          |
+| JVM_MEMORY_VARS     | -Xms6G -Xmx6G -Xmn3G -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=256M             | JVM内存参数                                                                                            |
+| JVM_PRINT_GC        | false                                                                             | 是否打印gc信息                                                                                         |
+| DEBUG_PORT          |                                                                                   | java 远程调试端口。当设置此值时，本java应用会开启此端口，提供给开发人员进行连接，从而实现代码级别调试  |
+| AUTO_TAIL_LOG       | true                                                                              | 启动后是否自动使用 tail 命令打印日志                                                                   |
+| RUN_AS_NOHUP        | true                                                                              | 启动 java 的命令是否结合 nohup 进行不挂断运行                                                          |
+| KEEP_DOCKER_RUNNING | false                                                                             | 当在 docker 环境中，启动 java 报错后，会导致容器退出，可配置此参数，阻止容器退出，便于进入容器调试问题 |
+| WRITE_LOG_TO_FILE   | true                                                                              | 是否把程序日志写到日志文件                                                                             |
+
+### 容器环境运行时脚本配置
+
+> 只列出与jar包直接运行时默认值 `不同` 的变量
+
+
+| 变量              | 默认值 | 说明                                          |
+| ------------------- | -------- | ----------------------------------------------- |
+| JVM_MEMORY_VARS   |        | JVM内存参数                                   |
+| AUTO_TAIL_LOG     | false  | 启动后是否自动使用 tail 命令打印日志          |
+| RUN_AS_NOHUP      | false  | 启动 java 的命令是否结合 nohup 进行不挂断运行 |
+| WRITE_LOG_TO_FILE | false  | 是否把程序日志写到日志文件                    |
