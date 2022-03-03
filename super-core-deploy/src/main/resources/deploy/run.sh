@@ -19,6 +19,9 @@ jvm_vars=${JVM_VARS="-server -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:
 # 是否打印gc信息
 jvm_print_gc=${JVM_PRINT_GC="false"}
 
+# java 远程调试端口。当设置此值时，本java应用会开启此端口，提供给开发人员进行连接，从而实现代码级别调试
+debug_port=${DEBUG_PORT=""}
+
 # 日志输出目录
 log_path="./logs/"
 
@@ -75,6 +78,9 @@ start() {
         jvm_params="${jvm_vars} ${jvm_memory_vars}"
         if [ $jvm_print_gc = "true" ]; then
             jvm_params="${jvm_params} -XX:+PrintGC -XX:+PrintGCDetails"
+        fi
+        if [ -n "$debug_port" ]; then
+            jvm_params="${jvm_params} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$debug_port"
         fi
 
         cmd="java ${jvm_params} -jar ${project_jar}"
