@@ -1,4 +1,4 @@
-# [](https://)部署文档
+# 部署文档
 
 - 本程序是 `@service-name-cn@`，基于 java、SpringCloud、mybatis-plus 开发。
 
