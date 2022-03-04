@@ -1,7 +1,6 @@
-# 部署文档
+# [](https://)部署文档
 
-- 本程序是@service-name-cn@，基于 java 开发。
-- 本部署包是单体包，已集成其他依赖的微服务
+- 本程序是 `@service-name-cn@`，基于 java、SpringCloud、mybatis-plus 开发。
 
 ## 前置条件
 
@@ -19,7 +18,7 @@
 - 若服务器已存在部署包，建议备份原部署包
 - 将压缩包 @project.artifactId@-bin.zip 拷贝到服务器 /opt/@service-name@
 - 进入服务器文件夹 cd /opt/@service-name@
-- 解压文件。解压文件前，请认真查看服务器已有配置文件与压缩包内文件，不要在解压时，覆盖掉已有配置文件
+- 解压文件。解压文件前，请认真查看服务器已有配置文件与压缩包内文件，不要在解压时，覆盖掉服务器上已经 `正确配置` 过的配置文件，避免重新更改配置
 - unzip @project.artifactId@-bin.zip
 
 ## 修改参数
@@ -38,8 +37,8 @@ spring.datasource.mysql.master.database=@service-name@
 
 ## 启动服务
 
-- linux系统 ./run.sh
-- windows系统 双击winstart.bat
+- linux系统 `./run.sh`
+- windows系统 双击 `winstart.bat`
 
 ## 查看日志
 
@@ -47,8 +46,8 @@ spring.datasource.mysql.master.database=@service-name@
 - 输出以下日志，视为启动成功
 
 ```text
-Tomcat started on port(s): 20000 (http) with context path ''
-Started MessageSpringbootApp in 20.82 seconds (JVM running for 21.431)
+Tomcat started on port(s): xxx (http) with context path ''
+Started xxxApp in 20.82 seconds (JVM running for 21.431)
 ```
 
 ## 停止服务
@@ -72,16 +71,16 @@ Started MessageSpringbootApp in 20.82 seconds (JVM running for 21.431)
 | AUTO_TAIL_LOG       | true                                                                              | 启动后是否自动使用 tail 命令打印日志                                                                   |
 | RUN_AS_NOHUP        | true                                                                              | 启动 java 的命令是否结合 nohup 进行不挂断运行                                                          |
 | KEEP_DOCKER_RUNNING | false                                                                             | 当在 docker 环境中，启动 java 报错后，会导致容器退出，可配置此参数，阻止容器退出，便于进入容器调试问题 |
-| WRITE_LOG_TO_FILE   | true                                                                              | 是否把程序日志写到日志文件                                                                             |
+| WRITE_LOG_TO_FILE   | true                                                                              | 是否使用slf4j把程序日志写到日志文件                                                                    |
 
-### 容器环境运行时脚本配置
+### 容器环境变量默认值差异列表
 
 > 只列出与jar包直接运行时默认值 `不同` 的变量
 
 
-| 变量              | 默认值 | 说明                                          |
-| ------------------- | -------- | ----------------------------------------------- |
-| JVM_MEMORY_VARS   |        | JVM内存参数                                   |
-| AUTO_TAIL_LOG     | false  | 启动后是否自动使用 tail 命令打印日志          |
-| RUN_AS_NOHUP      | false  | 启动 java 的命令是否结合 nohup 进行不挂断运行 |
-| WRITE_LOG_TO_FILE | false  | 是否把程序日志写到日志文件                    |
+| 变量              | 默认值 | 差异说明                                              |
+| ------------------- | -------- | ------------------------------------------------------- |
+| JVM_MEMORY_VARS   |        | 容器环境应该使用 cgroup 限制内存，不通过 jvm 参数限制 |
+| AUTO_TAIL_LOG     | false  | 容器环境应该使用 docker logs 查看日志                 |
+| RUN_AS_NOHUP      | false  | 容器环境的 java 程序无需后台运行                      |
+| WRITE_LOG_TO_FILE | false  | 容器通过控制台收集日志，无需写日志文件                |
