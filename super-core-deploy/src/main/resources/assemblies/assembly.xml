@@ -176,21 +176,6 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <dependencySets>
-        <!-- 把 super-core 项目的指定文件复制到压缩包中 -->
-        <dependencySet>
-            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
-            <includes>
-                <include>vip.isass:super-core</include>
-            </includes>
-            <unpack>true</unpack>
-            <unpackOptions>
-                <includes>
-                    <include>logback-spring.xml</include>
-                </includes>
-                <filtered>true</filtered>
-            </unpackOptions>
-        </dependencySet>
-
         <!-- 把 super-core-deploy 项目的 resources/deploy 目录文件复制到压缩包中 -->
         <dependencySet>
             <outputDirectory>${project.artifactId}</outputDirectory>
@@ -202,13 +187,12 @@
                 <includes>
                     <include>deploy/deploy.md</include>
                     <include>deploy/winstart.bat</include>
-                    <include>deploy/application.properties</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>
         </dependencySet>
 
-        <!-- 把 super-core-deploy 项目的 run.sh 目录文件复制到压缩包中，并赋予可执行权限 -->
+        <!-- 把 super-core-deploy 项目的脚本文件目录文件复制到压缩包中，并赋予可执行权限 -->
         <dependencySet>
             <outputDirectory>${project.artifactId}</outputDirectory>
             <includes>
@@ -248,15 +232,6 @@
             </includes>
         </fileSet>
 
-        <!-- 把项目中 spring-boot-maven-plugin 插件编译出来的可执行 jar 包复制到压缩包中 -->
-        <fileSet>
-            <directory>${project.build.directory}</directory>
-            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
-            <includes>
-                <include>*-exec.jar</include>
-            </includes>
-        </fileSet>
-
         <!-- 把项目中 lib 目录的文件复制到压缩包中 -->
         <fileSet>
             <directory>${project.build.directory}/lib</directory>
@@ -264,6 +239,12 @@
             <includes>
                 <include>*.*</include>
             </includes>
+        </fileSet>
+
+        <!-- 把项目中 config 目录的文件复制到压缩包中 -->
+        <fileSet>
+            <directory>${project.build.outputDirectory}/config</directory>
+            <outputDirectory>${project.artifactId}/deploy/config</outputDirectory>
         </fileSet>
 
         <!-- 把项目中 git 版本文件复制到压缩包中 -->
@@ -274,6 +255,14 @@
                 <include>git.properties</include>
             </includes>
         </fileSet>
-    </fileSets>
 
+        <!-- 把项目中 spring-boot-maven-plugin 插件编译出来的可执行 jar 包复制到压缩包中 -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
+            <includes>
+                <include>*-exec.jar</include>
+            </includes>
+        </fileSet>
+    </fileSets>
 </assembly>
