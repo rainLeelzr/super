@@ -185,7 +185,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -204,6 +203,8 @@ import vip.isass.core.page.PageConst;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -221,6 +222,9 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
 
     @Value("${mybatis-plus.mapper-locations:}")
     private List<String> mapperLocations;
+
+    @Autowired(required = false)
+    private List<IMapperLocationProvider> mapperLocationProviders;
 
     @Value("${mybatis-plus.global-config.db-config.capital-mode:false}")
     private boolean capitalMode;
@@ -259,19 +263,45 @@ public class SqlSessionConfig implements TransactionManagementConfigurer {
         return conf;
     }
 
-    @Bean
-    public SqlSessionFactory sqlSessionFactory(GlobalConfig globalConfig) throws Exception {
+    private org.springframework.core.io.Resource[] getMapperLocationsResources() throws Exception {
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        List<org.springframework.core.io.Resource> mapperResources =
-            CollUtil.toList(resolver.getResources("classpath*:/vip/isass/**/mapper/**/*Mapper.xml"));
+        List<org.springframework.core.io.Resource> mapperResources = new ArrayList<>();
+
+        parseMapperLocations(resolver, mapperResources, mapperLocations);
+
+        if (mapperLocationProviders != null) {
+            for (IMapperLocationProvider mapperLocationProvider : mapperLocationProviders) {
+                parseMapperLocations(resolver, mapperResources, mapperLocationProvider.getMapperLocations());
+            }
+        }
+
+        return mapperResources.isEmpty()
+            ? null
+            : ArrayUtil.toArray(mapperResources, org.springframework.core.io.Resource.class);
+    }
+
+    private void parseMapperLocations(ResourcePatternResolver resolver,
+                                      List<org.springframework.core.io.Resource> mapperResources,
+                                      List<String> mapperLocations) throws IOException {
+        if (CollUtil.isEmpty(mapperLocations)) {
+            return;
+        }
+
         for (String mapperLocation : mapperLocations) {
+            if (StrUtil.isBlank(mapperLocation)) {
+                continue;
+            }
+
             org.springframework.core.io.Resource[] resources = resolver.getResources(mapperLocation);
             mapperResources.addAll(CollUtil.toList(resources));
         }
+    }
 
+    @Bean
+    public SqlSessionFactory sqlSessionFactory(GlobalConfig globalConfig) throws Exception {
         MybatisSqlSessionFactoryBean sqlSessionFactory = new MybatisSqlSessionFactoryBean();
         sqlSessionFactory.setDataSource(dataSource);
-        sqlSessionFactory.setMapperLocations(ArrayUtil.toArray(mapperResources, org.springframework.core.io.Resource.class));
+        sqlSessionFactory.setMapperLocations(getMapperLocationsResources());
         sqlSessionFactory.setTypeEnumsPackage("vip.isass.**");
 
         MybatisConfiguration configuration = new MybatisConfiguration();
