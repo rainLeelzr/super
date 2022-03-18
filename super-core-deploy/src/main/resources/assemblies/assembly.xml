@@ -243,7 +243,7 @@
 
         <!-- 把项目中 config 目录的文件复制到压缩包中 -->
         <fileSet>
-            <directory>${project.build.outputDirectory}/externalConfig</directory>
+            <directory>${project.build.outputDirectory}/config</directory>
             <outputDirectory>${project.artifactId}/deploy/config</outputDirectory>
         </fileSet>
 
