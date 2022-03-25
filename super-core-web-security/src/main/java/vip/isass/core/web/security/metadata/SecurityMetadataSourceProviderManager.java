@@ -189,7 +189,9 @@ public class SecurityMetadataSourceProviderManager {
     private WebSecurityConfig webSecurityConfig;
 
     public Collection<String> findRoleCodesByUserId(String userId) {
-        return FunctionUtil.getFirstNotNullValueFromCollection(providers, service -> service.findRoleCodesByUserId(userId));
+        return webSecurityConfig.getUrlAccessSecurityStrategy() == UrlAccessSecurityStrategy.ROLE
+            ? FunctionUtil.getFirstNotNullValueFromCollection(providers, service -> service.findRoleCodesByUserId(userId))
+            : Collections.emptyList();
     }
 
     public Collection<String> findRoleCodesByUri(String uri) {
