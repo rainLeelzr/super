@@ -173,10 +173,12 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -402,11 +404,26 @@ public abstract class V2MybatisPlusRepository<
 
         UpdateWrapper<EDB> updateWrapper = new UpdateWrapper<EDB>()
             .eq(idEntity.getIdColumnName(), idEntity.getId());
-
         EDB edb = V2DbEntityConvert.convertToDbEntity(entity);
+
+        Class<EDB> edbClass = currentModelClass();
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(edbClass);
+        Map<String, Object> map = BeanUtil.beanToMap(entity);
+        for (TableFieldInfo tableFieldInfo : tableInfo.getFieldList()) {
+            Object value = map.get(tableFieldInfo.getProperty());
+            if (value != null) {
+                continue;
+            }
+
+            FieldFill fieldFill = tableFieldInfo.getFieldFill();
+            if (fieldFill != FieldFill.DEFAULT) {
+                continue;
+            }
+            updateWrapper.set(tableFieldInfo.getColumn(), null);
+        }
+
         // updateByWrapper不能走填充策略，只有entity才能填充
         // 参考连接 https://www.shangmayuan.com/a/3a4189a6a4424846aa96eb61.html
-
         return super.update(edb, updateWrapper);
     }
 
@@ -535,9 +552,9 @@ public abstract class V2MybatisPlusRepository<
                 i -> !SensitiveDataProperty.PROPERTIES.contains(i.getProperty()));
         }
         return this.page(
-            new Page<EDB>(page.getCurrent(), page.getSize(), page.isSearchCount())
-                .setOptimizeCountSql(page.optimizeCountSql()),
-            wrapper)
+                new Page<EDB>(page.getCurrent(), page.getSize(), page.isSearchCount())
+                    .setOptimizeCountSql(page.optimizeCountSql()),
+                wrapper)
             .convert(V2DbEntityConvert::convertToEntity);
     }
 
