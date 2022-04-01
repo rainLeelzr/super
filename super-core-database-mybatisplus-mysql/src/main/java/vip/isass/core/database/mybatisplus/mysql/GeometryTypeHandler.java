@@ -167,7 +167,7 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.typehandler;
+package vip.isass.core.database.mybatisplus.mysql;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
