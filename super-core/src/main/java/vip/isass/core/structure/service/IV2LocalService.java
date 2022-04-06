@@ -174,7 +174,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vip.isass.core.exception.AbsentException;
-import vip.isass.core.exception.AlreadyPresentException;
 import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.type.IV2WhereConditionCriteria;
 import vip.isass.core.structure.entity.IV2Entity;
@@ -236,7 +235,7 @@ public interface IV2LocalService<
         if (getRepository().addIfAbsentByColumns(entity, uniqueColumns)) {
             return entity;
         }
-        throw new AlreadyPresentException("添加失败，记录已存在");
+        return null;
     }
 
     @Override
