@@ -230,7 +230,7 @@ public class V2${entity} implements
     @Override
     @Transient
     public String getIdColumnName() {
-        return ${idEntityColumnName?upper_case};
+        return ${idEntityColumnName?upper_case}_COLUMN_NAME;
     }
 
 </#if>
