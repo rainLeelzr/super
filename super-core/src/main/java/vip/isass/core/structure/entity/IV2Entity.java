@@ -173,6 +173,7 @@ import cn.hutool.core.util.RandomUtil;
 import vip.isass.core.support.LocalDateTimeUtil;
 import vip.isass.core.support.SystemClock;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -182,7 +183,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * @author Rain
  */
-public interface IV2Entity<E extends IV2Entity<E>> {
+public interface IV2Entity<E extends IV2Entity<E>> extends Serializable {
 
     long serialVersionUID = 1L;
 
