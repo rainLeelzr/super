@@ -171,6 +171,7 @@ package vip.isass.core.support;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -247,6 +248,15 @@ public class JsonUtil {
         // 禁用科学计数法
         .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
 
+        // 允许使用注释
+        .configure(JsonParser.Feature.ALLOW_COMMENTS,true)
+
+        // 允许字段名没有引号
+        .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+
+        // 允许单引号
+        .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+
         .registerModule(simpleModule);
 
     public static final ObjectMapper NOT_NULL_INSTANCE = new ObjectMapper()
@@ -261,6 +271,15 @@ public class JsonUtil {
 
         // 禁用科学计数法
         .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
+
+        // 允许使用注释
+        .configure(JsonParser.Feature.ALLOW_COMMENTS,true)
+
+        // 允许字段名没有引号
+        .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+
+        // 允许单引号
+        .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
 
         // 只输出非 null 字段
         .setSerializationInclusion(JsonInclude.Include.NON_NULL)
