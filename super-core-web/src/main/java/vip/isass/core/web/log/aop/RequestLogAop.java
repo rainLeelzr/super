@@ -224,9 +224,13 @@ import java.util.Optional;
 @ConditionalOnProperty(value = "core.web.log.request-log.enable", havingValue = "true", matchIfMissing = true)
 public class RequestLogAop {
 
-    private static final int LENGTH_LIMIT = 5000;
-
     private static final int REQUEST_PARAM_LENGTH_LIMIT = 512;
+
+    private static final int RESPONSE_CONTENT_LENGTH_LIMIT = 512;
+
+    private static final int EXCEPTION_MESSAGE_LENGTH_LIMIT = 255;
+
+    private static final int EXCEPTION_DETAIL_LENGTH_LIMIT = 5000;
 
     @Value("${spring.application.name:unknown}")
     private String appName;
@@ -285,7 +289,7 @@ public class RequestLogAop {
             Object proceed = pjp.proceed();
             requestLog.setResponseContent(proceed == null
                 ? null
-                : StrUtil.subPre(ObjectUtil.toString(proceed), LENGTH_LIMIT));
+                : StrUtil.subPre(ObjectUtil.toString(proceed), RESPONSE_CONTENT_LENGTH_LIMIT));
             return proceed;
         } catch (Throwable throwable) {
             fillWithException(requestLog, throwable);
@@ -342,8 +346,8 @@ public class RequestLogAop {
 
     private void fillWithException(RequestLog requestLog, Throwable throwable) {
         Throwable t = ExceptionUtil.unwrap(throwable);
-        requestLog.setExceptionMessage(t.toString())
-            .setExceptionDetail(StrUtil.subPre(ExceptionUtil.stacktraceToString(t), LENGTH_LIMIT));
+        requestLog.setExceptionMessage(StrUtil.subPre(t.getMessage(), EXCEPTION_MESSAGE_LENGTH_LIMIT))
+            .setExceptionDetail(StrUtil.subPre(ExceptionUtil.stacktraceToString(t), EXCEPTION_DETAIL_LENGTH_LIMIT));
     }
 
     private void fillWithResponse(RequestLog requestLog, HttpServletResponse response) {
