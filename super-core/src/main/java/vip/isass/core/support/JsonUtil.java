@@ -172,7 +172,6 @@ package vip.isass.core.support;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -183,6 +182,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.NumberSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer;
+import lombok.SneakyThrows;
 import vip.isass.core.entity.Json;
 import vip.isass.core.support.json.DefaultJson;
 import vip.isass.core.support.json.LocalDateTimeToLongConvert;
@@ -320,11 +320,13 @@ public class JsonUtil {
         return list;
     }
 
-    public static Map<String, Object> readMap(String json) throws JsonProcessingException {
+    @SneakyThrows
+    public static Map<String, Object> readMap(String json) {
         return DEFAULT_INSTANCE.readValue(json, MAP_TYPE_REFERENCE);
     }
 
-    public static List<Map<String, Object>> readListMap(String json) throws JsonProcessingException {
+    @SneakyThrows
+    public static List<Map<String, Object>> readListMap(String json) {
         return DEFAULT_INSTANCE.readValue(json, LIST_MAP_TYPE_REFERENCE);
     }
 
