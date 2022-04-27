@@ -170,15 +170,23 @@
 package vip.isass.core.support;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.lang.tree.parser.NodeParser;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import vip.isass.core.entity.ChildrenEntity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -244,6 +252,93 @@ public class TreeEntityUtil {
                                                                              Function<Tree<TE>, R> treeNodeToChildrenEntity) {
 
         return convertToTree(entities, parentId, TreeNodeConfig.DEFAULT_CONFIG, entityToTreeNode, treeNodeToChildrenEntity);
+    }
+
+    /**
+     * 将 entityList 转为树形结构
+     *
+     * @param entityList         要转换的实体列表
+     * @param idFieldName        id字段名
+     * @param parentIdFieldName  parentId 字段名
+     * @param childrenFieldName  children 字段名
+     * @param topLevelIdValueArr 顶层实体的 id,当顶层实体的parentId不是 null 或空时，可以传此值指定顶级实体的 id，提高解析性能
+     * @param <T>                实体类型
+     * @return 树形结果
+     */
+    public static <T> List<T> convert(List<T> entityList,
+                                      String idFieldName,
+                                      String parentIdFieldName,
+                                      String childrenFieldName,
+                                      String... topLevelIdValueArr) {
+        if (CollUtil.isEmpty(entityList)) {
+            return Collections.emptyList();
+        }
+
+        Assert.notBlank(idFieldName, "idFileName 必填");
+        Assert.notBlank(parentIdFieldName, "parentIdFieldName 必填");
+        Assert.notBlank(childrenFieldName, "childrenFieldName 必填");
+        List<String> topLevelIdValues = ArrayUtil.isEmpty(topLevelIdValueArr)
+            ? Collections.emptyList()
+            : Arrays.asList(topLevelIdValueArr);
+
+        // 用于保存当前 id 索引的实体类
+        Map<String, T> entityMap = MapUtil.newHashMap(entityList.size());
+
+        // 暂存区, 用于保存没有找到父 id 的控件
+        List<T> tempList = new ArrayList<>();
+
+        List<T> result = new ArrayList<>();
+
+        for (T entity : entityList) {
+            String id = Optional.ofNullable(ReflectUtil.getFieldValue(entity, idFieldName)).map(Object::toString).orElse("");
+            Assert.notBlank(id, "存在主键为空的实体");
+            entityMap.put(id, entity);
+
+            String parentId = Optional.ofNullable(ReflectUtil.getFieldValue(entity, parentIdFieldName)).map(Object::toString).orElse("");
+            if (StrUtil.isBlank(parentId) || topLevelIdValues.contains(id)) {
+                // 如果父 id 为空, 或者 topLevelIdValues 包含 id， 则实体类为第一层
+                result.add(entity);
+            } else {
+                // 查找父类实体
+                T parentEntity = entityMap.get(parentId);
+                if (parentEntity == null) {
+                    // 没找到父类，先放入暂存区
+                    tempList.add(entity);
+                } else {
+                    // 把实体放到父类的 childrenList
+                    setChildrenValue(parentEntity, childrenFieldName, entity);
+                }
+            }
+        }
+
+        // 处理暂存区，找到其父类
+        for (T entity : tempList) {
+            // 获取 parentId
+            String parentId = Optional.ofNullable(ReflectUtil.getFieldValue(entity, parentIdFieldName)).map(Object::toString).orElse("");
+
+            // 根据父id获取实体类
+            T parentEntity = entityMap.get(parentId);
+            if (parentEntity == null) {
+                result.add(entity);
+            } else {
+                // 把实体放到父类的 childrenList
+                setChildrenValue(parentEntity, childrenFieldName, entity);
+            }
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> void setChildrenValue(T parentEntity, String childrenFieldName, T entity) {
+        Object children = ReflectUtil.getFieldValue(parentEntity, childrenFieldName);
+        List<T> childrenList;
+        if (children == null) {
+            childrenList = new ArrayList<>();
+            ReflectUtil.setFieldValue(parentEntity, childrenFieldName, childrenList);
+        } else {
+            childrenList = (List<T>) children;
+        }
+        childrenList.add(entity);
     }
 
 }
