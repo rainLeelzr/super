@@ -336,6 +336,11 @@ public class JsonUtil {
     }
 
     @SneakyThrows
+    public static <T> T readValue(String json, Class<T> clazz) {
+        return (T) NOT_NULL_INSTANCE.readValue(json, clazz);
+    }
+
+    @SneakyThrows
     public static String writeValue(Object object) {
         return DEFAULT_INSTANCE.writeValueAsString(object);
     }

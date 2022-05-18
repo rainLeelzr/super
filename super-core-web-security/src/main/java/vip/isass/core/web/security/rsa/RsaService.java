@@ -1,42 +1,67 @@
 package vip.isass.core.web.security.rsa;
 
+import cn.hutool.cache.Cache;
+import cn.hutool.cache.CacheUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
 public class RsaService {
 
-    // todo 现在只有一个 id 为 PUBLIC 的秘钥对，优化成可按时间过期的的方式来动态变更秘钥对，方式长期使用同样的秘钥对
-    // todo 秘钥对可放到 redis, 实现分布式加解密。需注意 redis 本身的安全访问，不能对外暴露，避免秘钥泄露
-    // 通过 id 来分组，实现不同业务可用不同的秘钥对
-    private static final Map<String, RsaKey> KEY_MAP = new ConcurrentHashMap<>();
+    private static final String RSA_REDIS_KEY = "auth:rsa:{id}";
 
     // 共用的 id，使用共用的密码对
     private static final String DEFAULT_ID = "PUBLIC";
+
+    @Resource
+    private RedisTemplate<String, Map<String, String>> redisTemplate;
+
+    private Cache<String, RsaKey> rsaCache = CacheUtil.newLRUCache(50, TimeUnit.DAYS.toMillis(1));
 
     /**
      * 根据 id 加载秘钥对象，不存在则创建一个并缓存
      */
     private RsaKey loadKey(String id) {
-        if (StrUtil.isBlank(id)) {
-            id = DEFAULT_ID;
-        }
-        return KEY_MAP.computeIfAbsent(id, i -> {
-            RSA rsa = SecureUtil.rsa();
-            return RsaKey.builder()
-                .rsa(rsa)
-                .publicKeyStr(rsa.getPublicKeyBase64())
-                .privateKeyStr(rsa.getPrivateKeyBase64())
-                .build();
+        final String rsaKeyId = StrUtil.isBlank(id) ? DEFAULT_ID : id;
+        return rsaCache.get(rsaKeyId, () -> {
+            String key = RSA_REDIS_KEY.replace("{id}", rsaKeyId);
+            Map<String, String> rsaKeyMap = redisTemplate.opsForValue().get(key);
+            RsaKey rsaKey;
+            if (MapUtil.isEmpty(rsaKeyMap)) {
+                RSA rsa = SecureUtil.rsa();
+                rsaKey = RsaKey.builder()
+                    .rsa(rsa)
+                    .privateKeyStr(rsa.getPrivateKeyBase64())
+                    .publicKeyStr(rsa.getPublicKeyBase64())
+                    .build();
+                redisTemplate.opsForValue().set(
+                    key,
+                    MapUtil.<String, String>builder()
+                        .put("privateKeyStr", rsaKey.getPrivateKeyStr())
+                        .put("publicKeyStr", rsaKey.getPublicKeyStr())
+                        .build());
+            } else {
+                String privateKeyStr = MapUtil.getStr(rsaKeyMap, "privateKeyStr");
+                String publicKeyStr = MapUtil.getStr(rsaKeyMap, "publicKeyStr");
+                rsaKey = RsaKey.builder()
+                    .rsa(SecureUtil.rsa(privateKeyStr, publicKeyStr))
+                    .privateKeyStr(privateKeyStr)
+                    .publicKeyStr(publicKeyStr)
+                    .build();
+            }
+            return rsaKey;
         });
     }
 
