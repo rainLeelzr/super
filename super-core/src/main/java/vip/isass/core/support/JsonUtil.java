@@ -249,7 +249,7 @@ public class JsonUtil {
         .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
 
         // 允许使用注释
-        .configure(JsonParser.Feature.ALLOW_COMMENTS,true)
+        .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
 
         // 允许字段名没有引号
         .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
@@ -273,7 +273,7 @@ public class JsonUtil {
         .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
 
         // 允许使用注释
-        .configure(JsonParser.Feature.ALLOW_COMMENTS,true)
+        .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
 
         // 允许字段名没有引号
         .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
@@ -328,6 +328,16 @@ public class JsonUtil {
     @SneakyThrows
     public static List<Map<String, Object>> readListMap(String json) {
         return DEFAULT_INSTANCE.readValue(json, LIST_MAP_TYPE_REFERENCE);
+    }
+
+    @SneakyThrows
+    public static <T> T readValue(String json, TypeReference<T> tTypeReference) {
+        return (T) DEFAULT_INSTANCE.readValue(json, tTypeReference);
+    }
+
+    @SneakyThrows
+    public static String writeValue(Object object) {
+        return DEFAULT_INSTANCE.writeValueAsString(object);
     }
 
 }
