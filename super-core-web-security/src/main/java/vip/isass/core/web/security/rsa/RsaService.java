@@ -89,11 +89,7 @@ public class RsaService {
     public String decrypt(String id, String cipherText) {
         Assert.notBlank(cipherText, "cipherText 必填");
         try {
-            return SecureUtil
-                .rsa(
-                    loadKey(id).getRsa().getPrivateKey().getEncoded(),
-                    null)
-                .decryptStr(cipherText, KeyType.PrivateKey);
+            return loadKey(id).getRsa().decryptStr(cipherText, KeyType.PrivateKey);
         } catch (Exception e) {
             throw new RuntimeException("无法解密密文，密文格式错误或秘钥不匹配");
         }
