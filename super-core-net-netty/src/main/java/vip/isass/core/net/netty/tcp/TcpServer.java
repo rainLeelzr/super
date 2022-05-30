@@ -180,11 +180,10 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
 import vip.isass.core.net.netty.channel.ChannelInitializerHandler;
-import vip.isass.core.net.end.Server;
+import vip.isass.core.net.server.Server;
 
 import javax.annotation.Resource;
 import java.util.concurrent.ExecutorService;
@@ -195,13 +194,14 @@ import java.util.concurrent.Executors;
  * @author Rain
  */
 @Slf4j
-@Component
-public class TcpServer implements ApplicationListener<ContextRefreshedEvent>, Server {
+@Configuration
+@ConditionalOnProperty(prefix = "core-net.tcp", name = "enabled", havingValue = "true")
+public class TcpServer implements Server {
 
     @Resource
-    private ChannelInitializerHandler channelInitializerHandler;
+    private TcpChannelInitializerHandler channelInitializerHandler;
 
-    @Value("${server.tcp.port:20002}")
+    @Value("${core-net.tcp.port:20002}")
     private int port;
 
     private ExecutorService executorService;
@@ -327,11 +327,6 @@ public class TcpServer implements ApplicationListener<ContextRefreshedEvent>, Se
         if (worker != null) {
             worker.shutdownGracefully();
         }
-    }
-
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        start();
     }
 
 }

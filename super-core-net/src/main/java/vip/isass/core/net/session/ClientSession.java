@@ -169,15 +169,14 @@
 
 package vip.isass.core.net.session;
 
-import vip.isass.core.net.end.Client;
+import vip.isass.core.net.server.Server;
 
 /**
  * 客户端会话，服务端接收客户端连接时，在服务端持有此会话
  *
- * @param <C>   Channel 通道，一个具体的 socket 通道。例如在 netty 中代表 netty 的 channel
- * @param <Cli> 客户端
+ * @param <svr> 服务端的具体实现类
  * @author Rain
  */
-public interface ClientSession<C, Cli extends Client<C>> extends Session<C, Cli> {
+public interface ClientSession<svr extends Server> extends Session<svr> {
 
 }

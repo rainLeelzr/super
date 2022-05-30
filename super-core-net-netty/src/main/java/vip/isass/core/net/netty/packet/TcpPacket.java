@@ -169,12 +169,12 @@
 
 package vip.isass.core.net.netty.packet;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
-import vip.isass.core.net.message.MessageType;
-import vip.isass.core.net.message.Packet;
 
 /**
  * tcp 数据包
@@ -184,17 +184,19 @@ import vip.isass.core.net.message.Packet;
 @Getter
 @Setter
 @ToString
-@Accessors(chain = true)
-public class TcpPacket implements Packet {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TcpPacket implements IPacket {
 
     Integer fullLength;
 
-    Integer type;
-
     Integer serializeMode;
 
-    Object content;
+    Integer cmdLength;
 
-    MessageType messageType;
+    String cmd;
+
+    Object payload;
 
 }

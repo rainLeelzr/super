@@ -172,12 +172,12 @@ package vip.isass.core.net.netty.request.handler;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessage;
 import com.googlecode.protobuf.format.JsonFormat;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -188,9 +188,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+import vip.isass.core.net.message.MessageCmd;
 import vip.isass.core.net.netty.config.NetProperties;
-import vip.isass.core.net.message.MessageType;
-import vip.isass.core.net.message.Packet;
+import vip.isass.core.net.netty.packet.IPacket;
+import vip.isass.core.net.netty.packet.TcpPacket;
 import vip.isass.core.net.netty.packet.impl.HttpContent;
 import vip.isass.core.net.netty.request.Request;
 import vip.isass.core.protobuf.Base;
@@ -230,31 +231,25 @@ public class DefaultHttpRequestHandler implements RequestHandler {
     @Resource
     private RestTemplate restTemplate;
 
-    @Value("${server.gateway.http.serverName}")
-    private String httpGatewayServerName;
-
     @Override
     public void handle(Request request) {
-        Packet packet = request.getPacket();
-        switch (packet.getMessageType()) {
-            case PING:
-            case PONG:
-            case LOGIN:
-                break;
-            case MESSAGE:
-                handelProtocolExchangeHttp(request);
-                break;
-            case ERROR:
+        TcpPacket packet = (TcpPacket) request.getPacket();
+
+        switch (packet.getCmd()) {
+            case MessageCmd.PING:
+            case MessageCmd.PONG:
+            case MessageCmd.LOGIN:
+            case MessageCmd.ERROR:
                 break;
             default:
-                throw new IllegalArgumentException(StrUtil.format("未支持的包类型：[{}]", packet.getMessageType()));
+                handelProtocolExchangeHttp(request);
         }
     }
 
     @SneakyThrows
     private void handelProtocolExchangeHttp(Request request) {
-        Packet packet = request.getPacket();
-        Object content = packet.getContent();
+        IPacket packet = request.getPacket();
+        Object content = packet.getPayload();
 
         // 反序列化HttpContent
         HttpContent httpContent;
@@ -268,7 +263,7 @@ public class DefaultHttpRequestHandler implements RequestHandler {
                     String str = new String((byte[]) content, UTF_8);
                     httpContent = JsonUtil.DEFAULT_INSTANCE.readValue((byte[]) content, HttpContent.class);
                 } else {
-                    httpContent = JsonUtil.DEFAULT_INSTANCE.convertValue(packet.getContent(), HttpContent.class);
+                    httpContent = JsonUtil.DEFAULT_INSTANCE.convertValue(packet.getPayload(), HttpContent.class);
                 }
                 break;
             case PROTOBUF2:
@@ -292,16 +287,16 @@ public class DefaultHttpRequestHandler implements RequestHandler {
                 throw new UnsupportedOperationException("未支持的序列化方式：" + serializeMode);
         }
 
-        packet.setContent(httpContent);
+        packet.setPayload(httpContent);
 
         // 获取请求url
         String url = httpContent.getUrl();
 
         if (StrUtil.isBlank(url)) {
             log.error("请求的url字符串为空，跳过请求！");
-            packet.setMessageType(MessageType.ERROR);
+            packet.setCmd(MessageCmd.ERROR);
             packet.setSerializeMode(SerializeMode.JSON.getCode());
-            packet.setContent("发起的http请求的url不能空");
+            packet.setPayload("发起的http请求的url不能空");
             request.sendResponse(packet);
             return;
         }
@@ -315,14 +310,14 @@ public class DefaultHttpRequestHandler implements RequestHandler {
                 body = "";
             } else if (body.length() < 2) {
                 body = "\"" + body + "\"";
-            } else if (!isJson(body)) {
+            } else if (!JSONUtil.isJson(body)) {
                 body = "\"" + body + "\"";
             }
             log.debug("http网关执行结果：{}", resp);
 
             if (serializeMode == SerializeMode.JSON) {
                 httpContent.setBody(body);
-                packet.setContent(httpContent);
+                packet.setPayload(httpContent);
             } else if (serializeMode == SerializeMode.PROTOBUF2) {
                 Method method = ProtobufMethodCache.BUILDER_METHOD_CACHE.get(javaProtobufClassS2C);
                 GeneratedMessage.Builder builder = (GeneratedMessage.Builder) method.invoke(method.getDeclaringClass());
@@ -338,13 +333,13 @@ public class DefaultHttpRequestHandler implements RequestHandler {
                         (k, v) -> contentBuilder.addHttpHeaders(Base.StringEntry.newBuilder().setKey(k).setValue(v))
                     );
                 }
-                packet.setContent(contentBuilder.build());
+                packet.setPayload(contentBuilder.build());
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            packet.setMessageType(MessageType.ERROR);
+            packet.setCmd(MessageCmd.ERROR);
             packet.setSerializeMode(SerializeMode.JSON.getCode());
-            packet.setContent(e.getMessage());
+            packet.setPayload(e.getMessage());
         }
 
         // 推送结果给客户端
@@ -388,16 +383,6 @@ public class DefaultHttpRequestHandler implements RequestHandler {
                 throw new UnsupportedOperationException("不支持的HttpMethodEnum值：[+" + httpMethod + "]");
         }
         return resp;
-    }
-
-    private boolean isJson(String str) {
-        if (str.startsWith("{") && str.endsWith("}")) {
-            return true;
-        }
-        if (str.startsWith("[") && str.endsWith("]")) {
-            return true;
-        }
-        return false;
     }
 
     private HttpHeaders getHttpHeaders(HttpContent httpContent) {

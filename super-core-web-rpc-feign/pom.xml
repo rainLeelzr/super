@@ -176,12 +176,12 @@
     <parent>
         <groupId>vip.isass</groupId>
         <artifactId>super</artifactId>
-        <version>super.3.2.1-SNAPSHOT</version>
+        <version>super.3.3.0-SNAPSHOT</version>
     </parent>
 
     <!-- 本项目信息 -->
     <artifactId>super-core-web-rpc-feign</artifactId>
-    <version>super.3.2.1-SNAPSHOT</version>
+    <version>super.3.3.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -209,25 +209,4 @@
             <artifactId>feign-form-spring</artifactId>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>alimaven</id>
-            <name>aliyun maven</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-        </repository>
-
-        <repository>
-            <id>center-snapshots</id>
-            <name>center-snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-
-        <repository>
-            <id>center</id>
-            <name>center</name>
-            <url>https://repo.maven.apache.org/maven2</url>
-        </repository>
-    </repositories>
-
 </project>

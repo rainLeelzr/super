@@ -172,24 +172,35 @@ package vip.isass.core.net.socketio;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import vip.isass.core.net.handler.manager.EventManager;
+import vip.isass.core.net.session.Session;
+import vip.isass.core.net.session.SessionManager;
 
 import javax.annotation.Resource;
 
+/**
+ * socketIo 断开连接事件监听器
+ *
+ * @author rain
+ */
 @Slf4j
 @Component
-public class OnDisconnectListener {
+public class OnSocketIoDisconnectListener {
 
     @Resource
-    private SocketIoServer socketIoServer;
+    private SessionManager sessionManager;
+
+    @Autowired
+    private EventManager eventManager;
 
     @OnDisconnect
     public void onDisconnect(SocketIOClient client) {
-        Object userId = client.get(OnLoginListener.USER_ID);
-        if (userId != null) {
-            SocketIoServer.CLIENT_BY_USER_ID.remove(userId);
-        }
-        log.info("用户[{}]断开链接", userId);
+        Session<?> session = sessionManager.getSessionById(
+            SocketIoServer.class,
+            client.getSessionId().toString());
+        eventManager.onDisconnect(session);
     }
 
 }

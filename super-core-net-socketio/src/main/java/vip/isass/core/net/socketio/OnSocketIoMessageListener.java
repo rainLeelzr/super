@@ -167,75 +167,54 @@
  *
  */
 
-package vip.isass.core.net.message;
+package vip.isass.core.net.socketio;
+
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import vip.isass.core.net.handler.OnMessageEventHandler;
+import vip.isass.core.net.handler.manager.EventManager;
+import vip.isass.core.net.session.SessionManager;
+
+import java.util.List;
 
 /**
- * 数据包
+ * socketIo 消息事件监听器
  *
- * @author Rain
+ * @author rain
  */
-public interface Packet {
+@Component
+public class OnSocketIoMessageListener implements InitializingBean {
 
-    /**
-     * 一个完整数据包的长度
-     *
-     * @return 数据包长度
-     */
-    Integer getFullLength();
+    @Autowired(required = false)
+    private SocketIoServer socketIoServer;
 
-    /**
-     * 设置数据包长度
-     *
-     * @param fullLength 长度
-     * @return 数据包
-     */
-    Packet setFullLength(Integer fullLength);
+    @Autowired
+    private SessionManager sessionManager;
 
-    /**
-     * 获取消息类型
-     *
-     * @return 消息类型
-     * @see MessageType
-     */
-    MessageType getMessageType();
+    @Autowired(required = false)
+    private List<OnMessageEventHandler<?>> onRouteMessageEventHandlers;
 
-    /**
-     * 设置消息类型
-     *
-     * @param messageType 消息类型
-     * @return 数据包
-     */
-    Packet setMessageType(MessageType messageType);
+    @Autowired
+    private EventManager eventManager;
 
-    /**
-     * body 的序列化方式
-     *
-     * @return serialize mode
-     * @see vip.isass.core.serialization.SerializeMode
-     */
-    Integer getSerializeMode();
+    public void addMessageListener() {
+        if (onRouteMessageEventHandlers == null || socketIoServer == null) {
+            return;
+        }
+        for (OnMessageEventHandler<?> handler : onRouteMessageEventHandlers) {
+            socketIoServer.getSocketIoServer().addEventListener(
+                handler.getCmd(),
+                Object.class,
+                (client, data, ackSender) -> eventManager.onMessage(
+                    sessionManager.getSessionById(SocketIoServer.class, client.getSessionId().toString()),
+                    handler.getCmd(),
+                    data));
+        }
+    }
 
-    /**
-     * 设置序列化模式
-     *
-     * @param serializeMode 序列化模式
-     * @return 数据包
-     */
-    Packet setSerializeMode(Integer serializeMode);
-
-    /**
-     * 获取消息体
-     *
-     * @return 消息体
-     */
-    Object getContent();
-
-    /**
-     * 设置消息体
-     *
-     * @param content 消息体
-     * @return 数据包
-     */
-    Packet setContent(Object content);
-
+    @Override
+    public void afterPropertiesSet() {
+        addMessageListener();
+    }
 }

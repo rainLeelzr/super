@@ -169,18 +169,18 @@
 
 package vip.isass.core.net.netty.tcp;
 
-import vip.isass.core.net.netty.channel.ChannelEventHandler;
-import vip.isass.core.net.netty.channel.ChannelInitializerHandler;
-import vip.isass.core.net.netty.packet.Decoder;
-import vip.isass.core.net.netty.packet.Encoder;
-import vip.isass.core.net.netty.packet.impl.coder.IsassBinaryPacketDecoder;
-import vip.isass.core.support.SpringContextUtil;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import vip.isass.core.net.netty.channel.ChannelEventHandler;
+import vip.isass.core.net.netty.channel.ChannelInitializerHandler;
+import vip.isass.core.net.netty.packet.Decoder;
+import vip.isass.core.net.netty.packet.Encoder;
+import vip.isass.core.net.netty.packet.impl.coder.IsassBinaryPacketDecoder;
+import vip.isass.core.support.SpringContextUtil;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
@@ -191,7 +191,7 @@ import java.util.concurrent.TimeUnit;
  * @author Rain
  */
 @ConditionalOnMissingBean(ChannelInitializerHandler.class)
-public class TcpChannelInitializerHandler extends ChannelInitializerHandler<SocketChannel> {
+public class TcpChannelInitializerHandler extends ChannelInitializerHandler {
 
     @Getter
     @Value("${tcp.server.socket.timeout:120000}")
@@ -209,8 +209,8 @@ public class TcpChannelInitializerHandler extends ChannelInitializerHandler<Sock
 
         // 设置tcp链路空闲超时时间
         pipeline.addLast(
-                "idleStateHandler",
-                new IdleStateHandler(0, 0, timeout, TimeUnit.MILLISECONDS));
+            "idleStateHandler",
+            new IdleStateHandler(0, 0, timeout, TimeUnit.MILLISECONDS));
 
         // 添加解码器
         Decoder decoder = SpringContextUtil.isInitialized() ? SpringContextUtil.getBean(Decoder.class) : new IsassBinaryPacketDecoder();

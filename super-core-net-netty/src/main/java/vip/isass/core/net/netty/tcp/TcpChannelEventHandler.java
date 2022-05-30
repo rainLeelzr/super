@@ -170,7 +170,7 @@
 package vip.isass.core.net.netty.tcp;
 
 import vip.isass.core.net.netty.channel.ChannelEventHandler;
-import vip.isass.core.net.message.Packet;
+import vip.isass.core.net.netty.packet.TcpPacket;
 import vip.isass.core.net.netty.request.Request;
 import vip.isass.core.net.netty.request.RequestManager;
 import vip.isass.core.net.session.SessionManager;
@@ -223,7 +223,7 @@ public class TcpChannelEventHandler extends ChannelInboundHandlerAdapter impleme
      */
     @Override
     public void channelRead(ChannelHandlerContext cx, Object object) {
-        channelRead1(cx, (Packet) object, Request.Protocol.TCP);
+        channelRead1(cx, (TcpPacket) object, Request.Protocol.TCP);
     }
 
     @Override

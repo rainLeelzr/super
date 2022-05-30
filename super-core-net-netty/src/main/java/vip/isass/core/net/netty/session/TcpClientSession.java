@@ -167,48 +167,118 @@
  *
  */
 
-package vip.isass.core.web.security.authentication.jwt;
+package vip.isass.core.net.netty.session;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import cn.hutool.core.lang.Assert;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.DefaultChannelPromise;
+import io.netty.util.concurrent.GenericFutureListener;
+import lombok.extern.slf4j.Slf4j;
+import vip.isass.core.net.netty.packet.TcpPacket;
+import vip.isass.core.net.netty.tcp.TcpServer;
+import vip.isass.core.net.session.ClientSession;
+import vip.isass.core.support.SystemClock;
 
 /**
+ * tcp 客户端会话
+ *
  * @author Rain
  */
-@Getter
-@Setter
-@Accessors(chain = true)
-public class JwtClaim {
-
-    public static final String USER_ID = "uid";
-
-    public static final String NICK_NAME = "name";
-
-    public static final String FROM = "fr";
-
-    public static final String VERSION = "v";
+@Slf4j
+public class TcpClientSession implements ClientSession<TcpServer> {
 
     /**
-     * 用户 id
+     * 与客户端的链接通道
      */
-    private String uid;
+    private Channel channel;
 
     /**
-     * 用户昵称
+     * 创建session的时间
      */
-    private String name;
+    private Long createTime;
+
+    private TcpClientSession() {
+    }
+
+    public TcpClientSession(Channel channel) {
+        Assert.notNull(channel, "channel不能为null");
+        this.channel = channel;
+        this.createTime = SystemClock.now();
+    }
+
+    @Override
+    public boolean isActive() {
+        return channel.isActive();
+    }
+
+    @Override
+    public void close() {
+        if (channel == null) {
+            return;
+        }
+        channel.close();
+    }
+
+    @Override
+    public String getRemoteIp() {
+        return channel.remoteAddress().toString();
+    }
+
+    @Override
+    public String getRemotePort() {
+        return null;
+    }
+
+    @Override
+    public String getSessionId() {
+        return channel.id().toString();
+    }
+
+    @Override
+    public Long getCreateTime() {
+        return createTime;
+    }
 
     /**
-     * 登录渠道，从什么产品登录
+     * 原则上系统向客户端发消息，均统一调用此方法
      */
-    private String fr;
+    @Override
+    public void sendMessage(String cmd, Object payload) {
+        sendMessage(TcpPacket.builder()
+            .cmd(cmd)
+            .payload(payload)
+            .build());
+    }
 
-    /**
-     * 版本，当服务端记录对应的登录渠道的版本，大于此值时，此 token 应当失效。
-     * 当服务端无对应的登录渠道的版本记录时，此值不作为失效判断的依据。
-     * 作用：作为强制用户下线或多端登录踢下线的判断依据。
-     */
-    private Integer v;
+    public void sendMessage(TcpPacket packet) {
+        if (!isActive()) {
+            log.debug("channel is inactive, send Message fail. session info: {}", this);
+            return;
+        }
+        channel.writeAndFlush(
+            packet,
+            new DefaultChannelPromise(channel, channel.eventLoop())
+                .addListener((GenericFutureListener<ChannelFuture>) future -> {
+                    if (future.isSuccess()) {
+                        log.debug("发送给客户端[{}]成功,cmd[{}]：{}", this.getRemoteIp(), packet.getCmd(), packet.getPayload().toString());
+                    } else {
+                        log.error("发送给客户端[{}]失败。", this.getRemoteIp(), future.cause());
+                    }
+                })
+        );
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public String toString() {
+        return "TcpSession{" +
+            "channel=" + channel +
+            ", createTime=" + createTime +
+            '}';
+    }
 
 }

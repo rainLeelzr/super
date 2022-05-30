@@ -169,10 +169,6 @@
 
 package vip.isass.core.net.netty.packet.impl.coder;
 
-import vip.isass.core.net.netty.packet.Encoder;
-import vip.isass.core.net.message.Packet;
-import vip.isass.core.serialization.SerializeMode;
-import vip.isass.core.support.JsonUtil;
 import com.google.protobuf.GeneratedMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -182,6 +178,10 @@ import io.netty.util.internal.EmptyArrays;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import vip.isass.core.net.netty.packet.Encoder;
+import vip.isass.core.net.netty.packet.TcpPacket;
+import vip.isass.core.serialization.SerializeMode;
+import vip.isass.core.support.JsonUtil;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -193,30 +193,31 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 @ChannelHandler.Sharable
 @ConditionalOnMissingBean(Encoder.class)
-public class IsassBinaryPacketEncoder extends Encoder<Packet> {
+public class IsassBinaryPacketEncoder extends Encoder<TcpPacket> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf out) {
+    protected void encode(ChannelHandlerContext ctx, TcpPacket packet, ByteBuf out) {
         out.writeBytes(encode(packet));
     }
 
     @SneakyThrows
-    public static ByteBuf encode(Packet packet) {
+    public static ByteBuf encode(TcpPacket packet) {
         byte[] contentBytes;
-        Object contentObj = packet.getContent();
-        if (contentObj == null) {
+        Object payload = packet.getPayload();
+        if (payload == null) {
             contentBytes = EmptyArrays.EMPTY_BYTES;
-        } else if (contentObj instanceof byte[]) {
-            contentBytes = (byte[]) packet.getContent();
-        } else if (SerializeMode.JSON.getCode().equals(packet.getSerializeMode())) {
-            if (contentObj instanceof String) {
-                contentBytes = (((String) contentObj).getBytes(UTF_8));
+        } else if (payload instanceof byte[]) {
+            contentBytes = (byte[]) packet.getPayload();
+        } else if (SerializeMode.JSON.getCode().equals(packet.getSerializeMode())
+            || packet.getSerializeMode() == null) {
+            if (payload instanceof String) {
+                contentBytes = (((String) payload).getBytes(UTF_8));
             } else {
-                contentBytes = JsonUtil.DEFAULT_INSTANCE.writeValueAsBytes(contentObj);
+                contentBytes = JsonUtil.DEFAULT_INSTANCE.writeValueAsBytes(payload);
             }
         } else if (SerializeMode.PROTOBUF2.getCode().equals(packet.getSerializeMode())) {
-            if (contentObj instanceof GeneratedMessage) {
-                contentBytes = ((GeneratedMessage) contentObj).toByteArray();
+            if (payload instanceof GeneratedMessage) {
+                contentBytes = ((GeneratedMessage) payload).toByteArray();
             } else {
                 throw new IllegalArgumentException("序列化模式是pb, 但content不是GeneratedMessage");
             }
@@ -227,9 +228,13 @@ public class IsassBinaryPacketEncoder extends Encoder<Packet> {
         packet.setFullLength(12 + contentBytes.length);
         ByteBuf byteBuf = Unpooled.buffer()
             .writeInt(packet.getFullLength())
-            .writeInt(packet.getMessageType().getCode())
             .writeInt(packet.getSerializeMode() == null ? SerializeMode.JSON.getCode() : packet.getSerializeMode())
-            .writeBytes(contentBytes);
+            .writeInt(packet.getCmdLength());
+
+        if (packet.getCmd() != null) {
+            byteBuf.writeBytes(packet.getCmd().getBytes(UTF_8));
+        }
+        byteBuf.writeBytes(contentBytes);
         log.debug("编码后字节大小:{} 字节", byteBuf.readableBytes());
         return byteBuf;
     }

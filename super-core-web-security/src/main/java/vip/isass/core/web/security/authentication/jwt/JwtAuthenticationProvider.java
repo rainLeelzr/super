@@ -169,12 +169,8 @@
 
 package vip.isass.core.web.security.authentication.jwt;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -184,14 +180,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
-import vip.isass.core.support.LocalDateTimeUtil;
+import vip.isass.core.exception.UnifiedException;
+import vip.isass.core.exception.code.StatusMessageEnum;
+import vip.isass.core.security.jwt.JwtInfo;
+import vip.isass.core.security.jwt.JwtUtil;
 import vip.isass.core.web.security.IsassGrantedAuthority;
 import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
 
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.stream.Collectors;
 
 /**
@@ -201,7 +199,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
-    @Value("${security.jwt.secret:vpAMjyZ9JqW4QNsw}")
+    @Value("${security.jwt.secret:" + JwtUtil.DEFAULT_SECRET + "}")
     private String secret;
 
     @Resource
@@ -210,32 +208,22 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String token = (String) authentication.getCredentials();
-        Claims claims;
+
+        JwtInfo jwtInfo;
         try {
-            claims = Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
-        } catch (ExpiredJwtException e) {
-            throw new CredentialsExpiredException("token");
+            jwtInfo = JwtUtil.parse(token, secret);
+        } catch (UnifiedException e) {
+            if (StatusMessageEnum.TOKEN_EXPIRED.getStatus().equals(e.getStatus())) {
+                throw new CredentialsExpiredException(e.getMsg());
+            }
+            throw new BadCredentialsException(e.getMsg());
         } catch (Exception e) {
-            throw new BadCredentialsException(token);
+            throw new BadCredentialsException(e.getMessage());
         }
-
-        // 判断 token 是否过期
-        Date expiration = claims.getExpiration();
-        if (expiration.before(LocalDateTimeUtil.nowDate())) {
-            throw new BadCredentialsException(token);
-        }
-
-        // 判断用户id是否存在
-
-        JwtClaim jwtClaim = new JwtClaim();
-        BeanUtil.copyProperties(claims, jwtClaim);
 
         // 获取用户拥有的角色
         Collection<GrantedAuthority> configAttributes = Collections.emptyList();
-        Collection<String> roleCodes = securityMetadataSourceProviderManager.findRoleCodesByUserId(jwtClaim.getUid());
+        Collection<String> roleCodes = securityMetadataSourceProviderManager.findRoleCodesByUserId(jwtInfo.getUid());
         if (!CollUtil.isEmpty(roleCodes)) {
             configAttributes = roleCodes.stream()
                 .filter(StrUtil::isNotBlank)
@@ -243,7 +231,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
                 .collect(Collectors.toList());
         }
 
-        return new JwtAuthenticationToken(token, jwtClaim, configAttributes);
+        return new JwtAuthenticationToken(token, jwtInfo, configAttributes);
     }
 
     @Override

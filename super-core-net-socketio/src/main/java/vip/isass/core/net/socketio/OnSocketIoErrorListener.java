@@ -167,81 +167,73 @@
  *
  */
 
-package vip.isass.core.net.message;
+package vip.isass.core.net.socketio;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Getter;
+import cn.hutool.core.exceptions.ExceptionUtil;
+import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.listener.ExceptionListener;
+import io.netty.channel.ChannelHandlerContext;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import vip.isass.core.net.handler.manager.EventManager;
+import vip.isass.core.net.message.MessageCmd;
+import vip.isass.core.net.session.Session;
+import vip.isass.core.net.session.SessionManager;
+
+import java.util.List;
 
 /**
- * 消息类型
+ * socketIo 异常事件监听器
  *
- * @author Rain
+ * @author rain
  */
-public enum MessageType {
+@Slf4j
+@Component
+public class OnSocketIoErrorListener implements ExceptionListener {
 
-    PING(1, "PING"),
-    PONG(2, "PONG"),
-    LOGIN(3, "登录请求"),
-    MESSAGE(4, "业务消息"),
-    ERROR(5, "异常报错");
+    @Autowired
+    private EventManager eventManager;
 
-//    // 心跳
-//    HEART_BEAT(1),
-//
-//    // 客户端以http的格式发起请求；服务端响应请求
-//    HTTP_REQUEST(2),
-//
-//    // 服务器主动推送http格式的内容给客户端
-//    PUSH_HTTP_CONTENT(3),
-//
-//    // 设置channel通道的userId(String类型),tcp通道、websocket二进制通道：userId直接用utf-8字节数组写在content里;
-//    // websocket文本通道：json字段content即是字符串的userId
-//    SET_USER_ID(4),
-//
-//    // 服务器主动推送消息给客户端
-//    PUSH(5),
-//
-//    // 请求错误，或者服务器抛出异常，websocket文本通道：异常信息写在content里
-//    ERROR(6),
-//
-//    // 客户端请求
-//    CLIENT_REQUEST(7);
-//
+    @Autowired
+    private SessionManager sessionManager;
 
-    @EnumValue
-    private final Integer code;
-
-    @Getter
-    private final String desc;
-
-    MessageType(Integer code, String desc) {
-        this.code = code;
-        this.desc = desc;
+    @Override
+    public void onEventException(Exception e, List<Object> args, SocketIOClient client) {
+        log.error(e.getMessage(), e);
+        Throwable unwrap = ExceptionUtil.unwrap(e);
+        Session<?> session = sessionManager.getSessionById(
+            SocketIoServer.class,
+            client.getSessionId().toString());
+        session.sendMessage(MessageCmd.ERROR, "发生异常：" + unwrap.getMessage());
     }
 
-    public static MessageType parseFromCode(Integer code) {
-        for (MessageType platform : MessageType.values()) {
-            if (platform.code.equals(code)) {
-                return platform;
-            }
-        }
-        return null;
+    @Override
+    public void onDisconnectException(Exception e, SocketIOClient client) {
+        Session<?> session = sessionManager.getSessionById(
+            SocketIoServer.class,
+            client.getSessionId().toString());
+        eventManager.onError(session, e);
     }
 
-    @JsonCreator
-    public static MessageType parseFromCodeOrException(Integer code) {
-        MessageType platform = parseFromCode(code);
-        if (platform == null) {
-            throw new IllegalArgumentException("不支持的参数：MessageType.code: " + code);
-        }
-        return platform;
+    @Override
+    public void onConnectException(Exception e, SocketIOClient client) {
+        Session<?> session = sessionManager.getSessionById(
+            SocketIoServer.class,
+            client.getSessionId().toString());
+        eventManager.onError(session, e);
     }
 
-    @JsonValue
-    public Integer getCode() {
-        return code;
+    @Override
+    public void onPingException(Exception e, SocketIOClient client) {
+        Session<?> session = sessionManager.getSessionById(
+            SocketIoServer.class,
+            client.getSessionId().toString());
+        eventManager.onError(session, e);
     }
 
+    @Override
+    public boolean exceptionCaught(ChannelHandlerContext ctx, Throwable e) {
+        return true;
+    }
 }

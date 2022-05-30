@@ -171,14 +171,15 @@ package vip.isass.core.net.session;
 
 import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import vip.isass.core.net.end.End;
-import vip.isass.core.net.tag.TagManager;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
+import vip.isass.core.net.server.Server;
+import vip.isass.core.net.server.ServerNameUtil;
+import vip.isass.core.net.tag.TagHolder;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 会话管理器抽象类
@@ -186,64 +187,87 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Rain
  */
 @Slf4j
-public abstract class SessionManagerImpl<C, E extends End, S extends Session<C, E>> implements SessionManager<C, E, S> {
+@Component
+public class SessionManagerImpl implements SessionManager {
 
-    private static final Map<String, Session<?, ?>> SESSION_MAP = new ConcurrentHashMap<>(16);
+    /**
+     * key: serverName
+     * value: sessionHolder
+     */
+    private static final Map<String, SessionHolder> SESSION_HOLDER_MAP = new HashMap<>();
 
-    private static final String USER_ID_TAG_KEY = "uid";
-
-    @Autowired
-    private TagManager tagManager;
+    /**
+     * key: serverName
+     * value: tagHolder
+     */
+    private static final Map<String, TagHolder> TAG_HOLDER_MAP = new HashMap<>();
 
     @Override
-    public void addSession(S session) {
-        Assert.notNull(session, "session不能为null");
-        SESSION_MAP.put(session.getSessionId(), session);
+    public void initHolder(Server server) {
+        SESSION_HOLDER_MAP.put(
+            ClassUtils.getUserClass(server).getSimpleName(),
+            new SessionHolder());
+        TAG_HOLDER_MAP.put(
+            ClassUtils.getUserClass(server).getSimpleName(),
+            new TagHolder());
     }
 
     @Override
-    public void removeSession(S session) {
-        Assert.notNull(session, "session不能为null");
-        SESSION_MAP.remove(session.getSessionId());
-        tagManager.removeAllTags(session);
+    public void clearHolder(Server server) {
+        SESSION_HOLDER_MAP.remove(ClassUtils.getUserClass(server).getSimpleName());
+        TAG_HOLDER_MAP.remove(ClassUtils.getUserClass(server).getSimpleName());
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public S removeSessionById(String sessionId) {
-        S removeSession = (S) SESSION_MAP.remove(sessionId);
+    public Map<String, SessionHolder> getSessionHolderMap() {
+        return SESSION_HOLDER_MAP;
+    }
+
+    @Override
+    public Map<String, TagHolder> getTagHolderMap() {
+        return TAG_HOLDER_MAP;
+    }
+
+    @Override
+    public void addSession(Session<?> session) {
+        Assert.notNull(session, "session不能为null");
+        SESSION_HOLDER_MAP.get(ServerNameUtil.getServerName(session.getClass())).getSessionMap().put(session.getSessionId(), session);
+    }
+
+    @Override
+    public void removeSession(Session<?> session) {
+        Assert.notNull(session, "session不能为null");
+        SESSION_HOLDER_MAP.get(ServerNameUtil.getServerName(session.getClass())).getSessionMap().remove(session.getSessionId());
+        TAG_HOLDER_MAP.get(ServerNameUtil.getServerName(session.getClass())).removeAllTags(session);
+    }
+
+    @Override
+    public Session<?> removeSessionById(Class<? extends Server> serverClass, String sessionId) {
+        String serverTypeName = serverClass.getSimpleName();
+        Session<?> removeSession = SESSION_HOLDER_MAP
+            .get(serverTypeName)
+            .getSessionMap()
+            .remove(sessionId);
         if (removeSession != null) {
-            tagManager.removeAllTags(removeSession);
+            TAG_HOLDER_MAP.get(serverTypeName).removeAllTags(removeSession);
         }
         return removeSession;
     }
 
     @Override
-    public Collection<Session<C, E>> removeSessionsByUserId(String userId) {
-        Assert.notBlank(userId, "userId 不能为空");
-        Collection<Session<C, E>> sessions = tagManager.removeByTagPair(USER_ID_TAG_KEY, userId);
-        sessions.forEach(s -> SESSION_MAP.remove(s.getSessionId()));
-        return sessions;
+    public Session<?> getSessionById(Class<? extends Server> serverClass, String sessionId) {
+        return SESSION_HOLDER_MAP.get(serverClass.getSimpleName()).getSessionMap().get(sessionId);
     }
 
     @Override
-    public S getSessionById(String sessionId) {
-        return (S) SESSION_MAP.get(sessionId);
+    public Map<String, Session<?>> getAllSessions(Class<? extends Server> serverClass) {
+        return Collections.unmodifiableMap(SESSION_HOLDER_MAP.get(serverClass.getSimpleName()).getSessionMap());
     }
 
     @Override
-    public Collection<Session<C, E>> getSessionsByUserId(String userId) {
-        return null;
-    }
-
-    @Override
-    public List<Session<C, E>> getSessionsByUserIds(List<String> userIds) {
-        return null;
-    }
-
-    @Override
-    public Map<String, List<Session<C, E>>> getSessionMapByUserIds(List<String> userIds) {
-        return null;
+    public void addTagPair(Session<?> session, String tagKey, String tagValue) {
+        TagHolder tagHolder = TAG_HOLDER_MAP.get(ServerNameUtil.getServerName(session.getClass()));
+        tagHolder.addTagPair(session, tagKey, tagValue);
     }
 
 }

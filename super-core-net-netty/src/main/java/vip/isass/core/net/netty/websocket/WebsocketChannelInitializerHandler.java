@@ -192,7 +192,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @ConditionalOnMissingBean(ChannelInitializerHandler.class)
-public class WebsocketChannelInitializerHandler extends ChannelInitializerHandler<SocketChannel> {
+public class WebsocketChannelInitializerHandler extends ChannelInitializerHandler {
 
     /**
      * 默认4分钟
@@ -210,8 +210,8 @@ public class WebsocketChannelInitializerHandler extends ChannelInitializerHandle
 
         // 设置tcp链路空闲超时时间
         pipeline.addLast(
-                "idleStateHandler",
-                new IdleStateHandler(0, 0, timeout, TimeUnit.MILLISECONDS));
+            "idleStateHandler",
+            new IdleStateHandler(0, 0, timeout, TimeUnit.MILLISECONDS));
 
         pipeline.addLast("http-codec", new HttpServerCodec());
         pipeline.addLast("aggregator", new HttpObjectAggregator(65536));

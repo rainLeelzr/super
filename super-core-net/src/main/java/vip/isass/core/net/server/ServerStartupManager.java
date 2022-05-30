@@ -167,55 +167,60 @@
  *
  */
 
-package vip.isass.core.net.handler;
+package vip.isass.core.net.server;
 
-import vip.isass.core.net.end.End;
-import vip.isass.core.net.message.Packet;
-import vip.isass.core.net.session.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Component;
+import vip.isass.core.net.session.SessionManager;
+
+import java.util.List;
 
 /**
- * 时间处理器
+ * 服务端启动管理器
  *
- * @author Rain
+ * @author rain
  */
-public interface EventHandler<C, E extends End> {
+@Component
+public class ServerStartupManager implements SmartLifecycle {
 
-    /**
-     * 连接创建事件
-     *
-     * @param session 会话
-     */
-    void onConnect(Session<C, E> session);
+    private static boolean IS_RUNNING = false;
 
-    /**
-     * 断开连接事件
-     *
-     * @param session 会话
-     */
-    void onDisconnect(Session<C, E> session);
+    @Autowired(required = false)
+    private List<Server> servers;
 
-    /**
-     * 收到消息事件
-     *
-     * @param session 会话
-     * @param packet  数据包
-     */
-    void onMessage(Session<C, E> session, Packet packet);
+    @Autowired
+    private SessionManager sessionManager;
 
-    /**
-     * 收到路由消息事件
-     *
-     * @param session 会话
-     * @param packet  数据包
-     */
-    void onRouteMessage(Session<C, E> session, Packet packet);
+    @Override
+    public void start() {
+        if (IS_RUNNING || servers == null) {
+            return;
+        }
 
-    /**
-     * 收到错误消息事件
-     *
-     * @param session 会话
-     * @param packet  数据包
-     */
-    void onError(Session<C, E> session, Packet packet);
+        servers.stream()
+            .peek(Server::start)
+            .forEach(sessionManager::initHolder);
+
+        IS_RUNNING = true;
+    }
+
+    @Override
+    public void stop() {
+        if (servers == null) {
+            return;
+        }
+
+        servers.stream()
+            .peek(Server::stop)
+            .forEach(sessionManager::clearHolder);
+
+        IS_RUNNING = false;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return IS_RUNNING;
+    }
 
 }

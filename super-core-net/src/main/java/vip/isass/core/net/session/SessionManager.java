@@ -169,88 +169,110 @@
 
 package vip.isass.core.net.session;
 
-import org.springframework.validation.annotation.Validated;
-import vip.isass.core.net.end.End;
+import vip.isass.core.net.server.Server;
+import vip.isass.core.net.tag.TagHolder;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
- * 会话管理器，一个 Channel 对应一个 session
- * 会话管理器，只记录 channel、session、userId 的关系
- * 删除 session 时，会话管理器不会调用 channel 的 close 方法
+ * 会话管理器，记录已经建立链接的会话，上层应用使用本接口发送消息给对端
+ * 删除 session 时，会自动调用 session 的 close 方法
  *
  * @author Rain
  */
-public interface SessionManager<
-    C,
-    E extends End,
-    S extends Session<C, E>> {
+public interface SessionManager {
 
     /**
-     * 添加一个会话
+     * 初始化 holder
      *
-     * @param session session
+     * @param server 服务端
      */
-    void addSession(@Validated S session);
+    void initHolder(Server server);
+
+    /**
+     * 清除 holder
+     *
+     * @param server 服务端
+     */
+    void clearHolder(Server server);
+
+    /**
+     * 获取 SessionHolder map
+     *
+     * @return SessionHolder map
+     */
+    Map<String, SessionHolder> getSessionHolderMap();
+
+    /**
+     * 获取 TagHolder map
+     * key: serverName
+     * value: tagHolder
+     *
+     * @return TagHolder map
+     */
+    Map<String, TagHolder> getTagHolderMap();
+
+    // region session
+
+    /**
+     * 新增会话
+     *
+     * @param session 会话
+     */
+    void addSession(Session<?> session);
 
     /**
      * 删除会话
      *
-     * @param session 需要删除的会话
+     * @param session 会话
      */
-    void removeSession(S session);
+    void removeSession(Session<?> session);
 
     /**
      * 根据会话 id 删除会话
      *
-     * @param sessionId 会话 id
+     * @param serverClass 服务端实现类
+     * @param sessionId   会话 id
      * @return 被删除的会话
      */
-    S removeSessionById(String sessionId);
-
-    /**
-     * 根据用户 id 删除会话
-     *
-     * @param userId 用户 id
-     * @return 被删除的会话集合
-     */
-    Collection<Session<C, E>> removeSessionsByUserId(String userId);
+    Session<?> removeSessionById(Class<? extends Server> serverClass, String sessionId);
 
     /**
      * 根据链接通道获取会话
      *
-     * @param sessionId 会话 id
+     * @param serverClass 服务端实现类
+     * @param sessionId   会话 id
      * @return 会话
      */
-    S getSessionById(String sessionId);
+    Session<?> getSessionById(Class<? extends Server> serverClass, String sessionId);
 
     /**
-     * 根据用户 id 获取会话集合
-     * todo 被移除的channel将不会再接收到业务数据，等待超时被清除。但是要考虑客户端还会保持心跳，所以不会超时的情况
-     * todo 后期添加支持多端同时在线的功能，通过配置来确定是否运行用户多端同时在线
+     * 获取所有 session
      *
-     * @param userId 用户 id
-     * @return 会话集合
+     * @param serverClass 服务端实现类
+     * @return 所有 session
      */
-    Collection<Session<C, E>> getSessionsByUserId(String userId);
+    Map<String, Session<?>> getAllSessions(Class<? extends Server> serverClass);
+
+    // endregion
 
     /**
-     * 根据用户 id 集合获取会话集合
+     * 为指定会话添加 tagKey
      *
-     * @param userIds 用户 id 集合
-     * @return 会话集合
+     * @param session 会话
+     * @param tagKey  标签键
      */
-    List<Session<C, E>> getSessionsByUserIds(List<String> userIds);
+    default void addTagKey(Session<?> session, String tagKey) {
+        addTagPair(session, tagKey, null);
+    }
 
     /**
-     * 根据用户 id 集合获取会话集合
-     * map 的 key 是用户 id
+     * 为指定会话添加 tagKey
      *
-     * @param userIds 用户 id 集合
-     * @return 会话 map
+     * @param session  会话
+     * @param tagKey   标签键
+     * @param tagValue 标签值
      */
-    Map<String, List<Session<C, E>>> getSessionMapByUserIds(List<String> userIds);
+    void addTagPair(Session<?> session, String tagKey, String tagValue);
 
 }

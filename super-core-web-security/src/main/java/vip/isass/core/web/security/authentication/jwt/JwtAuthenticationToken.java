@@ -172,6 +172,7 @@ package vip.isass.core.web.security.authentication.jwt;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import vip.isass.core.security.jwt.JwtInfo;
 
 import java.util.Collection;
 
@@ -183,7 +184,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     private String token;
 
     @Getter
-    private JwtClaim jwtClaim;
+    private JwtInfo jwtClaim;
 
     public JwtAuthenticationToken(String token) {
         super(null);
@@ -191,7 +192,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
         setAuthenticated(false);
     }
 
-    public JwtAuthenticationToken(String token, JwtClaim jwtClaim, Collection<? extends GrantedAuthority> authorities) {
+    public JwtAuthenticationToken(String token, JwtInfo jwtClaim, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.token = token;
         this.jwtClaim = jwtClaim;

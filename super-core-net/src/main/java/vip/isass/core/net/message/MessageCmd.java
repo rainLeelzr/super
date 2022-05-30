@@ -167,28 +167,33 @@
  *
  */
 
-package vip.isass.core.net.socketio;
+package vip.isass.core.net.message;
 
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.annotation.OnConnect;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+/**
+ * 内置消息路由
+ *
+ * @author Rain
+ */
+public interface MessageCmd {
 
-import javax.annotation.Resource;
+    /**
+     * PING
+     */
+    String PING = "/core/ping";
 
-@Slf4j
-@Component
-public class ConnectListener {
+    /**
+     * PONG
+     */
+    String PONG = "/core/pong";
 
-    @Resource
-    private SocketIoServer socketIoServer;
+    /**
+     * 登录请求
+     */
+    String LOGIN = "/core/login";
 
-    @OnConnect
-    public void onConnect(SocketIOClient client) {
-        log.info("[{}]client connect [{}]{}",
-                socketIoServer.getAllClients().size(),
-                client.getSessionId(),
-                client.getRemoteAddress());
-    }
+    /**
+     * 异常报错
+     */
+    String ERROR = "/core/exception";
 
 }

@@ -167,40 +167,73 @@
  *
  */
 
-package vip.isass.core.web.security.authentication.jwt;
+package vip.isass.core.net.socketio;
 
-import cn.hutool.core.date.SystemClock;
-import cn.hutool.core.map.MapUtil;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import vip.isass.core.login.LoginUser;
-
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Map;
+import cn.hutool.core.lang.Assert;
+import com.corundumstudio.socketio.SocketIOClient;
+import vip.isass.core.net.session.ClientSession;
+import vip.isass.core.support.SystemClock;
 
 /**
+ * socketIo 客户端会话
+ *
  * @author Rain
  */
-public class JwtUtil {
+public class SocketIoSession implements ClientSession<SocketIoServer> {
 
-    public static long TOKEN_EFFECTIVE_SECONDS = ChronoUnit.WEEKS.getDuration().getSeconds();
+    private SocketIOClient socketIoClient;
 
-    public static long TOKEN_EFFECTIVE_MILLS = TOKEN_EFFECTIVE_SECONDS * 1000;
+    /**
+     * 创建session的时间
+     */
+    private Long createTime;
 
-    public static String generateToken(LoginUser loginUser, String secret) {
-        // 生产 token
-        Map<String, Object> map = MapUtil.<String, Object>builder()
-            .put(JwtClaim.USER_ID, loginUser.getUserId())
-            .put(JwtClaim.NICK_NAME, loginUser.getNickName())
-            .put(JwtClaim.FROM, loginUser.getLoginFrom())
-            .put(JwtClaim.VERSION, loginUser.getVersion())
-            .build();
-        return Jwts.builder()
-            .setClaims(map)
-            .setExpiration(new Date(SystemClock.now() + TOKEN_EFFECTIVE_MILLS))
-            .signWith(SignatureAlgorithm.HS256, secret)
-            .compact();
+    private SocketIoSession() {
+    }
+
+    public SocketIoSession(SocketIOClient socketIoClient) {
+        Assert.notNull(socketIoClient, "socketIoClient 必填");
+        this.socketIoClient = socketIoClient;
+        this.createTime = SystemClock.now();
+    }
+
+    @Override
+    public boolean isActive() {
+        return socketIoClient.isChannelOpen();
+    }
+
+    @Override
+    public void close() {
+        socketIoClient.disconnect();
+    }
+
+    @Override
+    public String getRemoteIp() {
+        return socketIoClient.getRemoteAddress().toString();
+    }
+
+    @Override
+    public String getRemotePort() {
+        return socketIoClient.getRemoteAddress().toString();
+    }
+
+    @Override
+    public String getSessionId() {
+        return socketIoClient.getSessionId().toString();
+    }
+
+    @Override
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    @Override
+    public void sendMessage(String cmd, Object payload) {
+        socketIoClient.sendEvent(cmd, payload);
+    }
+
+    public SocketIOClient getSocketIoClient() {
+        return socketIoClient;
     }
 
 }

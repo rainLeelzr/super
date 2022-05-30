@@ -176,14 +176,14 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
-import vip.isass.core.net.message.MessageType;
-import vip.isass.core.net.message.Packet;
+import vip.isass.core.net.message.MessageCmd;
+import vip.isass.core.net.netty.packet.TcpPacket;
 import vip.isass.core.net.netty.request.Request;
 import vip.isass.core.net.netty.request.RequestManager;
-import vip.isass.core.net.netty.session.TcpSession;
+import vip.isass.core.net.netty.session.TcpClientSession;
+import vip.isass.core.net.netty.tcp.TcpServer;
 import vip.isass.core.net.session.Session;
 import vip.isass.core.net.session.SessionManager;
-import vip.isass.core.net.netty.tcp.TcpServer;
 import vip.isass.core.support.JsonUtil;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -199,11 +199,12 @@ public interface ChannelEventHandler extends ChannelInboundHandler {
 
     Logger getLogger();
 
+    @SuppressWarnings("unchecked")
     default void channelActive0(ChannelHandlerContext ctx) throws Exception {
         // 新的channel激活时，绑定channel与session的关系
         Channel channel = ctx.channel();
 
-        Session<Channel, TcpServer> session = new TcpSession(channel);
+        Session<TcpServer> session = new TcpClientSession(channel);
         getSessionManager().addSession(session);
 
         getLogger().debug("服务器接收到客户端的连接，客户端ip：{}", channel.remoteAddress());
@@ -212,18 +213,20 @@ public interface ChannelEventHandler extends ChannelInboundHandler {
     }
 
     @SneakyThrows
-    default void channelRead1(ChannelHandlerContext cx, Packet packet, Request.Protocol protocol) {
-        Session session = getSessionManager().getSessionById(cx.channel().id().toString());
+    default void channelRead1(ChannelHandlerContext cx, TcpPacket packet, Request.Protocol protocol) {
+        TcpClientSession session = (TcpClientSession) getSessionManager().getSessionById(
+            TcpServer.class,
+            cx.channel().id().toString());
         if (session == null) {
             getLogger().error("channelRead失败，channel对应的session为null");
             return;
         }
 
-        if (MessageType.PING == packet.getMessageType()) {
+        if (MessageCmd.PING.equals(packet.getCmd())) {
             getLogger().debug("收到ping");
             return;
-        } else if (MessageType.LOGIN == packet.getMessageType()) {
-            Object userId = packet.getContent();
+        } else if (MessageCmd.LOGIN.equals(packet.getCmd())) {
+            Object userId = packet.getPayload();
             if (userId == null) {
                 getLogger().error("处理LOGIN请求包时，content内容为null。忽略此包。");
                 return;
@@ -237,10 +240,8 @@ public interface ChannelEventHandler extends ChannelInboundHandler {
                 throw new UnsupportedOperationException("不支持的userId请求包的请求协议：" + protocol);
             }
 
-//            getSessionManager().setUserId(session, userIdStr);
-
-            packet.setMessageType(MessageType.MESSAGE);
-            packet.setContent("绑定此通道的userId成功！");
+//            getSessionManager().setUserId(session, userIdStr););
+            packet.setPayload("绑定此通道的userId成功！");
 
             if (Request.Protocol.TCP == protocol) {
                 session.sendMessage(packet);
@@ -262,7 +263,9 @@ public interface ChannelEventHandler extends ChannelInboundHandler {
             if (state == IdleState.ALL_IDLE) {
                 getLogger().debug(
                     "channel超时没有读写操作，将主动关闭链接通道！session={}",
-                    getSessionManager().getSessionById(ctx.channel().id().toString()));
+                    getSessionManager().getSessionById(
+                        TcpServer.class,
+                        ctx.channel().id().toString()));
                 ctx.close();
             }
         }
@@ -285,7 +288,8 @@ public interface ChannelEventHandler extends ChannelInboundHandler {
         ctx.fireChannelInactive();
         Channel channel = ctx.channel();
         if (channel != null) {
-            Session session = getSessionManager().removeSessionById(ctx.channel().id().toString());
+            Session session = getSessionManager()
+                .removeSessionById(TcpServer.class, ctx.channel().id().toString());
             getLogger().debug("成功关闭了一个websocket连接：session={}", session.toString());
         }
 

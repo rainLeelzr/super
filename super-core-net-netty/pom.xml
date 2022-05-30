@@ -176,12 +176,12 @@
     <parent>
         <groupId>vip.isass</groupId>
         <artifactId>super</artifactId>
-        <version>super.3.2.1-SNAPSHOT</version>
+        <version>super.3.3.0-SNAPSHOT</version>
     </parent>
 
     <!-- 本项目信息 -->
     <artifactId>super-core-net-netty</artifactId>
-    <version>super.3.2.1-SNAPSHOT</version>
+    <version>super.3.3.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>

@@ -167,113 +167,42 @@
  *
  */
 
-package vip.isass.core.net.netty.session;
+package vip.isass.core.net.tag;
 
-import cn.hutool.core.lang.Assert;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.DefaultChannelPromise;
-import io.netty.util.concurrent.GenericFutureListener;
 import lombok.Getter;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
-import vip.isass.core.net.message.Packet;
-import vip.isass.core.net.netty.tcp.TcpServer;
-import vip.isass.core.net.session.Session;
-import vip.isass.core.support.LocalDateTimeUtil;
-
-import java.time.LocalDateTime;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
- * tcp
+ * 标签键值对, 方便业务调用方使用组合键值对的场景
+ * tagPair = tagKey + tagValue
  *
  * @author Rain
  */
-@Slf4j
-@Accessors(chain = true)
-public class TcpSession implements Session<Channel, TcpServer> {
+@Getter
+@Setter
+@ToString
+public class TagPair {
 
     /**
-     * 与客户端的链接通道
+     * 当只有标签键，没有标签值时，使用空字符串代替标签值
      */
-    @Getter
-    private Channel channel;
+    public static final String BLANK_TAG_VALUE = "";
 
-    /**
-     * 创建session的时间
-     */
-    @Getter
-    private LocalDateTime createTime;
+    private String key;
 
-    private TcpSession() {
+    private String value = BLANK_TAG_VALUE;
+
+    public TagPair() {
     }
 
-    public TcpSession(Channel channel) {
-        Assert.notNull(channel, "channel不能为null");
-        this.channel = channel;
-        this.createTime = LocalDateTimeUtil.now();
+    public TagPair(String tagKey) {
+        this.key = tagKey;
     }
 
-    @Override
-    public String getChannelId() {
-        return channel.id().toString();
+    public TagPair(String tagKey, String tagValue) {
+        this.key = tagKey;
+        this.value = tagValue == null ? this.value : tagValue;
     }
 
-    @Override
-    public String getSessionId() {
-        return channel.id().toString();
-    }
-
-    @Override
-    public boolean isActive() {
-        return channel.isActive();
-    }
-
-    /**
-     * 原则上系统向客户端发消息，均统一调用此方法
-     */
-    @Override
-    public void sendMessage(Packet packet) {
-        if (!isActive()) {
-            log.debug("channel is inactive, send Message fail. session info: {}", this);
-            return;
-        }
-        channel.writeAndFlush(
-            packet,
-            new DefaultChannelPromise(channel, channel.eventLoop())
-                .addListener((GenericFutureListener<ChannelFuture>) future -> {
-                    if (future.isSuccess()) {
-                        log.debug("发送给客户端[{}]成功：{}", this.getRemoteIp(), packet.toString());
-                    } else {
-                        log.error("发送给客户端[{}]失败。", this.getRemoteIp(), future.cause());
-                    }
-                })
-        );
-    }
-
-    @Override
-    public String getRemoteIp() {
-        return getChannel().remoteAddress().toString();
-    }
-
-    @Override
-    public String getRemotePort() {
-        return null;
-    }
-
-    @Override
-    public void close() {
-        if (channel == null) {
-            return;
-        }
-        channel.close();
-    }
-
-    @Override
-    public String toString() {
-        return "TcpSession{" +
-            "channel=" + channel +
-            ", createTime=" + createTime +
-            '}';
-    }
 }

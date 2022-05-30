@@ -177,6 +177,7 @@ import org.springframework.security.core.AuthenticationException;
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
 import vip.isass.core.login.DefaultLoginUser;
+import vip.isass.core.security.jwt.JwtInfo;
 import vip.isass.core.web.security.authentication.AbstractAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -227,7 +228,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationFilter {
             JwtAuthenticationToken authResult = (JwtAuthenticationToken) getAuthenticationManager()
                 .authenticate(new JwtAuthenticationToken(token));
 
-            JwtClaim jwtClaim = authResult.getJwtClaim();
+            JwtInfo jwtClaim = authResult.getJwtClaim();
             DefaultLoginUser defaultLoginUser = new DefaultLoginUser()
                 .setUserId(jwtClaim.getUid())
                 .setNickName(jwtClaim.getName())

@@ -169,77 +169,39 @@
 
 package vip.isass.core.net.socketio;
 
-import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.SocketConfig;
-import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-
-import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
+import vip.isass.core.net.server.Server;
 
 /**
- * socketIO服务端
+ * socketIo 服务端
+ *
+ * @author Rain
  */
 @Slf4j
-@org.springframework.context.annotation.Configuration
-public class SocketIoServer {
+@Configuration
+@ConditionalOnProperty(prefix = "core-net.socketio", name = "enabled", havingValue = "true")
+public class SocketIoServer implements Server {
 
-    @Resource
-    private SocketIoConfiguration socketIoConfiguration;
+    @Getter
+    @Autowired
+    private SocketIOServer socketIoServer;
 
-    @Resource
-    private SocketIOServer socketIOServer;
-
-    static final Map<String, SocketIOClient> CLIENT_BY_USER_ID = new ConcurrentHashMap<>();
-
-    @Bean
-    public SocketIOServer socketIOServer() {
-        // 初始化服务
-        Configuration config = new Configuration();
-
-        config.setPort(socketIoConfiguration.getTcpPort());
-        config.setBossThreads(1);
-
-        log.info("正在启动 SocketIo [{}:{}]", config.getHostname(), config.getPort());
-
-        SocketConfig sockConfig = new SocketConfig();
-        sockConfig.setReuseAddress(true);// 解决SOCKET服务端重启"Address already in use"异常
-        sockConfig.setTcpKeepAlive(false);
-        config.setSocketConfig(sockConfig);
-
-        SocketIOServer socketServer = new SocketIOServer(config);
-        socketServer.start();
-        return socketServer;
+    @Override
+    public void start() {
+        socketIoServer.start();
     }
 
-    public Collection<SocketIOClient> getAllClients() {
-        return socketIOServer == null ? Collections.emptyList() : socketIOServer.getAllClients();
-    }
-
-    /**
-     * 用于扫描netty-socketio的注解，比如 @OnConnect、@OnEvent
-     **/
-    @Bean
-    public SpringAnnotationScanner springAnnotationScanner() {
-        return new SpringAnnotationScanner(socketIOServer());
-    }
-
-    public void sendByUserId(String userId, String event, Object data) {
-        SocketIOClient socketIOClient = CLIENT_BY_USER_ID.get(userId);
-        if (socketIOClient == null) {
-            return;
+    @Override
+    public void stop() {
+        if (socketIoServer != null) {
+            log.info("正在关闭 socketio 服务");
+            socketIoServer.stop();
         }
-        socketIOClient.sendEvent(event, data);
-    }
-
-    public void broadcast(String event, Object data) {
-        socketIOServer.getAllClients().parallelStream().forEach(c -> c.sendEvent(event, data));
     }
 
 }

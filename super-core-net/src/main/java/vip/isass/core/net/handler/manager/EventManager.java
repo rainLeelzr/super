@@ -167,24 +167,135 @@
  *
  */
 
-package vip.isass.core.net.end;
+package vip.isass.core.net.handler.manager;
+
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import vip.isass.core.converter.ConvertUtil;
+import vip.isass.core.net.handler.OnConnectEventHandler;
+import vip.isass.core.net.handler.OnDisconnectEventHandler;
+import vip.isass.core.net.handler.OnErrorEventHandler;
+import vip.isass.core.net.handler.OnMessageEventHandler;
+import vip.isass.core.net.message.MessageCmd;
+import vip.isass.core.net.session.Session;
+import vip.isass.core.net.session.SessionManager;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
- * 服务端
+ * 事件管理器
  *
- * @param <T> type 连接类型，netty-tcp, socketIo, grpc等
  * @author Rain
  */
-public interface Server<C> extends End {
+@Slf4j
+@Component
+public class EventManager implements IEventManager {
 
-    /**
-     * 启动服务端
-     */
-    void start();
+    @Autowired
+    private SessionManager sessionManager;
 
-    /**
-     * 停止服务端
-     */
-    void stop();
+    @Autowired(required = false)
+    private List<OnConnectEventHandler> onConnectEventHandlers;
+
+    @Autowired(required = false)
+    private List<OnDisconnectEventHandler> onDisconnectEventHandlers;
+
+    @Autowired(required = false)
+    private List<OnErrorEventHandler> onErrorEventHandlers;
+
+    private List<OnMessageEventHandler<?>> onMessageEventHandlers;
+
+    private Map<String, List<OnMessageEventHandler<?>>> onMessageEventHandlerMap = Collections.emptyMap();
+
+    @Autowired(required = false)
+    public void onRouteMessageEventHandlers(@Autowired(required = false) List<OnMessageEventHandler<?>> onMessageEventHandlers) {
+        this.onMessageEventHandlers = onMessageEventHandlers;
+        if (onMessageEventHandlers == null) {
+            return;
+        }
+
+        onMessageEventHandlerMap = MapUtil.newHashMap(onMessageEventHandlers.size());
+        onMessageEventHandlers
+            .forEach(h -> onMessageEventHandlerMap
+                .computeIfAbsent(StrUtil.nullToEmpty(h.getCmd()), s -> new ArrayList<>())
+                .add(h));
+    }
+
+    @Override
+    public void onConnect(Session<?> session) {
+        sessionManager.addSession(session);
+        if (onConnectEventHandlers != null) {
+            onConnectEventHandlers.forEach(h -> h.onConnect(session));
+        }
+        log.debug("新建立连接");
+    }
+
+    @Override
+    public void onDisconnect(Session<?> session) {
+        if (onDisconnectEventHandlers != null) {
+            try {
+                onDisconnectEventHandlers.forEach(h -> h.onDisconnect(session));
+            } catch (Exception e) {
+                log.error("执行 OnDisconnectEventHandler 异常：{}", e.getMessage(), e);
+            }
+        }
+        sessionManager.removeSession(session);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> void onMessage(Session<?> session, String cmd, T payload) {
+        List<OnMessageEventHandler<?>> handlers = StrUtil.isBlank(cmd)
+            ? onMessageEventHandlers
+            : onMessageEventHandlerMap.get(cmd);
+        if (handlers == null) {
+            return;
+        }
+
+        for (OnMessageEventHandler<?> handler : handlers) {
+            OnMessageEventHandler<T> h = (OnMessageEventHandler<T>) handler;
+            T convertedPayload;
+            try {
+                Type actualType = TypeUtil.toParameterizedType(h.getClass()).getActualTypeArguments()[0];
+                convertedPayload = ConvertUtil.convert(actualType, payload);
+            } catch (Exception e) {
+                String errorMessage = StrUtil.format("反序列化消息失败：cmd[{}],error[{}]", cmd, e.getMessage());
+                log.error(errorMessage, e);
+                session.sendMessage(MessageCmd.ERROR, errorMessage);
+                continue;
+            }
+
+            try {
+                Object process = h.onMessage(session, cmd, convertedPayload);
+                if (process != null) {
+                    session.sendMessage(cmd, process);
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                session.sendMessage(MessageCmd.ERROR, e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void onError(Session<?> session, Exception exception) {
+        if (onErrorEventHandlers != null) {
+            onErrorEventHandlers.forEach(h -> h.onError(session, null, null, exception));
+        }
+        Throwable e = ExceptionUtil.unwrap(exception);
+        session.sendMessage(MessageCmd.ERROR, "发生异常" + e.getMessage());
+        log.error("socket通道[{}]发生异常[{}]，将关闭该连接", session.getSessionId(), e.getMessage());
+        sessionManager.removeSession(session);
+        session.close();
+    }
 
 }

@@ -167,29 +167,27 @@
  *
  */
 
-package vip.isass.core.net.end;
+package vip.isass.core.net.session;
+
+import lombok.Builder;
+import lombok.Getter;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 客户端
+ * session 持有器
+ * 每个服务端，对应1个 sessionHolder 实例
  *
- * @param <C> channel 链接通道，netty-tcp, socketIo, grpc等具体的 channel
- * @author Rain
+ * @author rain
  */
-public interface Client<C> extends End {
+@Getter
+public class SessionHolder {
 
     /**
-     * 发起连接
+     * <p>{@literal  Map<sessionId, Session>}
      */
-    void connect();
-
-    /**
-     * 断开连接
-     */
-    void disconnect();
-
-    /**
-     * 重新连接
-     */
-    void reconnect();
+    @Builder.Default
+    private final Map<String, Session<?>> sessionMap = new ConcurrentHashMap<>(16);
 
 }

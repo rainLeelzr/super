@@ -169,11 +169,11 @@
 
 package vip.isass.core.net.netty.channel;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.socket.SocketChannel;
 
 /**
  * @author Rain
  */
-public abstract class ChannelInitializerHandler<C extends Channel> extends ChannelInitializer<C> {
+public abstract class ChannelInitializerHandler extends ChannelInitializer<SocketChannel> {
 }

@@ -169,14 +169,13 @@
 
 package vip.isass.core.net.netty.request;
 
-import vip.isass.core.net.message.Packet;
-import vip.isass.core.net.session.Session;
-import vip.isass.core.support.JsonUtil;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import vip.isass.core.net.netty.packet.IPacket;
+import vip.isass.core.net.session.Session;
+import vip.isass.core.support.JsonUtil;
 
 /**
  * 一个网络包请求就是一个系统的事件.类似一个task任务
@@ -186,7 +185,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Accessors(chain = true)
-public class Request<P extends Packet, S extends Session> {
+public class Request<P extends IPacket, S extends Session> {
 
     /**
      * 分组
@@ -213,12 +212,12 @@ public class Request<P extends Packet, S extends Session> {
     }
 
     @SneakyThrows
-    public void sendResponse(Packet packet) {
+    public void sendResponse(IPacket packet) {
         if (requestProtocol == Protocol.WEBSOCKET) {
             String json = JsonUtil.DEFAULT_INSTANCE.writeValueAsString(packet);
 //            this.session.sendMessage(new TextWebSocketFrame(json))Z
         } else if (requestProtocol == Protocol.TCP) {
-            this.session.sendMessage(packet);
+            this.session.sendMessage(packet.getCmd(), packet);
         }
     }
 
@@ -230,15 +229,15 @@ public class Request<P extends Packet, S extends Session> {
     @Override
     public String toString() {
         return new StringBuilder("{")
-                .append("\"group\":\"")
-                .append(group).append('\"')
-                .append(",\"packet\":")
-                .append(packet)
-                .append(",\"session\":")
-                .append(session)
-                .append(",\"requestProtocol\":")
-                .append(requestProtocol)
-                .append('}')
-                .toString();
+            .append("\"group\":\"")
+            .append(group).append('\"')
+            .append(",\"packet\":")
+            .append(packet)
+            .append(",\"session\":")
+            .append(session)
+            .append(",\"requestProtocol\":")
+            .append(requestProtocol)
+            .append('}')
+            .toString();
     }
 }

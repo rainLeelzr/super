@@ -169,7 +169,7 @@
 
 package vip.isass.core.net.netty.request.worker.sequential;
 
-import vip.isass.core.net.netty.session.TcpSession;
+import vip.isass.core.net.netty.session.TcpClientSession;
 import vip.isass.core.net.netty.request.Request;
 import vip.isass.core.net.netty.request.worker.WorkerPool;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -333,7 +333,7 @@ public class SequentialWorkerPool implements WorkerPool {
                             i + "",
                             // new BlueBinaryPacket(),
                             null,
-                            new TcpSession(null),
+                            new TcpClientSession(null),
                             null)
             );
         }

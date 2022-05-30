@@ -331,17 +331,22 @@ public class JsonUtil {
     }
 
     @SneakyThrows
-    public static <T> T readValue(String json, TypeReference<T> tTypeReference) {
-        return (T) DEFAULT_INSTANCE.readValue(json, tTypeReference);
+    public static <T> T readValue(String json, TypeReference<T> typeReference) {
+        return DEFAULT_INSTANCE.readValue(json, typeReference);
     }
 
     @SneakyThrows
     public static <T> T readValue(String json, Class<T> clazz) {
-        return (T) NOT_NULL_INSTANCE.readValue(json, clazz);
+        return DEFAULT_INSTANCE.readValue(json, clazz);
     }
 
     @SneakyThrows
     public static String writeValue(Object object) {
+        return DEFAULT_INSTANCE.writeValueAsString(object);
+    }
+
+    @SneakyThrows
+    public static String writeValueWithNotNullInstance(Object object) {
         return DEFAULT_INSTANCE.writeValueAsString(object);
     }
 

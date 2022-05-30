@@ -169,37 +169,17 @@
 
 package vip.isass.core.net.session;
 
-import vip.isass.core.net.end.End;
-import vip.isass.core.net.message.Packet;
-import vip.isass.core.net.end.Server;
 
-import java.time.LocalDateTime;
+import vip.isass.core.net.server.Server;
 
 /**
  * 会话
  * <p> 一个客户端连接持有一个 session</p>
  *
- * @param <C> Channel 通道，一个具体的 socket 通道。例如在 netty 中代表 netty 的 channel
- * @param <T> E 端类型
+ * @param <svr> 服务端，代表 session 由哪个服务端创建
  * @author Rain
  */
-public interface Session<C, E extends End> {
-
-    // region 通道信息
-
-    /**
-     * 获取连接通道
-     *
-     * @return 连接通道
-     */
-    C getChannel();
-
-    /**
-     * 获取此 session 绑定的通道 id
-     *
-     * @return 通道id
-     */
-    String getChannelId();
+public interface Session<svr extends Server> {
 
     /**
      * 判断连接是否可用
@@ -227,8 +207,6 @@ public interface Session<C, E extends End> {
      */
     String getRemotePort();
 
-    // endregion
-
     /**
      * session id
      *
@@ -241,13 +219,14 @@ public interface Session<C, E extends End> {
      *
      * @return 创建的时间
      */
-    LocalDateTime getCreateTime();
+    Long getCreateTime();
 
     /**
      * 发送消息
      *
-     * @param packet 消息体
+     * @param cmd    路由命令
+     * @param object 消息体
      */
-    void sendMessage(Packet packet);
+    void sendMessage(String cmd, Object object);
 
 }

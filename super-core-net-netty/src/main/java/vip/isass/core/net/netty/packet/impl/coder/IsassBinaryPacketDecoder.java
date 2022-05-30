@@ -169,9 +169,6 @@
 
 package vip.isass.core.net.netty.packet.impl.coder;
 
-import vip.isass.core.net.netty.packet.Decoder;
-import vip.isass.core.net.netty.packet.TcpPacket;
-import vip.isass.core.net.message.Packet;
 import cn.hutool.core.util.StrUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -180,6 +177,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Scope;
+import vip.isass.core.net.netty.packet.Decoder;
+import vip.isass.core.net.netty.packet.IPacket;
+import vip.isass.core.net.netty.packet.TcpPacket;
 
 import java.util.List;
 
@@ -193,20 +193,22 @@ import java.util.List;
 @Scope("prototype")
 public class IsassBinaryPacketDecoder extends Decoder {
 
-    private static final int MAX_READABLE_BYTES = 50 * 1024 * 1024;
-
-    @Value("${spring.application.name}")
-    private String appName;
+    /**
+     * 一个完整的报文包最大为 100M
+     */
+    private static final int MAX_MESSAGE_BYTES = 100 * 1024 * 1024;
 
     /**
      * tcp数据包的报文结构
-     * ┌╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌╌╌╌╌╌┐
-     * ╎ fullLength ╎    type    ╎ serializeMode ╎   content  ╎
-     * ├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
-     * ╎     4B     ╎     4B     ╎       4B      ╎    ≈50M    ╎
-     * ├╌╌╌╌╌╌╌╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌╌╌╌┤
-     * ╎                        50M                           ╎
-     * └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘
+     * ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌╌╌╌╌┐
+     * ╎                       header                 ╎  payload  ╎
+     * ├╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┤
+     * ╎ fullLength ╎ serializeMode ╎ cmdLength ╎ cmd ╎  payload  ╎
+     * ├╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌╌╌┤
+     * ╎     4B     ╎      4B       ╎     4B    ╎ < 100M - 3 * 4B ╎
+     * ├╌╌╌╌╌╌╌╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌╌╌┴╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+     * ╎                          100M                            ╎
+     * └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘
      */
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
@@ -214,9 +216,9 @@ public class IsassBinaryPacketDecoder extends Decoder {
 
         log.debug("收到网络包，长度：{} 字节", readableBytes);
 
-        if (readableBytes > MAX_READABLE_BYTES) {
+        if (readableBytes > MAX_MESSAGE_BYTES) {
             throw new IllegalArgumentException(StrUtil.format(
-                    "网络包的可读数据长度大于一个网络包(50m)长度：{}", readableBytes));
+                "网络包的可读数据长度大于一个网络包(50m)长度：{}", readableBytes));
         }
 
         // 获取网络包的前4个字节，作为一个完整报文包的数据长度
@@ -240,27 +242,38 @@ public class IsassBinaryPacketDecoder extends Decoder {
             return;
         }
 
-        Packet packet = createPackage(ctx, in, fullLength);
+        IPacket packet = createPackage(ctx, in, fullLength);
         out.add(packet);
 
         log.debug("已拆包长度：{}", readableBytes - in.readableBytes());
     }
 
     @SneakyThrows
-    private Packet createPackage(ChannelHandlerContext ctx, ByteBuf in, int fullLength) {
-        Packet packet = new TcpPacket()
-                .setFullLength(fullLength)
-                .setType(in.readInt())
-                .setSerializeMode(in.readInt());
+    private IPacket createPackage(ChannelHandlerContext ctx, ByteBuf in, int fullLength) {
+        TcpPacket packet = TcpPacket.builder()
+            .fullLength(fullLength)
+            .serializeMode(in.readInt())
+            .cmdLength(in.readInt())
+            .build();
 
-        int contentLength = fullLength - 12;
+        if (packet.getCmdLength() < 0) {
+            throw new RuntimeException("tcp 报文的 cmdLength 不能为负数");
+        }
+
+        if (packet.getCmdLength() > 0) {
+            byte[] bytes = new byte[packet.getCmdLength()];
+            in.readBytes(bytes);
+            packet.setCmd(new String(bytes));
+        }
+
+        int contentLength = fullLength - 16;
         if (contentLength == 0) {
             return packet;
         }
 
         byte[] bytes = new byte[contentLength];
         in.readBytes(bytes);
-        packet.setContent(bytes);
+        packet.setPayload(bytes);
         return packet;
     }
 

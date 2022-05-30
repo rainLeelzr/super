@@ -167,27 +167,28 @@
  *
  */
 
-package vip.isass.core.net.handler;
-
-import vip.isass.core.net.end.End;
-import vip.isass.core.net.message.Packet;
-import vip.isass.core.net.end.Server;
-import vip.isass.core.net.session.Session;
+package vip.isass.core.net.client;
 
 /**
- * 收到路由消息事件处理器
+ * 客户端
  *
  * @author Rain
  */
-public interface OnRouteMessageEventHandler<C, E extends End> {
+public interface Client {
 
     /**
-     * 收到路由消息事件
-     *
-     * @param session 会话
-     * @param cmd     路由命令
-     * @param packet  数据包
+     * 发起连接
      */
-    void onRouteMessage(Session<C, E> session, String cmd, Packet packet);
+    void connect();
+
+    /**
+     * 断开连接
+     */
+    void disconnect();
+
+    /**
+     * 重新连接
+     */
+    void reconnect();
 
 }
