@@ -4,6 +4,7 @@
 package ${cfg.criteriaPackageName};
 
 import cn.hutool.core.collection.CollUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import ${cfg.entityPackageName}.V2${entity};
 import vip.isass.core.structure.criteria.IV2Criteria;

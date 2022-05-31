@@ -32,18 +32,22 @@
         return orNotIn(V2${entity}.${field.name?upper_case}, V2${entity}.${field.name?upper_case}_COLUMN_NAME, ${field.propertyName}s);
     }
 
+    @JsonIgnore
     public V2${entity}Criteria set${field.propertyName?cap_first}In(${field.propertyType}... ${field.propertyName}s) {
         return in(V2${entity}.${field.name?upper_case}, V2${entity}.${field.name?upper_case}_COLUMN_NAME, CollUtil.newArrayList(${field.propertyName}s));
     }
 
+    @JsonIgnore
     public V2${entity}Criteria setOr${field.propertyName?cap_first}In(${field.propertyType}... ${field.propertyName}s) {
         return orIn(V2${entity}.${field.name?upper_case}, V2${entity}.${field.name?upper_case}_COLUMN_NAME, CollUtil.newArrayList(${field.propertyName}s));
     }
 
+    @JsonIgnore
     public V2${entity}Criteria set${field.propertyName?cap_first}NotIn(${field.propertyType}... ${field.propertyName}s) {
         return notIn(V2${entity}.${field.name?upper_case}, V2${entity}.${field.name?upper_case}_COLUMN_NAME, CollUtil.newArrayList(${field.propertyName}s));
     }
 
+    @JsonIgnore
     public V2${entity}Criteria setOr${field.propertyName?cap_first}NotIn(${field.propertyType}... ${field.propertyName}s) {
         return orNotIn(V2${entity}.${field.name?upper_case}, V2${entity}.${field.name?upper_case}_COLUMN_NAME, CollUtil.newArrayList(${field.propertyName}s));
     }
