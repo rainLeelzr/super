@@ -3,10 +3,9 @@
 ## 微服务
 
 
-| 名称                            | 端口                 |
-| --------------------------------- | ---------------------- |
+| 名称                            | 端口                   |
+| --------------------------------- |----------------------|
 | isass-service-gateway           | http:20000           |
-| isass-service-socketio          | http:20001           |
 | isass-service-config            | http:20010           |
 | isass-service-gateway-http      | http:20020           |
 | isass-service-gateway-tcp       | 20030,20031          |
@@ -18,11 +17,12 @@
 | isass-service-goods             | http:20090           |
 | isass-service-order             | http:20100           |
 | isass-service-job-center        | http:20110           |
-| isass-service-job-executor      | http:20120 tcp:20170 |
+| isass-service-job-executor      | http:20120 tcp:20121 |
 | isass-service-search            | http:20130           |
 | isass-service-finance           | http:20140           |
 | isass-service-pay               | http:20150           |
 | isass-service-taobao            | http:20160           |
+| isass-service-socketio          | http:20170 tcp:20171 |
 | isass-service-order             | http:20180           |
 | isass-service-poster            | http:20190           |
 | isass-service-apidoc            | http:20200           |
