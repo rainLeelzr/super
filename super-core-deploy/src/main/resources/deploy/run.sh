@@ -168,6 +168,25 @@ check_jdk() {
         fi
 }
 
+health_check() {
+         get_pid
+         if [ "$pid" = "" ]; then
+                 echo "${project_name} is not running."
+                 exit 1
+         else
+                 if [ -d "/proc/${pid}" ]; then
+                         url="http://localhost:20320/attachment-service/actuator/health"
+                         http_code=`curl -I -m 5 -o /dev/null -s -w %{http_code} ${url}`
+                         if [ "$http_code"x != "200"x ];then
+                             exit 1
+                         fi
+                 else
+                         echo "can not found running pid ${pid}, ${project_name} is not running!"
+                         exit 1
+                 fi
+         fi
+ }
+
 run() {
         if [ $# -eq 0 ]; then
                 start
@@ -177,6 +196,7 @@ run() {
                 stop) stop ;;
                 status) status ;;
                 log) print_log ;;
+                health) health_check ;;
                 h|H|help|HELP) print_usage ;;
                 *)
                         echo "illegal parameter : $1"
