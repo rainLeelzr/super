@@ -211,6 +211,7 @@ public enum StatusMessageEnum implements IStatusMessage {
     ASSOCIATED_DATA(1007, "存在关联数据"),
     TOKEN_EXPIRED(1008, "token 已过期"),
     TOKEN_ILLEGAL(1009, "token 错误"),
+    CONFIG_ERROR(1010, "配置错误"),
     ;
 
     private Integer status;
