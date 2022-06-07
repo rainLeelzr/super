@@ -40,6 +40,8 @@ keep_docker_running=${KEEP_DOCKER_RUNNING="false"}
 
 pid=''
 
+CURRENT_SCRIPT_DIR=$(cd "$(dirname "$0")";pwd)
+
 print_usage() {
         echo "./run.sh                           ---Start the ${project_name} server."
         echo "./run.sh start                     ---Start the ${project_name} server."
@@ -188,6 +190,7 @@ health_check() {
  }
 
 run() {
+        cd $CURRENT_SCRIPT_DIR
         if [ $# -eq 0 ]; then
                 start
         else

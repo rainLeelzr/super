@@ -1,3 +1,4 @@
 #!/bin/sh
 
-eval "./run.sh stop"
+CURRENT_SCRIPT_DIR=$(cd "$(dirname "$0")";pwd)
+eval "$CURRENT_SCRIPT_DIR/run.sh stop"
