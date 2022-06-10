@@ -12,7 +12,7 @@ project_name="@project.artifactId@"
 project_jar="@project.artifactId@-exec.jar"
 
 # 默认JVM内存参数，如果设置了环境变量 JVM_MEMORY_VARS ，则会被环境变量覆盖
-jvm_memory_vars=${JVM_MEMORY_VARS="-Xms6G -Xmx6G -XX:NewRatio=1 -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=512M"}
+jvm_memory_vars=${JVM_MEMORY_VARS="-Xms3G -Xmx6G -XX:NewRatio=1 -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=512M"}
 
 # 默认JVM非内存参数，如果设置了环境变量 JVM_VARS ，则会被环境变量覆盖
 jvm_vars=${JVM_VARS="-server -XX:+PrintCommandLineFlags"}
