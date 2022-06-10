@@ -216,7 +216,18 @@ health_check() {
                 if [ -d "/proc/${pid}" ]; then
                         ip_port=$(cat config/application.properties | grep server.port)
                         port=${ip_port##*=}
-                        port=${port:0:-1}
+
+                        portLastLetter=${port:0-1}
+                            case $portLastLetter in
+                            [a-z]|[A-Z])
+                            ;;
+                            [0-9])
+                            ;;
+                            *)
+                                port=${port:0:-1}
+                            ;;
+                        esac
+
                         microService=${project_name##*-service-}
                         url="http://localhost:${port}/${microService}/actuator/health"
 
