@@ -262,7 +262,7 @@ public class WebSwaggerAutoConfiguration {
         return new ApiInfoBuilder()
             .title(serviceName + " api文档")
             .description(serviceName + " | " + serviceNameCn + " | api接口文档，文档内容根据代码自动生成。")
-            .termsOfServiceUrl("https://dev.ms.isass.vip/apidoc-service/doc.html?plus=1&cache=1&lang=zh")
+            .termsOfServiceUrl("")
             .contact(new Contact("rain", "https://www.isass.vip", "lizhirong100@163.com"))
             .version(version)
             .build();
