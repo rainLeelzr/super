@@ -177,6 +177,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import vip.isass.core.converter.ConvertUtil;
+import vip.isass.core.net.handler.OnAnyMessageEventHandler;
 import vip.isass.core.net.handler.OnConnectEventHandler;
 import vip.isass.core.net.handler.OnDisconnectEventHandler;
 import vip.isass.core.net.handler.OnErrorEventHandler;
@@ -211,6 +212,9 @@ public class EventManager implements IEventManager {
 
     @Autowired(required = false)
     private List<OnErrorEventHandler> onErrorEventHandlers;
+
+    @Autowired(required = false)
+    private List<OnAnyMessageEventHandler> onAnyMessageEventHandlers;
 
     private List<OnMessageEventHandler<?>> onMessageEventHandlers;
 
@@ -257,31 +261,55 @@ public class EventManager implements IEventManager {
         List<OnMessageEventHandler<?>> handlers = StrUtil.isBlank(cmd)
             ? onMessageEventHandlers
             : onMessageEventHandlerMap.get(cmd);
-        if (handlers == null) {
-            return;
+        if (handlers != null) {
+            for (OnMessageEventHandler<?> handler : handlers) {
+                OnMessageEventHandler<T> h = (OnMessageEventHandler<T>) handler;
+                T convertedPayload;
+                try {
+                    Type actualType = TypeUtil.toParameterizedType(h.getClass()).getActualTypeArguments()[0];
+                    convertedPayload = ConvertUtil.convert(actualType, payload);
+                } catch (Exception e) {
+                    String errorMessage = StrUtil.format("反序列化消息失败：cmd[{}],error[{}]", cmd, e.getMessage());
+                    log.error(errorMessage, e);
+                    session.sendMessage(MessageCmd.ERROR, errorMessage);
+                    continue;
+                }
+
+                try {
+                    Object process = h.onMessage(session, cmd, convertedPayload);
+                    if (process != null) {
+                        session.sendMessage(cmd, process);
+                    }
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    session.sendMessage(MessageCmd.ERROR, e.getMessage());
+                }
+            }
         }
 
-        for (OnMessageEventHandler<?> handler : handlers) {
-            OnMessageEventHandler<T> h = (OnMessageEventHandler<T>) handler;
-            T convertedPayload;
-            try {
-                Type actualType = TypeUtil.toParameterizedType(h.getClass()).getActualTypeArguments()[0];
-                convertedPayload = ConvertUtil.convert(actualType, payload);
-            } catch (Exception e) {
-                String errorMessage = StrUtil.format("反序列化消息失败：cmd[{}],error[{}]", cmd, e.getMessage());
-                log.error(errorMessage, e);
-                session.sendMessage(MessageCmd.ERROR, errorMessage);
-                continue;
-            }
-
-            try {
-                Object process = h.onMessage(session, cmd, convertedPayload);
-                if (process != null) {
-                    session.sendMessage(cmd, process);
+        if (onAnyMessageEventHandlers != null) {
+            for (OnAnyMessageEventHandler<?> handler : onAnyMessageEventHandlers) {
+                OnAnyMessageEventHandler<T> h = (OnAnyMessageEventHandler<T>) handler;
+                T convertedPayload;
+                try {
+                    Type actualType = TypeUtil.toParameterizedType(h.getClass()).getActualTypeArguments()[0];
+                    convertedPayload = ConvertUtil.convert(actualType, payload);
+                } catch (Exception e) {
+                    String errorMessage = StrUtil.format("反序列化消息失败：cmd[{}],error[{}]", cmd, e.getMessage());
+                    log.error(errorMessage, e);
+                    session.sendMessage(MessageCmd.ERROR, errorMessage);
+                    continue;
                 }
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                session.sendMessage(MessageCmd.ERROR, e.getMessage());
+
+                try {
+                    Object process = h.onMessage(session, cmd, convertedPayload);
+                    if (process != null) {
+                        session.sendMessage(cmd, process);
+                    }
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    session.sendMessage(MessageCmd.ERROR, e.getMessage());
+                }
             }
         }
     }
@@ -296,6 +324,10 @@ public class EventManager implements IEventManager {
         log.error("socket通道[{}]发生异常[{}]，将关闭该连接", session.getSessionId(), e.getMessage());
         sessionManager.removeSession(session);
         session.close();
+    }
+
+    private void handleMessage(){
+
     }
 
 }
