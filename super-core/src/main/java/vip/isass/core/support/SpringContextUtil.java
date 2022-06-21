@@ -351,7 +351,7 @@ public class SpringContextUtil implements ApplicationContextAware {
      */
     public static String getBeanNameByBeanType(Class<?> beanClass) {
         String beanName = beanClass.getSimpleName();
-        return beanName.substring(0, 1).toLowerCase() + beanName.substring(1, beanName.length());
+        return beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
     }
 
     /**
@@ -368,6 +368,18 @@ public class SpringContextUtil implements ApplicationContextAware {
     }
 
     /**
+     * 移除 bean
+     *
+     * @param beanName bean name
+     */
+    public static void unRegistryBean(Class<?> beanClass) {
+        String[] beanNames = applicationContext.getBeanNamesForType(beanClass);
+        for (String beanName : beanNames) {
+            unRegistryBean(beanName);
+        }
+    }
+
+    /**
      * 获取 SpringBean 注册器
      *
      * @return BeanDefinitionRegistry
@@ -375,6 +387,16 @@ public class SpringContextUtil implements ApplicationContextAware {
     private static DefaultListableBeanFactory getBeanFactory() {
         ConfigurableApplicationContext configurableApplicationContext = (ConfigurableApplicationContext) applicationContext;
         return (DefaultListableBeanFactory) configurableApplicationContext.getBeanFactory();
+    }
+
+    /**
+     * 获取实现某接口的所有实例 bean 名称
+     *
+     * @param type 接口
+     * @return beanName 数组
+     */
+    public static String[] getBeanNamesForType(Class<?> type) {
+        return applicationContext.getBeanNamesForType(type);
     }
 
 }
