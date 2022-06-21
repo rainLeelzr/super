@@ -175,6 +175,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
@@ -272,7 +273,7 @@ public class SpringContextUtil implements ApplicationContextAware {
         return beans.values();
     }
 
-    public static <T> Collection<T> getBeans(Class<T> requiredType, ParameterizedTypeReference parameterizedTypeReference) {
+    public static <T> Collection<T> getBeans(Class<T> requiredType, ParameterizedTypeReference<T> parameterizedTypeReference) {
         Map<String, T> beans = applicationContext.getBeansOfType(requiredType);
         if (MapUtil.isEmpty(beans)) {
             return Collections.emptyList();
@@ -348,9 +349,32 @@ public class SpringContextUtil implements ApplicationContextAware {
      * @param beanClass bean class
      * @return bean name
      */
-    public static String getBeanNameByBeanType(Class beanClass) {
+    public static String getBeanNameByBeanType(Class<?> beanClass) {
         String beanName = beanClass.getSimpleName();
         return beanName.substring(0, 1).toLowerCase() + beanName.substring(1, beanName.length());
+    }
+
+    /**
+     * 移除 bean
+     *
+     * @param beanName bean name
+     */
+    public static void unRegistryBean(String beanName) {
+        DefaultListableBeanFactory beanFactory = getBeanFactory();
+        if (beanFactory.containsBeanDefinition(beanName)) {
+            beanFactory.destroySingleton(beanName);
+            beanFactory.removeBeanDefinition(beanName);
+        }
+    }
+
+    /**
+     * 获取 SpringBean 注册器
+     *
+     * @return BeanDefinitionRegistry
+     */
+    private static DefaultListableBeanFactory getBeanFactory() {
+        ConfigurableApplicationContext configurableApplicationContext = (ConfigurableApplicationContext) applicationContext;
+        return (DefaultListableBeanFactory) configurableApplicationContext.getBeanFactory();
     }
 
 }
