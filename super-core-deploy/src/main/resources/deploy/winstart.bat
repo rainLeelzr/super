@@ -1,4 +1,0 @@
-title "@project.artifactId@"
-chcp 65001
-java -Xms6G -Xmx6G -Xmn3G -XX:SurvivorRatio=8 -XX:InitialSurvivorRatio=8 -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=256M -Dfile.encoding=UTF-8 -jar @project.artifactId@-exec.jar
-pause

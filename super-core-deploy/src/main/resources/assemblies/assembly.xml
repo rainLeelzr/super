@@ -186,9 +186,27 @@
             <unpackOptions>
                 <includes>
                     <include>deploy/deploy.md</include>
-                    <include>deploy/winstart.bat</include>
+                    <include>deploy/win_start.bat</include>
+                    <include>deploy/win_service_install.bat</include>
+                    <include>deploy/win_service_start.bat</include>
+                    <include>deploy/win_service_stop.bat</include>
+                    <include>deploy/win_service_uninstall.bat</include>
                 </includes>
                 <filtered>true</filtered>
+            </unpackOptions>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>${project.artifactId}</outputDirectory>
+            <includes>
+                <include>vip.isass:super-core-deploy</include>
+            </includes>
+            <unpack>true</unpack>
+            <unpackOptions>
+                <includes>
+                    <include>deploy/JavaService.exe</include>
+                </includes>
+                <filtered>false</filtered>
             </unpackOptions>
         </dependencySet>
 

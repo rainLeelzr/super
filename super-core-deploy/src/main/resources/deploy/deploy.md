@@ -16,10 +16,10 @@
 
 - 在服务器创建文件夹：/opt/@service-name@
 - 若服务器已存在部署包，建议备份原部署包
-- 将压缩包 @project.artifactId@-bin.zip 拷贝到服务器 /opt/@service-name@
+- 将压缩包 @project.artifactId@-bin.tar.gz 拷贝到服务器 /opt/@service-name@
 - 进入服务器文件夹 cd /opt/@service-name@
 - 解压文件。解压文件前，请认真查看服务器已有配置文件与压缩包内文件，不要在解压时，覆盖掉服务器上已经 `正确配置` 过的配置文件，避免重新更改配置
-- unzip @project.artifactId@-bin.zip
+- tar -zxvf @project.artifactId@-bin.tar.gz
 
 ## 修改参数
 
@@ -27,18 +27,22 @@
 
 > vi application.properties
 
-```properties
-spring.datasource.mysql.master.host=127.0.0.1
-spring.datasource.mysql.master.port=3306
-spring.datasource.mysql.master.username=root
-spring.datasource.mysql.master.password=123456
-spring.datasource.mysql.master.database=@service-name@
-```
-
 ## 启动服务
 
-- linux系统 `./run.sh`
-- windows系统 双击 `winstart.bat`
+### linux系统
+
+- `./run.sh`
+
+### windows系统
+
+#### 命令行窗口运行
+
+-双击 `winstart.bat`
+
+#### windows系统服务
+
+1. 双击`win_service_install.bat`，安装windows服务
+2. 双击`win_service_start.bat`，运行服务。或者打开 `windows服务`，找到 `@project.artifactId@`进行操作
 
 ## 查看日志
 
@@ -52,8 +56,20 @@ Started xxxApp in 20.82 seconds (JVM running for 21.431)
 
 ## 停止服务
 
-- linux系统 `./stop.sh`
-- windows系统 关闭命令行窗口即可
+### linux 系统
+
+- `./stop.sh`
+
+### windows系统
+
+#### 命令行窗口运行
+
+- 关闭命令行窗口即可
+
+#### windows 系统服务
+
+- 双击 `win_service_stop.bat`。或者打开 `windows服务`，找到 `@project.artifactId@`进行操作
+- 卸载 windows 服务：双击`win_service_uninstall.bat`
 
 ## 环境变量
 
