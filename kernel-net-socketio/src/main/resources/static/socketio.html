@@ -48,6 +48,7 @@
     <label>content:</label><br><textarea id="content" rows="5" style="width: 100%"></textarea>
     <br>
     <button id="send">send</button>
+    <button id="clear">clearOutput</button>
 </div>
 <br>
 <div id="console" class="well"></div>
@@ -186,6 +187,10 @@
 
         serverOutput('<span class="connect-msg"><span style="color: blue; ">' + getNowTime() + '&nbsp;</span>' + '发送消息: ' + content + ' </span>');
         socket.emit(socketEvent, content);
+    })
+
+    $("#clear").click(function () {
+        $('#console').html("");
     })
 
     function getNowTime() {
