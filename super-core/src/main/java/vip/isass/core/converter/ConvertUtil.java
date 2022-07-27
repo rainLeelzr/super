@@ -177,6 +177,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import vip.isass.core.support.JsonUtil;
 
+import java.io.InputStream;
 import java.lang.reflect.Type;
 
 /**
@@ -196,15 +197,27 @@ public class ConvertUtil {
      * @return 转换后的结构
      */
     @SneakyThrows
+    @SuppressWarnings("unchecked")
     public static <T> T convert(Type actualType, Object value) {
         Class<T> clazz = (Class<T>) TypeUtil.getClass(actualType);
+        if (clazz == Object.class) {
+            return (T) value;
+        }
+
         if (ClassUtil.isBasicType(clazz)) {
             return Convert.convert(clazz, value);
         } else if (clazz == String.class) {
             return (T) value.toString();
         } else {
             JavaType javaType = JsonUtil.DEFAULT_INSTANCE.getTypeFactory().constructType(actualType);
-            return JsonUtil.DEFAULT_INSTANCE.readValue(value.toString(), javaType);
+            if (value instanceof String) {
+                return JsonUtil.DEFAULT_INSTANCE.readValue(value.toString(), javaType);
+            } else if (value instanceof byte[]) {
+                return JsonUtil.DEFAULT_INSTANCE.readValue((byte[]) value, javaType);
+            } else if (value instanceof InputStream) {
+                return JsonUtil.DEFAULT_INSTANCE.readValue((InputStream) value, javaType);
+            }
+            return JsonUtil.DEFAULT_INSTANCE.convertValue(value, javaType);
         }
     }
 }

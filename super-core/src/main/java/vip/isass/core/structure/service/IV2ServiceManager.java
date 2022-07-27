@@ -169,7 +169,6 @@
 
 package vip.isass.core.structure.service;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,228 +201,206 @@ public interface IV2ServiceManager<
 
     // region 增
 
+    @Override
     default E add(E entity) {
-        return applyUntilNotNull(s -> s.add(entity));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.add(entity));
     }
 
+    @Override
     default Collection<E> addBatch(Collection<E> entities) {
-        return applyUntilNotNull(s -> s.addBatch(entities));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.addBatch(entities));
     }
 
+    @Override
     default Collection<E> addBatchByBatchSize(Collection<E> entities, int batchSize) {
-        return applyUntilNotNull(s -> s.addBatchByBatchSize(entities, batchSize));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.addBatchByBatchSize(entities, batchSize));
     }
 
+    @Override
     default E addIfAbsentByCriteria(E entity, C criteria) {
-        return applyUntilNotNull(s -> s.addIfAbsentByCriteria(entity, criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.addIfAbsentByCriteria(entity, criteria));
     }
 
+    @Override
     default E addIfAbsentByColumns(E entity, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addIfAbsentByColumns(entity, uniqueColumns));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.addIfAbsentByColumns(entity, uniqueColumns));
     }
 
     @Override
     default Integer addBatchIfAbsentByCriteria(List<E> entities, C criteria) {
-        return applyUntilNotNull(s -> s.addBatchIfAbsentByCriteria(entities, criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.addBatchIfAbsentByCriteria(entities, criteria));
     }
 
     @Override
     default Integer addBatchIfAbsentByColumns(List<E> entities, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addBatchIfAbsentByColumns(entities, uniqueColumns));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.addBatchIfAbsentByColumns(entities, uniqueColumns));
     }
 
     @Override
     default Boolean addOrUpdateByCriteria(E entity, C criteria) {
-        return applyUntilNotNull(s -> s.addOrUpdateByCriteria(entity, criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.addOrUpdateByCriteria(entity, criteria));
     }
 
     @Override
     default E addOrUpdateByColumns(E entity, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addOrUpdateByColumns(entity, uniqueColumns));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.addOrUpdateByColumns(entity, uniqueColumns));
     }
 
     @Override
     default Integer addOrUpdateBatchByColumns(List<E> entities, List<String> uniqueColumns) {
-        return applyUntilNotNull(s -> s.addOrUpdateBatchByColumns(entities, uniqueColumns));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.addOrUpdateBatchByColumns(entities, uniqueColumns));
     }
 
     // endregion
 
     //  region 删
 
+    @Override
     default Boolean deleteById(Serializable id) {
-        return applyUntilNotNull(s -> s.deleteById(id));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.deleteById(id));
     }
 
+    @Override
     default Boolean deleteByIds(Collection<Serializable> ids) {
-        return applyUntilNotNull(s -> s.deleteByIds(ids));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.deleteByIds(ids));
     }
 
+    @Override
     default Boolean deleteByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.deleteByCriteria(criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.deleteByCriteria(criteria));
     }
 
     // endregion
 
     // region 改
 
+    @Override
     default Boolean updateById(E entity) {
-        return applyUntilNotNull(s -> s.updateById(entity));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.updateById(entity));
     }
 
+    @Override
     default Boolean updateAllColumnsById(E entity) {
-        return applyUntilNotNull(s -> s.updateAllColumnsById(entity));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.updateAllColumnsById(entity));
     }
 
+    @Override
     default void updateByIdOrException(E entity) {
-        consume(s -> s.updateByIdOrException(entity));
+        V2ServiceManagerUtil.consume(getServices(), s -> s.updateByIdOrException(entity));
     }
 
+    @Override
     default Boolean updateByCriteria(E entity, C criteria) {
-        return applyUntilNotNull(s -> s.updateByCriteria(entity, criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.updateByCriteria(entity, criteria));
     }
 
+    @Override
     default void updateByCriteriaOrException(E entity, C criteria) {
-        consume(s -> s.updateByCriteriaOrException(entity, criteria));
+        V2ServiceManagerUtil.consume(getServices(), s -> s.updateByCriteriaOrException(entity, criteria));
     }
 
     // endregion
 
     //  region 查
 
+    @Override
     default E getById(Serializable id) {
-        return applyUntilNotNull(s -> s.getById(id));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.getById(id));
     }
 
+    @Override
     default E getByIdOrException(Serializable id) {
-        return applyUntilNotNull(s -> s.getByIdOrException(id));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.getByIdOrException(id));
     }
 
+    @Override
     default E getByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.getByCriteria(criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.getByCriteria(criteria));
     }
 
+    @Override
     default E getByCriteriaOrWarn(C criteria) {
-        return applyUntilNotNull(s -> s.getByCriteriaOrWarn(criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.getByCriteriaOrWarn(criteria));
     }
 
+    @Override
     default E getByCriteriaOrException(C criteria) {
-        return applyUntilNotNull(s -> s.getByCriteriaOrException(criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.getByCriteriaOrException(criteria));
     }
 
+    @Override
     default List<E> findByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.findByCriteria(criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.findByCriteria(criteria));
     }
 
+    @Override
     default IPage<E> findPageByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.findPageByCriteria(criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.findPageByCriteria(criteria));
     }
 
+    @Override
     default List<E> findAll() {
-        return applyUntilNotNull(IV2Service::findAll);
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), IV2Service::findAll);
     }
 
+    @Override
     default Integer countByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.countByCriteria(criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.countByCriteria(criteria));
     }
 
+    @Override
     default Integer countAll() {
-        return applyUntilNotNull(IV2Service::countAll);
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), IV2Service::countAll);
     }
 
+    @Override
     default Boolean isPresentById(Serializable id) {
-        return applyUntilNotNull(s -> s.isPresentById(id));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.isPresentById(id));
     }
 
+    @Override
     default Boolean isPresentByColumn(String columnName, Object value) {
-        return applyUntilNotNull(s -> s.isPresentByColumn(columnName, value));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.isPresentByColumn(columnName, value));
     }
 
+    @Override
     default Boolean isPresentByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.isPresentByCriteria(criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.isPresentByCriteria(criteria));
     }
 
+    @Override
     default Boolean isAbsentByColumn(String columnName, Object value) {
-        return applyUntilNotNull(s -> s.isAbsentByColumn(columnName, value));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.isAbsentByColumn(columnName, value));
     }
 
+    @Override
     default Boolean isAbsentByCriteria(C criteria) {
-        return applyUntilNotNull(s -> s.isAbsentByCriteria(criteria));
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), s -> s.isAbsentByCriteria(criteria));
     }
 
+    @Override
     default void exceptionIfPresentByCriteria(C criteria) {
-        consume(s -> s.exceptionIfPresentByCriteria(criteria));
+        V2ServiceManagerUtil.consume(getServices(), s -> s.exceptionIfPresentByCriteria(criteria));
     }
 
+    @Override
     default void exceptionIfAbsentByCriteria(C criteria) {
-        consume(s -> s.exceptionIfAbsentByCriteria(criteria));
+        V2ServiceManagerUtil.consume(getServices(), s -> s.exceptionIfAbsentByCriteria(criteria));
     }
 
     // endregion
 
-    // region util
-
     default <V> V applyUntilNotNull(Function<S, V> function) {
-        checkServices();
-
-        boolean hasLocalService = false;
-        for (S service : getServices()) {
-            // controller 的实现无需执行
-            if (service.getOrder() == ApiOrder.CONTROLLER) {
-                continue;
-            }
-
-            // 如果有本地服务，则无需执行 feign 服务
-            if (service instanceof IV2LocalService) {
-                hasLocalService = true;
-            }
-
-            if (hasLocalService && (service.getOrder() == ApiOrder.FEIGN_SERVICE)) {
-                continue;
-            }
-
-            V value = function.apply(service);
-            if (value != null) {
-                return value;
-            }
-        }
-        return null;
+        return V2ServiceManagerUtil.applyUntilNotNull(getServices(), function);
     }
 
     default void consume(Consumer<S> consumer) {
-        checkServices();
-
-        for (S service : getServices()) {
-            consumer.accept(service);
-            return;
-        }
+        V2ServiceManagerUtil.consume(getServices(), consumer);
     }
+
 
     default void consumeWithoutException(Consumer<S> consumer) {
-        checkServices();
-
-        for (S service : getServices()) {
-            try {
-                consumer.accept(service);
-                return;
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-        }
+        V2ServiceManagerUtil.consumeWithoutException(getServices(), consumer);
     }
-
-    default void checkServices() {
-        if (getServices() == null) {
-            Class<?>[] interfaces = this.getClass().getInterfaces();
-            throw new UnsupportedOperationException(
-                StrUtil.format(
-                    "当前服务没有[{}]的实现类",
-                    interfaces.length > 0
-                        ? interfaces[0].getSimpleName()
-                        : this.getClass().getSimpleName()));
-        }
-    }
-
-    // endregion
 
 }

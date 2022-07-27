@@ -169,6 +169,9 @@
 
 package vip.isass.core.cache.redis;
 
+import cn.hutool.core.util.ReflectUtil;
+import lombok.SneakyThrows;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
@@ -179,13 +182,28 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.*;
+import org.springframework.data.redis.hash.HashMapper;
+import org.springframework.data.redis.hash.Jackson2HashMapper;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import vip.isass.core.support.JsonUtil;
 
+import java.util.List;
+
+/**
+ * @author rain
+ */
 @Configuration
 @EnableCaching
 @ComponentScan
 public class RedisConfig extends CachingConfigurerSupport {
+
+    public static final HashMapper HASH_MAPPER = new Jackson2HashMapper(false);
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
@@ -199,6 +217,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     @Bean
+    @SneakyThrows
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
@@ -210,9 +229,26 @@ public class RedisConfig extends CachingConfigurerSupport {
 
         template.setValueSerializer(jackson2JsonRedisSerializer);
         template.setHashValueSerializer(jackson2JsonRedisSerializer);
-
         template.afterPropertiesSet();
+
+        // 修改 stream 类型的 hashMapper
+        Object o = ReflectUtil.newInstance(Class.forName("org.springframework.data.redis.core.DefaultStreamOperations"), template, HASH_MAPPER);
+        ReflectUtil.setFieldValue(template, "streamOps", o);
         return template;
+    }
+
+    @Bean
+    @ConditionalOnBean(IRedisSubscriber.class)
+    public RedisMessageListenerContainer listenerContainer(RedisConnectionFactory connectionFactory,
+                                                           List<IRedisSubscriber> redisSubscribers) {
+        RedisMessageListenerContainer listenerContainer = new RedisMessageListenerContainer();
+        listenerContainer.setConnectionFactory(connectionFactory);
+        for (IRedisSubscriber redisSubscriber : redisSubscribers) {
+            MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(redisSubscriber);
+            messageListenerAdapter.afterPropertiesSet();
+            listenerContainer.addMessageListener(messageListenerAdapter, redisSubscriber.topic());
+        }
+        return listenerContainer;
     }
 
 }

@@ -207,9 +207,12 @@
         <module>super-core-web-security</module>
         <module>super-core-web-swagger</module>
         <module>super-core-web-rpc-feign</module>
-        <module>super-core-net</module>
-        <module>super-core-net-netty</module>
-        <module>super-core-net-socketio</module>
+        <module>kernel-net-core</module>
+        <module>kernel-net-netty</module>
+        <module>kernel-net-socketio</module>
+        <module>kernel-net-transfer-core</module>
+        <module>kernel-net-transfer-gateway</module>
+        <module>kernel-net-transfer-service</module>
         <module>super-core-protobuf</module>
         <module>super-core-elasticsearch</module>
         <module>super-core-encryption</module>
@@ -287,6 +290,7 @@
 
         <klock.version>1.4-RELEASE</klock.version>
         <lock4j-redisson.version>2.2.2</lock4j-redisson.version>
+        <redisson.version>3.13.1</redisson.version>
 
         <alipay.version>4.7.12.ALL</alipay.version>
 
@@ -491,19 +495,37 @@
 
             <dependency>
                 <groupId>vip.isass</groupId>
-                <artifactId>super-core-net</artifactId>
+                <artifactId>kernel-net-core</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
-                <artifactId>super-core-net-netty</artifactId>
+                <artifactId>kernel-net-netty</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
-                <artifactId>super-core-net-socketio</artifactId>
+                <artifactId>kernel-net-socketio</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>kernel-net-transfer-core</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>kernel-net-transfer-gateway</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>kernel-net-transfer-service</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
@@ -712,6 +734,18 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
                 <version>${lock4j-redisson.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.redisson</groupId>
+                        <artifactId>redisson-spring-boot-starter</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
 
             <!-- alipay -->

@@ -211,6 +211,9 @@ import java.util.Map;
  */
 public class JsonUtil {
 
+    public static final TypeReference<List<String>> STRING_LIST_TYPE_REFERENCE = new TypeReference<List<String>>() {
+    };
+
     public static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
     };
 
@@ -290,6 +293,7 @@ public class JsonUtil {
         return new DefaultJson().fromObject(object);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> List<T> convertArrayNodeToSimpleObjectList(JsonNode jsonNode, Class<T> clazz) {
         if (jsonNode == null || !jsonNode.isArray()) {
             return Collections.emptyList();
