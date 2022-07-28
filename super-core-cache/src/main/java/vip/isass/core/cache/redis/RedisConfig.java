@@ -191,9 +191,11 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import vip.isass.core.support.JsonUtil;
 
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author rain
@@ -204,6 +206,19 @@ import java.util.List;
 public class RedisConfig extends CachingConfigurerSupport {
 
     public static final HashMapper HASH_MAPPER = new Jackson2HashMapper(false);
+
+    private ThreadPoolTaskExecutor executor;
+
+    private void initExecutor() {
+        this.executor = new ThreadPoolTaskExecutor();
+        this.executor.setCorePoolSize(10);
+        this.executor.setMaxPoolSize(20);
+        this.executor.setQueueCapacity(10000);
+        this.executor.setKeepAliveSeconds(60);
+        this.executor.setThreadNamePrefix("redis-subscriber-");
+        this.executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        this.executor.initialize();
+    }
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
@@ -240,10 +255,12 @@ public class RedisConfig extends CachingConfigurerSupport {
     @Bean
     @ConditionalOnBean(IRedisSubscriber.class)
     public RedisMessageListenerContainer listenerContainer(RedisConnectionFactory connectionFactory,
-                                                           List<IRedisSubscriber> redisSubscribers) {
+                                                           List<IRedisSubscriber<?>> redisSubscribers) {
+        initExecutor();
         RedisMessageListenerContainer listenerContainer = new RedisMessageListenerContainer();
+        listenerContainer.setTaskExecutor(this.executor);
         listenerContainer.setConnectionFactory(connectionFactory);
-        for (IRedisSubscriber redisSubscriber : redisSubscribers) {
+        for (IRedisSubscriber<?> redisSubscriber : redisSubscribers) {
             MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(redisSubscriber);
             messageListenerAdapter.afterPropertiesSet();
             listenerContainer.addMessageListener(messageListenerAdapter, redisSubscriber.topic());

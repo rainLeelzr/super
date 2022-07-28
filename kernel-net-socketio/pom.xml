@@ -198,5 +198,10 @@
             <groupId>com.corundumstudio.socketio</groupId>
             <artifactId>netty-socketio</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>vip.isass</groupId>
+            <artifactId>super-core-web</artifactId>
+        </dependency>
     </dependencies>
 </project>

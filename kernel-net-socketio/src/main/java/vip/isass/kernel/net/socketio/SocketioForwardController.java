@@ -167,160 +167,30 @@
  *
  */
 
-package vip.isass.kernel.net.transfer.service;
+package vip.isass.kernel.net.socketio;
 
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.ReflectUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.redisson.client.protocol.RedisStrictCommand;
-import org.redisson.spring.data.connection.RedissonStreamCommands;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.stream.Consumer;
-import org.springframework.data.redis.connection.stream.ObjectRecord;
-import org.springframework.data.redis.connection.stream.ReadOffset;
-import org.springframework.data.redis.connection.stream.StreamOffset;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.stream.StreamListener;
-import org.springframework.data.redis.stream.StreamMessageListenerContainer;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Service;
-import vip.isass.core.cache.redis.RedisConfig;
-import vip.isass.kernel.net.core.handler.manager.IEventManager;
-import vip.isass.kernel.net.core.message.Message;
-import vip.isass.kernel.net.transfer.core.NetTransferRedisKeyConst;
-
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
-import java.lang.reflect.Field;
-import java.time.Duration;
-import java.util.concurrent.ThreadPoolExecutor;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * @author rain
+ * @author Rain
  */
-@Slf4j
-@Service
-public class MessageRedisStreamListener implements StreamListener<String, ObjectRecord<String, Message>> {
+@Controller
+public class SocketioForwardController {
 
-    @Autowired
-    private IEventManager eventManager;
-
-    private ThreadPoolTaskExecutor executor;
-
-    private void initExecutor() {
-        this.executor = new ThreadPoolTaskExecutor();
-        this.executor.setCorePoolSize(10);
-        this.executor.setMaxPoolSize(20);
-        this.executor.setQueueCapacity(10000);
-        this.executor.setKeepAliveSeconds(60);
-        this.executor.setThreadNamePrefix("redis-stream-");
-        this.executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        this.executor.initialize();
+    @GetMapping("/${spring.application.name}/socketio.html")
+    public String forwardSocketIoHtml() {
+        return "forward:/socketio.html";
     }
 
-    @Override
-    public void onMessage(ObjectRecord<String, Message> message) {
-        Message value = message.getValue();
-        eventManager.onMessage(value);
+    @GetMapping("/${spring.application.name}/socket.io.js")
+    public String forwardSocketIoJs() {
+        return "forward:/socket.io.js";
     }
 
-    private static final Consumer CONSUMER = Consumer.from(NetTransferRedisKeyConst.CONSUMER_GROUP, RandomUtil.randomString(6));
-
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
-    private String streamServiceKey;
-
-    @Autowired
-    public void setApplicationName(@Value("${spring.application.name:}") String applicationName) {
-        this.streamServiceKey = NetTransferRedisKeyConst.REDIS_STREAM_PREFIX_KEY + applicationName;
-    }
-
-    @PreDestroy
-    public void destroy() {
-        try {
-            log.info("正在清理 redis stream[{}]的消费者[{}]", streamServiceKey, CONSUMER);
-
-            // 由于 redisson 的 bug,执行删除消费者时错误地用了"XADD"指令，
-            // 新版 redisson 已更正，但他用了更加新的 springboot 版本，与我们冲突，所以这里只能通过反射修改其指令。
-            RedisStrictCommand<Boolean> command = new RedisStrictCommand<>("XGROUP", obj -> ((Long) obj) > 0);
-            Field field = ReflectUtil.getField(RedissonStreamCommands.class, "XGROUP_BOOLEAN");
-            FieldUtils.removeFinalModifier(field);
-            ReflectUtil.setFieldValue(RedissonStreamCommands.class, field, command);
-
-            redisTemplate.opsForStream().deleteConsumer(streamServiceKey, CONSUMER);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * 监听本微服务和 unknowns 的中转消息
-     *
-     * @param factory redis 连接工厂
-     * @return StreamMessageListenerContainer
-     */
-    @Bean(initMethod = "start", destroyMethod = "stop")
-    public StreamMessageListenerContainer<String, ObjectRecord<String, Message>>
-    netTransferMessageListenerContainer(RedisConnectionFactory factory) {
-        initExecutor();
-
-        @SuppressWarnings("unchecked")
-        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, Message>> options =
-            StreamMessageListenerContainer.StreamMessageListenerContainerOptions
-                .builder()
-                .objectMapper(RedisConfig.HASH_MAPPER)
-                .serializer(redisTemplate.getDefaultSerializer())
-                .hashValueSerializer(redisTemplate.getHashValueSerializer())
-                .pollTimeout(Duration.ofSeconds(4))
-                .batchSize(5)
-                .targetType(Message.class)
-                .executor(this.executor)
-                .build();
-
-        StreamMessageListenerContainer<String, ObjectRecord<String, Message>> listenerContainer =
-            StreamMessageListenerContainer.create(factory, options);
-
-        // 创建本微服务的消费组
-        try {
-            redisTemplate.opsForStream().createGroup(streamServiceKey, CONSUMER.getGroup());
-            log.info("redis stream[{}]的消费者组[{}]已创建", streamServiceKey, CONSUMER.getGroup());
-        } catch (Exception e) {
-            log.info("redis stream[{}]的消费者组[{}]已存在", streamServiceKey, CONSUMER.getGroup());
-        }
-
-        // 创建 unknowns 的消费组
-        try {
-            redisTemplate.opsForStream().createGroup(NetTransferRedisKeyConst.REDIS_STREAM_UNKNOWN_SERVICE_KEY, CONSUMER.getGroup());
-            log.info("redis stream[{}]的消费者组[{}]已创建", NetTransferRedisKeyConst.REDIS_STREAM_UNKNOWN_SERVICE_KEY, CONSUMER.getGroup());
-        } catch (Exception e) {
-            log.info("redis stream[{}]的消费者组[{}]已存在", NetTransferRedisKeyConst.REDIS_STREAM_UNKNOWN_SERVICE_KEY, CONSUMER.getGroup());
-        }
-
-        // 监听本微服务的中转消息
-        listenerContainer.register(
-            StreamMessageListenerContainer.StreamReadRequest
-                .builder(StreamOffset.create(streamServiceKey, ReadOffset.lastConsumed()))
-                .consumer(CONSUMER)
-                .autoAcknowledge(true)
-                .cancelOnError(throwable -> false)
-                .build(),
-            this);
-
-        // 监听 unknowns 的中转消息
-        listenerContainer.register(
-            StreamMessageListenerContainer.StreamReadRequest
-                .builder(StreamOffset.create(NetTransferRedisKeyConst.REDIS_STREAM_UNKNOWN_SERVICE_KEY, ReadOffset.lastConsumed()))
-                .consumer(CONSUMER)
-                .autoAcknowledge(true)
-                .cancelOnError(throwable -> false)
-                .build(),
-            this);
-        return listenerContainer;
+    @GetMapping("/${spring.application.name}/jquery/3.3.1/jquery.min.js")
+    public String forwardJquery() {
+        return "forward:/jquery/3.3.1/jquery.min.js";
     }
 
 }
