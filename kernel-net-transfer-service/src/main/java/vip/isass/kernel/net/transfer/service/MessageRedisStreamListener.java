@@ -169,10 +169,12 @@
 
 package vip.isass.kernel.net.transfer.service;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReflectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.redisson.RedissonShutdownException;
 import org.redisson.client.protocol.RedisStrictCommand;
 import org.redisson.spring.data.connection.RedissonStreamCommands;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -308,6 +310,14 @@ public class MessageRedisStreamListener implements StreamListener<String, Object
                 .consumer(CONSUMER)
                 .autoAcknowledge(true)
                 .cancelOnError(throwable -> false)
+                .errorHandler(t -> {
+                    //noinspection unchecked
+                    if (ExceptionUtil.isCausedBy(t, RedissonShutdownException.class)) {
+                        log.info("redis stream listener[{}:{}]is closed", streamServiceKey, CONSUMER);
+                    } else {
+                        throw new RuntimeException(t);
+                    }
+                })
                 .build(),
             this);
 
@@ -318,6 +328,14 @@ public class MessageRedisStreamListener implements StreamListener<String, Object
                 .consumer(CONSUMER)
                 .autoAcknowledge(true)
                 .cancelOnError(throwable -> false)
+                .errorHandler(t -> {
+                    //noinspection unchecked
+                    if (ExceptionUtil.isCausedBy(t, RedissonShutdownException.class)) {
+                        log.info("redis stream listener[{}:{}]is closed", NetTransferRedisKeyConst.REDIS_STREAM_UNKNOWN_SERVICE_KEY, CONSUMER);
+                    } else {
+                        throw new RuntimeException(t);
+                    }
+                })
                 .build(),
             this);
         return listenerContainer;
