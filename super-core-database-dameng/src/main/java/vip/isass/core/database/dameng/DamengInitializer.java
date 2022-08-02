@@ -167,76 +167,39 @@
  *
  */
 
-package vip.isass.core.database.init;
+package vip.isass.core.database.dameng;
 
 import cn.hutool.core.util.StrUtil;
+import vip.isass.core.database.init.DatabaseInitializer;
 
 /**
- * 数据库初始化器
+ * 达梦数据库 初始化器
  *
  * @author rain
  */
-public interface DatabaseInitializer {
+public class DamengInitializer implements DatabaseInitializer {
 
-    /**
-     * 数据库厂商名。例如mysql，oracle，postgresql
-     *
-     * @return 数据库名称
-     */
-    String database();
-
-    /**
-     * 根据 jdbcUrl 判断是否匹配数据库
-     *
-     * @param jdbcUrl jdbcUrl
-     * @return 是否匹配数据库
-     */
-    boolean match(String jdbcUrl);
-
-    /**
-     * 判断数据库是否存在的 sql
-     *
-     * @param databaseName 数据库名
-     * @return 判断数据库是否存在的 sql
-     */
-    String checkDatabaseNameExistSql(String databaseName);
-
-
-    /**
-     * 根据 jdbcUrl 解析出数据库名
-     *
-     * @param jdbcUrl jdbcUrl
-     * @return 数据库名
-     */
-    default String parseDatabaseName(String jdbcUrl) {
-        int index = jdbcUrl.indexOf("://");
-        if (index == -1) {
-            throw new IllegalArgumentException("can not parse database name from jdbcUrl:" + jdbcUrl);
-        }
-
-        int slashIndex = jdbcUrl.indexOf("/", index + 3);
-        slashIndex++;
-        if (slashIndex == 0 || slashIndex == jdbcUrl.length()) {
-            throw new IllegalArgumentException("can not parse database name from jdbcUrl:" + jdbcUrl);
-        }
-
-        int questionMarkIndex = jdbcUrl.indexOf("?", slashIndex);
-        String databaseName = questionMarkIndex == -1
-            ? jdbcUrl.substring(slashIndex)
-            : jdbcUrl.substring(slashIndex, questionMarkIndex);
-
-        if (StrUtil.isBlank(databaseName)) {
-            throw new IllegalArgumentException("can not parse database name from jdbcUrl:" + jdbcUrl);
-        }
-        return databaseName;
+    @Override
+    public String database() {
+        return "dameng";
     }
 
-    /**
-     * 创建数据的sql
-     *
-     * @param databaseName 数据库名
-     * @return 创建数据库sql
-     */
-    String createDatabaseSql(String databaseName);
+    @Override
+    public boolean match(String jdbcUrl) {
+        return jdbcUrl.contains(":dm:");
+    }
 
+    @Override
+    public String checkDatabaseNameExistSql(String databaseName) {
+        return StrUtil.format("select count(*) from sysobjects where NAME='{}' and SUBTYPE$ is null;", databaseName.toUpperCase());
+    }
+
+    @Override
+    public String createDatabaseSql(String databaseName) {
+        return StrUtil.format("CREATE SCHEMA {};", databaseName);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new DamengInitializer().parseDatabaseName("jdbc:dm://ip:5236/SY?SDsBA21"));
+    }
 }

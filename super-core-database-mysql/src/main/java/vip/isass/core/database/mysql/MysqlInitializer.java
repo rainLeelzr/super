@@ -167,76 +167,38 @@
  *
  */
 
-package vip.isass.core.database.init;
+package vip.isass.core.database.mysql;
 
 import cn.hutool.core.util.StrUtil;
+import vip.isass.core.database.init.DatabaseInitializer;
 
 /**
- * 数据库初始化器
+ * mysql 初始化器
  *
  * @author rain
  */
-public interface DatabaseInitializer {
+public class MysqlInitializer implements DatabaseInitializer {
 
-    /**
-     * 数据库厂商名。例如mysql，oracle，postgresql
-     *
-     * @return 数据库名称
-     */
-    String database();
-
-    /**
-     * 根据 jdbcUrl 判断是否匹配数据库
-     *
-     * @param jdbcUrl jdbcUrl
-     * @return 是否匹配数据库
-     */
-    boolean match(String jdbcUrl);
-
-    /**
-     * 判断数据库是否存在的 sql
-     *
-     * @param databaseName 数据库名
-     * @return 判断数据库是否存在的 sql
-     */
-    String checkDatabaseNameExistSql(String databaseName);
-
-
-    /**
-     * 根据 jdbcUrl 解析出数据库名
-     *
-     * @param jdbcUrl jdbcUrl
-     * @return 数据库名
-     */
-    default String parseDatabaseName(String jdbcUrl) {
-        int index = jdbcUrl.indexOf("://");
-        if (index == -1) {
-            throw new IllegalArgumentException("can not parse database name from jdbcUrl:" + jdbcUrl);
-        }
-
-        int slashIndex = jdbcUrl.indexOf("/", index + 3);
-        slashIndex++;
-        if (slashIndex == 0 || slashIndex == jdbcUrl.length()) {
-            throw new IllegalArgumentException("can not parse database name from jdbcUrl:" + jdbcUrl);
-        }
-
-        int questionMarkIndex = jdbcUrl.indexOf("?", slashIndex);
-        String databaseName = questionMarkIndex == -1
-            ? jdbcUrl.substring(slashIndex)
-            : jdbcUrl.substring(slashIndex, questionMarkIndex);
-
-        if (StrUtil.isBlank(databaseName)) {
-            throw new IllegalArgumentException("can not parse database name from jdbcUrl:" + jdbcUrl);
-        }
-        return databaseName;
+    @Override
+    public String database() {
+        return "mysql";
     }
 
-    /**
-     * 创建数据的sql
-     *
-     * @param databaseName 数据库名
-     * @return 创建数据库sql
-     */
-    String createDatabaseSql(String databaseName);
+    @Override
+    public boolean match(String jdbcUrl) {
+        return jdbcUrl.contains(":mysql:");
+    }
+
+    @Override
+    public String checkDatabaseNameExistSql(String databaseName) {
+        // SELECT count(*) FROM information_schema.SCHEMATA where SCHEMA_NAME ='{}'
+        return null;
+    }
+
+    @Override
+    public String createDatabaseSql(String databaseName) {
+        return StrUtil.format(
+            "create database if not exists `{}` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci", databaseName);
+    }
 
 }

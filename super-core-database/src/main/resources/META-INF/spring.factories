@@ -2,4 +2,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 vip.isass.core.database.DatabaseAutoConfiguration
 org.springframework.context.ApplicationContextInitializer=\
-vip.isass.core.database.init.DatabaseInitializer
+vip.isass.core.database.init.DatabaseInitializerManager

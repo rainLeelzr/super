@@ -167,196 +167,115 @@
  *
  */
 
-package vip.isass.core.database.mybatisplus.config;
+package vip.isass.core.database.init;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ServiceLoaderUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.core.config.GlobalConfig;
-import com.baomidou.mybatisplus.core.injector.ISqlInjector;
-import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
-import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
-import org.apache.ibatis.logging.nologging.NoLoggingImpl;
-import org.apache.ibatis.mapping.DatabaseIdProvider;
-import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
-import org.apache.ibatis.session.AutoMappingUnknownColumnBehavior;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.type.BaseTypeHandler;
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.lang.NonNull;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.annotation.TransactionManagementConfigurer;
-import vip.isass.core.database.mybatisplus.driver.MybatisXmlLanguageDriver;
-import vip.isass.core.database.mybatisplus.plus.handler.MybatisPlusMetaObjectHandler;
-import vip.isass.core.database.mybatisplus.typehandler.DefaultEnumTypeHandler;
-import vip.isass.core.page.PageConst;
+import cn.hutool.db.Db;
+import cn.hutool.db.DbUtil;
+import cn.hutool.db.StatementUtil;
+import cn.hutool.db.ds.simple.SimpleDataSource;
+import cn.hutool.db.handler.NumberHandler;
+import cn.hutool.db.sql.SqlExecutor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
-/**
- * @author rain
- */
-@Configuration
-@EnableTransactionManagement
-public class SqlSessionConfig implements TransactionManagementConfigurer {
+@Slf4j
+public class DatabaseInitializerManager implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    @Resource
-    private DataSource dataSource;
+    private static volatile boolean RUN = false;
 
-    @Value("${spring.profiles:default}")
-    private String profiles;
-
-    @Value("${mybatis-plus.mapper-locations:}")
-    private List<String> mapperLocations;
-
-    @Autowired(required = false)
-    private List<IMapperLocationProvider> mapperLocationProviders;
-
-    @Value("${mybatis-plus.global-config.db-config.capital-mode:false}")
-    private boolean capitalMode;
-
-    @Value("${mybatisPlus.globalConfig.dbConfig.columnFormat:}")
-    private String columnFormat;
-
-    @Autowired(required = false)
-    private List<BaseTypeHandler<?>> baseTypeHandlers;
-
-    @Autowired(required = false)
-    private ISqlInjector sqlInjector;
-
-    @Bean
-    public GlobalConfig globalConfig() {
-        GlobalConfig.DbConfig dbConfig = new GlobalConfig.DbConfig();
-        dbConfig.setLogicDeleteValue(Boolean.TRUE.toString());
-        dbConfig.setLogicNotDeleteValue(Boolean.FALSE.toString());
-        dbConfig.setIdType(IdType.ASSIGN_ID);
-        dbConfig.setCapitalMode(capitalMode);
-        if (StrUtil.isNotBlank(columnFormat)) {
-            dbConfig.setColumnFormat(columnFormat);
-        }
-
-        GlobalConfig conf = new GlobalConfig();
-        conf.setBanner(false);
-        conf.setDbConfig(dbConfig);
-
-        if (sqlInjector != null) {
-            conf.setSqlInjector(sqlInjector);
-        }
-
-        // 自定义填充策略接口实现
-        conf.setMetaObjectHandler(new MybatisPlusMetaObjectHandler());
-
-        return conf;
-    }
-
-    @Bean
-    public DatabaseIdProvider databaseIdProvider() {
-        VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
-        Properties properties = new Properties();
-        properties.put("Oracle", "oracle");
-        properties.put("MySQL", "mysql");
-        properties.put("DM DBMS", "dm");
-        databaseIdProvider.setProperties(properties);
-        return databaseIdProvider;
-    }
-
-    private org.springframework.core.io.Resource[] getMapperLocationsResources() throws Exception {
-        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        List<org.springframework.core.io.Resource> mapperResources = new ArrayList<>();
-
-        parseMapperLocations(resolver, mapperResources, mapperLocations);
-
-        if (mapperLocationProviders != null) {
-            for (IMapperLocationProvider mapperLocationProvider : mapperLocationProviders) {
-                parseMapperLocations(resolver, mapperResources, mapperLocationProvider.getMapperLocations());
-            }
-        }
-
-        return mapperResources.isEmpty()
-            ? null
-            : ArrayUtil.toArray(mapperResources, org.springframework.core.io.Resource.class);
-    }
-
-    private void parseMapperLocations(ResourcePatternResolver resolver,
-                                      List<org.springframework.core.io.Resource> mapperResources,
-                                      List<String> mapperLocations) throws IOException {
-        if (CollUtil.isEmpty(mapperLocations)) {
+    @Override
+    public void initialize(ConfigurableApplicationContext applicationContext) {
+        if (RUN) {
             return;
         }
 
-        for (String mapperLocation : mapperLocations) {
-            if (StrUtil.isBlank(mapperLocation)) {
-                continue;
+        String autoCreate = applicationContext.getEnvironment().getProperty(
+            "spring.datasource.autoCreate");
+        if ("false".equalsIgnoreCase(autoCreate)) {
+            RUN = true;
+            return;
+        }
+
+        String jdbcUrl = applicationContext.getEnvironment().getProperty(
+            "spring.datasource.dynamic.datasource.master.url");
+        String username = applicationContext.getEnvironment().getProperty(
+            "spring.datasource.dynamic.datasource.master.username");
+        String password = applicationContext.getEnvironment().getProperty(
+            "spring.datasource.dynamic.datasource.master.password");
+
+        if (StrUtil.hasBlank(jdbcUrl, username, password)) {
+            return;
+        }
+        try {
+            log.info("开始创建数据库: 数据库不存在则自动创建数据库");
+            initDatabase(jdbcUrl, username, password);
+        } catch (Exception e) {
+            log.info("数据库初始化失败");
+            log.error(e.getMessage(), e);
+        }
+        RUN = true;
+    }
+
+    private void initDatabase(String jdbcUrl, String username, String password) {
+        List<DatabaseInitializer> databaseInitializers = ServiceLoaderUtil.loadList(DatabaseInitializer.class);
+        if (databaseInitializers == null) {
+            log.error("cannot found DatabaseInitializer implements");
+            return;
+        }
+
+        DatabaseInitializer databaseInitializer = null;
+        for (DatabaseInitializer temp : databaseInitializers) {
+            if (temp.match(jdbcUrl)) {
+                databaseInitializer = temp;
+                break;
+            }
+        }
+
+        if (databaseInitializer == null) {
+            log.error("cannot found DatabaseInitializer, jdbcUrl: {}", jdbcUrl);
+            return;
+        }
+
+        log.info("found master datasource jdbcUrl: {}", jdbcUrl);
+
+        String databaseName = databaseInitializer.parseDatabaseName(jdbcUrl);
+        log.info("database name: {}", databaseName);
+        String checkDatabaseNameExistSql = databaseInitializer.checkDatabaseNameExistSql(databaseName);
+        String createDatabaseSql = databaseInitializer.createDatabaseSql(databaseName);
+
+        jdbcUrl = StrUtil.removeAll(jdbcUrl, "/" + databaseName);
+        DataSource ds = new SimpleDataSource(jdbcUrl, username, password);
+        Db db = DbUtil.use(ds);
+        Connection conn = null;
+
+        try {
+            conn = ds.getConnection();
+            boolean databaseExist = false;
+            if (checkDatabaseNameExistSql != null) {
+                log.info("running check database exist sql: {}", checkDatabaseNameExistSql);
+                Number query = SqlExecutor.query(conn, checkDatabaseNameExistSql, new NumberHandler(), Collections.emptyMap());
+                int databaseCount = query.intValue();
+                databaseExist = databaseCount > 0;
             }
 
-            org.springframework.core.io.Resource[] resources = resolver.getResources(mapperLocation);
-            mapperResources.addAll(CollUtil.toList(resources));
+            if (!databaseExist) {
+                log.info("running create database sql: {}", createDatabaseSql);
+                PreparedStatement preparedStatement = StatementUtil.prepareStatement(conn, createDatabaseSql);
+                SqlExecutor.execute(preparedStatement);
+            }
+        } catch (Exception e) {
+            log.error("database init fail :{}", e.getMessage(), e);
+        } finally {
+            db.closeConnection(conn);
         }
     }
-
-    @Bean
-    public SqlSessionFactory sqlSessionFactory(GlobalConfig globalConfig, DatabaseIdProvider databaseIdProvider) throws Exception {
-        MybatisSqlSessionFactoryBean sqlSessionFactory = new MybatisSqlSessionFactoryBean();
-        sqlSessionFactory.setDataSource(dataSource);
-        sqlSessionFactory.setMapperLocations(getMapperLocationsResources());
-        sqlSessionFactory.setTypeEnumsPackage("vip.isass.**");
-
-        MybatisConfiguration configuration = new MybatisConfiguration();
-        configuration.setMapUnderscoreToCamelCase(true);
-        configuration.setCacheEnabled(false);
-        configuration.setDefaultScriptingLanguage(MybatisXmlLanguageDriver.class);
-        configuration.setJdbcTypeForNull(JdbcType.NULL);
-        configuration.setDefaultEnumTypeHandler(DefaultEnumTypeHandler.class);
-        configuration.setDatabaseId(databaseIdProvider.getDatabaseId(dataSource));
-
-        // 关闭 mybatis 日志。由 p6spy 实现日志打印
-        configuration.setLogImpl(NoLoggingImpl.class);
-
-        if (CollUtil.isNotEmpty(baseTypeHandlers)) {
-            TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
-            baseTypeHandlers.forEach(typeHandlerRegistry::register);
-        }
-
-        /*
-         * MyBatis 自动映射时未知列或未知属性处理策略
-         * 通过该配置可指定 MyBatis 在自动映射过程中遇到未知列或者未知属性时如何处理，总共有 3 种可选值：
-         * AutoMappingUnknownColumnBehavior.NONE：不做任何处理 (默认值)
-         * AutoMappingUnknownColumnBehavior.WARNING：以日志的形式打印相关警告信息
-         * AutoMappingUnknownColumnBehavior.FAILING：当作映射失败处理，并抛出异常和详细信息
-         */
-        configuration.setAutoMappingUnknownColumnBehavior(AutoMappingUnknownColumnBehavior.WARNING);
-
-        sqlSessionFactory.setConfiguration(configuration);
-
-        // 配置插件
-        sqlSessionFactory.setPlugins(
-            new PaginationInterceptor().setLimit(PageConst.MAX_PAGE_SIZE),
-            new OptimisticLockerInterceptor());
-        sqlSessionFactory.setGlobalConfig(globalConfig);
-        return sqlSessionFactory.getObject();
-    }
-
-    @NonNull
-    @Override
-    public PlatformTransactionManager annotationDrivenTransactionManager() {
-        return new DataSourceTransactionManager(dataSource);
-    }
-
 }
