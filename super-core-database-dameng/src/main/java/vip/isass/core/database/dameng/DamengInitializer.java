@@ -199,7 +199,11 @@ public class DamengInitializer implements DatabaseInitializer {
         return StrUtil.format("CREATE SCHEMA {};", databaseName);
     }
 
-    public static void main(String[] args) {
-        System.out.println(new DamengInitializer().parseDatabaseName("jdbc:dm://ip:5236/SY?SDsBA21"));
+    @Override
+    public String removeDatabaseName(String jdbcUrl, String databaseName) {
+        jdbcUrl = DatabaseInitializer.super.removeDatabaseName(jdbcUrl, databaseName);
+        jdbcUrl = jdbcUrl.replace("schema=" + databaseName, "");
+        return jdbcUrl;
     }
+
 }

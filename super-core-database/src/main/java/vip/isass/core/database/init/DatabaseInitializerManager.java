@@ -249,16 +249,12 @@ public class DatabaseInitializerManager implements ApplicationContextInitializer
 
         String databaseName = databaseInitializer.parseDatabaseName(jdbcUrl);
         log.info("database name: {}", databaseName);
+        jdbcUrl = databaseInitializer.removeDatabaseName(jdbcUrl, databaseName);
+        log.info("remove database name jdbcUrl: {}", jdbcUrl);
         String checkDatabaseNameExistSql = databaseInitializer.checkDatabaseNameExistSql(databaseName);
         String createDatabaseSql = databaseInitializer.createDatabaseSql(databaseName);
 
-        String connectJdbcUrl = jdbcUrl;
-        int questionIndex = jdbcUrl.indexOf("?");
-        if (questionIndex > 0) {
-            connectJdbcUrl = connectJdbcUrl.substring(0, questionIndex);
-        }
-        connectJdbcUrl = connectJdbcUrl.replace("/" + databaseName, "");
-        DataSource ds = new SimpleDataSource(connectJdbcUrl, username, password);
+        DataSource ds = new SimpleDataSource(jdbcUrl, username, password);
         Db db = DbUtil.use(ds);
         Connection conn = null;
 

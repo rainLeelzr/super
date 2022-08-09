@@ -239,4 +239,15 @@ public interface DatabaseInitializer {
      */
     String createDatabaseSql(String databaseName);
 
+    /**
+     * 删除 jdbcUrl 的数据库名
+     *
+     * @param jdbcUrl      jdbcUrl
+     * @param databaseName 数据库名
+     * @return jdbcUrl
+     */
+    default String removeDatabaseName(String jdbcUrl, String databaseName) {
+        return jdbcUrl.replace("/" + databaseName, "");
+    }
+
 }

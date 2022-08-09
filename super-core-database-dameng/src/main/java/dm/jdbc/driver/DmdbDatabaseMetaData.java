@@ -183,6 +183,9 @@ import java.sql.RowIdLifetime;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * 修复 do_getDatabaseMinorVersion 报错的bug
+ */
 public class DmdbDatabaseMetaData extends Filterable implements DatabaseMetaData {
     public DmdbConnection connection = null;
     private final String m_esp = " ESCAPE '!' ";
