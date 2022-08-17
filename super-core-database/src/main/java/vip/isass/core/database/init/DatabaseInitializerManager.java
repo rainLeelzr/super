@@ -192,6 +192,11 @@ public class DatabaseInitializerManager implements ApplicationContextInitializer
 
     private static volatile boolean RUN = false;
 
+    /**
+     * 主数据源数据库名
+     */
+    private String masterDatasourceDatabaseName = "";
+
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
         if (RUN) {
@@ -247,12 +252,12 @@ public class DatabaseInitializerManager implements ApplicationContextInitializer
 
         log.info("found master datasource jdbcUrl: {}", jdbcUrl);
 
-        String databaseName = databaseInitializer.parseDatabaseName(jdbcUrl);
-        log.info("database name: {}", databaseName);
-        jdbcUrl = databaseInitializer.removeDatabaseName(jdbcUrl, databaseName);
+        masterDatasourceDatabaseName = databaseInitializer.parseDatabaseName(jdbcUrl);
+        log.info("database name: {}", masterDatasourceDatabaseName);
+        jdbcUrl = databaseInitializer.removeDatabaseName(jdbcUrl, masterDatasourceDatabaseName);
         log.info("remove database name jdbcUrl: {}", jdbcUrl);
-        String checkDatabaseNameExistSql = databaseInitializer.checkDatabaseNameExistSql(databaseName);
-        String createDatabaseSql = databaseInitializer.createDatabaseSql(databaseName);
+        String checkDatabaseNameExistSql = databaseInitializer.checkDatabaseNameExistSql(masterDatasourceDatabaseName);
+        String createDatabaseSql = databaseInitializer.createDatabaseSql(masterDatasourceDatabaseName);
 
         DataSource ds = new SimpleDataSource(jdbcUrl, username, password);
         Db db = DbUtil.use(ds);
@@ -279,4 +284,14 @@ public class DatabaseInitializerManager implements ApplicationContextInitializer
             db.closeConnection(conn);
         }
     }
+
+    /**
+     * 获取主数据源数据库名
+     *
+     * @return 主数据源数据库名
+     */
+    public String getMasterDatasourceDatabaseName() {
+        return masterDatasourceDatabaseName;
+    }
+
 }
