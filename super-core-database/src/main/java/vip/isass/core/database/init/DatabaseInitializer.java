@@ -204,6 +204,8 @@ public interface DatabaseInitializer {
 
     /**
      * 根据 jdbcUrl 解析出数据库名
+     * 示例: jdbc:mysql://127.0.0.1:3306/attachment?useUnicode
+     * 从提取到 attachment 作为数据库名
      *
      * @param jdbcUrl jdbcUrl
      * @return 数据库名

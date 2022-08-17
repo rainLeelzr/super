@@ -169,6 +169,7 @@
 
 package vip.isass.core.database.dameng;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import vip.isass.core.database.init.DatabaseInitializer;
 
@@ -187,6 +188,23 @@ public class DamengInitializer implements DatabaseInitializer {
     @Override
     public boolean match(String jdbcUrl) {
         return jdbcUrl.contains(":dm:");
+    }
+
+    @Override
+    public String parseDatabaseName(String jdbcUrl) {
+        int schemaKeyIndex = jdbcUrl.indexOf("schema=");
+        if (schemaKeyIndex == -1) {
+            schemaKeyIndex = jdbcUrl.indexOf("SCHEMA=");
+        }
+        Assert.isTrue(schemaKeyIndex > 0, "can not parse database name because not found property 'schema=' from jdbcUrl: {}", jdbcUrl);
+        int schemaValueIndex = schemaKeyIndex + 7;
+        int ampIndex = jdbcUrl.indexOf("&", schemaValueIndex);
+        String databaseName = ampIndex == -1
+            ? jdbcUrl.substring(schemaValueIndex)
+            : jdbcUrl.substring(schemaValueIndex, ampIndex);
+
+        Assert.notBlank(databaseName, "can not parse database name because not found property 'schema=' from jdbcUrl: {}", jdbcUrl);
+        return databaseName;
     }
 
     @Override

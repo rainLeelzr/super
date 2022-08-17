@@ -9,8 +9,7 @@
 
 ## 创建数据库
 
-- 启动服务时，程序会自动判断数据库是否存在，不存在则自动创建数据库。数据库名读取 `spring.datasource.mysql.master.database` 的配置
-- 如需更改数据库名，请修改参数 `spring.datasource.mysql.master.database`
+- 启动服务时，程序会自动读取配置文件的 `spring.datasource.dynamic.datasource.master.url`, 判断数据库是否存在，不存在则自动创建数据库。
 
 ## 拷贝文件
 
