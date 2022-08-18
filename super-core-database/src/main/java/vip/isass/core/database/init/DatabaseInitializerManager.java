@@ -187,6 +187,12 @@ import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 数据库初始化管理器
+ * jdbcUrl 指定的数据库不存在时自动创建数据库
+ *
+ * @author rain
+ */
 @Slf4j
 public class DatabaseInitializerManager implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
@@ -195,7 +201,7 @@ public class DatabaseInitializerManager implements ApplicationContextInitializer
     /**
      * 主数据源数据库名
      */
-    private String masterDatasourceDatabaseName = "";
+    private static String masterDatasourceDatabaseName = "";
 
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
@@ -290,7 +296,7 @@ public class DatabaseInitializerManager implements ApplicationContextInitializer
      *
      * @return 主数据源数据库名
      */
-    public String getMasterDatasourceDatabaseName() {
+    public static String getMasterDatasourceDatabaseName() {
         return masterDatasourceDatabaseName;
     }
 
