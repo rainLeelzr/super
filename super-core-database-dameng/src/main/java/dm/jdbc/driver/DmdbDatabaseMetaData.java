@@ -169,6 +169,7 @@
 
 package dm.jdbc.driver;
 
+import cn.hutool.core.util.StrUtil;
 import dm.jdbc.desc.Configuration;
 import dm.jdbc.desc.DmProperties;
 import dm.jdbc.filter.Filterable;
@@ -1340,7 +1341,9 @@ public class DmdbDatabaseMetaData extends Filterable implements DatabaseMetaData
         if (StringUtil.equals(var3, "")) {
             return null;
         } else {
-            String var5 = var2 == null ? "%" : StringUtil.processSingleQuoteOfName(var2);
+            String var5 = var2 == null
+                ? StrUtil.isBlank(this.connection.getSchema()) ? "%" : this.connection.getSchema()
+                : StringUtil.processSingleQuoteOfName(var2);
             String var6 = var3 == null ? "%" : StringUtil.processSingleQuoteOfName(var3);
             StringBuilder var7 = new StringBuilder("");
             var7.append("SELECT /*+ MAX_OPT_N_TABLES(5) */ NULL AS TABLE_CAT,SCHEMAS.NAME AS TABLE_SCHEM,TABS.NAME AS TABLE_NAME, CASE TABS.SUBTYPE$ WHEN 'UTAB' THEN 'TABLE' WHEN 'VIEW' THEN 'VIEW' WHEN 'STAB' THEN 'SYSTEM TABLE' WHEN 'SYNOM' THEN 'SYNONYM' END AS TABLE_TYPE, (SELECT COMMENT$ FROM SYSTABLECOMMENTS WHERE SCHNAME = SCHEMAS.NAME AND TVNAME = TABS.NAME) AS REMARKS, NULL AS TYPE_CAT, NULL AS TYPE_SCHEM, NULL AS TYPE_NAME, NULL AS SELF_REFERENCING_COL_NAME, NULL AS REF_GENERATION ");

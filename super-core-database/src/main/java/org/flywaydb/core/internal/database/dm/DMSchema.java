@@ -936,7 +936,19 @@ public class DMSchema extends Schema<DMDatabase, DMTable> {
          */
         public static Set<String> getObjectTypeNames(JdbcTemplate jdbcTemplate, DMDatabase database, DMSchema schema) throws SQLException {
             // 某模式下所有表名 需要DBA权限          AND SEGMENT_NAME LIKE 'CD_%'\n"
-            String query = "select SEGMENT_NAME as tbName from dba_segments  where segment_type='TABLE' and OWNER =? ";
+            // 此条 dba_segments 的 sql很慢，OWNER没有索引，查询需要分钟级，所以优化成查询sysobjects表
+            // String query = "select SEGMENT_NAME as tbName from dba_segments  where segment_type='TABLE' and OWNER =? ";
+            String query = "select name from sysobjects " +
+                "where " +
+                "schid = ( " +
+                "   select object_id " +
+                "   from all_objects " +
+                "   where " +
+                "       object_type = 'SCH' and " +
+                "       object_name = ? " +
+                ") " +
+                "and type$='SCHOBJ'";
+
             int n = 1;
             String[] params = new String[n];
             Arrays.fill(params, schema.getName());
