@@ -193,7 +193,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class V2MybatisPlusWhereCondition {
 
-    private static final Map<DataSource, String> DATA_SOURCE_TYPE_MAPPING = new ConcurrentHashMap<>();
+    private static final Map<DataSource, String> DB_TYPE_MAPPING = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
     public static void apply(V2WhereCondition whereCondition, AbstractWrapper wrapper) {
@@ -396,15 +396,21 @@ public class V2MybatisPlusWhereCondition {
     private static String getDbType() {
         DynamicRoutingDataSource ds = SpringContextUtil.getBean(DynamicRoutingDataSource.class);
         DataSource datasource = ds.determineDataSource();
-        if (!datasource.isWrapperFor(HikariDataSource.class)) {
-            return "";
+        String dbType = DB_TYPE_MAPPING.get(datasource);
+        if (dbType != null) {
+            return dbType;
         }
-        String jdbcUrl = datasource.unwrap(HikariDataSource.class).getJdbcUrl();
-        if (jdbcUrl.contains(":dm:")) {
-            return "dm";
-        } else if (jdbcUrl.contains("mysql:")) {
-            return "mysql";
+
+        dbType = "";
+        if (datasource.isWrapperFor(HikariDataSource.class)) {
+            String jdbcUrl = datasource.unwrap(HikariDataSource.class).getJdbcUrl();
+            if (jdbcUrl.contains(":dm:")) {
+                dbType = "dm";
+            } else if (jdbcUrl.contains("mysql:")) {
+                dbType = "mysql";
+            }
         }
-        return "";
+        DB_TYPE_MAPPING.put(datasource, dbType);
+        return dbType;
     }
 }
