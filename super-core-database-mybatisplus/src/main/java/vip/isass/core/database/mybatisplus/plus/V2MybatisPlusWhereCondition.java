@@ -171,20 +171,29 @@ package vip.isass.core.database.mybatisplus.plus;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.zaxxer.hikari.HikariDataSource;
+import lombok.SneakyThrows;
 import vip.isass.core.structure.criteria.V2WhereCondition;
 import vip.isass.core.support.JsonUtil;
+import vip.isass.core.support.SpringContextUtil;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Rain
  */
 public class V2MybatisPlusWhereCondition {
+
+    private static final Map<DataSource, String> DATA_SOURCE_TYPE_MAPPING = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
     public static void apply(V2WhereCondition whereCondition, AbstractWrapper wrapper) {
@@ -264,67 +273,138 @@ public class V2MybatisPlusWhereCondition {
                         whereCondition.getColumnName(),
                         CollUtil.join((Collection) whereCondition.getValue(), ",")));
                 break;
-            case MYSQL_JSON_ARRAY_CONTAINS:
+            case JSON_ARRAY_CONTAINS:
                 if (whereCondition.getValue() == null) {
                     return;
                 }
-                try {
-                    wrapper.apply(
-                        StrUtil.format("JSON_CONTAINS({},{0})", whereCondition.getColumnName()),
-                        JsonUtil.DEFAULT_INSTANCE.writeValueAsString(Collections.singletonList(whereCondition.getValue()))
-                    );
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                switch (getDbType()) {
+                    case "":
+                    case "mysql":
+                        try {
+                            wrapper.apply(
+                                StrUtil.format("JSON_CONTAINS({},{0})", whereCondition.getColumnName()),
+                                JsonUtil.DEFAULT_INSTANCE.writeValueAsString(Collections.singletonList(whereCondition.getValue()))
+                            );
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+                    case "dm":
+                        wrapper.apply(
+                            StrUtil.format("{} like concat('%',{0},'%')", whereCondition.getColumnName()),
+                            whereCondition.getValue()
+                        );
+                        break;
                 }
+
                 break;
-            case MYSQL_JSON_ARRAY_CONTAINS_ANY:
+            case JSON_ARRAY_CONTAINS_ANY:
                 Collection<?> containsAnyValues = (Collection<?>) whereCondition.getValue();
                 if (CollUtil.isEmpty(containsAnyValues)) {
                     return;
                 }
-                try {
-                    List<String> sqlFragments = new ArrayList<>(containsAnyValues.size());
-                    Object[] valueArr = new Object[containsAnyValues.size()];
-                    int i = 0;
-                    for (Object o : containsAnyValues) {
-                        sqlFragments.add(StrUtil.format("JSON_CONTAINS({},{{}})", whereCondition.getColumnName(), i));
-                        valueArr[i] = JsonUtil.DEFAULT_INSTANCE.writeValueAsString(o);
-                        i++;
-                    }
-                    String whereSql = CollUtil.join(sqlFragments, " OR ");
-                    wrapper.apply(
-                        whereSql,
-                        valueArr
-                    );
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                switch (getDbType()) {
+                    case "":
+                    case "mysql":
+                        try {
+                            List<String> sqlFragments = new ArrayList<>(containsAnyValues.size());
+                            Object[] valueArr = new Object[containsAnyValues.size()];
+                            int i = 0;
+                            for (Object o : containsAnyValues) {
+                                sqlFragments.add(StrUtil.format("JSON_CONTAINS({},{{}})", whereCondition.getColumnName(), i));
+                                valueArr[i] = JsonUtil.DEFAULT_INSTANCE.writeValueAsString(o);
+                                i++;
+                            }
+                            String whereSql = CollUtil.join(sqlFragments, " OR ");
+                            wrapper.apply(
+                                whereSql,
+                                valueArr
+                            );
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+                    case "dm":
+                        List<String> sqlFragments = new ArrayList<>(containsAnyValues.size());
+                        Object[] valueArr = new Object[containsAnyValues.size()];
+                        int i = 0;
+                        for (Object o : containsAnyValues) {
+                            sqlFragments.add(StrUtil.format("{} like concat('%',{{}},'%')", whereCondition.getColumnName(), i));
+                            valueArr[i] = o;
+                            i++;
+                        }
+                        String whereSql = CollUtil.join(sqlFragments, " OR ");
+                        wrapper.apply(
+                            whereSql,
+                            valueArr
+                        );
+                        break;
                 }
+
                 break;
-            case MYSQL_JSON_ARRAY_CONTAINS_ALL:
+            case JSON_ARRAY_CONTAINS_ALL:
                 Collection<?> containsAllValues = (Collection<?>) whereCondition.getValue();
                 if (CollUtil.isEmpty(containsAllValues)) {
                     return;
                 }
-                try {
-                    List<String> sqlFragments = new ArrayList<>(containsAllValues.size());
-                    Object[] valueArr = new Object[containsAllValues.size()];
-                    int i = 0;
-                    for (Object o : containsAllValues) {
-                        sqlFragments.add(StrUtil.format("JSON_CONTAINS({},{{}})", whereCondition.getColumnName(), i));
-                        valueArr[i] = JsonUtil.DEFAULT_INSTANCE.writeValueAsString(o);
-                        i++;
-                    }
-                    String whereSql = CollUtil.join(sqlFragments, " AND ");
-                    wrapper.apply(
-                        whereSql,
-                        valueArr
-                    );
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+
+                switch (getDbType()) {
+                    case "":
+                    case "mysql":
+                        try {
+                            List<String> sqlFragments = new ArrayList<>(containsAllValues.size());
+                            Object[] valueArr = new Object[containsAllValues.size()];
+                            int i = 0;
+                            for (Object o : containsAllValues) {
+                                sqlFragments.add(StrUtil.format("JSON_CONTAINS({},{{}})", whereCondition.getColumnName(), i));
+                                valueArr[i] = JsonUtil.DEFAULT_INSTANCE.writeValueAsString(o);
+                                i++;
+                            }
+                            String whereSql = CollUtil.join(sqlFragments, " AND ");
+                            wrapper.apply(
+                                whereSql,
+                                valueArr
+                            );
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+                    case "dm":
+                        List<String> sqlFragments = new ArrayList<>(containsAllValues.size());
+                        Object[] valueArr = new Object[containsAllValues.size()];
+                        int i = 0;
+                        for (Object o : containsAllValues) {
+                            sqlFragments.add(StrUtil.format("{} like concat('%',{{}},'%')", whereCondition.getColumnName(), i));
+                            valueArr[i] = o;
+                            i++;
+                        }
+                        String whereSql = CollUtil.join(sqlFragments, " AND ");
+                        wrapper.apply(
+                            whereSql,
+                            valueArr
+                        );
+                        break;
                 }
+
                 break;
             default:
                 throw new UnsupportedOperationException(StrUtil.format("不支持的[{}]条件转换成mybatis plus wrapper", whereCondition.getCondition()));
         }
+    }
+
+    @SneakyThrows
+    private static String getDbType() {
+        DynamicRoutingDataSource ds = SpringContextUtil.getBean(DynamicRoutingDataSource.class);
+        DataSource datasource = ds.determineDataSource();
+        if (!datasource.isWrapperFor(HikariDataSource.class)) {
+            return "";
+        }
+        String jdbcUrl = datasource.unwrap(HikariDataSource.class).getJdbcUrl();
+        if (jdbcUrl.contains(":dm:")) {
+            return "dm";
+        } else if (jdbcUrl.contains("mysql:")) {
+            return "mysql";
+        }
+        return "";
     }
 }

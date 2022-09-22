@@ -579,45 +579,45 @@ public interface IV2WhereConditionCriteria<E extends IV2Entity<E>, C extends IV2
     }
 
     @SuppressWarnings("unchecked")
-    default C mysqlJsonArrayContains(String propertyName, String columnName, Object value) {
+    default C jsonArrayContains(String propertyName, String columnName, Object value) {
         Assert.notBlank(propertyName, "propertyName 不能为空");
         Assert.notBlank(columnName, "columnName 不能为空");
         Assert.notNull(value, "value不能为空");
-        getWhereConditions().add(new V2WhereCondition(propertyName, columnName, V2Condition.MYSQL_JSON_ARRAY_CONTAINS, value));
+        getWhereConditions().add(new V2WhereCondition(propertyName, columnName, V2Condition.JSON_ARRAY_CONTAINS, value));
         return (C) this;
     }
 
     @Transient
     default <T> T getMysqlJsonArrayContains(String propertyName, Class<T> clazz) {
-        return getValue(propertyName, V2Condition.MYSQL_JSON_ARRAY_CONTAINS, clazz);
+        return getValue(propertyName, V2Condition.JSON_ARRAY_CONTAINS, clazz);
     }
 
     @SuppressWarnings("unchecked")
-    default C mysqlJsonArrayContainsAny(String propertyName, String columnName, Collection<?> value) {
+    default C jsonArrayContainsAny(String propertyName, String columnName, Collection<?> value) {
         Assert.notBlank(propertyName, "propertyName 不能为空");
         Assert.notBlank(columnName, "columnName 不能为空");
         Assert.notEmpty(value, "value不能为空");
-        getWhereConditions().add(new V2WhereCondition(propertyName, columnName, V2Condition.MYSQL_JSON_ARRAY_CONTAINS_ANY, value));
+        getWhereConditions().add(new V2WhereCondition(propertyName, columnName, V2Condition.JSON_ARRAY_CONTAINS_ANY, value));
         return (C) this;
     }
 
     @Transient
-    default <T> Collection<T> getMysqlJsonArrayContainsAny(String propertyName) {
-        return getValue(propertyName, V2Condition.MYSQL_JSON_ARRAY_CONTAINS_ANY);
+    default <T> Collection<T> getJsonArrayContainsAny(String propertyName) {
+        return getValue(propertyName, V2Condition.JSON_ARRAY_CONTAINS_ANY);
     }
 
     @SuppressWarnings("unchecked")
-    default C mysqlJsonArrayContainsAll(String propertyName, String columnName, Collection<?> value) {
+    default C jsonArrayContainsAll(String propertyName, String columnName, Collection<?> value) {
         Assert.notBlank(propertyName, "propertyName 不能为空");
         Assert.notBlank(columnName, "columnName 不能为空");
         Assert.notEmpty(value, "value不能为空");
-        getWhereConditions().add(new V2WhereCondition(propertyName, columnName, V2Condition.MYSQL_JSON_ARRAY_CONTAINS_ALL, value));
+        getWhereConditions().add(new V2WhereCondition(propertyName, columnName, V2Condition.JSON_ARRAY_CONTAINS_ALL, value));
         return (C) this;
     }
 
     @Transient
-    default <T> Collection<T> getMysqlJsonArrayContainsAll(String propertyName) {
-        return getValue(propertyName, V2Condition.MYSQL_JSON_ARRAY_CONTAINS_ALL);
+    default <T> Collection<T> getJsonArrayContainsAll(String propertyName) {
+        return getValue(propertyName, V2Condition.JSON_ARRAY_CONTAINS_ALL);
     }
 
     // endregion
