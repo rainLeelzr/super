@@ -72,7 +72,7 @@ print_usage() {
         echo "  -l, --auto_tail_log true|false    whether to output logs in current process, default to true"
         echo "  -n, --run_as_nohup true|false     running server using nohup, default to true"
         echo "  -d, --debug_port [0-65535]        java remote debug listening port, must be port range[0-65535]"
-        echo "  -r, --rm_log                      remove all log files befare startup"
+        echo "  -r, --rm_log                      remove all log files before startup"
         echo "  --print_gc                        print gc info"
         echo "  --jmx_hostname                    jmx hostname. Generally, set this parameter to the server IP address"
         echo "  --jmx_port                        listening jmx port"
@@ -210,7 +210,7 @@ health_check() {
         get_pid
         if [ "$pid" = "" ]; then
                 echo "${project_name} is not running."
-                echo "${project_name} unhealth"
+                echo "${project_name} unhealthy"
                 exit 1
         else
                 if [ -d "/proc/${pid}" ]; then
@@ -239,11 +239,11 @@ health_check() {
                                 echo "${project_name} health"
                                 exit
                         fi
-                        echo "${project_name} unhealth"
+                        echo "${project_name} unhealthy"
                         exit 1
                 else
                         echo "can not found running pid ${pid}, ${project_name} is not running!"
-                        echo "${project_name} unhealth"
+                        echo "${project_name} unhealthy"
                         exit 1
                 fi
         fi
