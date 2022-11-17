@@ -1126,18 +1126,36 @@
         <repository>
             <id>alimaven</id>
             <name>aliyun maven</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>https://maven.aliyun.com/repository/public</url>
         </repository>
 
         <repository>
             <id>center-snapshots</id>
             <name>center-snapshots</name>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
 
         <repository>
             <id>center</id>
             <name>center</name>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
