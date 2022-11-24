@@ -183,7 +183,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * @author Rain
  */
-public interface IV2Entity<E extends IV2Entity<E>> extends Serializable {
+public interface IV2Entity<E extends IV2Entity<E>> extends Serializable, IAnyJsonEntity {
 
     long serialVersionUID = 1L;
 

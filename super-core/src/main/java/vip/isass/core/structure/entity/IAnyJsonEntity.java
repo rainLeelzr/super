@@ -167,33 +167,106 @@
  *
  */
 
-package vip.isass.core.web.interceptor;
+package vip.isass.core.structure.entity;
 
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerMapping;
-import vip.isass.core.support.UriRequestMapping;
-import vip.isass.core.web.uri.UriPrefixProvider;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vip.isass.core.support.LocalDateTimeUtil;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Rain
  */
-@Component
-public class UriMappingInterceptor implements IsassHandlerInterceptor {
+public interface IAnyJsonEntity {
 
-    @Resource
-    private UriPrefixProvider uriPrefixProvider;
+    Logger log = LoggerFactory.getLogger(IAnyJsonEntity.class);
 
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        String mapping = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        response.addHeader(
-            UriRequestMapping.MAPPING_KEY,
-            request.getMethod().toUpperCase() + " " + uriPrefixProvider.getUriPrefix() + mapping);
-        return true;
+    ThreadLocal<AdvancedFeature> ADVANCED_FEATURE = new ThreadLocal<>();
+
+    String FORMATED_VALUE_SUFFIX = "Text";
+
+    @JsonAnyGetter
+    default Map<String, Object> anyJson() {
+        AdvancedFeature advanceFeature = ADVANCED_FEATURE.get();
+        if (advanceFeature == null) {
+            return null;
+        }
+
+        Map<String, Object> anyJsonMap = new HashMap<>();
+        formatDataField(advanceFeature, anyJsonMap);
+        formatDecimalPlaces(advanceFeature, anyJsonMap);
+        return anyJsonMap;
     }
 
+    default void formatDataField(AdvancedFeature advanceFeature, Map<String, Object> anyJsonMap) {
+        Map<String, String> dateFormatMap = advanceFeature.getDateFormat();
+        if (MapUtil.isEmpty(dateFormatMap)) {
+            return;
+        }
+
+        for (Map.Entry<String, String> entry : dateFormatMap.entrySet()) {
+            if (StrUtil.isBlank(entry.getValue())) {
+                continue;
+            }
+            Object fieldValue = ReflectUtil.getFieldValue(this, entry.getKey());
+            if (fieldValue == null) {
+                continue;
+            }
+
+            String formatedValue = "";
+            if (fieldValue instanceof LocalDateTime) {
+                formatedValue = DateUtil.format((LocalDateTime) fieldValue, entry.getValue());
+            } else if (fieldValue instanceof LocalDate) {
+                formatedValue = DateUtil.format(
+                    LocalDateTimeUtil.toLocalDateTime((LocalDate) fieldValue),
+                    entry.getValue());
+            } else if (fieldValue instanceof LocalTime) {
+                formatedValue = DateUtil.format(
+                    LocalDateTimeUtil.toLocalDateTime((LocalTime) fieldValue),
+                    entry.getValue());
+            } else if (fieldValue instanceof Long) {
+                formatedValue = DateUtil.format(
+                    LocalDateTimeUtil.toLocalDateTime((Long) fieldValue),
+                    entry.getValue());
+            } else if (fieldValue instanceof String) {
+                formatedValue = DateUtil.format(DateUtil.parse((String) fieldValue), entry.getValue());
+            }
+            anyJsonMap.put(entry.getKey() + FORMATED_VALUE_SUFFIX, formatedValue);
+        }
+    }
+
+    default void formatDecimalPlaces(AdvancedFeature advanceFeature, Map<String, Object> anyJsonMap) {
+        Map<String, Integer> decimalPlacesMap = advanceFeature.getDecimalPlaces();
+        if (MapUtil.isEmpty(decimalPlacesMap)) {
+            return;
+        }
+
+        for (Map.Entry<String, Integer> entry : decimalPlacesMap.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
+            Object fieldValue = ReflectUtil.getFieldValue(this, entry.getKey());
+            if (fieldValue == null) {
+                continue;
+            }
+            try {
+                anyJsonMap.put(
+                    entry.getKey() + FORMATED_VALUE_SUFFIX,
+                    NumberUtil.round(fieldValue.toString(), entry.getValue()));
+            } catch (Exception e) {
+                log.warn("entity[{}] field[{}] can not be scale decimal", this.getClass(), entry.getKey(), e);
+            }
+        }
+    }
 }

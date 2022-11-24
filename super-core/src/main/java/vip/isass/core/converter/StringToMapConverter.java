@@ -167,33 +167,36 @@
  *
  */
 
-package vip.isass.core.web.interceptor;
+package vip.isass.core.converter;
 
+import cn.hutool.core.util.StrUtil;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerMapping;
-import vip.isass.core.support.UriRequestMapping;
-import vip.isass.core.web.uri.UriPrefixProvider;
+import vip.isass.core.support.Converter;
+import vip.isass.core.support.JsonUtil;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
+ * 把 json 字符串转成 map
+ *
  * @author Rain
  */
 @Component
-public class UriMappingInterceptor implements IsassHandlerInterceptor {
-
-    @Resource
-    private UriPrefixProvider uriPrefixProvider;
+public class StringToMapConverter implements Converter<String, Map<String, Object>> {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        String mapping = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        response.addHeader(
-            UriRequestMapping.MAPPING_KEY,
-            request.getMethod().toUpperCase() + " " + uriPrefixProvider.getUriPrefix() + mapping);
-        return true;
+    public boolean supportSourceType(Object source) {
+        return source instanceof String;
+    }
+
+    @Override
+    public boolean supportTargetClass(Class clazz) {
+        return Map.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public Map<String, Object> convert(String source) {
+        return StrUtil.isBlank(source) ? null : JsonUtil.readMap(source);
     }
 
 }

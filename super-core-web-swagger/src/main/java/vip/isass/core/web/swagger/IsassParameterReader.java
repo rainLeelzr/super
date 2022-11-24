@@ -204,6 +204,7 @@ import vip.isass.core.structure.criteria.field.IV2ParentIdCriteria;
 import vip.isass.core.structure.criteria.field.IV2TraceCriteria;
 import vip.isass.core.structure.criteria.type.IV2OrderByCriteria;
 import vip.isass.core.structure.criteria.type.IV2SelectColumnCriteria;
+import vip.isass.core.structure.entity.AdvancedFeature;
 import vip.isass.core.structure.entity.IV2IdEntity;
 import vip.isass.core.structure.entity.IV2ParentIdEntity;
 import vip.isass.core.structure.entity.IV2TraceEntity;
@@ -267,7 +268,8 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             ResolvedType alternate = context.alternateFor(methodParameter.getParameterType());
 
             if (ClassUtil.isAssignable(IV2Criteria.class, alternate.getErasedType())) {
-                Optional<List<Parameter>> optionalParameters = createCriteriaParameters(methodParameter.getParameterType().getErasedType());
+                Optional<List<Parameter>> optionalParameters = createCriteriaParameters(methodParameter.getParameterType()
+                    .getErasedType());
                 if (optionalParameters.isPresent()) {
                     if (!optionalList.isPresent()) {
                         optionalList = Optional.of(new ArrayList<>());
@@ -305,7 +307,8 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             ResolvedType resolvedType = attribute.getFieldType();
 
             if (ClassUtil.isAssignable(IV2Criteria.class, resolvedType.getErasedType())) {
-                Optional<List<Parameter>> optionalCriteriaParameters = createCriteriaParameters(attribute.getFieldType().getErasedType());
+                Optional<List<Parameter>> optionalCriteriaParameters = createCriteriaParameters(attribute.getFieldType()
+                    .getErasedType());
                 if (optionalCriteriaParameters.isPresent()) {
                     if (!optionalParameters.isPresent()) {
                         optionalParameters = Optional.of(new ArrayList<>());
@@ -387,11 +390,12 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             .collect(Collectors.toList());
 
         Map<String, ResolvedField> fieldsByName = StreamSupport.stream(
-            this.fields.in(context.getParamType()).spliterator(),
-            false)
+                this.fields.in(context.getParamType()).spliterator(),
+                false)
             .collect(Collectors.toMap(ResolvedMember::getName, Function.identity()));
 
-        final AlternateTypeProvider alternateTypeProvider = context.getDocumentationContext().getAlternateTypeProvider();
+        final AlternateTypeProvider alternateTypeProvider = context.getDocumentationContext()
+            .getAlternateTypeProvider();
 
         return Stream
             .concat(
@@ -460,6 +464,14 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             optionalList.get().addAll(optionalOrderCriteriaParameters.get());
         }
 
+        Optional<List<Parameter>> optionalAdvanceFeatureCriteriaParameters = parseAdvanceFeatureCriteria(type);
+        if (optionalAdvanceFeatureCriteriaParameters.isPresent()) {
+            if (!optionalList.isPresent()) {
+                optionalList = Optional.of(new ArrayList<>());
+            }
+            optionalList.get().addAll(optionalAdvanceFeatureCriteriaParameters.get());
+        }
+
         return optionalList;
     }
 
@@ -492,6 +504,7 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             .build()));
     }
 
+
     private Optional<List<Parameter>> parseIdCriteria(Class<?> type) {
         if (!ClassUtil.isAssignable(IV2IdCriteria.class, type)) {
             return Optional.empty();
@@ -515,6 +528,21 @@ public class IsassParameterReader implements OperationBuilderPlugin {
             .parameterType("query")
             .modelRef(MODEL_REF)
             .order(4)
+            .build()));
+    }
+
+    private Optional<List<Parameter>> parseAdvanceFeatureCriteria(Class<?> type) {
+        if (!ClassUtil.isAssignable(IV2Criteria.class, type)) {
+            return Optional.empty();
+        }
+        return Optional.of(Collections.singletonList(new ParameterBuilder()
+            .name("advancedFeature")
+            .description("高级特性json。1:指定时间字段格式化。2:指定小数字段保留小数位数(四舍五入)。" +
+                "例子：{\"dateFormat\":{\"createTime\":\"yy/MM/dd\",\"modifyTime\":\"HH:mm:ss\"},\"decimalPlaces\":{\"unitPrice\":2}}")
+            .parameterType("query")
+            .modelRef(MODEL_REF)
+            .type(resolver.resolve(AdvancedFeature.class))
+            .order(5)
             .build()));
     }
 

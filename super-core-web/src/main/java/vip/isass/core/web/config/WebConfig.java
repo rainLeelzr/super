@@ -169,17 +169,24 @@
 
 package vip.isass.core.web.config;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.support.ResourcePatternUtils;
+import org.springframework.http.MediaType;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import vip.isass.core.web.interceptor.TraceIdInterceptor;
-import vip.isass.core.web.interceptor.UriMappingInterceptor;
+import vip.isass.core.web.interceptor.IsassHandlerInterceptor;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Rain
@@ -188,10 +195,7 @@ import javax.annotation.Resource;
 public class WebConfig implements WebMvcConfigurer {
 
     @Resource
-    private TraceIdInterceptor traceIdInterceptor;
-
-    @Resource
-    private UriMappingInterceptor uriMappingInterceptor;
+    private List<IsassHandlerInterceptor> isassHandlerInterceptors;
 
     /**
      * 允许跨域的域名，*表示允许任何域名使用
@@ -216,8 +220,12 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(traceIdInterceptor).addPathPatterns("/**");
-        registry.addInterceptor(uriMappingInterceptor).addPathPatterns("/**");
+        for (IsassHandlerInterceptor interceptor : isassHandlerInterceptors) {
+            registry.addInterceptor(interceptor)
+                .addPathPatterns(interceptor.getPatterns() == null
+                    ? Collections.singletonList("/**")
+                    : interceptor.getPatterns());
+        }
     }
 
     @Bean
@@ -233,4 +241,36 @@ public class WebConfig implements WebMvcConfigurer {
         };
     }
 
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        try {
+            org.springframework.core.io.Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(null)
+                .getResources("classpath*:META-INF/mime.type");
+            for (org.springframework.core.io.Resource resource : resources) {
+                if (!resource.exists()) {
+                    continue;
+                }
+                List<String> mimeTypes = FileUtil.readUtf8Lines(resource.getURL());
+                for (String line : mimeTypes) {
+                    line = StrUtil.replace(line, StrUtil.TAB, StrUtil.SPACE).trim();
+                    if (line.isEmpty() || line.startsWith("#")) {
+                        continue;
+                    }
+                    String[] split = line.split(StrUtil.SPACE);
+                    if (split.length == 1) {
+                        continue;
+                    }
+                    MediaType mediaType = MediaType.valueOf(split[0]);
+                    for (int i = 1; i < split.length; i++) {
+                        if (split[i].isEmpty()) {
+                            continue;
+                        }
+                        configurer.mediaType(split[i], mediaType);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("can not read file META-INF/mime.type: " + e);
+        }
+    }
 }
