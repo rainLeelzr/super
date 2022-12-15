@@ -330,6 +330,11 @@ public class JsonUtil {
     }
 
     @SneakyThrows
+    public static Map<String, Object> convertToMap(Object object) {
+        return DEFAULT_INSTANCE.convertValue(object, MAP_TYPE_REFERENCE);
+    }
+
+    @SneakyThrows
     public static List<Map<String, Object>> readListMap(String json) {
         return DEFAULT_INSTANCE.readValue(json, LIST_MAP_TYPE_REFERENCE);
     }
