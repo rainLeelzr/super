@@ -169,6 +169,9 @@
 
 package vip.isass.core.support.api;
 
+/**
+ * 实现接口的排序，数字越少越靠前
+ */
 public interface ApiOrder {
 
     int CACHE_SERVICE = 10;
