@@ -176,12 +176,12 @@
     <parent>
         <groupId>vip.isass</groupId>
         <artifactId>super</artifactId>
-        <version>super.3.3.0-SNAPSHOT</version>
+        <version>super.3.3.1-SNAPSHOT</version>
     </parent>
 
     <!-- 本项目信息 -->
     <artifactId>super-core-web-security</artifactId>
-    <version>super.3.3.0-SNAPSHOT</version>
+    <version>super.3.3.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
