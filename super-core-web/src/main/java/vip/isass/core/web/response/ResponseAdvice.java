@@ -206,7 +206,7 @@ public class ResponseAdvice implements ResponseBodyAdvice<Object> {
                                   ServerHttpRequest request,
                                   ServerHttpResponse response) {
         Resp<Object> resp = Resp.bizSuccess(body);
-        return body instanceof String
+        return CharSequence.class.isAssignableFrom(returnType.getParameterType())
             ? JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(resp)
             : resp;
     }
