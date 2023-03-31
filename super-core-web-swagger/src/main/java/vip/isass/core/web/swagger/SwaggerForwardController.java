@@ -171,6 +171,7 @@ package vip.isass.core.web.swagger;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * @author Rain
@@ -203,19 +204,14 @@ public class SwaggerForwardController {
         return "forward:/doc.html";
     }
 
-    @GetMapping("/${spring.application.name}/webjars/css/app.3167b4c3.css")
-    public String forwardWebjarsCssApp() {
-        return "forward:/webjars/css/app.3167b4c3.css";
+    @GetMapping("/${spring.application.name}/webjars/css/{fileName}")
+    public String forwardWebjarsCssFile(@PathVariable("fileName") String fileName) {
+        return "forward:/webjars/css/" + fileName;
     }
 
-    @GetMapping("/${spring.application.name}/webjars/js/app.e4826b43.js")
-    public String forwardWebjarsJsApp() {
-        return "forward:/webjars/js/app.e4826b43.js";
-    }
-
-    @GetMapping("/${spring.application.name}/webjars/js/chunk-vendors.86544bae.js")
-    public String forwardWebjarsJsChunkVendors() {
-        return "forward:/webjars/js/chunk-vendors.86544bae.js";
+    @GetMapping("/${spring.application.name}/webjars/js/{fileName}")
+    public String forwardWebjarsJsFile(@PathVariable("fileName") String fileName) {
+        return "forward:/webjars/js/" + fileName;
     }
 
 }
