@@ -177,7 +177,9 @@ import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vip.isass.core.structure.IDictTranslationProvider;
 import vip.isass.core.support.LocalDateTimeUtil;
+import vip.isass.core.support.SpringContextUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -206,7 +208,34 @@ public interface IAnyJsonEntity {
         Map<String, Object> anyJsonMap = new HashMap<>();
         formatDataField(advanceFeature, anyJsonMap);
         formatDecimalPlaces(advanceFeature, anyJsonMap);
+        dictTranslation(advanceFeature, anyJsonMap);
         return anyJsonMap;
+    }
+
+    default void dictTranslation(AdvancedFeature advanceFeature, Map<String, Object> anyJsonMap) {
+        Map<String, String> dictTranslationMap = advanceFeature.getDictTranslation();
+        if (MapUtil.isEmpty(dictTranslationMap)) {
+            return;
+        }
+        IDictTranslationProvider dictTranslationProvider = SpringContextUtil.getBean(IDictTranslationProvider.class);
+        for (Map.Entry<String, String> entry : dictTranslationMap.entrySet()) {
+            if (StrUtil.isBlank(entry.getValue())) {
+                continue;
+            }
+            Object fieldValue = ReflectUtil.getFieldValue(this, entry.getKey());
+            if (fieldValue == null || StrUtil.isBlankIfStr(fieldValue)) {
+                continue;
+            }
+
+            try {
+                String text = dictTranslationProvider.translate(entry.getValue(), fieldValue.toString());
+                if (text != null) {
+                    anyJsonMap.put(entry.getKey() + FORMATED_VALUE_SUFFIX, text);
+                }
+            } catch (Exception e) {
+                log.warn("entity[{}] field[{}] can not be scale decimal", this.getClass(), entry.getKey(), e);
+            }
+        }
     }
 
     default void formatDataField(AdvancedFeature advanceFeature, Map<String, Object> anyJsonMap) {

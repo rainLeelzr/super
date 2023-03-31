@@ -28,4 +28,7 @@ public class AdvancedFeature {
     @ApiModelProperty("小数位数")
     private Map<String, Integer> decimalPlaces;
 
+    @ApiModelProperty("字典翻译")
+    private Map<String, String> dictTranslation;
+
 }
