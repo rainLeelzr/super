@@ -29,7 +29,7 @@ pipeline {
                 }
             }
             steps {
-                sh "mvn -q -T 1C -U -am clean deploy -DskipTests -Pisass-deploy"
+                sh "source /etc/profile && mvn -T 1C -U -am clean deploy -DskipTests"
             }
         }
     }
