@@ -27,7 +27,9 @@ public class LogUtil {
         Assert.notBlank(loggerName, "loggerName 必填");
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger logger = loggerContext.getLogger(loggerName);
-        LEVEL_MAP.put(loggerName, logger.getLevel());
+        if (logger.getLevel() != null) {
+            LEVEL_MAP.put(loggerName, logger.getLevel());
+        }
         logger.setLevel(Level.OFF);
     }
 
@@ -45,11 +47,6 @@ public class LogUtil {
     public static void loggerRestore(String loggerName) {
         Assert.notBlank(loggerName, "loggerName 必填");
         Level level = LEVEL_MAP.remove(loggerName);
-        if (level == null) {
-            log.warn("未纪录[{}]的原始级别，无法恢复日志级别", loggerName);
-            return;
-        }
-
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger logger = loggerContext.getLogger(loggerName);
         logger.setLevel(level);
