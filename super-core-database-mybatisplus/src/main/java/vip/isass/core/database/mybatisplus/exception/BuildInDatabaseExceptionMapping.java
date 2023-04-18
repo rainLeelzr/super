@@ -167,7 +167,7 @@
  *
  */
 
-package vip.isass.core.database.exception;
+package vip.isass.core.database.mybatisplus.exception;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;

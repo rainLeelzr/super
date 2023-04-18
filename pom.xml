@@ -249,8 +249,8 @@
         <skywalking.version>6.6.0</skywalking.version>
 
         <!-- 数据库 -->
-        <mybatis-spring-boot-starter.version>2.0.1</mybatis-spring-boot-starter.version>
         <mybatis-plus.version>3.3.1</mybatis-plus.version>
+        <mybatis.version>3.5.7</mybatis.version>
         <flyway.version>6.3.3</flyway.version>
         <sharding-jdbc.version>4.0.0-RC2</sharding-jdbc.version>
         <p6spy.version>3.9.0</p6spy.version>
@@ -564,12 +564,6 @@
 
             <!-- 数据库 -->
             <dependency>
-                <groupId>org.mybatis.spring.boot</groupId>
-                <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis-spring-boot-starter.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.shardingsphere</groupId>
                 <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
                 <version>${sharding-jdbc.version}</version>
@@ -609,6 +603,18 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-annotation</artifactId>
                 <version>${mybatis-plus.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mybatis</groupId>
+                        <artifactId>mybatis</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
             </dependency>
 
             <dependency>
