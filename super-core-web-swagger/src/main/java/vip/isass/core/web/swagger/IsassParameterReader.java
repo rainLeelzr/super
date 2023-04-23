@@ -538,7 +538,7 @@ public class IsassParameterReader implements OperationBuilderPlugin {
         return Optional.of(Collections.singletonList(new ParameterBuilder()
             .name("advancedFeature")
             .description("高级特性json。1:指定时间字段格式化。2:指定小数字段保留小数位数(四舍五入)。" +
-                "例子：{\"dateFormat\":{\"createTime\":\"yy/MM/dd\",\"modifyTime\":\"HH:mm:ss\"},\"decimalPlaces\":{\"unitPrice\":2}}")
+                "例子：{\"dateFormat\":{\"createTime\":\"yy/MM/dd\",\"modifyTime\":\"HH:mm:ss\"},\"decimalPlaces\":{\"unitPrice\":2},\"dictTranslation\":{\"fieldName\":\"parentDictCode\"}}")
             .parameterType("query")
             .modelRef(MODEL_REF)
             .type(resolver.resolve(AdvancedFeature.class))
