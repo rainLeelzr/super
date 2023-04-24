@@ -26,11 +26,11 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import vip.isass.core.structure.entity.IV2Entity;
 <#if isIdEntity>
 import vip.isass.core.structure.entity.IV2IdEntity;
@@ -103,8 +103,8 @@ import java.util.Collection;
  */
 @Getter
 @Setter
-@Builder
 @ToString
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel("v2<#if table.comment?trim?length gt 0>${table.comment}<#else>${entity}</#if>")
