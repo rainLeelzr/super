@@ -9,10 +9,10 @@ public interface IDictTranslationProvider {
     /**
      * 翻译字典
      *
-     * @param parentDictCode 字典项的父字典编码
-     * @param dictCode       字典项的编码
+     * @param typeCode   字典类型典编码
+     * @param optionCode 字典选项编码
      * @return 字典名称
      */
-    String translate(String parentDictCode, String dictCode);
+    String translate(String typeCode, String optionCode);
 
 }
