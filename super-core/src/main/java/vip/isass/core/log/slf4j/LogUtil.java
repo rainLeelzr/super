@@ -1,11 +1,11 @@
 package vip.isass.core.log.slf4j;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
 import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
+import org.springframework.boot.logging.LogLevel;
+import org.springframework.boot.logging.LoggerConfiguration;
+import org.springframework.boot.logging.LoggingSystem;
+import vip.isass.core.support.SpringContextUtil;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,19 +18,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class LogUtil {
 
-    public static final Map<String, Level> LEVEL_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, LoggerConfiguration> LEVEL_MAP = new ConcurrentHashMap<>();
 
     /**
      * 关闭日志
      */
     public static void loggerOff(String loggerName) {
         Assert.notBlank(loggerName, "loggerName 必填");
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger logger = loggerContext.getLogger(loggerName);
-        if (logger.getLevel() != null) {
-            LEVEL_MAP.put(loggerName, logger.getLevel());
+        LoggingSystem loggingSystem = SpringContextUtil.getBean(LoggingSystem.class);
+        LoggerConfiguration loggerConfiguration = loggingSystem.getLoggerConfiguration(loggerName);
+        if (loggerConfiguration != null) {
+            LEVEL_MAP.put(loggerName, loggerConfiguration);
         }
-        logger.setLevel(Level.OFF);
+        loggingSystem.setLogLevel(loggerName, LogLevel.OFF);
     }
 
     /**
@@ -46,10 +46,12 @@ public class LogUtil {
      */
     public static void loggerRestore(String loggerName) {
         Assert.notBlank(loggerName, "loggerName 必填");
-        Level level = LEVEL_MAP.remove(loggerName);
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger logger = loggerContext.getLogger(loggerName);
-        logger.setLevel(level);
+        LoggerConfiguration loggerConfiguration = LEVEL_MAP.remove(loggerName);
+        if (loggerConfiguration == null) {
+            return;
+        }
+        LoggingSystem loggingSystem = SpringContextUtil.getBean(LoggingSystem.class);
+        loggingSystem.setLogLevel(loggerName, loggerConfiguration.getConfiguredLevel());
     }
 
     /**
