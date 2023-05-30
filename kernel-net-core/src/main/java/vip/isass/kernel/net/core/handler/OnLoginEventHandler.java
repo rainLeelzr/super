@@ -173,6 +173,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import vip.isass.core.security.jwt.JwtInfo;
 import vip.isass.core.security.jwt.JwtUtil;
 import vip.isass.core.web.Resp;
@@ -186,6 +187,7 @@ import vip.isass.kernel.net.core.tag.ITagService;
  *
  * @author rain
  */
+@Order(-1)
 @Configuration
 @ConditionalOnBean(Server.class)
 public class OnLoginEventHandler implements OnMessageEventHandler<String> {
