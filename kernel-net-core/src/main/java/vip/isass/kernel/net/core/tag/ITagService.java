@@ -330,6 +330,23 @@ public interface ITagService extends Ordered {
 
     // endregion
 
+    /**
+     * 根据标检键获取指定会话的标签键值对
+     *
+     * @param sessionId 会话 id
+     * @param tagKey    标签键
+     * @return 标签键值对
+     */
+    String getTagValue(String sessionId, String tagKey);
+
+    /**
+     * 查找指定会话的所有标签键值对
+     *
+     * @param sessionId 会话 id
+     * @return 标签键值对集合
+     */
+    Collection<TagPair> findAllTagPair(String sessionId);
+
     // region remove
 
     /**

@@ -211,6 +211,16 @@ public class TagServiceManager implements ITagService {
     }
 
     @Override
+    public String getTagValue(String sessionId, String tagKey) {
+        return tagServices.get(0).getTagValue(sessionId, tagKey);
+    }
+
+    @Override
+    public Collection<TagPair> findAllTagPair(String sessionId) {
+        return tagServices.get(0).findAllTagPair(sessionId);
+    }
+
+    @Override
     public void removeTagPairs(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
         tagServices.get(0).removeTagPairs(sessionIds, tagPairs);
     }

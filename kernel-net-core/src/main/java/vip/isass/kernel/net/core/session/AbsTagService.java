@@ -176,8 +176,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import vip.isass.kernel.net.core.tag.ITagService;
 import vip.isass.kernel.net.core.tag.TagPair;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -284,6 +286,28 @@ public abstract class AbsTagService implements ITagService {
     @Override
     public void consumeAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs, Consumer<String> consumer) {
         findAllMatchSessionStreamByTagPairs(tagPairs).ifPresent(s -> s.forEach(consumer));
+    }
+
+    @Override
+    public String getTagValue(String sessionId, String tagKey) {
+        Map<String, String> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+        if (tagPairMap == null) {
+            return null;
+        }
+        return tagPairMap.get(tagKey);
+    }
+
+    @Override
+    public Collection<TagPair> findAllTagPair(String sessionId) {
+        Map<String, String> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+        if (CollUtil.isEmpty(tagPairMap)) {
+            return Collections.emptyList();
+        }
+        List<TagPair> tagPairs = new ArrayList<>(tagPairMap.size());
+        for (Map.Entry<String, String> entry : tagPairMap.entrySet()) {
+            tagPairs.add(new TagPair(entry.getKey(), entry.getValue()));
+        }
+        return tagPairs;
     }
 
     @Override

@@ -222,6 +222,16 @@ public class TagRedisPublisherService implements ITagService {
     }
 
     @Override
+    public String getTagValue(String sessionId, String tagKey) {
+        throw new UnsupportedOperationException("net网关中转的实现模式不支持调用[getTagValue(sessionId, tagKey)]方法");
+    }
+
+    @Override
+    public Collection<TagPair> findAllTagPair(String sessionId) {
+        throw new UnsupportedOperationException("net网关中转的实现模式不支持调用[findAllTagPair(sessionId)]方法");
+    }
+
+    @Override
     public void removeTagPairs(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
         redisTemplate.convertAndSend(
             NetTransferRedisKeyConst.REMOVE_TAG_PUBSUB_KEY,
