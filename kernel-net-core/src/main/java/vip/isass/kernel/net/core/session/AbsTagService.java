@@ -170,6 +170,7 @@
 package vip.isass.kernel.net.core.session;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,9 +180,11 @@ import vip.isass.kernel.net.core.tag.TagPair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -202,7 +205,7 @@ public abstract class AbsTagService implements ITagService {
      * 保存所有会话和标签的关系
      * <p> {@literal Map<sessionId, Map<tagKey, tagValue>>}
      */
-    private final Map<String, Map<String, String>> sessionIdAndTagPairMap = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, Set<String>>> sessionIdAndTagPairMap = new ConcurrentHashMap<>();
 
     @Override
     public void addTagPairs(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
@@ -216,13 +219,22 @@ public abstract class AbsTagService implements ITagService {
             }
             log.debug("添加会话标签[{}][{}]", sessionId, tagPairs);
 
-            Map<String, String> tagPairMap = sessionIdAndTagPairMap.computeIfAbsent(
+            Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.computeIfAbsent(
                 sessionId,
                 s -> new ConcurrentHashMap<>(16));
 
-            tagPairs.forEach(tagPair -> tagPairMap.put(
-                tagPair.getTagKey(),
-                tagPair.getTagValue())
+            tagPairs.forEach(tagPair -> {
+                    Set<String> tagValues = tagPairMap.computeIfAbsent(tagPair.getTagKey(), k -> new HashSet<>());
+                    if (tagPair.getTagValues() == null) {
+                        return;
+                    }
+                    for (String tagValue : tagPair.getTagValues()) {
+                        if (tagValue == null) {
+                            continue;
+                        }
+                        tagValues.add(tagValue);
+                    }
+                }
             );
         }
     }
@@ -231,20 +243,17 @@ public abstract class AbsTagService implements ITagService {
     public boolean hasAllTagPair(String sessionId, Collection<TagPair> tagPairs) {
         Assert.notBlank(sessionId, "sessionId 不能为空");
 
-        Map<String, String> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
         if (tagPairMap == null) {
             return false;
         }
 
         for (TagPair tagPair : tagPairs) {
-            String tagValue = tagPairMap.get(tagPair.getTagKey());
-            if (tagValue == null) {
+            Set<String> tagValues = tagPairMap.get(tagPair.getTagKey());
+            if (tagValues == null) {
                 return false;
             }
-            if (tagPair.getTagValue().isEmpty()) {
-                continue;
-            }
-            if (!tagPair.getTagValue().equals(tagValue)) {
+            if (!CollUtil.containsAll(tagValues, tagPair.getTagValues())) {
                 return false;
             }
         }
@@ -258,12 +267,13 @@ public abstract class AbsTagService implements ITagService {
             .entrySet()
             .parallelStream()
             .filter(entry -> {
-                Map<String, String> havingTagPairMap = entry.getValue();
+                Map<String, Set<String>> havingTagPairMap = entry.getValue();
                 for (TagPair tagPair : tagPairs) {
-                    boolean match = tagPair.getTagValue().equals(TagPair.BLANK_TAG_VALUE)
-                        ? havingTagPairMap.containsKey(tagPair.getTagKey())
-                        : tagPair.getTagValue().equals(havingTagPairMap.get(tagPair.getTagKey()));
-                    if (!match) {
+                    Set<String> havingTagValues = havingTagPairMap.get(tagPair.getTagKey());
+                    if (havingTagValues == null) {
+                        return false;
+                    }
+                    if (!CollUtil.containsAll(havingTagValues, tagPair.getTagValues())) {
                         return false;
                     }
                 }
@@ -289,23 +299,23 @@ public abstract class AbsTagService implements ITagService {
     }
 
     @Override
-    public String getTagValue(String sessionId, String tagKey) {
-        Map<String, String> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+    public String getFirstTagValue(String sessionId, String tagKey) {
+        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
         if (tagPairMap == null) {
             return null;
         }
-        return tagPairMap.get(tagKey);
+        return IterUtil.getFirst(tagPairMap.get(tagKey));
     }
 
     @Override
     public Collection<TagPair> findAllTagPair(String sessionId) {
-        Map<String, String> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
         if (CollUtil.isEmpty(tagPairMap)) {
             return Collections.emptyList();
         }
         List<TagPair> tagPairs = new ArrayList<>(tagPairMap.size());
-        for (Map.Entry<String, String> entry : tagPairMap.entrySet()) {
-            tagPairs.add(new TagPair(entry.getKey(), entry.getValue()));
+        for (Map.Entry<String, Set<String>> entry : tagPairMap.entrySet()) {
+            tagPairs.add(new TagPair(entry.getKey(), new HashSet<>(entry.getValue())));
         }
         return tagPairs;
     }
@@ -319,23 +329,25 @@ public abstract class AbsTagService implements ITagService {
         for (String sessionId : sessionIds) {
             log.debug("删除会话标签[{}][{}]", sessionId, tagPairs);
 
-            Map<String, String> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+            Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
             if (tagPairMap == null) {
                 // 此会话没有记录任何标签，继续下一次循环
                 continue;
             }
 
             for (TagPair tagPair : tagPairs) {
-                String realTagValue = tagPairMap.get(tagPair.getTagKey());
-                if (realTagValue == null) {
+                Set<String> realTagValues = tagPairMap.get(tagPair.getTagKey());
+                if (realTagValues == null) {
                     // 此会话没有此标签，不用删除。继续下一次循环
                     continue;
                 }
-
-                if (tagPair.getTagValue().isEmpty()) {
+                if (CollUtil.isEmpty(tagPair.getTagValues())) {
                     tagPairMap.remove(tagPair.getTagKey());
-                } else if (tagPair.getTagValue().equals(realTagValue)) {
-                    tagPairMap.remove(tagPair.getTagKey());
+                } else {
+                    realTagValues.removeAll(tagPair.getTagValues());
+                    if (realTagValues.isEmpty()) {
+                        tagPairMap.remove(tagPair.getTagKey());
+                    }
                 }
             }
 

@@ -222,7 +222,7 @@ public class TagRedisPublisherService implements ITagService {
     }
 
     @Override
-    public String getTagValue(String sessionId, String tagKey) {
+    public String getFirstTagValue(String sessionId, String tagKey) {
         throw new UnsupportedOperationException("net网关中转的实现模式不支持调用[getTagValue(sessionId, tagKey)]方法");
     }
 

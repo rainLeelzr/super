@@ -211,8 +211,8 @@ public class TagServiceManager implements ITagService {
     }
 
     @Override
-    public String getTagValue(String sessionId, String tagKey) {
-        return tagServices.get(0).getTagValue(sessionId, tagKey);
+    public String getFirstTagValue(String sessionId, String tagKey) {
+        return tagServices.get(0).getFirstTagValue(sessionId, tagKey);
     }
 
     @Override

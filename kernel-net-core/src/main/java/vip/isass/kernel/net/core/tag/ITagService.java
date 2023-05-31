@@ -337,7 +337,7 @@ public interface ITagService extends Ordered {
      * @param tagKey    标签键
      * @return 标签键值对
      */
-    String getTagValue(String sessionId, String tagKey);
+    String getFirstTagValue(String sessionId, String tagKey);
 
     /**
      * 查找指定会话的所有标签键值对

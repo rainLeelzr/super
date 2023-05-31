@@ -169,8 +169,13 @@
 
 package vip.isass.kernel.net.core.tag;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.lang.Assert;
 import lombok.ToString;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 标签键值对, 方便业务调用方使用组合键值对的场景
@@ -181,28 +186,28 @@ import lombok.ToString;
 @ToString
 public class TagPair {
 
-    /**
-     * 当只有标签键，没有标签值时，使用空字符串代替标签值
-     */
-    public static final String BLANK_TAG_VALUE = "";
-
     private String tagKey;
 
-    private String tagValue;
+    private Set<String> tagValues;
 
     public TagPair() {
-        this.tagValue = BLANK_TAG_VALUE;
     }
 
     public TagPair(String tagKey) {
-        this.tagKey = tagKey;
-        this.tagValue = BLANK_TAG_VALUE;
+        Assert.notBlank(tagKey, "tagKey 不能为空");
+        new TagPair(tagKey);
     }
 
     public TagPair(String tagKey, String tagValue) {
         Assert.notBlank(tagKey, "tagKey 不能为空");
         this.tagKey = tagKey;
-        this.tagValue = tagValue == null ? BLANK_TAG_VALUE : tagValue;
+        this.tagValues = tagValue == null ? null : CollUtil.newHashSet(tagValue);
+    }
+
+    public TagPair(String tagKey, Set<String> tagValues) {
+        Assert.notBlank(tagKey, "tagKey 不能为空");
+        this.tagKey = tagKey;
+        this.tagValues = tagValues;
     }
 
     public String getTagKey() {
@@ -214,12 +219,16 @@ public class TagPair {
         this.tagKey = tagKey;
     }
 
-    public String getTagValue() {
-        return tagValue;
+    public Set<String> getTagValues() {
+        return tagValues;
     }
 
-    public void setTagValue(String tagValue) {
-        this.tagValue = tagValue == null ? BLANK_TAG_VALUE : tagValue;
+    public void setTagValues(Set<String> tagValues) {
+        this.tagValues = tagValues == null ? new HashSet<>() : tagValues;
+    }
+
+    public String getFirstTagValue() {
+        return IterUtil.getFirst(this.tagValues);
     }
 
 }
