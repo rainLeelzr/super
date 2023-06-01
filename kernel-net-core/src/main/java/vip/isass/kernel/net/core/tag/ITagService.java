@@ -242,6 +242,18 @@ public interface ITagService extends Ordered {
     }
 
     /**
+     * 给会话添加标签键值对
+     *
+     * @param sessionId 会话 id
+     * @param tagPair   标签键值对
+     */
+    default void addTagPair(String sessionId, TagPair tagPair) {
+        addTagPairs(
+            Collections.singleton(sessionId),
+            Collections.singleton(tagPair));
+    }
+
+    /**
      * 给会话添加多个标签键值对
      *
      * @param sessionId 会话 id
