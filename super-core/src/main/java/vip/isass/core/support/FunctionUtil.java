@@ -197,6 +197,13 @@ public class FunctionUtil {
         consumer.accept(t);
     }
 
+    public static <T> void consumeIfNotBlank(T t, Consumer<T> consumer) {
+        if (StrUtil.isBlankIfStr(t)) {
+            return;
+        }
+        consumer.accept(t);
+    }
+
     public static <T, R> R applyIfTrue(boolean flag, T t, Function<T, R> function) {
         if (flag) {
             return function.apply(t);
