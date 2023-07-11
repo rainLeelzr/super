@@ -185,12 +185,12 @@
             <unpack>true</unpack>
             <unpackOptions>
                 <includes>
-                    <include>deploy/deploy.md</include>
-                    <include>deploy/win_start.bat</include>
-                    <include>deploy/win_service_install.bat</include>
-                    <include>deploy/win_service_start.bat</include>
-                    <include>deploy/win_service_stop.bat</include>
-                    <include>deploy/win_service_uninstall.bat</include>
+                    <include>deploy.md</include>
+                    <include>win_start.bat</include>
+                    <include>win_service_install.bat</include>
+                    <include>win_service_start.bat</include>
+                    <include>win_service_stop.bat</include>
+                    <include>win_service_uninstall.bat</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>
@@ -204,7 +204,7 @@
             <unpack>true</unpack>
             <unpackOptions>
                 <includes>
-                    <include>deploy/JavaService.exe</include>
+                    <include>JavaService.exe</include>
                 </includes>
                 <filtered>false</filtered>
             </unpackOptions>
@@ -220,9 +220,9 @@
             <unpack>true</unpack>
             <unpackOptions>
                 <includes>
-                    <include>deploy/run.sh</include>
-                    <include>deploy/stop.sh</include>
-                    <include>deploy/printlog.sh</include>
+                    <include>run.sh</include>
+                    <include>stop.sh</include>
+                    <include>printlog.sh</include>
                 </includes>
                 <filtered>true</filtered>
             </unpackOptions>
@@ -230,30 +230,10 @@
     </dependencySets>
 
     <fileSets>
-        <!-- 把项目中 resources/deploy 目录的文件复制到压缩包中（除了 *.sh） -->
-        <fileSet>
-            <directory>${project.build.outputDirectory}/deploy</directory>
-            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
-            <excludes>
-                <exclude>*.sh</exclude>
-            </excludes>
-        </fileSet>
-
-        <!-- 把项目中 resources/deploy 目录的 *.sh 文件复制到压缩包中 -->
-        <fileSet>
-            <directory>${project.build.outputDirectory}/deploy</directory>
-            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
-            <lineEnding>unix</lineEnding>
-            <fileMode>0755</fileMode>
-            <includes>
-                <include>*.sh</include>
-            </includes>
-        </fileSet>
-
         <!-- 把项目中 lib 目录的文件复制到压缩包中 -->
         <fileSet>
             <directory>${project.build.directory}/lib</directory>
-            <outputDirectory>${project.artifactId}/deploy/lib</outputDirectory>
+            <outputDirectory>${project.artifactId}/lib</outputDirectory>
             <includes>
                 <include>*.*</include>
             </includes>
@@ -262,13 +242,13 @@
         <!-- 把项目中 config 目录的文件复制到压缩包中 -->
         <fileSet>
             <directory>${project.build.outputDirectory}/config</directory>
-            <outputDirectory>${project.artifactId}/deploy/config</outputDirectory>
+            <outputDirectory>${project.artifactId}/config</outputDirectory>
         </fileSet>
 
         <!-- 把项目中 git 版本文件复制到压缩包中 -->
         <fileSet>
             <directory>${project.build.outputDirectory}</directory>
-            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
+            <outputDirectory>${project.artifactId}</outputDirectory>
             <includes>
                 <include>git.properties</include>
             </includes>
@@ -277,7 +257,7 @@
         <!-- 把项目中 spring-boot-maven-plugin 插件编译出来的可执行 jar 包复制到压缩包中 -->
         <fileSet>
             <directory>${project.build.directory}</directory>
-            <outputDirectory>${project.artifactId}/deploy</outputDirectory>
+            <outputDirectory>${project.artifactId}</outputDirectory>
             <includes>
                 <include>*-exec.jar</include>
             </includes>
