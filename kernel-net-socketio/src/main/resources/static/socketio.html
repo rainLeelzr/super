@@ -122,7 +122,7 @@
             }
 
             str = `收到消息event[${event}],数据类型[${dataType}]：${str}`
-            if (filterEvents.indexOf(event) > -1) {
+            if (filterEvents.length == 0 || filterEvents.indexOf(event) > -1) {
                 output('<span class="username-msg"><span style="color: blue; ">' + getNowTime() + '&nbsp;</span>' + str + ' </span>');
             }
             console.log(data);
