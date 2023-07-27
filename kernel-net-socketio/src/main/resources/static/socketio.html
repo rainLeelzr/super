@@ -45,6 +45,10 @@
 <div style="border: 1px;">
     <label>socketEvent:</label><input type="text" id="socketEvent" style="width:300px">
     <br>
+    <div>
+        <label>只显示以下event(英文逗号分割):</label><input type="filterEvents" id="filterEvents" style="width:98%">
+        <button id="setFilterEvents" style="position: absolute">应用</button>
+    </div>
     <label>content:</label><br><textarea id="content" rows="5" style="width: 100%"></textarea>
     <br>
     <button id="send">send</button>
@@ -54,6 +58,18 @@
 <div id="console" class="well"></div>
 </body>
 <script type="text/javascript">
+    var socket;
+    var errorCount = 0;
+    var isConnected = false;
+    var maxError = 10;
+    var filterEvents = [];
+
+    function parseFilterEvents(filterEventsStr) {
+        filterEvents = filterEventsStr.split(",").filter(element => element && element.trim());
+        localStorage.setItem("filterEvents", filterEventsStr);
+        console.log(filterEvents)
+    }
+
     function restoreSocketIoUrl() {
         let socketIoUrl = localStorage.getItem("socketIoUrl") || "http://localhost:20001";
         $("#url").val(socketIoUrl);
@@ -63,16 +79,13 @@
 
         let content = localStorage.getItem("content") || "";
         $("#content").val(content);
+
+        let filterEventsStr = localStorage.getItem("filterEvents") || "";
+        $("#filterEvents").val(filterEventsStr);
+        parseFilterEvents(filterEventsStr);
     }
 
     restoreSocketIoUrl();
-
-    var socket;
-    var errorCount = 0;
-    var isConnected = false;
-    var maxError = 10;
-
-    // connect(null,null);
 
     function connect(url) {
         if (url === '' || url == null) {
@@ -109,7 +122,9 @@
             }
 
             str = `收到消息event[${event}],数据类型[${dataType}]：${str}`
-            output('<span class="username-msg"><span style="color: blue; ">' + getNowTime() + '&nbsp;</span>' + str + ' </span>');
+            if (filterEvents.indexOf(event) > -1) {
+                output('<span class="username-msg"><span style="color: blue; ">' + getNowTime() + '&nbsp;</span>' + str + ' </span>');
+            }
             console.log(data);
         });
         socket.on('disconnect', function () {
@@ -192,6 +207,12 @@
     $("#clear").click(function () {
         $('#console').html("");
     })
+
+    $("#setFilterEvents").click(function () {
+        let filterEventsStr = $("#filterEvents").val().trim();
+        parseFilterEvents(filterEventsStr);
+    })
+
 
     function getNowTime() {
         var date = new Date();
