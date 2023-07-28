@@ -184,4 +184,8 @@ public class SocketIoConfiguration {
 
     private int port = 20001;
 
+    private int maxHttpContentLength = 64 * 1024;
+
+    private int maxFramePayloadLength = 64 * 1024;
+
 }

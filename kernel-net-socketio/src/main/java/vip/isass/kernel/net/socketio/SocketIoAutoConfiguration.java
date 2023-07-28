@@ -201,6 +201,8 @@ public class SocketIoAutoConfiguration {
         com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
         config.setHostname(socketIoConfiguration.getHostName());
         config.setPort(socketIoConfiguration.getPort());
+        config.setMaxHttpContentLength(socketIoConfiguration.getMaxHttpContentLength());
+        config.setMaxFramePayloadLength(socketIoConfiguration.getMaxFramePayloadLength());
         config.setBossThreads(1);
         config.setExceptionListener(onErrorListener);
 
