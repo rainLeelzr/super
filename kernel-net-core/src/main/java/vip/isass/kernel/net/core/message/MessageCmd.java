@@ -209,6 +209,6 @@ public interface MessageCmd {
     /**
      * 客户端发起广播消息
      */
-    String BROADCAST = "/core/clientSendBroadcast";
+    String CLIENT_SEND_BROADCAST = "/core/clientSendBroadcast";
 
 }

@@ -194,12 +194,12 @@ public class OnClientSendBroadcastEventHandler implements OnMessageEventHandler<
 
     @Override
     public String getCmd() {
-        return MessageCmd.BROADCAST;
+        return MessageCmd.CLIENT_SEND_BROADCAST;
     }
 
     @Override
     public Object onMessage(Message message, String payload) {
-        messageSender.broadcastMessage(MessageCmd.BROADCAST, payload);
+        messageSender.broadcastMessage(MessageCmd.CLIENT_SEND_BROADCAST, payload);
         return null;
     }
 
