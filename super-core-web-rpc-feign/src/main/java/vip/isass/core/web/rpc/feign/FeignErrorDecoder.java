@@ -213,7 +213,11 @@ public class FeignErrorDecoder implements ErrorDecoder {
             }
         }
 
-        return new UnifiedException(StatusMessageEnum.FEIGN_ERROR, StatusMessageEnum.FEIGN_ERROR.getMsg() + " " + methodKey + " 被调用方返回状态码：" + httpStatus);
+        return new UnifiedException(StatusMessageEnum.FEIGN_ERROR,
+            "{} {} 被调用方返回状态码[{}]",
+            StatusMessageEnum.FEIGN_ERROR.getMsg(),
+            methodKey,
+            httpStatus);
     }
 
 }

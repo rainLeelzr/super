@@ -187,7 +187,7 @@ import javax.annotation.Resource;
 @Order(-1)
 @Configuration
 @ConditionalOnBean(Server.class)
-public class OnClientSendBroadcastEventHandler implements OnMessageEventHandler<String> {
+public class OnClientSendBroadcastEventHandler implements OnMessageEventHandler<Object> {
 
     @Resource
     private IMessageSender messageSender;
@@ -198,7 +198,7 @@ public class OnClientSendBroadcastEventHandler implements OnMessageEventHandler<
     }
 
     @Override
-    public Object onMessage(Message message, String payload) {
+    public Object onMessage(Message message, Object payload) {
         messageSender.broadcastMessage(MessageCmd.CLIENT_SEND_BROADCAST, payload);
         return null;
     }
