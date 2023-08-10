@@ -256,7 +256,8 @@
         <p6spy.version>3.9.0</p6spy.version>
         <dynamic-datasource.version>3.2.1</dynamic-datasource.version>
         <dameng.version>8.1.1.193</dameng.version>
-        <!--<mysql-connector-java.version>5.1.47</mysql-connector-java.version>-->
+        <postgresql.version>42.4.3</postgresql.version>
+        <mysql.version>8.0.33</mysql.version>
 
         <!-- net -->
         <netty.version>4.1.76.Final</netty.version>
