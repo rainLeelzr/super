@@ -167,81 +167,42 @@
  *
  */
 
-package vip.isass.kernel.net.core.session;
+package vip.isass.kernel.net.core.handler;
 
-import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
-import vip.isass.kernel.net.core.tag.ITagService;
+import vip.isass.kernel.net.core.message.Message;
+import vip.isass.kernel.net.core.server.Server;
+import vip.isass.kernel.net.core.session.AbsSessionService;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 会话管理器抽象类
+ * ping 事件处理器
  *
- * @author Rain
+ * @author rain
  */
 @Slf4j
-public abstract class AbsSessionService implements ISessionService {
-
-    public final static String SESSION_REDIS_KEY = "kernel:net:sessionId:";
-
-    /**
-     * 保存所有会话
-     * <p> {@literal Map<sessionId, Session>}
-     */
-    private final Map<String, Session<?>> sessionMap = new ConcurrentHashMap<>();
-
-    /**
-     * 所有会话 map 的不可变 map
-     */
-    private final Map<String, Session<?>> unmodifiableSessionMap = Collections.unmodifiableMap(sessionMap);
-
-    @Autowired
-    private ITagService tagService;
+@Configuration
+@ConditionalOnBean(Server.class)
+public class OnPingRefreshEventHandler extends OnPingEventHandler {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
-    // region session 操作
-
     @Override
-    public void addSession(Session<?> session) {
-        Assert.notNull(session, "session 不能为 null");
-        sessionMap.put(session.getSessionId(), session);
+    public Object onMessage(Message message, String ping) {
         redisTemplate.opsForValue().set(
-                SESSION_REDIS_KEY + session.getSessionId(),
-                session.getSessionId(),
+                AbsSessionService.SESSION_REDIS_KEY + message.getSenderSessionId(),
+                message.getSenderSessionId(),
                 ThreadLocalRandom.current().nextInt(5, 10),
                 TimeUnit.MINUTES);
+        log.debug("kernel:net:ping:sessionId:{}", message.getSenderSessionId());
+        return null;
     }
 
-    @Override
-    public Session<?> removeSessionById(String sessionId) {
-        Session<?> remove = sessionMap.remove(sessionId);
-        if (remove != null) {
-            tagService.removeAllTags(remove.getSessionId());
-            redisTemplate.delete(SESSION_REDIS_KEY + remove.getSessionId());
-        }
-        return remove;
-    }
-
-    @Override
-    public Session<?> getSessionById(String sessionId) {
-        return sessionMap.get(sessionId);
-    }
-
-    @Override
-    public Collection<Session<?>> getAllSessions() {
-        return unmodifiableSessionMap.values();
-    }
-
-    // endregion
 }
