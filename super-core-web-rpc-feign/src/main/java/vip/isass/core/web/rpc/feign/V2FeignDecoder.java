@@ -170,20 +170,24 @@
 package vip.isass.core.web.rpc.feign;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import feign.FeignException;
 import feign.Response;
 import feign.codec.Decoder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.ResolvableType;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.GenericHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -204,6 +208,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * isass v2 接口 feign 响应解码
@@ -232,8 +237,8 @@ public class V2FeignDecoder implements Decoder {
     @Override
     public Object decode(Response response, Type type) throws IOException, FeignException {
         if (type instanceof Resp
-            || type instanceof ResponseEntity
-            || !IV2FeignService.class.isAssignableFrom(response.request().requestTemplate().feignTarget().type())) {
+                || type instanceof ResponseEntity
+                || !IV2FeignService.class.isAssignableFrom(response.request().requestTemplate().feignTarget().type())) {
             return decodeByHttpMessageConverters(response, type);
         }
 
@@ -250,7 +255,7 @@ public class V2FeignDecoder implements Decoder {
 
         Resp<JsonNode> resp = JsonUtil.DEFAULT_INSTANCE.readValue(responseStr, RESP_TYPE_REFERENCE);
         if (resp.getSuccess() == null
-            || resp.getMessage() == null) {
+                || resp.getMessage() == null) {
             return decodeByHttpMessageConverters(response, type, responseStr, charset, httpHeaders);
         }
 
@@ -264,9 +269,31 @@ public class V2FeignDecoder implements Decoder {
             return null;
         }
 
-        JavaType javaType = getJavaType(type, null);
+        JavaType javaType = JsonUtil.DEFAULT_INSTANCE.getTypeFactory().constructType(type);
+        Object obj = JsonUtil.NOT_NULL_INSTANCE.convertValue(dataJsonNode, javaType);
 
-        return JsonUtil.NOT_NULL_INSTANCE.convertValue(dataJsonNode, javaType);
+        if (obj instanceof IPage) {
+            IPage<?> page = (IPage<?>) obj;
+            if (page.getRecords().isEmpty()) {
+                return obj;
+            }
+
+            List<JavaType> bindingsTypeParameters = javaType.getBindings().getTypeParameters();
+            if (bindingsTypeParameters.isEmpty()) {
+                return obj;
+            }
+
+            JavaType entityJavaType = bindingsTypeParameters.get(0);
+            Class<?> entityClass = entityJavaType.getRawClass();
+
+            Class<?> currentRecordEntityClass = IterUtil.getElementType(page.getRecords());
+            if (entityClass.isAssignableFrom(currentRecordEntityClass)) {
+                return obj;
+            }
+            page.convert((Function<Object, Object>) o1 -> JsonUtil.DEFAULT_INSTANCE.convertValue(o1, entityJavaType));
+        }
+
+        return obj;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -277,7 +304,7 @@ public class V2FeignDecoder implements Decoder {
             for (HttpMessageConverter<?> messageConverter : this.messageConverters) {
                 if (messageConverter instanceof GenericHttpMessageConverter) {
                     GenericHttpMessageConverter<?> genericMessageConverter =
-                        (GenericHttpMessageConverter<?>) messageConverter;
+                            (GenericHttpMessageConverter<?>) messageConverter;
                     if (genericMessageConverter.canRead(type, null, contentType)) {
                         ResolvableType resolvableType = ResolvableType.forType(type);
                         log.trace("Reading to [{}]", resolvableType);
@@ -293,19 +320,19 @@ public class V2FeignDecoder implements Decoder {
             }
         } catch (IOException | HttpMessageNotReadableException ex) {
             throw new RestClientException(
-                StrUtil.format(
-                    "Error while extracting response for type [{}] and content type [{}]",
-                    type,
-                    contentType),
-                ex);
+                    StrUtil.format(
+                            "Error while extracting response for type [{}] and content type [{}]",
+                            type,
+                            contentType),
+                    ex);
         }
 
         throw new RestClientException(
-            StrUtil.format(
-                "Could not extract response: no suitable HttpMessageConverter found " +
-                    "for response type [{}] and content type [{}]",
-                type,
-                contentType));
+                StrUtil.format(
+                        "Could not extract response: no suitable HttpMessageConverter found " +
+                                "for response type [{}] and content type [{}]",
+                        type,
+                        contentType));
     }
 
     private Object decodeByHttpMessageConverters(Response response, Type type) {
@@ -337,10 +364,10 @@ public class V2FeignDecoder implements Decoder {
         }
         try {
             return contentTypes.stream()
-                .filter(StrUtil::isNotBlank)
-                .map(MediaType::parseMediaType)
-                .findFirst()
-                .orElse(MediaType.APPLICATION_OCTET_STREAM);
+                    .filter(StrUtil::isNotBlank)
+                    .map(MediaType::parseMediaType)
+                    .findFirst()
+                    .orElse(MediaType.APPLICATION_OCTET_STREAM);
         } catch (Exception e) {
             log.warn("解析feign[{}]的contentType错误，将使用 'application/octet-stream'", response.request().toString());
             return MediaType.APPLICATION_OCTET_STREAM;
@@ -409,11 +436,6 @@ public class V2FeignDecoder implements Decoder {
             Assert.state(charset != null, "No default charset");
             return charset;
         }
-    }
-
-    private JavaType getJavaType(Type type, @Nullable Class<?> contextClass) {
-        TypeFactory typeFactory = JsonUtil.DEFAULT_INSTANCE.getTypeFactory();
-        return typeFactory.constructType(GenericTypeResolver.resolveType(type, contextClass));
     }
 
 }
