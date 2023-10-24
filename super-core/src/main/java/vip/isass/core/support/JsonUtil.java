@@ -222,72 +222,72 @@ public class JsonUtil {
 
     @SuppressWarnings("unchecked")
     public static SimpleModule simpleModule = new SimpleModule()
-        .addSerializer(LocalDateTime.class, new StdDelegatingSerializer(new LocalDateTimeToLongConvert()))
-        .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new LongToLocalDateTimeConvert()))
-        .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new StringToLocalDateTimeConvert()))
-        .addSerializer(LocalDate.class, new StdDelegatingSerializer(new LocalDateToLongConvert()))
-        //        .addDeserializer(LocalDate.class, new StdDelegatingDeserializer<>(new LongToLocalDateConvert()))
-        .addDeserializer(LocalDate.class, new StdDelegatingDeserializer<>(new StringToLocalDateConvert()))
-        .addSerializer(LocalTime.class, new StdDelegatingSerializer(new LocalTimeToLongConvert()))
-        //        .addDeserializer(LocalTime.class, new StdDelegatingDeserializer<>(new LongToLocalTimeConvert()))
-        .addDeserializer(LocalTime.class, new StdDelegatingDeserializer<>(new StringToLocalTimeConvert()))
-        .addDeserializer(Json.class, new StdDelegatingDeserializer<>(new ObjectToJsonConvert()))
-        .addSerializer(BigDecimal.class, (JsonSerializer<BigDecimal>) NumberSerializer.bigDecimalAsStringSerializer())
-        .addSerializer(Double.class, new DoubleSerializer())
-        .addSerializer(double.class, new DoubleSerializer())
-        .addSerializer(Float.class, new FloatSerializer())
-        .addSerializer(float.class, new FloatSerializer());
+            .addSerializer(LocalDateTime.class, new StdDelegatingSerializer(new LocalDateTimeToLongConvert()))
+            .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new LongToLocalDateTimeConvert()))
+            .addDeserializer(LocalDateTime.class, new StdDelegatingDeserializer<>(new StringToLocalDateTimeConvert()))
+            .addSerializer(LocalDate.class, new StdDelegatingSerializer(new LocalDateToLongConvert()))
+            //        .addDeserializer(LocalDate.class, new StdDelegatingDeserializer<>(new LongToLocalDateConvert()))
+            .addDeserializer(LocalDate.class, new StdDelegatingDeserializer<>(new StringToLocalDateConvert()))
+            .addSerializer(LocalTime.class, new StdDelegatingSerializer(new LocalTimeToLongConvert()))
+            //        .addDeserializer(LocalTime.class, new StdDelegatingDeserializer<>(new LongToLocalTimeConvert()))
+            .addDeserializer(LocalTime.class, new StdDelegatingDeserializer<>(new StringToLocalTimeConvert()))
+            .addDeserializer(Json.class, new StdDelegatingDeserializer<>(new ObjectToJsonConvert()))
+            .addSerializer(BigDecimal.class, (JsonSerializer<BigDecimal>) NumberSerializer.bigDecimalAsStringSerializer())
+            .addSerializer(Double.class, new DoubleSerializer())
+            .addSerializer(double.class, new DoubleSerializer())
+            .addSerializer(Float.class, new FloatSerializer())
+            .addSerializer(float.class, new FloatSerializer());
 
     public static final ObjectMapper DEFAULT_INSTANCE = new ObjectMapper()
-        // 当实体类中不含有 json 字符串的某些字段时，不抛出异常
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            // 当实体类中不含有 json 字符串的某些字段时，不抛出异常
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-        // 非 bean 对象不抛异常
-        .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+            // 非 bean 对象不抛异常
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
 
-        // BigDecimal 精度
-        .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
+            // BigDecimal 精度
+            .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
 
-        // 禁用科学计数法
-        .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
+            // 禁用科学计数法
+            .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
 
-        // 允许使用注释
-        .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
+            // 允许使用注释
+            .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
 
-        // 允许字段名没有引号
-        .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+            // 允许字段名没有引号
+            .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
 
-        // 允许单引号
-        .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+            // 允许单引号
+            .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
 
-        .registerModule(simpleModule);
+            .registerModule(simpleModule);
 
     public static final ObjectMapper NOT_NULL_INSTANCE = new ObjectMapper()
-        // 当实体类中不含有 json 字符串的某些字段时，不抛出异常
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            // 当实体类中不含有 json 字符串的某些字段时，不抛出异常
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-        // 非 bean 对象不抛异常
-        .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+            // 非 bean 对象不抛异常
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
 
-        // BigDecimal 精度
-        .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
+            // BigDecimal 精度
+            .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
 
-        // 禁用科学计数法
-        .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
+            // 禁用科学计数法
+            .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
 
-        // 允许使用注释
-        .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
+            // 允许使用注释
+            .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
 
-        // 允许字段名没有引号
-        .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+            // 允许字段名没有引号
+            .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
 
-        // 允许单引号
-        .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+            // 允许单引号
+            .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
 
-        // 只输出非 null 字段
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            // 只输出非 null 字段
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
 
-        .registerModule(simpleModule);
+            .registerModule(simpleModule);
 
     public static Json fromObject(Object object) {
         return new DefaultJson().fromObject(object);
@@ -356,7 +356,7 @@ public class JsonUtil {
 
     @SneakyThrows
     public static String writeValueWithNotNullInstance(Object object) {
-        return DEFAULT_INSTANCE.writeValueAsString(object);
+        return NOT_NULL_INSTANCE.writeValueAsString(object);
     }
 
 }
