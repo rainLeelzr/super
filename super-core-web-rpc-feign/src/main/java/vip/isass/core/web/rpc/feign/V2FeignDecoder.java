@@ -170,11 +170,9 @@
 package vip.isass.core.web.rpc.feign;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -208,7 +206,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * isass v2 接口 feign 响应解码
@@ -270,30 +267,7 @@ public class V2FeignDecoder implements Decoder {
         }
 
         JavaType javaType = JsonUtil.DEFAULT_INSTANCE.getTypeFactory().constructType(type);
-        Object obj = JsonUtil.NOT_NULL_INSTANCE.convertValue(dataJsonNode, javaType);
-
-        if (obj instanceof IPage) {
-            IPage<?> page = (IPage<?>) obj;
-            if (page.getRecords().isEmpty()) {
-                return obj;
-            }
-
-            List<JavaType> bindingsTypeParameters = javaType.getBindings().getTypeParameters();
-            if (bindingsTypeParameters.isEmpty()) {
-                return obj;
-            }
-
-            JavaType entityJavaType = bindingsTypeParameters.get(0);
-            Class<?> entityClass = entityJavaType.getRawClass();
-
-            Class<?> currentRecordEntityClass = IterUtil.getElementType(page.getRecords());
-            if (entityClass.isAssignableFrom(currentRecordEntityClass)) {
-                return obj;
-            }
-            page.convert((Function<Object, Object>) o1 -> JsonUtil.DEFAULT_INSTANCE.convertValue(o1, entityJavaType));
-        }
-
-        return obj;
+        return JsonUtil.NOT_NULL_INSTANCE.convertValue(dataJsonNode, javaType);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

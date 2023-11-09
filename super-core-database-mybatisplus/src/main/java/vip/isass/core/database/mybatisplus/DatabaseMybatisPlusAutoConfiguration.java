@@ -170,22 +170,21 @@
 package vip.isass.core.database.mybatisplus;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.ComponentScan;
-import vip.isass.core.database.mybatisplus.json.JsonNodeToIPageConvert;
+import vip.isass.core.database.mybatisplus.json.IPageDeserializer;
 import vip.isass.core.support.JsonUtil;
 
 /**
  * @author Rain
  */
 @ComponentScan
-public class DatabaseMybatisplusAutoConfiguration implements InitializingBean {
+public class DatabaseMybatisPlusAutoConfiguration implements InitializingBean {
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public void afterPropertiesSet() {
-        JsonUtil.simpleModule.addDeserializer(IPage.class, new StdDelegatingDeserializer(new JsonNodeToIPageConvert()));
+        JsonUtil.simpleModule.addDeserializer(IPage.class, new IPageDeserializer());
+        // JsonUtil.DEFAULT_INSTANCE.registerModule(new PageModule());
+        // JsonUtil.NOT_NULL_INSTANCE.registerModule(new PageModule());
     }
-
 }
