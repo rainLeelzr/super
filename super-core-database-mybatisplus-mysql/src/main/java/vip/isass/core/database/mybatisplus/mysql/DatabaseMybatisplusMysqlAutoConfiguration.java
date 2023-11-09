@@ -177,5 +177,5 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @ComponentScan
 @MapperScan(basePackages = "vip.isass.core.database.mybatisplus.mysql.mapper")
-public class DatabaseMybatisplusMysqlAutoConfiguration {
+public class DatabaseMybatisPlusMysqlAutoConfiguration {
 }
