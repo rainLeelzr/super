@@ -170,10 +170,12 @@
 package vip.isass.kernel.net.core.tag;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import lombok.ToString;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -188,26 +190,29 @@ public class TagPair {
 
     private String tagKey;
 
-    private Set<String> tagValues;
+    /**
+     * 标签值集合，需保证不能为 null
+     */
+    private Set<String> tagValues = Collections.emptySet();
 
     public TagPair() {
     }
 
     public TagPair(String tagKey) {
         Assert.notBlank(tagKey, "tagKey 不能为空");
-        new TagPair(tagKey);
+        new TagPair(tagKey, Collections.emptySet());
     }
 
     public TagPair(String tagKey, String tagValue) {
         Assert.notBlank(tagKey, "tagKey 不能为空");
         this.tagKey = tagKey;
-        this.tagValues = tagValue == null ? null : CollUtil.newHashSet(tagValue);
+        this.tagValues = tagValue == null ? Collections.emptySet() : CollUtil.newHashSet(tagValue);
     }
 
     public TagPair(String tagKey, Set<String> tagValues) {
         Assert.notBlank(tagKey, "tagKey 不能为空");
         this.tagKey = tagKey;
-        this.tagValues = tagValues;
+        this.tagValues = tagValues == null ? Collections.emptySet() : tagValues;
     }
 
     public String getTagKey() {
@@ -227,8 +232,36 @@ public class TagPair {
         this.tagValues = tagValues == null ? new HashSet<>() : tagValues;
     }
 
-    public String getFirstTagValue() {
-        return IterUtil.getFirst(this.tagValues);
+    public void addTagValue(String tagValue) {
+        if (StrUtil.isBlank(tagValue)) {
+            return;
+        }
+        if (this.tagValues == Collections.EMPTY_SET) {
+            this.tagValues = new HashSet<>();
+        }
+        this.tagValues.add(tagValue);
+    }
+
+    public void addTagValues(Collection<String> tagValues) {
+        if (CollUtil.isEmpty(tagValues)) {
+            return;
+        }
+        if (this.tagValues == Collections.EMPTY_SET) {
+            this.tagValues = new HashSet<>(tagValues);
+        } else {
+            this.tagValues.addAll(tagValues);
+        }
+    }
+
+    /**
+     * 获取标签值集合里第一个值
+     *
+     * @return 第一个标签值
+     */
+    public String tagValue() {
+        return this.tagValues.isEmpty()
+                ? null
+                : tagValues.iterator().next();
     }
 
 }

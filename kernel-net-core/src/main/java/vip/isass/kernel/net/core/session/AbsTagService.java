@@ -169,26 +169,17 @@
 
 package vip.isass.kernel.net.core.session;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.IterUtil;
-import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import vip.isass.kernel.net.core.tag.ITagService;
+import vip.isass.kernel.net.core.tag.ITagStore;
 import vip.isass.kernel.net.core.tag.TagPair;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 标签服务
@@ -199,170 +190,50 @@ import java.util.stream.Stream;
 public abstract class AbsTagService implements ITagService {
 
     @Autowired
-    private ISessionService sessionService;
-
-    /**
-     * 保存所有会话和标签的关系
-     * <p> {@literal Map<sessionId, Map<tagKey, tagValue>>}
-     */
-    private final Map<String, Map<String, Set<String>>> sessionIdAndTagPairMap = new ConcurrentHashMap<>();
+    private ITagStore tagStore;
 
     @Override
     public void addTagPairs(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
-        if (sessionIds.isEmpty() || tagPairs.isEmpty()) {
-            return;
-        }
-
-        for (String sessionId : sessionIds) {
-            if (!sessionService.existSession(sessionId)) {
-                continue;
-            }
-            log.debug("添加会话标签[{}][{}]", sessionId, tagPairs);
-
-            Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.computeIfAbsent(
-                sessionId,
-                s -> new ConcurrentHashMap<>(16));
-
-            tagPairs.forEach(tagPair -> {
-                    Set<String> tagValues = tagPairMap.computeIfAbsent(tagPair.getTagKey(), k -> new HashSet<>());
-                    if (tagPair.getTagValues() == null) {
-                        return;
-                    }
-                    for (String tagValue : tagPair.getTagValues()) {
-                        if (tagValue == null) {
-                            continue;
-                        }
-                        tagValues.add(tagValue);
-                    }
-                }
-            );
-        }
+        tagStore.addTags(sessionIds, tagPairs);
     }
 
     @Override
-    public boolean hasAllTagPair(String sessionId, Collection<TagPair> tagPairs) {
-        Assert.notBlank(sessionId, "sessionId 不能为空");
-
-        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-        if (tagPairMap == null) {
-            return false;
-        }
-
-        for (TagPair tagPair : tagPairs) {
-            Set<String> tagValues = tagPairMap.get(tagPair.getTagKey());
-            if (tagValues == null) {
-                return false;
-            }
-            if (!CollUtil.containsAll(tagValues, tagPair.getTagValues())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private Optional<Stream<String>> findAllMatchSessionStreamByTagPairs(Collection<TagPair> tagPairs) {
-        return CollUtil.isEmpty(tagPairs)
-            ? Optional.empty()
-            : Optional.of(sessionIdAndTagPairMap
-            .entrySet()
-            .parallelStream()
-            .filter(entry -> {
-                Map<String, Set<String>> havingTagPairMap = entry.getValue();
-                for (TagPair tagPair : tagPairs) {
-                    Set<String> havingTagValues = havingTagPairMap.get(tagPair.getTagKey());
-                    if (havingTagValues == null) {
-                        return false;
-                    }
-                    if (!CollUtil.containsAll(havingTagValues, tagPair.getTagValues())) {
-                        return false;
-                    }
-                }
-                return true;
-            })
-            .map(Map.Entry::getKey));
-    }
-
-    @Override
-    public Collection<String> findAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs) {
-        return findAllMatchSessionStreamByTagPairs(tagPairs)
-            .map(s -> s.collect(Collectors.toList()))
-            .orElse(Collections.emptyList());
-    }
-
-    /**
-     * @param tagPairs 标签键值对集合
-     * @param consumer 消费逻辑
-     */
-    @Override
-    public void consumeAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs, Consumer<String> consumer) {
-        findAllMatchSessionStreamByTagPairs(tagPairs).ifPresent(s -> s.forEach(consumer));
+    public boolean containAllTags(String sessionId, Collection<TagPair> tagPairs) {
+        return tagStore.containAllTags(sessionId, tagPairs);
     }
 
     @Override
     public String getFirstTagValue(String sessionId, String tagKey) {
-        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-        if (tagPairMap == null) {
-            return null;
-        }
-        return IterUtil.getFirst(tagPairMap.get(tagKey));
+        return tagStore.getTagValue(sessionId, tagKey);
     }
 
     @Override
     public Collection<TagPair> findAllTagPair(String sessionId) {
-        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-        if (CollUtil.isEmpty(tagPairMap)) {
-            return Collections.emptyList();
-        }
-        List<TagPair> tagPairs = new ArrayList<>(tagPairMap.size());
-        for (Map.Entry<String, Set<String>> entry : tagPairMap.entrySet()) {
-            tagPairs.add(new TagPair(entry.getKey(), new HashSet<>(entry.getValue())));
-        }
-        return tagPairs;
+        Map<String, Set<String>> tags = tagStore.findTags(sessionId);
+        return tags.entrySet()
+                .stream()
+                .map(e -> new TagPair(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void removeTagPairs(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
-        if (CollUtil.isEmpty(sessionIds) && CollUtil.isEmpty(tagPairs)) {
-            return;
-        }
-
-        for (String sessionId : sessionIds) {
-            log.debug("删除会话标签[{}][{}]", sessionId, tagPairs);
-
-            Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-            if (tagPairMap == null) {
-                // 此会话没有记录任何标签，继续下一次循环
-                continue;
-            }
-
-            for (TagPair tagPair : tagPairs) {
-                Set<String> realTagValues = tagPairMap.get(tagPair.getTagKey());
-                if (realTagValues == null) {
-                    // 此会话没有此标签，不用删除。继续下一次循环
-                    continue;
-                }
-                if (CollUtil.isEmpty(tagPair.getTagValues())) {
-                    tagPairMap.remove(tagPair.getTagKey());
-                } else {
-                    realTagValues.removeAll(tagPair.getTagValues());
-                    if (realTagValues.isEmpty()) {
-                        tagPairMap.remove(tagPair.getTagKey());
-                    }
-                }
-            }
-
-            if (tagPairMap.isEmpty()) {
-                sessionIdAndTagPairMap.remove(sessionId);
-            }
-        }
+    public void removeTags(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
+        tagStore.removeTags(sessionIds, tagPairs);
     }
 
     @Override
-    public void removeAllTags(Collection<String> sessionIds) {
-        sessionIds.forEach(sessionId -> {
-            log.debug("删除全部会话标签[{}]", sessionId);
-            sessionIdAndTagPairMap.remove(sessionId);
-        });
+    public void removeTags(Collection<String> sessionIds) {
+        tagStore.removeTags(sessionIds);
+    }
+
+    @Override
+    public Collection<String> findAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs) {
+        return null;
+    }
+
+    @Override
+    public void consumeAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs, Consumer<String> consumer) {
+
     }
 
     @Override

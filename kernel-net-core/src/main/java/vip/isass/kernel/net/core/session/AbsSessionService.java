@@ -227,7 +227,7 @@ public abstract class AbsSessionService implements ISessionService {
     public Session<?> removeSessionById(String sessionId) {
         Session<?> remove = sessionMap.remove(sessionId);
         if (remove != null) {
-            tagService.removeAllTags(remove.getSessionId());
+            tagService.removeTags(remove.getSessionId());
             redisTemplate.delete(SESSION_REDIS_KEY + remove.getSessionId());
         }
         return remove;

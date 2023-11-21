@@ -196,8 +196,8 @@ public class TagServiceManager implements ITagService {
     }
 
     @Override
-    public boolean hasAllTagPair(String sessionId, Collection<TagPair> tagPairs) {
-        return tagServices.get(0).hasAllTagPair(sessionId, tagPairs);
+    public boolean containAllTags(String sessionId, Collection<TagPair> tagPairs) {
+        return tagServices.get(0).containAllTags(sessionId, tagPairs);
     }
 
     @Override
@@ -221,13 +221,13 @@ public class TagServiceManager implements ITagService {
     }
 
     @Override
-    public void removeTagPairs(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
-        tagServices.get(0).removeTagPairs(sessionIds, tagPairs);
+    public void removeTags(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
+        tagServices.get(0).removeTags(sessionIds, tagPairs);
     }
 
     @Override
-    public void removeAllTags(Collection<String> sessionIds) {
-        tagServices.get(0).removeAllTags(sessionIds);
+    public void removeTags(Collection<String> sessionIds) {
+        tagServices.get(0).removeTags(sessionIds);
     }
 
     @Override

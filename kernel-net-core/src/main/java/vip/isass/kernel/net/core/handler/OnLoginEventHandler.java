@@ -206,7 +206,7 @@ public class OnLoginEventHandler implements OnMessageEventHandler<String> {
     @Override
     public Object onMessage(Message message, String token) {
         JwtInfo jwtInfo = JwtUtil.parse(token, secret);
-        tagService.addTagPair(message.getSenderSessionId(), ITagService.USER_ID_TAG_KEY, jwtInfo.getUid());
+        tagService.addTag(message.getSenderSessionId(), ITagService.USER_ID_TAG_KEY, jwtInfo.getUid());
         return Resp.bizSuccess(jwtInfo);
     }
 

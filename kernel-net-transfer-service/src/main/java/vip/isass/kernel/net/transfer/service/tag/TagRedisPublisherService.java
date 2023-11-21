@@ -207,7 +207,7 @@ public class TagRedisPublisherService implements ITagService {
     }
 
     @Override
-    public boolean hasAllTagPair(String sessionId, Collection<TagPair> tagPairs) {
+    public boolean containAllTags(String sessionId, Collection<TagPair> tagPairs) {
         throw new UnsupportedOperationException("net网关中转的实现模式不支持调用[hasAllTagPair]方法");
     }
 
@@ -232,7 +232,7 @@ public class TagRedisPublisherService implements ITagService {
     }
 
     @Override
-    public void removeTagPairs(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
+    public void removeTags(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
         redisTemplate.convertAndSend(
             NetTransferRedisKeyConst.REMOVE_TAG_PUBSUB_KEY,
             ChangeTagPairDto.builder()
@@ -243,7 +243,7 @@ public class TagRedisPublisherService implements ITagService {
     }
 
     @Override
-    public void removeAllTags(Collection<String> sessionIds) {
+    public void removeTags(Collection<String> sessionIds) {
         redisTemplate.convertAndSend(NetTransferRedisKeyConst.REMOVE_ALL_TAG_PUBSUB_KEY, sessionIds);
     }
 

@@ -208,24 +208,10 @@ public interface ITagService extends Ordered {
      * @param sessionId 会话 id
      * @param tagKey    标签键
      */
-    default void addTagKey(String sessionId, String tagKey) {
+    default void addTag(String sessionId, String tagKey) {
         addTagPairs(
-            Collections.singleton(sessionId),
-            Collections.singleton(new TagPair(tagKey)));
-    }
-
-    /**
-     * 给会话添加多个标签键
-     *
-     * @param sessionId 会话 id
-     * @param tagKeys   标签键集合
-     */
-    default void addTagKeys(String sessionId, Collection<String> tagKeys) {
-        addTagPairs(
-            Collections.singleton(sessionId),
-            tagKeys.stream()
-                .map(TagPair::new)
-                .collect(Collectors.toList()));
+                Collections.singleton(sessionId),
+                Collections.singleton(new TagPair(tagKey)));
     }
 
     /**
@@ -235,10 +221,10 @@ public interface ITagService extends Ordered {
      * @param tagKey    标签键
      * @param tagValue  标签值
      */
-    default void addTagPair(String sessionId, String tagKey, String tagValue) {
+    default void addTag(String sessionId, String tagKey, String tagValue) {
         addTagPairs(
-            Collections.singleton(sessionId),
-            Collections.singleton(new TagPair(tagKey, tagValue)));
+                Collections.singleton(sessionId),
+                Collections.singleton(new TagPair(tagKey, tagValue)));
     }
 
     /**
@@ -247,10 +233,24 @@ public interface ITagService extends Ordered {
      * @param sessionId 会话 id
      * @param tagPair   标签键值对
      */
-    default void addTagPair(String sessionId, TagPair tagPair) {
+    default void addTag(String sessionId, TagPair tagPair) {
         addTagPairs(
-            Collections.singleton(sessionId),
-            Collections.singleton(tagPair));
+                Collections.singleton(sessionId),
+                Collections.singleton(tagPair));
+    }
+
+    /**
+     * 给会话添加多个标签键
+     *
+     * @param sessionId 会话 id
+     * @param tagKeys   标签键集合
+     */
+    default void addTags(String sessionId, Collection<String> tagKeys) {
+        addTagPairs(
+                Collections.singleton(sessionId),
+                tagKeys.stream()
+                        .map(TagPair::new)
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -261,8 +261,8 @@ public interface ITagService extends Ordered {
      */
     default void addTagPairs(String sessionId, Collection<TagPair> tagPairs) {
         addTagPairs(
-            Collections.singleton(sessionId),
-            tagPairs);
+                Collections.singleton(sessionId),
+                tagPairs);
     }
 
     /**
@@ -285,7 +285,7 @@ public interface ITagService extends Ordered {
      * @return 会话是否拥有标签键
      */
     default boolean hasTagKey(String sessionId, String tagKey) {
-        return hasAllTagPair(sessionId, Collections.singleton(new TagPair(tagKey)));
+        return containAllTags(sessionId, Collections.singleton(new TagPair(tagKey)));
     }
 
     /**
@@ -296,9 +296,9 @@ public interface ITagService extends Ordered {
      * @return 会话是否拥有所有标签键
      */
     default boolean hasAllTagKey(String sessionId, Collection<String> tagKeys) {
-        return hasAllTagPair(sessionId, tagKeys.stream()
-            .map(TagPair::new)
-            .collect(Collectors.toList()));
+        return containAllTags(sessionId, tagKeys.stream()
+                .map(TagPair::new)
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -310,7 +310,7 @@ public interface ITagService extends Ordered {
      * @return 会话是否拥有标签键值对
      */
     default boolean hasTagPair(String sessionId, String tagKey, String tagValue) {
-        return hasAllTagPair(sessionId, Collections.singleton(new TagPair(tagKey, tagValue)));
+        return containAllTags(sessionId, Collections.singleton(new TagPair(tagKey, tagValue)));
     }
 
     /**
@@ -320,7 +320,7 @@ public interface ITagService extends Ordered {
      * @param tagPairs  标签键值对
      * @return 会话是否拥有所有标签键值对
      */
-    boolean hasAllTagPair(String sessionId, Collection<TagPair> tagPairs);
+    boolean containAllTags(String sessionId, Collection<TagPair> tagPairs);
 
     /**
      * 查找拥有所有标签键值对的会话
@@ -368,7 +368,7 @@ public interface ITagService extends Ordered {
      * @param tagKey    标签键
      */
     default void removeByTagKey(String sessionId, String tagKey) {
-        removeTagPairs(Collections.singleton(sessionId), Collections.singleton(new TagPair(tagKey)));
+        removeTags(Collections.singleton(sessionId), Collections.singleton(new TagPair(tagKey)));
     }
 
     /**
@@ -379,7 +379,7 @@ public interface ITagService extends Ordered {
      * @param tagValue  标签值
      */
     default void removeByTagPair(String sessionId, String tagKey, String tagValue) {
-        removeTagPairs(Collections.singleton(sessionId), Collections.singleton(new TagPair(tagKey, tagValue)));
+        removeTags(Collections.singleton(sessionId), Collections.singleton(new TagPair(tagKey, tagValue)));
     }
 
     /**
@@ -389,7 +389,7 @@ public interface ITagService extends Ordered {
      * @param tagKey     标签键
      */
     default void removeBySessionsAndTagKey(Collection<String> sessionIds, String tagKey) {
-        removeTagPairs(sessionIds, Collections.singleton(new TagPair(tagKey)));
+        removeTags(sessionIds, Collections.singleton(new TagPair(tagKey)));
     }
 
     /**
@@ -399,9 +399,9 @@ public interface ITagService extends Ordered {
      * @param tagKeys    标签键集合
      */
     default void removeTagBySessionsAndTagKeys(Collection<String> sessionIds, Collection<String> tagKeys) {
-        removeTagPairs(
-            sessionIds,
-            tagKeys.stream().map(TagPair::new).collect(Collectors.toList())
+        removeTags(
+                sessionIds,
+                tagKeys.stream().map(TagPair::new).collect(Collectors.toList())
         );
     }
 
@@ -411,15 +411,15 @@ public interface ITagService extends Ordered {
      * @param sessionIds 会话 id 集合
      * @param tagPairs   标签键值对集合
      */
-    void removeTagPairs(Collection<String> sessionIds, Collection<TagPair> tagPairs);
+    void removeTags(Collection<String> sessionIds, Collection<TagPair> tagPairs);
 
     /**
      * 删除会话的所有标签
      *
      * @param sessionId 会话 id
      */
-    default void removeAllTags(String sessionId) {
-        removeAllTags(Collections.singleton(sessionId));
+    default void removeTags(String sessionId) {
+        removeTags(Collections.singleton(sessionId));
     }
 
     /**
@@ -427,7 +427,7 @@ public interface ITagService extends Ordered {
      *
      * @param sessionIds 会话 id 集合
      */
-    void removeAllTags(Collection<String> sessionIds);
+    void removeTags(Collection<String> sessionIds);
 
     // endregion
 

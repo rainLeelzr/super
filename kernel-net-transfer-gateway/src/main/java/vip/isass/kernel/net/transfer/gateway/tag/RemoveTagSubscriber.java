@@ -206,7 +206,7 @@ public class RemoveTagSubscriber implements IRedisSubscriber<ChangeTagPairDto> {
         if (CollUtil.isEmpty(payload.getSessionIds())) {
             return;
         }
-        tagService.removeTagPairs(payload.getSessionIds(), payload.getTagPairs());
+        tagService.removeTags(payload.getSessionIds(), payload.getTagPairs());
     }
 
     @Override

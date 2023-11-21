@@ -180,7 +180,7 @@ import vip.isass.kernel.net.core.server.Server;
 import javax.annotation.Resource;
 
 /**
- * 登录事件处理器
+ * 客户端发送的广播事件处理器
  *
  * @author rain
  */

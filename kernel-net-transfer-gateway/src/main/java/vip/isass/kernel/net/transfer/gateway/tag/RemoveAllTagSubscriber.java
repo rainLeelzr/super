@@ -197,7 +197,7 @@ public class RemoveAllTagSubscriber implements IRedisSubscriber<List<String>> {
 
     @Override
     public void onMessage(List<String> sessionIds, Message redisMessage, byte[] pattern) {
-        tagService.removeAllTags(sessionIds);
+        tagService.removeTags(sessionIds);
     }
 
     @Override
