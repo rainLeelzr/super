@@ -1,7 +1,7 @@
 @startuml
 'https://plantuml.com/component-diagram
 
-frame 单体应用网络通信组件{
+frame 单体应用网络通信组件数据流{
 
     component [服务实例启动类] as server {
     }
@@ -19,7 +19,7 @@ frame 单体应用网络通信组件{
                     "OnClientSendBroadcastEventHandler"
                 ]
             }],
-            "OnAnyMessageEventHandler": "收到任何事件消息处理器",
+            "OnAnyMessageEventHandler": "收到任何客户端消息事件处理器",
             "OnErrorEventHandler": "错误消息处理器"
         }
 
@@ -40,11 +40,11 @@ frame 单体应用网络通信组件{
 
     }
 
-    component [业务组件]  as bizComponent {
+    component [业务组件]  as bizComponent #yellow {
 
     }
 
-    note left of [handler]
+    note left of [handler] #yellow
       - 消息路由分发到handler实现类
       - 业务实现接口以处理消息
     end note
@@ -60,16 +60,18 @@ frame 单体应用网络通信组件{
 
     note top of [tagService] : 管理并保存客户端标签
 
+    note right of [bizComponent] : 业务代码，可调用"消息发送器"和"标签服务"
+
     messageSender --> sessionService : 调用会话服务发送消息
     messageSender --> tagService : 发送消息前查询符合标签条件的会话
     server --> handler : 扫描并添加handler监听
     bizComponent -up-> tagService : 给客户端打标签
-bizComponent -up-> messageSender : 给客户端发送消息
-OnMessageEventHandler --> tagService : 给客户端打标签
-OnMessageEventHandler --> messageSender : 给客户端发送消息
+    bizComponent -up-> messageSender : 给客户端发送消息
+    OnMessageEventHandler --> tagService : 给客户端打标签
+    OnMessageEventHandler --> messageSender : 给客户端发送消息
 
-OnConnectEventHandler --> sessionService : 记录会话
-OnDisconnectEventHandler --> sessionService : 删除会话
+    OnConnectEventHandler --> sessionService : 记录会话
+    OnDisconnectEventHandler --> sessionService : 删除会话
 
 }
 

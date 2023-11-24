@@ -234,9 +234,9 @@ public class EventManager implements IEventManager {
 
         onMessageEventHandlerMap = MapUtil.newHashMap(onMessageEventHandlers.size());
         onMessageEventHandlers
-            .forEach(h -> onMessageEventHandlerMap
-                .computeIfAbsent(StrUtil.nullToEmpty(h.getCmd()), s -> new ArrayList<>())
-                .add(h));
+                .forEach(h -> onMessageEventHandlerMap
+                        .computeIfAbsent(StrUtil.nullToEmpty(h.getCmd()), s -> new ArrayList<>())
+                        .add(h));
     }
 
     @Override
@@ -266,8 +266,8 @@ public class EventManager implements IEventManager {
         log.debug("收到客户端消息: cmd[{}] payload[{}]", message.getCmd(), message.getPayload());
 
         List<OnMessageEventHandler<?>> handlers = StrUtil.isBlank(message.getCmd())
-            ? onMessageEventHandlers
-            : onMessageEventHandlerMap.get(message.getCmd());
+                ? onMessageEventHandlers
+                : onMessageEventHandlerMap.get(message.getCmd());
 
         Map<Type, T> convertedPayloadMap = MapUtil.newHashMap(2);
 
@@ -278,13 +278,13 @@ public class EventManager implements IEventManager {
                 try {
                     Type actualType = TypeUtil.toParameterizedType(h.getClass()).getActualTypeArguments()[0];
                     convertedPayload = convertedPayloadMap.computeIfAbsent(
-                        actualType,
-                        k -> ConvertUtil.convert(k, message.getPayload()));
+                            actualType,
+                            k -> ConvertUtil.convert(k, message.getPayload()));
                 } catch (Exception e) {
                     String errorMessage = StrUtil.format(
-                        "反序列化消息失败：cmd[{}],error[{}]",
-                        message.getCmd(),
-                        e.getMessage());
+                            "反序列化消息失败：cmd[{}],error[{}]",
+                            message.getCmd(),
+                            e.getMessage());
                     log.error(errorMessage, e);
                     replyMessage(message, MessageCmd.ERROR, errorMessage);
                     continue;
@@ -309,13 +309,13 @@ public class EventManager implements IEventManager {
                 try {
                     Type actualType = TypeUtil.toParameterizedType(h.getClass()).getActualTypeArguments()[0];
                     convertedPayload = convertedPayloadMap.computeIfAbsent(
-                        actualType,
-                        k -> ConvertUtil.convert(k, message.getPayload()));
+                            actualType,
+                            k -> ConvertUtil.convert(k, message.getPayload()));
                 } catch (Exception e) {
                     String errorMessage = StrUtil.format(
-                        "反序列化消息失败：cmd[{}],error[{}]",
-                        message.getCmd(),
-                        e.getMessage());
+                            "反序列化消息失败：cmd[{}],error[{}]",
+                            message.getCmd(),
+                            e.getMessage());
                     log.error(errorMessage, e);
                     replyMessage(message, MessageCmd.ERROR, errorMessage);
                     continue;
@@ -358,11 +358,11 @@ public class EventManager implements IEventManager {
         }
 
         messageSender.sendMessage(Message.builder()
-            .receiverSession(message.getSenderSession())
-            .receiverSessionId(message.getSenderSessionId())
-            .cmd(cmd)
-            .payload(payload)
-            .build());
+                .receiverSession(message.getSenderSession())
+                .receiverSessionId(message.getSenderSessionId())
+                .cmd(cmd)
+                .payload(payload)
+                .build());
     }
 
 }

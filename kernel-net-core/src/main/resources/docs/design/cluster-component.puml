@@ -1,0 +1,134 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+frame 集群应用网络通信组件数据流{
+
+    database redis {
+
+    }
+
+    node 网关实例 {
+        component [底层网络通讯框架\n-具体网络通讯框架的配置与启动监听] as server {
+        }
+
+        component [服务注册] as serviceRegister {
+        }
+
+        component [事件处理器] as eventHandler_gateway {
+            [OnConnectEventHandler]
+            [OnDisconnectEventHandler]
+            [OnAnyMessageEventHandler]
+        }
+
+        component [消息事件处理器变更监听器] as messageEventHandlerChangeListener {
+        }
+
+        component [消息推送中转监听器] as messageTransferListener {
+
+        }
+
+        component [消息发送器\n-提供统一消息发送接口\n-负责调用标签服务和会话服务把消息发送出去] as messageSender {
+
+        }
+
+        component [会话服务\n-管理并保存客户端连接的会话对象]  as sessionService {
+
+        }
+
+        component [标签服务\n-提供标签curd服务]  as tagService {
+
+        }
+
+        component [http服务\n-获取在线用户列表\n-判断用户是否在线\n-获取用户标签]  as httpService {
+
+        }
+
+        component [http服务\n-获取在线用户列表\n-获取用户标签]  as httpService {
+
+        }
+    }
+
+    node 应用实例 {
+        component [服务发现] as serviceDiscovery {
+        }
+
+        component [消息事件处理器收集器\n-收集所有本应用的MessageEventHandler] as messageEventHandlerCollector {
+
+        }
+
+        component [消息事件中转监听器] as messageEventTransferListener {
+        }
+
+        component [事件处理器/业务组件] as eventHandler_biz {
+            [OnMessageEventHandler\n-业务实现接口以处理消息] as OnMessageEventHandler_biz #orange
+        }
+
+        component [消息发送器\n-提供统一消息发送接口\n-负责把推送给客户端的消息中转到redis] as messageSender_TransferSender {
+
+        }
+
+        component [标签服务\n-提供标签curd服务]  as tagService_biz {
+
+        }
+    }
+
+    json 事件处理器接口 {
+        "OnConnectEventHandler": "新建连接事件处理器",
+        "OnDisconnectEventHandler": "断开连接事件处理器",
+        "OnMessageEventHandler": [
+            "消息事件处理器",
+            {
+                "内置": {
+                    "OnLoginEventHandler": "登录消息事件处理器",
+                    "OnLogoutEventHandler": "登出消息事件处理器",
+                    "OnPingEventHandler": "ping消息事件处理器",
+                    "OnClientSendBroadcastEventHandler": "广播消息事件处理器"
+                }
+            }
+        ],
+        "OnAnyMessageEventHandler": "任何消息事件处理器",
+        "OnErrorEventHandler": "错误事件处理器"
+    }
+
+' 所有箭头为数据流向箭头
+
+' 数据流向分类颜色
+' '消息事件处理器收集器' #blue
+' '收到客户端消息' #red
+' '标签' #orange
+' '推送消息' #purple
+
+' 应用实例与各组件的关系
+    OnMessageEventHandler_biz --> messageEventHandlerCollector #blue
+    messageEventHandlerCollector --> redis #blue
+    redis --> messageEventTransferListener #red
+    messageEventTransferListener --> OnMessageEventHandler_biz #red
+    OnMessageEventHandler_biz --> tagService_biz #orange
+    tagService_biz --> redis #orange
+    OnMessageEventHandler_biz --> messageSender_TransferSender #purple
+    messageSender_TransferSender --> redis #purple
+
+    redis --> serviceDiscovery
+
+' 网关实例与各组件的关系
+    redis --> messageEventHandlerChangeListener #blue : 广播cmd给网关
+    messageEventHandlerChangeListener --> server #blue : 添加消息事件监听
+    server --> OnAnyMessageEventHandler #red
+    OnAnyMessageEventHandler --> redis #red
+    redis --> messageTransferListener #purple
+
+
+    messageTransferListener --> messageSender #purple : 发送消息给客户端
+    messageSender --> tagService #purple : 发送消息前查询符合标签条件的会话
+    tagService --> redis #purple
+    messageSender --> sessionService #purple : 执行消息发送逻辑
+
+    OnConnectEventHandler --> sessionService : 记录会话
+    OnDisconnectEventHandler --> sessionService : 删除会话
+    sessionService --> redis : 新增话删除会话
+
+    serviceRegister --> redis
+}
+
+footer %filename() rendered with PlantUML version %version()
+@enduml
