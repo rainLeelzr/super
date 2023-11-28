@@ -172,6 +172,7 @@ package vip.isass.kernel.net.core.tag;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.util.Collection;
@@ -188,6 +189,7 @@ import java.util.Set;
 @ToString
 public class TagPair {
 
+    @Getter
     private String tagKey;
 
     /**
@@ -200,7 +202,7 @@ public class TagPair {
 
     public TagPair(String tagKey) {
         Assert.notBlank(tagKey, "tagKey 不能为空");
-        new TagPair(tagKey, Collections.emptySet());
+        this.tagKey = tagKey;
     }
 
     public TagPair(String tagKey, String tagValue) {
@@ -215,17 +217,13 @@ public class TagPair {
         this.tagValues = tagValues == null ? Collections.emptySet() : tagValues;
     }
 
-    public String getTagKey() {
-        return tagKey;
-    }
-
     public void setTagKey(String tagKey) {
         Assert.notBlank(tagKey, "tagKey 不能为空");
         this.tagKey = tagKey;
     }
 
     public Set<String> getTagValues() {
-        return tagValues;
+        return Collections.unmodifiableSet(tagValues);
     }
 
     public void setTagValues(Set<String> tagValues) {
@@ -262,6 +260,10 @@ public class TagPair {
         return this.tagValues.isEmpty()
                 ? null
                 : tagValues.iterator().next();
+    }
+
+    public boolean isEmptyValues() {
+        return this.tagValues.isEmpty();
     }
 
 }

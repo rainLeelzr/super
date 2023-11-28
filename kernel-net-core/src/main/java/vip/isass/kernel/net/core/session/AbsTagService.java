@@ -170,11 +170,11 @@
 package vip.isass.kernel.net.core.session;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import vip.isass.kernel.net.core.tag.ITagService;
 import vip.isass.kernel.net.core.tag.ITagStore;
 import vip.isass.kernel.net.core.tag.TagPair;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -189,7 +189,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public abstract class AbsTagService implements ITagService {
 
-    @Autowired
+    @Resource
     private ITagStore tagStore;
 
     @Override

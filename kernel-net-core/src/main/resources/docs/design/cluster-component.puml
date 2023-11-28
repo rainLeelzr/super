@@ -8,6 +8,9 @@ frame 集群应用网络通信组件数据流{
     }
 
     node 网关实例 {
+        component [http服务\n-使用一致性hash算法，分配给客户端网关地址] as httpServer {
+        }
+
         component [底层网络通讯框架\n-具体网络通讯框架的配置与启动监听] as server {
         }
 
@@ -31,19 +34,11 @@ frame 集群应用网络通信组件数据流{
 
         }
 
-        component [会话服务\n-管理并保存客户端连接的会话对象]  as sessionService {
+        component [会话服务\n-管理并保存客户端连接的会话对象\n-命名空间\n-房间]  as sessionService {
 
         }
 
-        component [标签服务\n-提供标签curd服务]  as tagService {
-
-        }
-
-        component [http服务\n-获取在线用户列表\n-判断用户是否在线\n-获取用户标签]  as httpService {
-
-        }
-
-        component [http服务\n-获取在线用户列表\n-获取用户标签]  as httpService {
+        component [标签服务\n-提供标签curd服务\n-内置标签如用户标签]  as tagService {
 
         }
     }
@@ -52,7 +47,7 @@ frame 集群应用网络通信组件数据流{
         component [服务发现] as serviceDiscovery {
         }
 
-        component [消息事件处理器收集器\n-收集所有本应用的MessageEventHandler] as messageEventHandlerCollector {
+        component [消息事件处理器收集器\n-收集所有本应用的OnMessageEventHandler] as messageEventHandlerCollector {
 
         }
 
@@ -67,7 +62,11 @@ frame 集群应用网络通信组件数据流{
 
         }
 
-        component [标签服务\n-提供标签curd服务]  as tagService_biz {
+        component [会话服务\n-获取在线用户列表\n-判断用户是否在线]  as sessionService_biz {
+
+        }
+
+        component [标签服务\n-提供标签curd服务\n-内置标签如用户标签]  as tagService_biz {
 
         }
     }
@@ -90,45 +89,56 @@ frame 集群应用网络通信组件数据流{
         "OnErrorEventHandler": "错误事件处理器"
     }
 
-' 所有箭头为数据流向箭头
-
-' 数据流向分类颜色
-' '消息事件处理器收集器' #blue
-' '收到客户端消息' #red
-' '标签' #orange
-' '推送消息' #purple
+    cloud 箭头方向为数据流向\n\n服务启动初始化(black)\n客户端连接/断连(blue)\n收到客户端消息(red)\n查询/编辑标签(orange)\n推送消息(purple) as comment{
+        comment -up- 事件处理器接口 #white
+    }
 
 ' 应用实例与各组件的关系
-    OnMessageEventHandler_biz --> messageEventHandlerCollector #blue
-    messageEventHandlerCollector --> redis #blue
+    ' 服务启动初始化' #black
+    OnMessageEventHandler_biz --> messageEventHandlerCollector #black
+    messageEventHandlerCollector --> redis #black
+'    redis --> serviceDiscovery
+
+    ' 客户端连接 #blue
+    eventHandler_biz --> sessionService_biz #blue
+    sessionService_biz --> tagService_biz #blue
+    tagService_biz --> redis #blue
+
+    ' 收到客户端消息 #red
     redis --> messageEventTransferListener #red
     messageEventTransferListener --> OnMessageEventHandler_biz #red
-    OnMessageEventHandler_biz --> tagService_biz #orange
+
+    ' 查询/编辑标签 #orange
+    eventHandler_biz --> tagService_biz #orange
     tagService_biz --> redis #orange
-    OnMessageEventHandler_biz --> messageSender_TransferSender #purple
+
+    ' 推送消息 #purple
+    eventHandler_biz --> messageSender_TransferSender #purple
     messageSender_TransferSender --> redis #purple
 
-    redis --> serviceDiscovery
 
 ' 网关实例与各组件的关系
-    redis --> messageEventHandlerChangeListener #blue : 广播cmd给网关
-    messageEventHandlerChangeListener --> server #blue : 添加消息事件监听
+    ' 服务启动初始化 #black
+'    serviceRegister --> redis
+    redis --> messageEventHandlerChangeListener #black : 广播cmd给网关
+    messageEventHandlerChangeListener --> server #black : 添加消息事件监听
+
+    ' 客户端连接 #blue
+    server --> OnConnectEventHandler #blue
+    OnConnectEventHandler --> sessionService #blue: 记录会话
+    OnDisconnectEventHandler --> sessionService #blue : 删除会话
+    sessionService --> redis #blue : 新增/删除会话
+
+    ' 收到客户端消息 #red
     server --> OnAnyMessageEventHandler #red
     OnAnyMessageEventHandler --> redis #red
+
+    ' 推送消息 #purple
     redis --> messageTransferListener #purple
-
-
     messageTransferListener --> messageSender #purple : 发送消息给客户端
-    messageSender --> tagService #purple : 发送消息前查询符合标签条件的会话
-    tagService --> redis #purple
-    messageSender --> sessionService #purple : 执行消息发送逻辑
+    messageSender --> tagService #purple : 发送消息给客户端
+    tagService --> sessionService #purple : 执行消息发送逻辑
 
-    OnConnectEventHandler --> sessionService : 记录会话
-    OnDisconnectEventHandler --> sessionService : 删除会话
-    sessionService --> redis : 新增话删除会话
-
-    serviceRegister --> redis
 }
-
 footer %filename() rendered with PlantUML version %version()
 @enduml
