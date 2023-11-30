@@ -166,31 +166,44 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core;
+package vip.isass.kernel.net.socketio;
 
-/**
- * net 模块 redis key
- */
-public interface NetRedisKey {
+import cn.hutool.core.net.NetUtil;
+import cn.hutool.core.util.StrUtil;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
+import vip.isass.kernel.net.core.server.INodeAllocatorService;
 
-    String NET_PREFIX = "isass:net:";
+import javax.annotation.Resource;
 
-    /**
-     * 标签 isass:net:tag:{node}:{sessionId}
-     */
-    String TAG_REDIS_KEY_PREFIX = NET_PREFIX + "tag:";
+@Configuration
+@ConditionalOnProperty(name = "isass.core.net.proxy", havingValue = "false", matchIfMissing = true)
+public class SocketIoLocalNodeAllocatorService implements INodeAllocatorService, InitializingBean {
 
-    /**
-     * 会话 redis hash 结构 key: isass:net:session:{node} field: {sessionId} value: 上线时间
-     */
-    String SESSION_REDIS_KEY_PREFIX = NET_PREFIX + "session:";
+    @Resource
+    private SocketIoConfiguration socketIoConfiguration;
 
-    static String formatSessionKey(String node) {
-        return TAG_REDIS_KEY_PREFIX + node;
+    @Value("${isass.core.net.socketio.exposeUrl:}")
+    private String exposeUrl;
+
+    private String finallyExposeUrl;
+
+    @Override
+    public String allocate(String clientIp, String userId) {
+        return finallyExposeUrl;
     }
 
-    static String formatTagKey(String node, String sessionId) {
-        return TAG_REDIS_KEY_PREFIX + node + ":" + sessionId;
-    }
+    @Override
+    public void afterPropertiesSet() {
+        if (StrUtil.isNotBlank(exposeUrl)) {
+            finallyExposeUrl = exposeUrl;
+            return;
+        }
 
+        int port = socketIoConfiguration.getPort();
+        String ip = NetUtil.getLocalhostStr();
+        finallyExposeUrl = "http://" + ip + ":" + port;
+    }
 }

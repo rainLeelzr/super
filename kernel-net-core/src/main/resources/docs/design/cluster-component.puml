@@ -8,7 +8,7 @@ frame 集群应用网络通信组件数据流{
     }
 
     node 网关实例 {
-        component [http服务\n-使用一致性hash算法，分配给客户端网关地址] as httpServer {
+        component [http服务\n-使用一致性hash算法，给客户端分配节点地址] as httpServer {
         }
 
         component [底层网络通讯框架\n-具体网络通讯框架的配置与启动监听] as server {
@@ -55,7 +55,7 @@ frame 集群应用网络通信组件数据流{
         }
 
         component [事件处理器/业务组件] as eventHandler_biz {
-            [OnMessageEventHandler\n-业务实现接口以处理消息] as OnMessageEventHandler_biz #orange
+            [OnMessageEventHandler\n-业务实现接口以处理消息] as OnMessageEventHandler_biz #yellow
         }
 
         component [消息发送器\n-提供统一消息发送接口\n-负责把推送给客户端的消息中转到redis] as messageSender_TransferSender {
@@ -89,8 +89,12 @@ frame 集群应用网络通信组件数据流{
         "OnErrorEventHandler": "错误事件处理器"
     }
 
-    cloud 箭头方向为数据流向\n\n服务启动初始化(black)\n客户端连接/断连(blue)\n收到客户端消息(red)\n查询/编辑标签(orange)\n推送消息(purple) as comment{
+    cloud 箭头方向为数据流向\n\n服务启动初始化(black)\n客户端连接/断连(blue)\n收到客户端消息(red)\n查询/编辑标签(orange)\n推送消息(purple) as comment {
         comment -up- 事件处理器接口 #white
+    }
+
+    cloud [关键技术\n\n一、带虚拟节点的一致性hash算法\n1、均衡分配客户端连接网关\n2、快速查找用户在哪个网关\n3、分散redis_key，避免数据倾斜\n4、网关下线时快速移除客户端的redis数据(isass:net:session:$node)\n二、redis_stream消息队列(c2s)\n三、redis_pub/sub发布订阅(s2c)] as key_tech {
+        key_tech -up- comment #white
     }
 
 ' 应用实例与各组件的关系
@@ -98,11 +102,6 @@ frame 集群应用网络通信组件数据流{
     OnMessageEventHandler_biz --> messageEventHandlerCollector #black
     messageEventHandlerCollector --> redis #black
 '    redis --> serviceDiscovery
-
-    ' 客户端连接 #blue
-    eventHandler_biz --> sessionService_biz #blue
-    sessionService_biz --> tagService_biz #blue
-    tagService_biz --> redis #blue
 
     ' 收到客户端消息 #red
     redis --> messageEventTransferListener #red

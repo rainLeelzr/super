@@ -11,7 +11,9 @@ isass:
       protocol: socketio
       # 是否使用通信代理
       proxy: true
-
+      totalNodeAbove: 1000
+      virtualNodeCount: -1
+      
       # 网络通信 socketio 协议实现
       socketio:
         enabled: true
@@ -19,4 +21,6 @@ isass:
         hostname: 0.0.0.0
         # 端口
         port: 20041
+        # 不使用代理时，暴露给客户端连接的 url。如果不填，则自动获取生成为：http://{网卡ip}:port
+        exposeUrl: http://127.0.0.1:20041
 ```

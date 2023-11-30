@@ -166,31 +166,56 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core;
+package vip.isass.kernel.net.core.server;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.ConsistentHash;
+import cn.hutool.core.util.StrUtil;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 /**
- * net 模块 redis key
+ * 一致性 hash 算法的实例存储，在使用网关代理时，需要用到此算法分配网关节点给客户端连接
  */
-public interface NetRedisKey {
-
-    String NET_PREFIX = "isass:net:";
-
-    /**
-     * 标签 isass:net:tag:{node}:{sessionId}
-     */
-    String TAG_REDIS_KEY_PREFIX = NET_PREFIX + "tag:";
+@Configuration
+@ConditionalOnProperty(name = "isass.core.net.proxy", havingValue = "true")
+public class ConsistentHashNodeAllocatorService implements INodeAllocatorService {
 
     /**
-     * 会话 redis hash 结构 key: isass:net:session:{node} field: {sessionId} value: 上线时间
+     * 总节点数量不低于，非实际总节点数。
+     * <p>
+     * 在虚拟节点数没配置或为 -1 的情况下，会根据实际物理节点数和总节点数，算出一个不低于总节点数的虚拟节点数。总节点数量会保持在这个数量之上
+     * </p>
      */
-    String SESSION_REDIS_KEY_PREFIX = NET_PREFIX + "session:";
+    @Value("${isass.core.net.totalNodeAbove:1000}")
+    private int totalNodeAbove = 1000;
 
-    static String formatSessionKey(String node) {
-        return TAG_REDIS_KEY_PREFIX + node;
+    /**
+     * 每个物理节点对应的虚拟节点数量
+     */
+    @Value("${isass.core.net.virtualNodeCount:-1}")
+    private int virtualNodeCount = -1;
+
+    public static ConsistentHash<String> hashServer;
+
+    public void init() {
+        List<String> node = CollUtil.newArrayList("192.168.1.1:2001",
+                "192.168.1.2:2001",
+                "192.168.1.2:2001",
+                "192.168.1.3:2001"
+        );
+        hashServer = new ConsistentHash<>(virtualNodeCount, node);
     }
 
-    static String formatTagKey(String node, String sessionId) {
-        return TAG_REDIS_KEY_PREFIX + node + ":" + sessionId;
+    public String allocate(String clientIp, String userId) {
+        Assert.isFalse(StrUtil.isAllBlank(clientIp, userId), "clientIp, userId 必填其一");
+        return StrUtil.isBlank(userId)
+                ? hashServer.get(clientIp)
+                : hashServer.get(userId);
     }
 
 }

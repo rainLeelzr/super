@@ -2,77 +2,59 @@
 'https://plantuml.com/component-diagram
 
 frame 单体应用网络通信组件数据流{
+    node 应用实例 {
 
-    component [服务实例启动类] as server {
-    }
+        component [底层网络通讯框架\n-具体网络通讯框架的配置与启动监听] as server {
+                }
 
-    component [消息处理器] as handler {
-        json 消息处理器接口 {
-            "OnConnectEventHandler": "新建连接事件处理器",
-            "OnDisconnectEventHandler": "断开连接事件处理器",
-            "OnMessageEventHandler": ["收到指定事件消息处理器",
-            {
-                "内置":[
-                    "OnLoginEventHandler",
-                    "OnLogoutEventHandler",
-                    "OnPingEventHandler",
-                    "OnClientSendBroadcastEventHandler"
-                ]
-            }],
-            "OnAnyMessageEventHandler": "收到任何客户端消息事件处理器",
-            "OnErrorEventHandler": "错误消息处理器"
+        component [消息处理器] as handler {
+            json 消息处理器接口 {
+                "OnConnectEventHandler": "新建连接事件处理器",
+                "OnDisconnectEventHandler": "断开连接事件处理器",
+                "OnMessageEventHandler": [
+                    "消息事件处理器",
+                    {
+                        "内置": {
+                            "OnLoginEventHandler": "登录消息事件处理器",
+                            "OnLogoutEventHandler": "登出消息事件处理器",
+                            "OnPingEventHandler": "ping消息事件处理器",
+                            "OnClientSendBroadcastEventHandler": "广播消息事件处理器"
+                        }
+                    }
+                ],
+                "OnAnyMessageEventHandler": "任何消息事件处理器",
+                "OnErrorEventHandler": "错误事件处理器"
+            }
+
+            [OnConnectEventHandler]
+            [OnDisconnectEventHandler]
+            component [OnMessageEventHandler/业务组件] as OnMessageEventHandler #yellow {
+            }
         }
 
-        [OnConnectEventHandler]
-        [OnDisconnectEventHandler]
-        [OnMessageEventHandler]
+
+
+        component [消息发送器\n-提供给业务调用的统一消息发送接口\n-实现服务端给客户端发送消息的逻辑] as messageSender {
+
+        }
+
+        component [会话服务\n-管理并保存客户端连接的会话对象\n-命名空间\n-房间]  as sessionService {
+
+        }
+
+        component [标签服务\n-提供标签curd服务\n-内置标签如用户标签]  as tagService {
+
+        }
     }
-
-    component [消息发送器] as messageSender {
-
-    }
-
-    component [会话服务]  as sessionService {
-
-    }
-
-    component [标签服务]  as tagService {
-
-    }
-
-    component [业务组件]  as bizComponent #yellow {
-
-    }
-
-    note left of [handler] #yellow
-      - 消息路由分发到handler实现类
-      - 业务实现接口以处理消息
-    end note
-
-    note right of [server] : 具体网络通讯框架的配置与启动实现
-
-    note right of [messageSender] {
-        - 提供给业务调用的统一消息发送接口
-        - 实现服务端给客户端发送消息的逻辑
-    }
-
-    note right of [sessionService]: 管理并保存客户端连接的会话对象
-
-    note top of [tagService] : 管理并保存客户端标签
-
-    note right of [bizComponent] : 业务代码，可调用"消息发送器"和"标签服务"
 
     messageSender --> sessionService : 调用会话服务发送消息
     messageSender --> tagService : 发送消息前查询符合标签条件的会话
     server --> handler : 扫描并添加handler监听
-    bizComponent -up-> tagService : 给客户端打标签
-    bizComponent -up-> messageSender : 给客户端发送消息
     OnMessageEventHandler --> tagService : 给客户端打标签
     OnMessageEventHandler --> messageSender : 给客户端发送消息
 
     OnConnectEventHandler --> sessionService : 记录会话
     OnDisconnectEventHandler --> sessionService : 删除会话
-
 }
 
 

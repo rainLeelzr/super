@@ -166,31 +166,13 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core;
+package vip.isass.kernel.net.core.server;
 
 /**
- * net 模块 redis key
+ * 节点分配器
  */
-public interface NetRedisKey {
+public interface INodeAllocatorService {
 
-    String NET_PREFIX = "isass:net:";
-
-    /**
-     * 标签 isass:net:tag:{node}:{sessionId}
-     */
-    String TAG_REDIS_KEY_PREFIX = NET_PREFIX + "tag:";
-
-    /**
-     * 会话 redis hash 结构 key: isass:net:session:{node} field: {sessionId} value: 上线时间
-     */
-    String SESSION_REDIS_KEY_PREFIX = NET_PREFIX + "session:";
-
-    static String formatSessionKey(String node) {
-        return TAG_REDIS_KEY_PREFIX + node;
-    }
-
-    static String formatTagKey(String node, String sessionId) {
-        return TAG_REDIS_KEY_PREFIX + node + ":" + sessionId;
-    }
+    String allocate(String clientIp, String userId);
 
 }
