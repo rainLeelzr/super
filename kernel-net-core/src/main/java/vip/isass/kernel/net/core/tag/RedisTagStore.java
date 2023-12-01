@@ -171,8 +171,6 @@ package vip.isass.kernel.net.core.tag;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisOperations;
@@ -206,7 +204,7 @@ public class RedisTagStore implements InitializingBean {
         if (sessionIds.size() == 1) {
             if (tagPairs.size() == 1) {
                 TagPair tag = tagPairs.iterator().next();
-                hashOperations.put(NetRedisKey.formatTagKey(null, sessionIds.iterator().next()), tag.getTagKey(), tag.getTagValues());
+                hashOperations.put(NetRedisKey.formatTagKey(null, sessionIds.iterator().next()), tag.getTagKey(), tag.getValues());
             } else {
                 hashOperations.putAll(NetRedisKey.formatTagKey(null, sessionIds.iterator().next()), TagUtil.tagPairsToMap(tagPairs));
             }
@@ -222,7 +220,7 @@ public class RedisTagStore implements InitializingBean {
                 if (tagPairs.size() == 1) {
                     TagPair next = tagPairs.iterator().next();
                     for (String sessionId : sessionIds) {
-                        ops.put(NetRedisKey.formatTagKey(null, sessionId), next.getTagKey(), next.getTagValues());
+                        ops.put(NetRedisKey.formatTagKey(null, sessionId), next.getTagKey(), next.getValues());
                     }
                 } else {
                     Map<String, Set<String>> map = TagUtil.tagPairsToMap(tagPairs);
@@ -295,7 +293,7 @@ public class RedisTagStore implements InitializingBean {
                 continue;
             }
 
-            Set<String> shouldHavTagValues = shouldHaveTagPair.getTagValues();
+            Set<String> shouldHavTagValues = shouldHaveTagPair.getValues();
 
             // 如果需要拥有的标签值的数量大于实际拥有的标签值数量，则肯定不符合条件
             if (shouldHavTagValues.size() > existingTagValueSet.size()) {
@@ -346,7 +344,7 @@ public class RedisTagStore implements InitializingBean {
                 continue;
             }
 
-            Set<String> shouldHavTagValues = shouldHaveTagPair.getTagValues();
+            Set<String> shouldHavTagValues = shouldHaveTagPair.getValues();
 
             // 如果需要拥有的标签值是任意值，则肯定符合条件
             if (shouldHaveTagPair.isEmptyValues()) {
@@ -394,7 +392,7 @@ public class RedisTagStore implements InitializingBean {
                     continue;
                 }
 
-                if (existingTagValueSet.containsAll(shouldHaveTagPair.getTagValues())) {
+                if (existingTagValueSet.containsAll(shouldHaveTagPair.getValues())) {
                     willDeleteTagKeys.add(shouldHaveTagPair.getTagKey());
                 }
             }

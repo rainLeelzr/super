@@ -168,10 +168,7 @@
 
 package vip.isass.kernel.net.core.tag;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ConcurrentHashSet;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Nonnull;
@@ -179,7 +176,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Configuration
@@ -210,10 +206,10 @@ public class HashMapTagStore {
             if (tagValues == null) {
                 continue;
             }
-            if (tagPair.getTagValues().isEmpty()) {
+            if (tagPair.getValues().isEmpty()) {
                 return true;
             }
-            if (tagValues.containsAll(tagPair.getTagValues())) {
+            if (tagValues.containsAll(tagPair.getValues())) {
                 return true;
             }
         }

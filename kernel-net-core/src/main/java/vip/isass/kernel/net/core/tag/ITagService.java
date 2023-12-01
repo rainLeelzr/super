@@ -200,10 +200,7 @@ public interface ITagService {
      * @param tagKey    标签键
      */
     default void addTag(String sessionId, String tagKey) {
-        addTags(Collections.singleton(sessionId),
-                MapUtil.<String, Set<String>>builder()
-                        .put(tagKey, Collections.emptySet())
-                        .build());
+        addTags(Collections.singleton(sessionId), new TagPair(tagKey));
     }
 
     /**
@@ -214,9 +211,7 @@ public interface ITagService {
      * @param tagValue  标签值
      */
     default void addTag(String sessionId, String tagKey, String tagValue) {
-        addTags(
-                Collections.singleton(sessionId),
-                Collections.singleton(new TagPair(tagKey, tagValue)));
+        addTags(Collections.singleton(sessionId), new TagPair(tagKey, tagValue));
     }
 
     /**
@@ -226,11 +221,11 @@ public interface ITagService {
      * @param tagKeys   标签键集合
      */
     default void addTagKeys(String sessionId, Collection<String> tagKeys) {
-        addTags(
-                Collections.singleton(sessionId),
-                tagKeys.stream()
-                        .map(TagPair::new)
-                        .collect(Collectors.toList()));
+        Map<String, Set<String>> tagMap = MapUtil.newHashMap(tagKeys.size());
+        for (String tagKey : tagKeys) {
+            tagMap.put(tagKey, Collections.emptySet());
+        }
+        addTags(Collections.singleton(sessionId), tagMap);
     }
 
     /**

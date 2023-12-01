@@ -319,15 +319,15 @@ public class HashMapTagService implements ITagService {
             }
 
             for (TagPair tagPair : tagPairs) {
-                Set<String> realTagValues = tagPairMap.get(tagPair.getTagKey());
+                Set<String> realTagValues = tagPairMap.get(tagPair.getKey());
                 if (realTagValues == null) {
                     // 此会话没有此标签，不用删除。继续下一次循环
                     continue;
                 }
 
-                realTagValues.removeAll(tagPair.getTagValues());
+                realTagValues.removeAll(tagPair.getValues());
                 if (realTagValues.isEmpty()) {
-                    tagPairMap.remove(tagPair.getTagKey());
+                    tagPairMap.remove(tagPair.getKey());
                 }
             }
 

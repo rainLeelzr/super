@@ -170,15 +170,13 @@
 package vip.isass.kernel.net.core.tag;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import lombok.ToString;
 
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -188,69 +186,35 @@ import java.util.Set;
  *
  * @author Rain
  */
-@ToString
 public class TagPair implements Map<String, Set<String>> {
 
-    @Getter
-    private String tagKey;
-
-    /**
-     * 标签值集合，需保证不能为 null
-     */
-    private Set<String> tagValues = Collections.emptySet();
-
-    public TagPair() {
-    }
+    private final AbstractMap.SimpleEntry<String, Set<String>> entry;
 
     public TagPair(String tagKey) {
         Assert.notBlank(tagKey, "tagKey 不能为空");
-        this.tagKey = tagKey;
+        entry = new AbstractMap.SimpleEntry<>(tagKey, Collections.emptySet());
     }
 
     public TagPair(String tagKey, String tagValue) {
         Assert.notBlank(tagKey, "tagKey 不能为空");
-        this.tagKey = tagKey;
-        this.tagValues = tagValue == null ? Collections.emptySet() : CollUtil.newHashSet(tagValue);
+        entry = new AbstractMap.SimpleEntry<>(
+                tagKey,
+                tagValue == null ? Collections.emptySet() : CollUtil.newHashSet(tagValue));
     }
 
     public TagPair(String tagKey, Set<String> tagValues) {
         Assert.notBlank(tagKey, "tagKey 不能为空");
-        this.tagKey = tagKey;
-        this.tagValues = tagValues == null ? Collections.emptySet() : tagValues;
+        entry = new AbstractMap.SimpleEntry<>(
+                tagKey,
+                tagValues == null ? Collections.emptySet() : CollUtil.newHashSet(tagValues));
     }
 
-    public void setTagKey(String tagKey) {
-        Assert.notBlank(tagKey, "tagKey 不能为空");
-        this.tagKey = tagKey;
+    public String getKey() {
+        return entry.getKey();
     }
 
-    public Set<String> getTagValues() {
-        return Collections.unmodifiableSet(tagValues);
-    }
-
-    public void setTagValues(Set<String> tagValues) {
-        this.tagValues = tagValues == null ? new HashSet<>() : tagValues;
-    }
-
-    public void addTagValue(String tagValue) {
-        if (StrUtil.isBlank(tagValue)) {
-            return;
-        }
-        if (this.tagValues == Collections.EMPTY_SET) {
-            this.tagValues = new HashSet<>();
-        }
-        this.tagValues.add(tagValue);
-    }
-
-    public void addTagValues(Collection<String> tagValues) {
-        if (CollUtil.isEmpty(tagValues)) {
-            return;
-        }
-        if (this.tagValues == Collections.EMPTY_SET) {
-            this.tagValues = new HashSet<>(tagValues);
-        } else {
-            this.tagValues.addAll(tagValues);
-        }
+    public Set<String> getValues() {
+        return Collections.unmodifiableSet(entry.getValue());
     }
 
     /**
@@ -259,13 +223,36 @@ public class TagPair implements Map<String, Set<String>> {
      * @return 第一个标签值
      */
     public String tagValue() {
-        return this.tagValues.isEmpty()
-                ? null
-                : tagValues.iterator().next();
+        return entry.getValue().isEmpty() ? "" : entry.getValue().iterator().next();
+    }
+
+    public void setValues(Set<String> tagValues) {
+        entry.setValue(tagValues == null ? Collections.emptySet() : CollUtil.newHashSet(tagValues));
+    }
+
+    public void addValue(String tagValue) {
+        if (StrUtil.isBlank(tagValue)) {
+            return;
+        }
+        if (entry.getValue() == Collections.EMPTY_SET) {
+            entry.setValue(new ConcurrentHashSet<>());
+        }
+        entry.getValue().add(tagValue);
+    }
+
+    public void addValues(Collection<String> tagValues) {
+        if (CollUtil.isEmpty(tagValues)) {
+            return;
+        }
+        if (entry.getValue() == Collections.EMPTY_SET) {
+            entry.setValue(new ConcurrentHashSet<>(tagValues));
+        } else {
+            entry.getValue().addAll(tagValues);
+        }
     }
 
     public boolean isEmptyValues() {
-        return this.tagValues.isEmpty();
+        return entry.getValue().isEmpty();
     }
 
     @Override
@@ -280,38 +267,38 @@ public class TagPair implements Map<String, Set<String>> {
 
     @Override
     public boolean containsKey(Object key) {
-        return tagKey.equals(key);
+        return entry.getKey().equals(key);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public boolean containsValue(Object value) {
         if (value instanceof String) {
-            return this.tagValues.contains(value);
+            return entry.getValue().contains(value);
         } else if (value instanceof Collection) {
             Collection<String> collection = (Collection<String>) value;
-            return this.tagValues.containsAll(collection);
+            return entry.getValue().containsAll(collection);
         }
         return false;
     }
 
+    public boolean containsAnyValue(Collection<String> values) {
+        return CollUtil.containsAny(entry.getValue(), values);
+    }
+
     @Override
     public Set<String> get(Object key) {
-        return this.tagKey.equals(key) ? this.tagValues : null;
+        return entry.getKey().equals(key) ? entry.getValue() : null;
     }
 
     @Override
     public Set<String> put(String key, Set<String> value) {
-        this.tagKey = key;
-        this.tagValues = value;
-        return this.tagValues;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Set<String> remove(Object key) {
-        Set<String> temp = this.tagValues;
-        this.tagValues = Collections.emptySet();
-        return temp;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -326,16 +313,16 @@ public class TagPair implements Map<String, Set<String>> {
 
     @Override
     public Set<String> keySet() {
-        return Collections.singleton(this.tagKey);
+        return Collections.singleton(entry.getKey());
     }
 
     @Override
     public Collection<Set<String>> values() {
-        return Collections.singleton(this.getTagValues());
+        return Collections.singleton(entry.getValue());
     }
 
     @Override
     public Set<Entry<String, Set<String>>> entrySet() {
-        return Collections.singleton(new AbstractMap.SimpleEntry<>(this.getTagKey(), this.getTagValues()));
+        return Collections.singleton(entry);
     }
 }

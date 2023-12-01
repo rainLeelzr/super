@@ -184,7 +184,7 @@ public class TagUtil {
     public static Map<String, Set<String>> tagPairsToMap(Collection<TagPair> tagPairs) {
         HashMap<String, Set<String>> map = MapUtil.newHashMap(tagPairs.size());
         for (TagPair tagPair : tagPairs) {
-            map.put(tagPair.getTagKey(), tagPair.getTagValues());
+            map.put(tagPair.getTagKey(), tagPair.getValues());
         }
         return map;
     }
