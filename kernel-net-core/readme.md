@@ -14,6 +14,10 @@ isass:
       totalNodeAbove: 1000
       virtualNodeCount: -1
       
+      tag:
+        # 标签存储方式：local(本地)、redis
+        store: redis
+      
       # 网络通信 socketio 协议实现
       socketio:
         enabled: true

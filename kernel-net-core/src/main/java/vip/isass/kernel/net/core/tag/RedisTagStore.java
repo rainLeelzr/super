@@ -190,9 +190,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Configuration
-@ConditionalOnProperty(name = "isass.core.net.proxy", havingValue = "true")
-public class RedisTagStore implements ITagStore, InitializingBean {
+public class RedisTagStore implements InitializingBean {
 
     @Resource
     private RedisTemplate<String, Map<String, Set<String>>> redisTemplate;

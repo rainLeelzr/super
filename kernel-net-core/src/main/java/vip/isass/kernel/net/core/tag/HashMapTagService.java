@@ -168,93 +168,183 @@
 
 package vip.isass.kernel.net.core.tag;
 
-import org.springframework.stereotype.Component;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ConcurrentHashSet;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
- * 标签存储接口
+ * 标签服务
+ *
+ * @author Rain
  */
-@Component
-public interface ITagStore {
+@Slf4j
+@Configuration
+@ConditionalOnProperty(name = "isass.core.net.tag.store", havingValue = "redis")
+public class HashMapTagService implements ITagService {
 
     /**
-     * 给中指定的会话添加相同的标签列表
-     *
-     * @param sessionIds 会话 id 集合
-     * @param tagPairs   标签集合
+     * key: sessionId
+     * value: Map<tagKey, set<TagValue>
      */
-    void addTags(@Nonnull Collection<String> sessionIds, @Nonnull Collection<TagPair> tagPairs);
+    private final Map<String, Map<String, Set<String>>> sessionIdAndTagPairMap = new ConcurrentHashMap<>();
 
-    /**
-     * 查找会话的标签
-     *
-     * @param sessionId 会话 id
-     * @return 标签 map
-     */
-    Map<String, Set<String>> findTags(@Nonnull String sessionId);
+    // region add
+
+    @Override
+    public void addTags(Collection<String> sessionIds, Map<String, Set<String>> tags) {
+        for (String sessionId : sessionIds) {
+            log.debug("添加会话标签[{}][{}]", sessionId, tags);
+
+            Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.computeIfAbsent(
+                    sessionId,
+                    s -> new ConcurrentHashMap<>());
+
+            for (Map.Entry<String, Set<String>> entry : tags.entrySet()) {
+                tagPairMap.computeIfAbsent(entry.getKey(), k -> new ConcurrentHashSet<>())
+                        .addAll(entry.getValue());
+            }
+        }
+    }
+
+    // endregion
+
+    // region contain
+
+    @Override
+    public boolean containAllTags(String sessionId, Map<String, Set<String>> tags) {
+        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+        if (tagPairMap == null) {
+            return false;
+        }
+        for (Map.Entry<String, Set<String>> entry : tags.entrySet()) {
+            Set<String> tagValues = tagPairMap.get(entry.getKey());
+            if (tagValues == null) {
+                return false;
+            }
+            if (!tagValues.containsAll(entry.getValue())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean containAnyTag(@Nonnull String sessionId, @Nonnull Map<String, Set<String>> tags) {
+        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+        if (tagPairMap == null) {
+            return false;
+        }
+
+        for (Map.Entry<String, Set<String>> entry : tags.entrySet()) {
+            Set<String> tagValues = tagPairMap.get(entry.getKey());
+            if (tagValues == null) {
+                continue;
+            }
+            if (entry.getValue().isEmpty()) {
+                return true;
+            }
+            if (tagValues.isEmpty()) {
+                continue;
+            }
+            if (CollUtil.containsAny(entry.getValue(), tagValues)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
-    /**
-     * 查找会话指定标签键的标签值集合
-     *
-     * @param sessionId 会话 id
-     * @param tagKey    标签键
-     * @return 标签值集合
-     */
-    Set<String> findTagValues(@Nonnull String sessionId, @Nonnull String tagKey);
+    // endregion
 
-    /**
-     * 查找会话指定标签键的第一个标签值
-     *
-     * @param sessionId 会话 id
-     * @param tagKey    标签键
-     * @return 标签值
-     */
-    String getTagValue(@Nonnull String sessionId, @Nonnull String tagKey);
+    // region find tag
 
-    /**
-     * 会话是否包含指定标签集合中的所有标签
-     *
-     * @param sessionId 会话 id
-     * @param tagPairs  标签集合
-     * @return 是否包含指定标签集合中的所有标签
-     */
-    boolean containAllTags(@Nonnull String sessionId, @Nonnull Collection<TagPair> tagPairs);
+    @Override
+    public String getTagValue(String sessionId, String tagKey) {
+        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+        if (tagPairMap == null) {
+            return null;
+        }
+        Set<String> tagValues = tagPairMap.get(tagKey);
+        return tagValues == null ? null : tagValues.iterator().next();
+    }
 
-    /**
-     * 会话是否包含指定标签集合中的任意标签
-     *
-     * @param sessionId 会话 id
-     * @param tagPairs  标签集合
-     * @return 是否包含指定标签集合中的任意标签
-     */
-    boolean containAnyTag(@Nonnull String sessionId, @Nonnull Collection<TagPair> tagPairs);
+    @Override
+    public Map<String, Set<String>> findTags(String sessionId) {
+        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+        return tagPairMap == null ? Collections.emptyMap() : tagPairMap;
+    }
 
-    /**
-     * 删除指定 会话 id 集合的所有标签
-     *
-     * @param sessionIds 会话 id 集合
-     */
-    void removeTags(@Nonnull Collection<String> sessionIds);
+    @Override
+    public Set<String> findTagValues(@Nonnull String sessionId, @Nonnull String tagKey) {
+        return null;
+    }
 
-    /**
-     * 删除指定 会话 id 集合的指定标签集合
-     *
-     * @param sessionIds 会话 id 集合
-     * @param tagPairs   标签集合
-     */
-    void removeTags(@Nonnull Collection<String> sessionIds, @Nonnull Collection<TagPair> tagPairs);
+    // endregion
 
-    /**
-     * 删除指定 会话 id 集合的指定标签集合
-     *
-     * @param sessionIds 会话 id 集合
-     * @param tagKeys    标签键集合
-     */
-    void removeTagKeys(@Nonnull Collection<String> sessionIds, @Nonnull Collection<String> tagKeys);
+    // region consume
+
+    @Override
+    public Collection<String> findAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs) {
+        return null;
+    }
+
+    @Override
+    public void consumeAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs, Consumer<String> consumer) {
+
+    }
+
+    // endregion
+
+    // region remove
+
+    @Override
+    public void removeTags(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
+        for (String sessionId : sessionIds) {
+            log.debug("删除会话标签[{}][{}]", sessionId, tagPairs);
+
+            Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
+            if (tagPairMap == null) {
+                // 此会话没有记录任何标签，继续下一次循环
+                continue;
+            }
+
+            for (TagPair tagPair : tagPairs) {
+                Set<String> realTagValues = tagPairMap.get(tagPair.getTagKey());
+                if (realTagValues == null) {
+                    // 此会话没有此标签，不用删除。继续下一次循环
+                    continue;
+                }
+
+                realTagValues.removeAll(tagPair.getTagValues());
+                if (realTagValues.isEmpty()) {
+                    tagPairMap.remove(tagPair.getTagKey());
+                }
+            }
+
+            if (tagPairMap.isEmpty()) {
+                sessionIdAndTagPairMap.remove(sessionId);
+            }
+        }
+    }
+
+    @Override
+    public void removeTags(Collection<String> sessionIds) {
+        sessionIds.forEach(sessionId -> {
+            log.debug("删除全部会话标签[{}]", sessionId);
+            sessionIdAndTagPairMap.remove(sessionId);
+        });
+    }
+
+    // endregion
 
 }

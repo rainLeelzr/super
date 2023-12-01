@@ -175,9 +175,11 @@ import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -187,7 +189,7 @@ import java.util.Set;
  * @author Rain
  */
 @ToString
-public class TagPair {
+public class TagPair implements Map<String, Set<String>> {
 
     @Getter
     private String tagKey;
@@ -266,4 +268,74 @@ public class TagPair {
         return this.tagValues.isEmpty();
     }
 
+    @Override
+    public int size() {
+        return 1;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        return tagKey.equals(key);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean containsValue(Object value) {
+        if (value instanceof String) {
+            return this.tagValues.contains(value);
+        } else if (value instanceof Collection) {
+            Collection<String> collection = (Collection<String>) value;
+            return this.tagValues.containsAll(collection);
+        }
+        return false;
+    }
+
+    @Override
+    public Set<String> get(Object key) {
+        return this.tagKey.equals(key) ? this.tagValues : null;
+    }
+
+    @Override
+    public Set<String> put(String key, Set<String> value) {
+        this.tagKey = key;
+        this.tagValues = value;
+        return this.tagValues;
+    }
+
+    @Override
+    public Set<String> remove(Object key) {
+        Set<String> temp = this.tagValues;
+        this.tagValues = Collections.emptySet();
+        return temp;
+    }
+
+    @Override
+    public void putAll(Map<? extends String, ? extends Set<String>> tags) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<String> keySet() {
+        return Collections.singleton(this.tagKey);
+    }
+
+    @Override
+    public Collection<Set<String>> values() {
+        return Collections.singleton(this.getTagValues());
+    }
+
+    @Override
+    public Set<Entry<String, Set<String>>> entrySet() {
+        return Collections.singleton(new AbstractMap.SimpleEntry<>(this.getTagKey(), this.getTagValues()));
+    }
 }

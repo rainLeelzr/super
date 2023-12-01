@@ -169,10 +169,13 @@
 
 package vip.isass.kernel.net.core.tag;
 
-import org.springframework.core.Ordered;
+import cn.hutool.core.map.MapUtil;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -186,19 +189,7 @@ import java.util.stream.Collectors;
  *
  * @author Rain
  */
-public interface ITagService extends Ordered {
-
-    /*
-    各实现类的 order:
-    TagServiceManager          Integer.MIN_VALUE
-    RealTagService             1
-    TagRedisPublisherService   10
-     */
-
-    /**
-     * 已登录用户使用此 tagKey 保存 session
-     */
-    String USER_ID_TAG_KEY = "_uid";
+public interface ITagService {
 
     // region add
 
@@ -209,9 +200,10 @@ public interface ITagService extends Ordered {
      * @param tagKey    标签键
      */
     default void addTag(String sessionId, String tagKey) {
-        addTagPairs(
-                Collections.singleton(sessionId),
-                Collections.singleton(new TagPair(tagKey)));
+        addTags(Collections.singleton(sessionId),
+                MapUtil.<String, Set<String>>builder()
+                        .put(tagKey, Collections.emptySet())
+                        .build());
     }
 
     /**
@@ -222,21 +214,9 @@ public interface ITagService extends Ordered {
      * @param tagValue  标签值
      */
     default void addTag(String sessionId, String tagKey, String tagValue) {
-        addTagPairs(
+        addTags(
                 Collections.singleton(sessionId),
                 Collections.singleton(new TagPair(tagKey, tagValue)));
-    }
-
-    /**
-     * 给会话添加标签键值对
-     *
-     * @param sessionId 会话 id
-     * @param tagPair   标签键值对
-     */
-    default void addTag(String sessionId, TagPair tagPair) {
-        addTagPairs(
-                Collections.singleton(sessionId),
-                Collections.singleton(tagPair));
     }
 
     /**
@@ -245,8 +225,8 @@ public interface ITagService extends Ordered {
      * @param sessionId 会话 id
      * @param tagKeys   标签键集合
      */
-    default void addTags(String sessionId, Collection<String> tagKeys) {
-        addTagPairs(
+    default void addTagKeys(String sessionId, Collection<String> tagKeys) {
+        addTags(
                 Collections.singleton(sessionId),
                 tagKeys.stream()
                         .map(TagPair::new)
@@ -254,28 +234,16 @@ public interface ITagService extends Ordered {
     }
 
     /**
-     * 给会话添加多个标签键值对
-     *
-     * @param sessionId 会话 id
-     * @param tagPairs  标签键值对集合
-     */
-    default void addTagPairs(String sessionId, Collection<TagPair> tagPairs) {
-        addTagPairs(
-                Collections.singleton(sessionId),
-                tagPairs);
-    }
-
-    /**
-     * 给多个会话添加多个标签键值对
+     * 给指定的会话列表添加相同的标签列表
      *
      * @param sessionIds 会话 id 集合
-     * @param tagPairs   标签键值对集合
+     * @param tagPairs   标签集合
      */
-    void addTagPairs(Collection<String> sessionIds, Collection<TagPair> tagPairs);
+    void addTags(Collection<String> sessionIds, Map<String, Set<String>> tags);
 
     // endregion
 
-    // region has
+    // region contain
 
     /**
      * 判断会话是否拥有标签键
@@ -284,21 +252,8 @@ public interface ITagService extends Ordered {
      * @param tagKey    标签键
      * @return 会话是否拥有标签键
      */
-    default boolean hasTagKey(String sessionId, String tagKey) {
+    default boolean containTag(String sessionId, String tagKey) {
         return containAllTags(sessionId, Collections.singleton(new TagPair(tagKey)));
-    }
-
-    /**
-     * 判断会话是否拥有所有标签键
-     *
-     * @param sessionId 会话 id
-     * @param tagKeys   标签键集合
-     * @return 会话是否拥有所有标签键
-     */
-    default boolean hasAllTagKey(String sessionId, Collection<String> tagKeys) {
-        return containAllTags(sessionId, tagKeys.stream()
-                .map(TagPair::new)
-                .collect(Collectors.toList()));
     }
 
     /**
@@ -309,18 +264,74 @@ public interface ITagService extends Ordered {
      * @param tagValue  标签值
      * @return 会话是否拥有标签键值对
      */
-    default boolean hasTagPair(String sessionId, String tagKey, String tagValue) {
+    default boolean containTag(String sessionId, String tagKey, String tagValue) {
         return containAllTags(sessionId, Collections.singleton(new TagPair(tagKey, tagValue)));
     }
 
     /**
-     * 判断会话是否拥有所有标签键值对
+     * 判断会话是否拥有所有标签键
      *
      * @param sessionId 会话 id
-     * @param tagPairs  标签键值对
-     * @return 会话是否拥有所有标签键值对
+     * @param tagKeys   标签键集合
+     * @return 会话是否拥有所有标签键
      */
-    boolean containAllTags(String sessionId, Collection<TagPair> tagPairs);
+    default boolean containAllTag(String sessionId, Collection<String> tagKeys) {
+        return containAllTags(sessionId, tagKeys.stream()
+                .map(TagPair::new)
+                .collect(Collectors.toList()));
+    }
+
+    /**
+     * 会话是否包含指定标签集合中的所有标签
+     *
+     * @param sessionId 会话 id
+     * @param tagPairs  标签集合
+     * @return 是否包含指定标签集合中的所有标签
+     */
+    boolean containAllTags(String sessionId, Map<String, Set<String>> tags);
+
+    /**
+     * 会话是否包含指定标签集合中的任意标签
+     *
+     * @param sessionId 会话 id
+     * @param tagPairs  标签集合
+     * @return 是否包含指定标签集合中的任意标签
+     */
+    boolean containAnyTag(@Nonnull String sessionId, @Nonnull Map<String, Set<String>> tags);
+
+    // endregion
+
+    // region find tag
+
+    /**
+     * 查找会话的标签
+     *
+     * @param sessionId 会话 id
+     * @return 标签 map
+     */
+    Map<String, Set<String>> findTags(@Nonnull String sessionId);
+
+    /**
+     * 查找会话指定标签键的标签值集合
+     *
+     * @param sessionId 会话 id
+     * @param tagKey    标签键
+     * @return 标签值集合
+     */
+    Set<String> findTagValues(@Nonnull String sessionId, @Nonnull String tagKey);
+
+    /**
+     * 查找会话指定标签键的第一个标签值
+     *
+     * @param sessionId 会话 id
+     * @param tagKey    标签键
+     * @return 标签值
+     */
+    String getTagValue(@Nonnull String sessionId, @Nonnull String tagKey);
+
+    // endregion
+
+    // region find session
 
     /**
      * 查找拥有所有标签键值对的会话
@@ -332,6 +343,10 @@ public interface ITagService extends Ordered {
      */
     Collection<String> findAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs);
 
+    // endregion
+
+    // region consume
+
     /**
      * 查找拥有所有标签键值对的会话，执行消费逻辑
      *
@@ -341,23 +356,6 @@ public interface ITagService extends Ordered {
     void consumeAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs, Consumer<String> consumer);
 
     // endregion
-
-    /**
-     * 根据标检键获取指定会话的标签键值对
-     *
-     * @param sessionId 会话 id
-     * @param tagKey    标签键
-     * @return 标签键值对
-     */
-    String getFirstTagValue(String sessionId, String tagKey);
-
-    /**
-     * 查找指定会话的所有标签键值对
-     *
-     * @param sessionId 会话 id
-     * @return 标签键值对集合
-     */
-    Collection<TagPair> findAllTagPair(String sessionId);
 
     // region remove
 
@@ -393,12 +391,12 @@ public interface ITagService extends Ordered {
     }
 
     /**
-     * 删除多个会话的多个标签键
+     * 删除指定 会话 id 集合的指定标签集合
      *
      * @param sessionIds 会话 id 集合
      * @param tagKeys    标签键集合
      */
-    default void removeTagBySessionsAndTagKeys(Collection<String> sessionIds, Collection<String> tagKeys) {
+    default void removeTagKeys(Collection<String> sessionIds, Collection<String> tagKeys) {
         removeTags(
                 sessionIds,
                 tagKeys.stream().map(TagPair::new).collect(Collectors.toList())
@@ -406,10 +404,10 @@ public interface ITagService extends Ordered {
     }
 
     /**
-     * 删除多个会话的多个标签键值对
+     * 删除指定 会话 id 集合的指定标签集合
      *
      * @param sessionIds 会话 id 集合
-     * @param tagPairs   标签键值对集合
+     * @param tagPairs   标签集合
      */
     void removeTags(Collection<String> sessionIds, Collection<TagPair> tagPairs);
 
@@ -423,7 +421,7 @@ public interface ITagService extends Ordered {
     }
 
     /**
-     * 删除多个会话的所有标签
+     * 删除指定 会话 id 集合的所有标签
      *
      * @param sessionIds 会话 id 集合
      */

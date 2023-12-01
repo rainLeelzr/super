@@ -168,29 +168,69 @@
 
 package vip.isass.kernel.net.core;
 
+import cn.hutool.core.util.HashUtil;
+
 /**
  * net 模块 redis key
  */
 public interface NetRedisKey {
 
-    String NET_PREFIX = "isass:net:";
-
     /**
-     * 标签 isass:net:tag:{node}:{sessionId}
+     * redis key 分片数，将大 key 分割，避免集群模式的 redis 出现数据倾斜
      */
-    String TAG_REDIS_KEY_PREFIX = NET_PREFIX + "tag:";
+    int partition = 32;
+
+    String NET_PREFIX = "net:";
 
     /**
-     * 会话 redis hash 结构 key: isass:net:session:{node} field: {sessionId} value: 上线时间
+     * 会话
+     * <p>
+     * hash 结构
+     * key: net:session:{node}-${hash(sessionId)%32} field: {sessionId} value: 上线时间
      */
     String SESSION_REDIS_KEY_PREFIX = NET_PREFIX + "session:";
 
-    static String formatSessionKey(String node) {
-        return TAG_REDIS_KEY_PREFIX + node;
+    // region 标签
+
+    /**
+     * 标签
+     * <p>
+     * hash 结构
+     * key: net:tag:sid:{node}-${hash(sessionId)%32} field {sessionId} value: tag map
+     */
+    String TAG_REDIS_KEY_PREFIX = NET_PREFIX + "tag:sid:";
+
+    /**
+     * 标签 用户
+     * <p>
+     * hash 结构
+     * key: net:tag:uid:{node}-${hash(userId)%32} field: {userId} value: sessionId
+     */
+    String TAG_USER_REDIS_KEY_PREFIX = NET_PREFIX + "tag:uid:";
+
+    /**
+     * 标签 设备
+     * <p>
+     * hash 结构
+     * key: net:tag:did:{node}-${hash(deviceId)%32} field: {deviceId} value: sessionId
+     */
+    String TAG_DEVICE_REDIS_KEY_PREFIX = NET_PREFIX + "tag:did:";
+
+    // endregion
+
+    static String formatSessionKey(String node, String sessionId) {
+        int index = HashUtil.fnvHash(sessionId) % partition;
+        return SESSION_REDIS_KEY_PREFIX + node + "-" + index;
     }
 
     static String formatTagKey(String node, String sessionId) {
-        return TAG_REDIS_KEY_PREFIX + node + ":" + sessionId;
+        int index = HashUtil.fnvHash(sessionId) % partition;
+        return TAG_REDIS_KEY_PREFIX + node + "-" + index;
+    }
+
+    static String formatUserTagKey(String node, String userId) {
+        int index = HashUtil.fnvHash(userId) % partition;
+        return TAG_USER_REDIS_KEY_PREFIX + node + "-" + index;
     }
 
 }

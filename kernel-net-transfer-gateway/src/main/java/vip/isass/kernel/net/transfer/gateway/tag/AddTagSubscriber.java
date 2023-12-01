@@ -196,7 +196,7 @@ public class AddTagSubscriber implements IRedisSubscriber<ChangeTagPairDto> {
 
     @Override
     public void onMessage(ChangeTagPairDto payload, Message message, byte[] pattern) {
-        tagService.addTagPairs(payload.getSessionIds(), payload.getTagPairs());
+        tagService.addTags(payload.getSessionIds(), payload.getTagPairs());
     }
 
     @Override

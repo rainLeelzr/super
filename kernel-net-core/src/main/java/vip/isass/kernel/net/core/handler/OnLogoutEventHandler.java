@@ -177,6 +177,7 @@ import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.message.MessageCmd;
 import vip.isass.kernel.net.core.server.Server;
 import vip.isass.kernel.net.core.tag.ITagService;
+import vip.isass.kernel.net.core.tag.TagKeys;
 
 /**
  * 登录事件处理器
@@ -197,7 +198,7 @@ public class OnLogoutEventHandler implements OnMessageEventHandler<String> {
 
     @Override
     public Object onMessage(Message message, String token) {
-        tagService.removeByTagKey(message.getSenderSessionId(), ITagService.USER_ID_TAG_KEY);
+        tagService.removeByTagKey(message.getSenderSessionId(), TagKeys.USER_ID);
         return Resp.bizSuccess("登出成功");
     }
 

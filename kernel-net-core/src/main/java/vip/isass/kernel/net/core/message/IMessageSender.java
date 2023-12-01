@@ -178,7 +178,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import vip.isass.core.structure.service.V2ServiceManagerUtil;
 import vip.isass.core.support.api.ApiOrder;
-import vip.isass.kernel.net.core.tag.ITagService;
+import vip.isass.kernel.net.core.tag.TagKeys;
 import vip.isass.kernel.net.core.tag.TagPair;
 
 import java.util.Collection;
@@ -236,9 +236,9 @@ public interface IMessageSender extends Ordered {
      */
     default void sendMessageByUserId(Object payload, String userId) {
         sendMessageByTagPairs(
-            null,
-            payload,
-            Collections.singleton(new TagPair(ITagService.USER_ID_TAG_KEY, userId)));
+                null,
+                payload,
+                Collections.singleton(new TagPair(TagKeys.USER_ID, userId)));
     }
 
     /**
@@ -250,9 +250,9 @@ public interface IMessageSender extends Ordered {
      */
     default void sendMessageByUserId(String cmd, Object payload, String userId) {
         sendMessageByTagPairs(
-            cmd,
-            payload,
-            Collections.singleton(new TagPair(ITagService.USER_ID_TAG_KEY, userId)));
+                cmd,
+                payload,
+                Collections.singleton(new TagPair(TagKeys.USER_ID, userId)));
     }
 
     /**
@@ -264,9 +264,9 @@ public interface IMessageSender extends Ordered {
     default void sendMessagesByUserId(Collection<Object> payloads, String userId) {
         for (Object payload : payloads) {
             sendMessageByTagPairs(
-                null,
-                payload,
-                Collections.singleton(new TagPair(ITagService.USER_ID_TAG_KEY, userId)));
+                    null,
+                    payload,
+                    Collections.singleton(new TagPair(TagKeys.USER_ID, userId)));
         }
     }
 
@@ -279,9 +279,9 @@ public interface IMessageSender extends Ordered {
     default void sendMessageByUserIds(Object payload, Collection<String> userIds) {
         for (String userId : userIds) {
             sendMessageByTagPairs(
-                null,
-                payload,
-                Collections.singleton(new TagPair(ITagService.USER_ID_TAG_KEY, userId)));
+                    null,
+                    payload,
+                    Collections.singleton(new TagPair(TagKeys.USER_ID, userId)));
         }
     }
 
@@ -295,9 +295,9 @@ public interface IMessageSender extends Ordered {
     default void sendMessageByUserIds(String cmd, Object payload, Collection<String> userIds) {
         for (String userId : userIds) {
             sendMessageByTagPairs(
-                null,
-                payload,
-                Collections.singleton(new TagPair(ITagService.USER_ID_TAG_KEY, userId)));
+                    null,
+                    payload,
+                    Collections.singleton(new TagPair(TagKeys.USER_ID, userId)));
         }
     }
 
@@ -311,9 +311,9 @@ public interface IMessageSender extends Ordered {
         for (String userId : userIds) {
             for (Object payload : payloads) {
                 sendMessageByTagPairs(
-                    null,
-                    payload,
-                    Collections.singleton(new TagPair(ITagService.USER_ID_TAG_KEY, userId)));
+                        null,
+                        payload,
+                        Collections.singleton(new TagPair(TagKeys.USER_ID, userId)));
             }
         }
     }
@@ -325,9 +325,9 @@ public interface IMessageSender extends Ordered {
      */
     default void sendMessageToLoginUsers(Object payload) {
         sendMessageByTagPairs(
-            null,
-            payload,
-            Collections.singleton(new TagPair(ITagService.USER_ID_TAG_KEY)));
+                null,
+                payload,
+                Collections.singleton(new TagPair(TagKeys.USER_ID)));
     }
 
     /**
@@ -338,9 +338,9 @@ public interface IMessageSender extends Ordered {
      */
     default void sendMessageToLoginUsers(String cmd, Object payload) {
         sendMessageByTagPairs(
-            null,
-            payload,
-            Collections.singleton(new TagPair(ITagService.USER_ID_TAG_KEY)));
+                null,
+                payload,
+                Collections.singleton(new TagPair(TagKeys.USER_ID)));
     }
 
     /**
@@ -351,9 +351,9 @@ public interface IMessageSender extends Ordered {
     default void sendMessagesToLoginUsers(Collection<Object> payloads) {
         for (Object payload : payloads) {
             sendMessageByTagPairs(
-                null,
-                payload,
-                Collections.singleton(new TagPair(ITagService.USER_ID_TAG_KEY)));
+                    null,
+                    payload,
+                    Collections.singleton(new TagPair(TagKeys.USER_ID)));
         }
     }
 
@@ -365,9 +365,9 @@ public interface IMessageSender extends Ordered {
      */
     default void sendMessageByTagKey(Object payload, String tagKey) {
         sendMessageByTagPairs(
-            null,
-            payload,
-            Collections.singleton(new TagPair(ITagService.USER_ID_TAG_KEY)));
+                null,
+                payload,
+                Collections.singleton(new TagPair(TagKeys.USER_ID)));
     }
 
     /**
@@ -378,11 +378,11 @@ public interface IMessageSender extends Ordered {
      */
     default void sendMessageByTagKeys(Object payload, Collection<String> tagKeys) {
         sendMessageByTagPairs(
-            null,
-            payload,
-            tagKeys.stream()
-                .map(TagPair::new)
-                .collect(Collectors.toList()));
+                null,
+                payload,
+                tagKeys.stream()
+                        .map(TagPair::new)
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -394,9 +394,9 @@ public interface IMessageSender extends Ordered {
      */
     default void sendMessageByTagPair(Object payload, String tagKey, String tagValue) {
         sendMessageByTagPairs(
-            null,
-            payload,
-            Collections.singleton(new TagPair(tagKey, tagValue)));
+                null,
+                payload,
+                Collections.singleton(new TagPair(tagKey, tagValue)));
     }
 
     /**
@@ -409,9 +409,9 @@ public interface IMessageSender extends Ordered {
      */
     default void sendMessageByTagPair(String cmd, Object payload, String tagKey, String tagValue) {
         sendMessageByTagPairs(
-            cmd,
-            payload,
-            Collections.singleton(new TagPair(tagKey, tagValue)));
+                cmd,
+                payload,
+                Collections.singleton(new TagPair(tagKey, tagValue)));
     }
 
     /**
@@ -423,10 +423,10 @@ public interface IMessageSender extends Ordered {
      */
     default void sendMessageByTagPairs(String cmd, Object payload, Collection<TagPair> tags) {
         sendMessage(Message.builder()
-            .cmd(cmd)
-            .payload(payload)
-            .tags(tags)
-            .build());
+                .cmd(cmd)
+                .payload(payload)
+                .tags(tags)
+                .build());
     }
 
     /**

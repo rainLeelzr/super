@@ -181,6 +181,7 @@ import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.message.MessageCmd;
 import vip.isass.kernel.net.core.server.Server;
 import vip.isass.kernel.net.core.tag.ITagService;
+import vip.isass.kernel.net.core.tag.TagKeys;
 
 /**
  * 登录事件处理器
@@ -206,7 +207,7 @@ public class OnLoginEventHandler implements OnMessageEventHandler<String> {
     @Override
     public Object onMessage(Message message, String token) {
         JwtInfo jwtInfo = JwtUtil.parse(token, secret);
-        tagService.addTag(message.getSenderSessionId(), ITagService.USER_ID_TAG_KEY, jwtInfo.getUid());
+        tagService.addTag(message.getSenderSessionId(), TagKeys.USER_ID, jwtInfo.getUid());
         return Resp.bizSuccess(jwtInfo);
     }
 

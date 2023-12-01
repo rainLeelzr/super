@@ -193,7 +193,7 @@ public class TagRedisPublisherService implements ITagService {
     private RedisTemplate<String, ?> redisTemplate;
 
     @Override
-    public void addTagPairs(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
+    public void addTags(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
         if (sessionIds.isEmpty() || tagPairs.isEmpty()) {
             return;
         }

@@ -166,79 +166,10 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.tag;
+package vip.isass.kernel.net.core;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ConcurrentHashSet;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
+public interface Namespace {
 
-import javax.annotation.Nonnull;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-@Slf4j
-@Configuration
-public class HashMapTagStore {
-
-
-    public Map<String, Set<String>> findTags(@Nonnull String sessionId) {
-    }
-
-    public Set<String> findTagValues(@Nonnull String sessionId, @Nonnull String tagKey) {
-        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-        if (tagPairMap == null) {
-            return Collections.emptySet();
-        }
-        Set<String> tagValues = tagPairMap.get(tagKey);
-        return tagValues == null ? Collections.emptySet() : Collections.unmodifiableSet(tagValues);
-    }
-
-    @Override
-    public boolean containAnyTag(@Nonnull String sessionId, @Nonnull Collection<TagPair> tagPairs) {
-        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-        if (tagPairMap == null) {
-            return false;
-        }
-
-        for (TagPair tagPair : tagPairs) {
-            Set<String> tagValues = tagPairMap.get(tagPair.getTagKey());
-            if (tagValues == null) {
-                continue;
-            }
-            if (tagPair.getTagValues().isEmpty()) {
-                return true;
-            }
-            if (tagValues.containsAll(tagPair.getTagValues())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void removeTagKeys(@Nonnull Collection<String> sessionIds, @Nonnull Collection<String> tagKeys) {
-        for (String sessionId : sessionIds) {
-            log.debug("删除会话标签[{}][{}]", sessionId, tagKeys);
-
-            Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-            if (tagPairMap == null) {
-                // 此会话没有记录任何标签，继续下一次循环
-                continue;
-            }
-
-            for (String tagKey : tagKeys) {
-                tagPairMap.remove(tagKey);
-            }
-
-            if (tagPairMap.isEmpty()) {
-                sessionIdAndTagPairMap.remove(sessionId);
-            }
-        }
-    }
+    String DEFAULT = "default";
 
 }
