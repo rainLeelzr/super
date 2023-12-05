@@ -171,8 +171,8 @@ package vip.isass.kernel.net.core.session;
 
 import cn.hutool.core.lang.Assert;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 会话服务，记录已经建立链接的会话，上层应用使用本接口发送消息给对端
@@ -183,11 +183,9 @@ import java.util.Collection;
 public interface ISessionService {
 
     /**
-     * 实现类对应的 server 类型
-     *
-     * @return server 类型
+     * 默认的命名空间
      */
-    Type getServerType();
+    String DEFAULT_NAMESPACE = "default";
 
     // region session
 
@@ -240,6 +238,110 @@ public interface ISessionService {
      * @return 会话集合
      */
     Collection<Session<?>> getAllSessions();
+
+    // endregion
+
+    // region user id
+
+    /**
+     * 获取用户 id
+     *
+     * @return 用户 id
+     */
+    String getUserId(String sessionId);
+
+    /**
+     * 获取会话 id
+     *
+     * @param userId 用户 id
+     * @return 会话 id 集合
+     */
+    Collection<String> getSessionIds(String userId);
+
+    /**
+     * 设置用户 id
+     *
+     * @param userId 用户 id
+     */
+    void setUserId(String sessionId, String userId);
+
+    // endregion
+
+    // region alias
+
+    /**
+     * 获取别名
+     *
+     * @return 别名
+     */
+    String getAlias();
+
+    /**
+     * 设置别名
+     *
+     * @param alias 别名
+     */
+    void setAlias(String alias);
+
+    // endregion
+
+    // region tag
+
+    /**
+     * 获取标签
+     *
+     * @return 标签列表
+     */
+    List<String> getTags(String sessionId);
+
+    /**
+     * 根据用户获取标签
+     *
+     * @return 标签列表
+     */
+    List<String> getTagsByUserId(String userId);
+
+    /**
+     * 设置标签
+     *
+     * @param tags 标签集合
+     */
+    void setTags(String sessionId, Collection<String> tags);
+
+    /**
+     * 设置标签
+     *
+     * @param userId 用户 id
+     */
+    void setTagsByUserId(String userId, Collection<String> tags);
+
+    /**
+     * 添加标签
+     *
+     * @param tags 标签集合
+     */
+    void addTags(String sessionId, Collection<String> tags);
+
+    /**
+     * 添加标签
+     *
+     * @param userId 用户 id
+     */
+    void addTagsByUserId(String userId, Collection<String> tags);
+
+    /**
+     * 删除标签
+     *
+     * @param tags 标签集合
+     */
+    void removeTags(String sessionId, Collection<String> tags);
+
+    /**
+     * 删除标签
+     *
+     * @param userId 用户 id
+     */
+    void removeTagsByUserId(String userId, Collection<String> tags);
 
     // endregion
 

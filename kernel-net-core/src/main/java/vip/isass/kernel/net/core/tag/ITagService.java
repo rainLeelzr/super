@@ -184,7 +184,7 @@ import java.util.stream.Collectors;
  * 名称定义：
  * tagKey: 标签键
  * tagValue: 标签值
- * tagPair = tagKey + tagValue: 标签键值对，方便业务调用方使用组合键值对的场景
+ * tagPair = tagKey + tagValue: 标签，方便业务调用方使用组合的场景
  * <p>
  *
  * @author Rain
@@ -204,7 +204,7 @@ public interface ITagService {
     }
 
     /**
-     * 给会话添加标签键值对
+     * 给会话添加标签
      *
      * @param sessionId 会话 id
      * @param tagKey    标签键
@@ -232,7 +232,7 @@ public interface ITagService {
      * 给指定的会话列表添加相同的标签列表
      *
      * @param sessionIds 会话 id 集合
-     * @param tagPairs   标签集合
+     * @param tags       标签集合
      */
     void addTags(Collection<String> sessionIds, Map<String, Set<String>> tags);
 
@@ -248,19 +248,19 @@ public interface ITagService {
      * @return 会话是否拥有标签键
      */
     default boolean containTag(String sessionId, String tagKey) {
-        return containAllTags(sessionId, Collections.singleton(new TagPair(tagKey)));
+        return containAllTags(sessionId, new TagPair(tagKey));
     }
 
     /**
-     * 判断会话是否拥有标签键值对
+     * 判断会话是否拥有标签
      *
      * @param sessionId 会话 id
      * @param tagKey    标签键
      * @param tagValue  标签值
-     * @return 会话是否拥有标签键值对
+     * @return 会话是否拥有标签
      */
     default boolean containTag(String sessionId, String tagKey, String tagValue) {
-        return containAllTags(sessionId, Collections.singleton(new TagPair(tagKey, tagValue)));
+        return containAllTags(sessionId, new TagPair(tagKey, tagValue));
     }
 
     /**
@@ -271,16 +271,16 @@ public interface ITagService {
      * @return 会话是否拥有所有标签键
      */
     default boolean containAllTag(String sessionId, Collection<String> tagKeys) {
-        return containAllTags(sessionId, tagKeys.stream()
-                .map(TagPair::new)
-                .collect(Collectors.toList()));
+        Map<String, Set<String>> tagMap = MapUtil.newHashMap(tagKeys.size());
+        tagKeys.forEach(t -> tagMap.put(t, Collections.emptySet()));
+        return containAllTags(sessionId, tagMap);
     }
 
     /**
      * 会话是否包含指定标签集合中的所有标签
      *
      * @param sessionId 会话 id
-     * @param tagPairs  标签集合
+     * @param tags      标签集合
      * @return 是否包含指定标签集合中的所有标签
      */
     boolean containAllTags(String sessionId, Map<String, Set<String>> tags);
@@ -289,7 +289,7 @@ public interface ITagService {
      * 会话是否包含指定标签集合中的任意标签
      *
      * @param sessionId 会话 id
-     * @param tagPairs  标签集合
+     * @param tags      标签集合
      * @return 是否包含指定标签集合中的任意标签
      */
     boolean containAnyTag(@Nonnull String sessionId, @Nonnull Map<String, Set<String>> tags);
@@ -329,26 +329,34 @@ public interface ITagService {
     // region find session
 
     /**
-     * 查找拥有所有标签键值对的会话
-     * 先查找符合标签键值对集合的第一个标签键值对的会话 id 集合
-     * 再从会话 id 集合中剔除不符合余下标签键值对的会话
+     * 查找拥有所有标签的会话
+     * 先查找符合标签集合的第一个标签的会话 id 集合
+     * 再从会话 id 集合中剔除不符合余下标签的会话
      *
-     * @param tagPairs 标签键值对集合
+     * @param tags 标签集合
      * @return 符合条件的会话 id 集合
      */
-    Collection<String> findAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs);
+    Collection<String> findSessions(Map<String, Set<String>> tags);
+
+    /**
+     * 查找拥有任意指定标签的会话
+     *
+     * @param tags 标签集合
+     * @return 符合条件的会话 id 集合
+     */
+    Collection<String> findAnyMatchSessions(Map<String, Set<String>> tags);
 
     // endregion
 
     // region consume
 
     /**
-     * 查找拥有所有标签键值对的会话，执行消费逻辑
+     * 查找拥有所有标签的会话，执行消费逻辑
      *
-     * @param tagPairs 标签键值对集合
+     * @param tagPairs 标签集合
      * @param consumer 消费逻辑
      */
-    void consumeAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs, Consumer<String> consumer);
+    void consumeSessions(Collection<TagPair> tagPairs, Consumer<String> consumer);
 
     // endregion
 
@@ -365,7 +373,7 @@ public interface ITagService {
     }
 
     /**
-     * 删除会话的标签键值对
+     * 删除会话的标签
      *
      * @param sessionId 会话 id
      * @param tagKey    标签键

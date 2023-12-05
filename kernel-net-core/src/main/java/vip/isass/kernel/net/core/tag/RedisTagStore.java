@@ -188,23 +188,31 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RedisTagStore implements InitializingBean {
+/**
+ * 存在问题：当网关节点掉线后，无法通过一个key快速删除改节点所有的会话标签，需要通过 scsn 扫描，存在性能瓶颈
+ */
+public class RedisTagStore implements ITagService, InitializingBean {
 
     @Resource
     private RedisTemplate<String, Map<String, Set<String>>> redisTemplate;
 
     private HashOperations<String, String, Set<String>> hashOperations;
 
+    // region add
+
     @Override
-    public void addTags(@Nonnull Collection<String> sessionIds, @Nonnull Collection<TagPair> tagPairs) {
-        if (sessionIds.isEmpty() || tagPairs.isEmpty()) {
+    public void addTags(Collection<String> sessionIds, Map<String, Set<String>> tags) {
+        if (sessionIds.isEmpty() || tags.isEmpty()) {
             return;
         }
 
         if (sessionIds.size() == 1) {
-            if (tagPairs.size() == 1) {
-                TagPair tag = tagPairs.iterator().next();
-                hashOperations.put(NetRedisKey.formatTagKey(null, sessionIds.iterator().next()), tag.getTagKey(), tag.getValues());
+            if (tags.size() == 1) {
+                Map.Entry<String, Set<String>> tag = tags.entrySet().iterator().next();
+                hashOperations.put(
+                        NetRedisKey.formatTagKey(null, sessionIds.iterator().next()),
+                        tag.getKey(),
+                        tag.getValue());
             } else {
                 hashOperations.putAll(NetRedisKey.formatTagKey(null, sessionIds.iterator().next()), TagUtil.tagPairsToMap(tagPairs));
             }

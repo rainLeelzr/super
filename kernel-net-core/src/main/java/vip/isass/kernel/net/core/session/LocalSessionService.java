@@ -170,18 +170,18 @@
 package vip.isass.kernel.net.core.session;
 
 import cn.hutool.core.lang.Assert;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import vip.isass.kernel.net.core.tag.ITagService;
 
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 会话管理器抽象类
@@ -189,9 +189,9 @@ import java.util.concurrent.TimeUnit;
  * @author Rain
  */
 @Slf4j
-public abstract class AbsSessionService implements ISessionService {
+public class LocalSessionService implements ISessionService {
 
-    public final static String SESSION_REDIS_KEY = "kernel:net:sessionId:";
+    // region sessionId 和 session 关系
 
     /**
      * 保存所有会话
@@ -204,11 +204,12 @@ public abstract class AbsSessionService implements ISessionService {
      */
     private final Map<String, Session<?>> unmodifiableSessionMap = Collections.unmodifiableMap(sessionMap);
 
-    @Autowired
-    private ITagService tagService;
+    // endregion
+
+    private final SessionAndUserStore sessionAndUserStore = new SessionAndUserStore();
 
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private ITagService tagService;
 
     // region session 操作
 
@@ -216,11 +217,6 @@ public abstract class AbsSessionService implements ISessionService {
     public void addSession(Session<?> session) {
         Assert.notNull(session, "session 不能为 null");
         sessionMap.put(session.getSessionId(), session);
-        redisTemplate.opsForValue().set(
-                SESSION_REDIS_KEY + session.getSessionId(),
-                session.getSessionId(),
-                ThreadLocalRandom.current().nextInt(5, 10),
-                TimeUnit.MINUTES);
     }
 
     @Override
@@ -228,7 +224,6 @@ public abstract class AbsSessionService implements ISessionService {
         Session<?> remove = sessionMap.remove(sessionId);
         if (remove != null) {
             tagService.removeTags(remove.getSessionId());
-            redisTemplate.delete(SESSION_REDIS_KEY + remove.getSessionId());
         }
         return remove;
     }
@@ -243,5 +238,137 @@ public abstract class AbsSessionService implements ISessionService {
         return unmodifiableSessionMap.values();
     }
 
+    // region user
+
+    @Override
+    public String getUserId(String sessionId) {
+        return sessionAndUserStore.getUserId(sessionId);
+    }
+
+    @Override
+    public Collection<String> getSessionIds(String userId) {
+        return sessionAndUserStore.getSessionIds(userId);
+    }
+
+    @Override
+    public void setUserId(String sessionId, String userId) {
+        sessionAndUserStore.setUserId(sessionId, userId);
+    }
+
     // endregion
+
+    @Override
+    public String getAlias() {
+        return null;
+    }
+
+    @Override
+    public void setAlias(String alias) {
+
+    }
+
+    @Override
+    public List<String> getTags(String sessionId) {
+        return null;
+    }
+
+    @Override
+    public List<String> getTagsByUserId(String userId) {
+        return null;
+    }
+
+    @Override
+    public void setTags(String sessionId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void setTagsByUserId(String userId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void addTags(String sessionId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void addTagsByUserId(String userId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void removeTags(String sessionId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void removeTagsByUserId(String userId, Collection<String> tags) {
+
+    }
+
+    // endregion
+
+    /**
+     * 会话与用户关系存储器
+     */
+    @Getter
+    static class SessionAndUserStore {
+
+        /**
+         * 保存所有会话
+         * <p> {@literal Map<sessionId, userId>}
+         */
+        private final Map<String, String> sessionUserMap = new ConcurrentHashMap<>();
+
+        /**
+         * MultiValuedMap
+         * 保存所有会话
+         * <p> {@literal Map<userId, Set<sessionId>}
+         */
+        private final MultiValuedMap<String, String> userSessionMap = new HashSetValuedHashMap<>();
+
+        public Collection<String> getSessionIds(String userId) {
+            return userSessionMap.get(userId);
+        }
+
+        public String getUserId(String sessionId) {
+            return sessionUserMap.get(sessionId);
+        }
+
+        public void setUserId(String sessionId, String userId) {
+            String oldUserId = sessionUserMap.get(sessionId);
+            userSessionMap.removeMapping(oldUserId, sessionId);
+            sessionUserMap.put(sessionId, userId);
+            userSessionMap.put(userId, sessionId);
+        }
+
+        public void removeBinding(String sessionId) {
+            String oldUserId = sessionUserMap.get(sessionId);
+            userSessionMap.removeMapping(oldUserId, sessionId);
+            sessionUserMap.remove(sessionId);
+        }
+
+    }
+
+    /**
+     * 会话与标签关系存储器
+     */
+    @Getter
+    static class SessionAndTagStore {
+
+        /**
+         * 保存所有会话
+         * <p> {@literal Map<sessionId, tag>}
+         */
+        private final HashSetValuedHashMap<String, String> sessionTagMap = new HashSetValuedHashMap<>();
+
+        /**
+         * MultiValuedMap
+         * 保存所有会话
+         * <p> {@literal Map<userId, Set<sessionId>}
+         */
+        private final HashSetValuedHashMap<String, String> tagSessionMap = new HashSetValuedHashMap<>();
+
+    }
 }

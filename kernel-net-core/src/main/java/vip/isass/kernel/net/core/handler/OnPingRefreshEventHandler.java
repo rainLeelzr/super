@@ -175,7 +175,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.server.Server;
-import vip.isass.kernel.net.core.session.AbsSessionService;
+import vip.isass.kernel.net.core.session.LocalSessionService;
 
 import javax.annotation.Resource;
 import java.util.concurrent.ThreadLocalRandom;
@@ -197,7 +197,7 @@ public class OnPingRefreshEventHandler extends OnPingEventHandler {
     @Override
     public Object onMessage(Message message, String ping) {
         redisTemplate.opsForValue().set(
-                AbsSessionService.SESSION_REDIS_KEY + message.getSenderSessionId(),
+                LocalSessionService.SESSION_REDIS_KEY + message.getSenderSessionId(),
                 message.getSenderSessionId(),
                 ThreadLocalRandom.current().nextInt(5, 10),
                 TimeUnit.MINUTES);

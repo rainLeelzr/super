@@ -193,12 +193,20 @@ public interface NetRedisKey {
     // region 标签
 
     /**
-     * 标签
+     * 标签，会话与标签的关系
      * <p>
      * hash 结构
      * key: net:tag:sid:{node}-${hash(sessionId)%32} field {sessionId} value: tag map
      */
     String TAG_REDIS_KEY_PREFIX = NET_PREFIX + "tag:sid:";
+
+    /**
+     * 标签，标签键与会话的关系
+     * <p>
+     * hash 结构
+     * key: net:tag:sid:{node}-${hash(sessionId)%32} field {sessionId} value: tag map
+     */
+    String TAG_PREFIX = NET_PREFIX + "tag:sid:";
 
     /**
      * 标签 用户

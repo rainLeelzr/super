@@ -225,7 +225,7 @@ public class DirectSessionMessageSender implements IMessageSender {
             return;
         }
 
-        tagService.consumeAllMatchSessionsByTagPairs(
+        tagService.consumeSessions(
             message.getTags(),
             sessionId -> {
                 Session<?> session = sessionService.getSessionById(sessionId);

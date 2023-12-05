@@ -313,6 +313,7 @@
         <coordtransform4j.version>1.0.2</coordtransform4j.version>
         <sqlite-jdbc.version>3.34.0</sqlite-jdbc.version>
         <fastjson.version>1.2.83</fastjson.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
     </properties>
 
     <!-- maven功能说明 -->
@@ -847,6 +848,13 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

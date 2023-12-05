@@ -291,15 +291,24 @@ public class HashMapTagService implements ITagService {
 
     // endregion
 
-    // region consume
+    // region find session
 
     @Override
-    public Collection<String> findAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs) {
+    public Collection<String> findSessions(Map<String, Set<String>> tags) {
         return null;
     }
 
     @Override
-    public void consumeAllMatchSessionsByTagPairs(Collection<TagPair> tagPairs, Consumer<String> consumer) {
+    public Collection<String> findAnyMatchSessions(Map<String, Set<String>> tags) {
+        return null;
+    }
+
+    // endregion
+
+    // region consume
+
+    @Override
+    public void consumeSessions(Collection<TagPair> tagPairs, Consumer<String> consumer) {
 
     }
 
