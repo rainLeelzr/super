@@ -284,7 +284,7 @@ public interface ChannelEventHandler extends ChannelInboundHandler {
         ctx.fireChannelInactive();
         Channel channel = ctx.channel();
         if (channel != null) {
-            Session session = getSessionManager().removeSessionById(ctx.channel().id().toString());
+            Session session = getSessionManager().removeSession(ctx.channel().id().toString());
             getLogger().debug("成功关闭了一个websocket连接：session={}", session.toString());
         }
 

@@ -169,19 +169,22 @@
 
 package vip.isass.kernel.net.core.session;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
-import vip.isass.kernel.net.core.tag.ITagService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
+import vip.isass.core.map.MultiKeyMultiValueBiMap;
+import vip.isass.core.map.MultiValueBiMap;
 
-import javax.annotation.Resource;
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 会话管理器抽象类
@@ -189,6 +192,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Rain
  */
 @Slf4j
+@Configuration
+@ConditionalOnProperty(name = "isass.core.net.session.store", havingValue = "local")
 public class LocalSessionService implements ISessionService {
 
     // region sessionId 和 session 关系
@@ -206,12 +211,13 @@ public class LocalSessionService implements ISessionService {
 
     // endregion
 
-    private final SessionAndUserStore sessionAndUserStore = new SessionAndUserStore();
+    private final MultiValueBiMap<String, String> userAndSessionMap = new MultiValueBiMap<>();
 
-    @Resource
-    private ITagService tagService;
+    private final MultiValueBiMap<String, String> aliasAndSessionMap = new MultiValueBiMap<>();
 
-    // region session 操作
+    private final MultiKeyMultiValueBiMap<String, String> sessionAndTagMap = new MultiKeyMultiValueBiMap<>();
+
+    // region session
 
     @Override
     public void addSession(Session<?> session) {
@@ -220,10 +226,12 @@ public class LocalSessionService implements ISessionService {
     }
 
     @Override
-    public Session<?> removeSessionById(String sessionId) {
+    public Session<?> removeSession(String sessionId) {
         Session<?> remove = sessionMap.remove(sessionId);
         if (remove != null) {
-            tagService.removeTags(remove.getSessionId());
+            removeUserId(sessionId);
+            removeAlias(sessionId);
+            removeTags(sessionId);
         }
         return remove;
     }
@@ -238,137 +246,165 @@ public class LocalSessionService implements ISessionService {
         return unmodifiableSessionMap.values();
     }
 
+    // endregion
+
     // region user
 
     @Override
     public String getUserId(String sessionId) {
-        return sessionAndUserStore.getUserId(sessionId);
+        return userAndSessionMap.getKey(sessionId);
     }
 
     @Override
-    public Collection<String> getSessionIds(String userId) {
-        return sessionAndUserStore.getSessionIds(userId);
+    public Collection<String> getSessionIdsByUserId(String userId) {
+        return userAndSessionMap.get(userId);
     }
 
     @Override
-    public void setUserId(String sessionId, String userId) {
-        sessionAndUserStore.setUserId(sessionId, userId);
+    public void setUserId(String userId, String sessionId) {
+        userAndSessionMap.replaceValues(userId, Collections.singleton(sessionId));
+    }
+
+    @Override
+    public void removeUserId(String sessionId) {
+        userAndSessionMap.removeValue(sessionId);
     }
 
     // endregion
 
+    // region alias
+
     @Override
-    public String getAlias() {
-        return null;
+    public String getAlias(String sessionId) {
+        return aliasAndSessionMap.getKey(sessionId);
     }
 
     @Override
-    public void setAlias(String alias) {
-
+    public void setAlias(String alias, String sessionId) {
+        aliasAndSessionMap.replaceValues(alias, Collections.singleton(sessionId));
     }
 
     @Override
-    public List<String> getTags(String sessionId) {
-        return null;
+    public void addAlias(String alias, String sessionId) {
+        aliasAndSessionMap.put(alias, sessionId);
     }
 
     @Override
-    public List<String> getTagsByUserId(String userId) {
-        return null;
+    public void removeAlias(String sessionId) {
+        aliasAndSessionMap.removeValue(sessionId);
+    }
+
+    // endregion
+
+    // region tag
+
+    @Override
+    public Collection<String> getTags(String sessionId) {
+        return sessionAndTagMap.get(sessionId);
+    }
+
+    @Override
+    public Collection<String> getTagsByUserId(String userId) {
+        Collection<String> sessionIds = getSessionIdsByUserId(userId);
+        if (CollUtil.isEmpty(sessionIds)) {
+            return Collections.emptySet();
+        }
+        return sessionIds.stream()
+                .map(this::getTags)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Collection<String> findSessions(Collection<String> tags) {
+        Set<String> sessionIds = null;
+        for (String tag : tags) {
+            Collection<String> tempSessionIds = sessionAndTagMap.getKey(tag);
+            if (CollUtil.isEmpty(tempSessionIds)) {
+                return Collections.emptySet();
+            }
+
+            if (sessionIds == null) {
+                sessionIds = new HashSet<>(tempSessionIds);
+                continue;
+            }
+
+            sessionIds.retainAll(tempSessionIds);
+            if (sessionIds.isEmpty()) {
+                return Collections.emptySet();
+            }
+        }
+        return sessionIds;
+    }
+
+    @Override
+    public Collection<String> findSessionsByAnyMatchTags(Collection<String> tags) {
+        return tags.stream()
+                .map(sessionAndTagMap::getKey)
+                .filter(CollUtil::isNotEmpty)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public boolean containAnyTag(@Nonnull String sessionId, @Nonnull Collection<String> tags) {
+        Collection<String> existingTags = sessionAndTagMap.get(sessionId);
+        return CollUtil.containsAny(existingTags, tags);
+    }
+
+    @Override
+    public boolean containAllTags(String sessionId, Collection<String> tags) {
+        Collection<String> existingTags = sessionAndTagMap.get(sessionId);
+        return CollUtil.containsAll(existingTags, tags);
     }
 
     @Override
     public void setTags(String sessionId, Collection<String> tags) {
-
-    }
-
-    @Override
-    public void setTagsByUserId(String userId, Collection<String> tags) {
-
+        sessionAndTagMap.replaceValues(sessionId, tags);
     }
 
     @Override
     public void addTags(String sessionId, Collection<String> tags) {
+        sessionAndTagMap.putAll(sessionId, tags);
+    }
 
+    @Override
+    public void setTagsByUserId(String userId, Collection<String> tags) {
+        Collection<String> sessionIds = getSessionIdsByUserId(userId);
+        if (CollUtil.isEmpty(sessionIds)) {
+            return;
+        }
+        sessionIds.forEach(s -> setTags(s, tags));
     }
 
     @Override
     public void addTagsByUserId(String userId, Collection<String> tags) {
+        Collection<String> sessionIds = getSessionIdsByUserId(userId);
+        if (CollUtil.isEmpty(sessionIds)) {
+            return;
+        }
+        sessionIds.forEach(s -> addTags(s, tags));
+    }
 
+    @Override
+    public void removeTags(String sessionId) {
+        sessionAndTagMap.removeAll(sessionId);
     }
 
     @Override
     public void removeTags(String sessionId, Collection<String> tags) {
-
+        sessionAndTagMap.removeValues(sessionId, tags);
     }
 
     @Override
     public void removeTagsByUserId(String userId, Collection<String> tags) {
-
+        Collection<String> sessionIds = getSessionIdsByUserId(userId);
+        if (CollUtil.isEmpty(sessionIds)) {
+            return;
+        }
+        sessionIds.forEach(s -> removeTags(s, tags));
     }
 
     // endregion
 
-    /**
-     * 会话与用户关系存储器
-     */
-    @Getter
-    static class SessionAndUserStore {
-
-        /**
-         * 保存所有会话
-         * <p> {@literal Map<sessionId, userId>}
-         */
-        private final Map<String, String> sessionUserMap = new ConcurrentHashMap<>();
-
-        /**
-         * MultiValuedMap
-         * 保存所有会话
-         * <p> {@literal Map<userId, Set<sessionId>}
-         */
-        private final MultiValuedMap<String, String> userSessionMap = new HashSetValuedHashMap<>();
-
-        public Collection<String> getSessionIds(String userId) {
-            return userSessionMap.get(userId);
-        }
-
-        public String getUserId(String sessionId) {
-            return sessionUserMap.get(sessionId);
-        }
-
-        public void setUserId(String sessionId, String userId) {
-            String oldUserId = sessionUserMap.get(sessionId);
-            userSessionMap.removeMapping(oldUserId, sessionId);
-            sessionUserMap.put(sessionId, userId);
-            userSessionMap.put(userId, sessionId);
-        }
-
-        public void removeBinding(String sessionId) {
-            String oldUserId = sessionUserMap.get(sessionId);
-            userSessionMap.removeMapping(oldUserId, sessionId);
-            sessionUserMap.remove(sessionId);
-        }
-
-    }
-
-    /**
-     * 会话与标签关系存储器
-     */
-    @Getter
-    static class SessionAndTagStore {
-
-        /**
-         * 保存所有会话
-         * <p> {@literal Map<sessionId, tag>}
-         */
-        private final HashSetValuedHashMap<String, String> sessionTagMap = new HashSetValuedHashMap<>();
-
-        /**
-         * MultiValuedMap
-         * 保存所有会话
-         * <p> {@literal Map<userId, Set<sessionId>}
-         */
-        private final HashSetValuedHashMap<String, String> tagSessionMap = new HashSetValuedHashMap<>();
-
-    }
 }

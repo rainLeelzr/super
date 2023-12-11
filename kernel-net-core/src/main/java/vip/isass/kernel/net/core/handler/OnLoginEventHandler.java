@@ -180,8 +180,7 @@ import vip.isass.core.web.Resp;
 import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.message.MessageCmd;
 import vip.isass.kernel.net.core.server.Server;
-import vip.isass.kernel.net.core.tag.ITagService;
-import vip.isass.kernel.net.core.tag.TagKeys;
+import vip.isass.kernel.net.core.session.ISessionService;
 
 /**
  * 登录事件处理器
@@ -197,7 +196,7 @@ public class OnLoginEventHandler implements OnMessageEventHandler<String> {
     private String secret;
 
     @Autowired
-    private ITagService tagService;
+    private ISessionService sessionService;
 
     @Override
     public String getCmd() {
@@ -207,7 +206,7 @@ public class OnLoginEventHandler implements OnMessageEventHandler<String> {
     @Override
     public Object onMessage(Message message, String token) {
         JwtInfo jwtInfo = JwtUtil.parse(token, secret);
-        tagService.addTag(message.getSenderSessionId(), TagKeys.USER_ID, jwtInfo.getUid());
+        sessionService.setUserId(jwtInfo.getUid(), message.getSenderSessionId());
         return Resp.bizSuccess(jwtInfo);
     }
 

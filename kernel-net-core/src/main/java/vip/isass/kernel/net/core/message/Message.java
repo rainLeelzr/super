@@ -176,7 +176,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import vip.isass.kernel.net.core.session.Session;
-import vip.isass.kernel.net.core.tag.TagPair;
 
 import java.beans.Transient;
 import java.util.Collection;

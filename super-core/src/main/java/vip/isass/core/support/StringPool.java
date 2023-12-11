@@ -166,33 +166,17 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.tag;
+package vip.isass.core.support;
 
-import cn.hutool.core.map.MapUtil;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+public class StringPool {
 
-/**
- * 标签工具类
- */
-public class TagUtil {
+    private static final Interner<String> STRING_POOL = Interners.newWeakInterner();
 
-    public static Map<String, Set<String>> tagPairsToMap(Collection<TagPair> tagPairs) {
-        HashMap<String, Set<String>> map = MapUtil.newHashMap(tagPairs.size());
-        for (TagPair tagPair : tagPairs) {
-            map.put(tagPair.getTagKey(), tagPair.getValues());
-        }
-        return map;
-    }
-
-    public static Collection<TagPair> mapToTagPairs(Map<String, Set<String>> map) {
-        return map.entrySet().stream()
-                .map(e -> new TagPair(e.getKey(), e.getValue()))
-                .collect(Collectors.toList());
+    public static final String intern(String str) {
+        return STRING_POOL.intern(str);
     }
 
 }

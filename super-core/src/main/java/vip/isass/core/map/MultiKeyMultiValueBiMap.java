@@ -166,194 +166,215 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.tag;
+package vip.isass.core.map;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ConcurrentHashSet;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import vip.isass.core.support.StringPool;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 /**
- * 标签服务
+ * 多键多值的双向映射集合
  *
- * @author Rain
+ * @param <K> 键类型
+ * @param <V> 值类型
  */
-@Slf4j
-@Configuration
-@ConditionalOnProperty(name = "isass.core.net.tag.store", havingValue = "redis")
-public class HashMapTagService implements ITagService {
+public class MultiKeyMultiValueBiMap<K, V> implements Multimap<K, V> {
 
-    /**
-     * key: sessionId
-     * value: Map<tagKey, set<TagValue>
-     */
-    private final Map<String, Map<String, Set<String>>> sessionIdAndTagPairMap = new ConcurrentHashMap<>();
+    private final Multimap<K, V> multiValueMap = HashMultimap.create();
 
-    // region add
+    private final Multimap<V, K> reverseMap = HashMultimap.create();
 
     @Override
-    public void addTags(Collection<String> sessionIds, Map<String, Set<String>> tags) {
-        for (String sessionId : sessionIds) {
-            log.debug("添加会话标签[{}][{}]", sessionId, tags);
-
-            Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.computeIfAbsent(
-                    sessionId,
-                    s -> new ConcurrentHashMap<>());
-
-            for (Map.Entry<String, Set<String>> entry : tags.entrySet()) {
-                tagPairMap.computeIfAbsent(entry.getKey(), k -> new ConcurrentHashSet<>())
-                        .addAll(entry.getValue());
-            }
-        }
+    public int size() {
+        return multiValueMap.size();
     }
 
-    // endregion
-
-    // region contain
+    @Override
+    public boolean isEmpty() {
+        return multiValueMap.isEmpty();
+    }
 
     @Override
-    public boolean containAllTags(String sessionId, Map<String, Set<String>> tags) {
-        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-        if (tagPairMap == null) {
-            return false;
+    public boolean containsKey(Object key) {
+        return multiValueMap.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        //noinspection SuspiciousMethodCalls
+        return reverseMap.containsKey(value);
+    }
+
+    @Override
+    public boolean containsEntry(Object key, Object value) {
+        return multiValueMap.containsEntry(key, value);
+    }
+
+    @Override
+    public Collection<V> get(K key) {
+        return multiValueMap.get(key);
+    }
+
+    public Collection<K> getKey(Object value) {
+        //noinspection unchecked
+        return reverseMap.get((V) value);
+    }
+
+    @Override
+    public boolean put(K key, V value) {
+        synchronized (StringPool.intern(key.toString())) {
+            multiValueMap.put(key, value);
         }
-        for (Map.Entry<String, Set<String>> entry : tags.entrySet()) {
-            Set<String> tagValues = tagPairMap.get(entry.getKey());
-            if (tagValues == null) {
-                return false;
-            }
-            if (!tagValues.containsAll(entry.getValue())) {
-                return false;
+        synchronized (StringPool.intern(value.toString())) {
+            reverseMap.put(value, key);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean putAll(K key, Iterable<? extends V> values) {
+        synchronized (StringPool.intern(key.toString())) {
+            multiValueMap.putAll(key, values);
+        }
+        for (V value : values) {
+            synchronized (StringPool.intern(value.toString())) {
+                reverseMap.put(value, key);
             }
         }
         return true;
     }
 
     @Override
-    public boolean containAnyTag(@Nonnull String sessionId, @Nonnull Map<String, Set<String>> tags) {
-        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-        if (tagPairMap == null) {
-            return false;
-        }
-
-        for (Map.Entry<String, Set<String>> entry : tags.entrySet()) {
-            Set<String> tagValues = tagPairMap.get(entry.getKey());
-            if (tagValues == null) {
-                continue;
+    public boolean putAll(Multimap<? extends K, ? extends V> multimap) {
+        for (Map.Entry<? extends K, ? extends V> entry : multimap.entries()) {
+            synchronized (StringPool.intern(entry.getKey().toString())) {
+                multiValueMap.put(entry.getKey(), entry.getValue());
             }
-            if (entry.getValue().isEmpty()) {
-                return true;
-            }
-            if (tagValues.isEmpty()) {
-                continue;
-            }
-            if (CollUtil.containsAny(entry.getValue(), tagValues)) {
-                return true;
+            synchronized (StringPool.intern(entry.getValue().toString())) {
+                reverseMap.put(entry.getValue(), entry.getKey());
             }
         }
-        return false;
+        return true;
     }
 
+    @Override
+    public Collection<V> replaceValues(@Nullable K key, Iterable<? extends V> values) {
+        Collection<V> existingValues;
+        synchronized (StringPool.intern(key.toString())) {
+            existingValues = multiValueMap.replaceValues(key, values);
+        }
+        if (existingValues != null) {
+            for (V existingValue : existingValues) {
+                synchronized (StringPool.intern(existingValue.toString())) {
+                    reverseMap.remove(existingValue, key);
+                }
+            }
+        }
 
-    // endregion
-
-    // region find tag
+        for (V value : values) {
+            synchronized (StringPool.intern(value.toString())) {
+                reverseMap.put(value, key);
+            }
+        }
+        return existingValues;
+    }
 
     @Override
-    public String getTagValue(String sessionId, String tagKey) {
-        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-        if (tagPairMap == null) {
+    public Collection<V> removeAll(@Nullable Object key) {
+        Collection<V> existingValues;
+        synchronized (StringPool.intern(key.toString())) {
+            existingValues = multiValueMap.removeAll(key);
+        }
+        if (existingValues == null) {
+            return Collections.emptyList();
+        }
+
+        for (V existingValue : existingValues) {
+            synchronized (StringPool.intern(existingValue.toString())) {
+                reverseMap.remove(existingValue, key);
+            }
+        }
+        return existingValues;
+    }
+
+    @Override
+    public boolean remove(@Nullable Object key, @Nullable Object value) {
+        boolean removed;
+        synchronized (StringPool.intern(key.toString())) {
+            removed = multiValueMap.remove(key, value);
+        }
+        if (removed) {
+            synchronized (StringPool.intern(value.toString())) {
+                reverseMap.remove(value, key);
+            }
+        }
+        return removed;
+    }
+
+    public Collection<K> removeValue(Object value) {
+        Collection<K> removedKeys;
+        synchronized (StringPool.intern(value.toString())) {
+            //noinspection SuspiciousMethodCalls
+            removedKeys = reverseMap.removeAll(value);
+        }
+        if (removedKeys == null) {
             return null;
         }
-        Set<String> tagValues = tagPairMap.get(tagKey);
-        return tagValues == null ? null : tagValues.iterator().next();
-    }
-
-    @Override
-    public Map<String, Set<String>> findTags(String sessionId) {
-        Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-        return tagPairMap == null ? Collections.emptyMap() : tagPairMap;
-    }
-
-    @Override
-    public Set<String> findTagValues(@Nonnull String sessionId, @Nonnull String tagKey) {
-        return null;
-    }
-
-    // endregion
-
-    // region find session
-
-    @Override
-    public Collection<String> findSessions(Map<String, Set<String>> tags) {
-        return null;
-    }
-
-    @Override
-    public Collection<String> findAnyMatchSessions(Map<String, Set<String>> tags) {
-        return null;
-    }
-
-    // endregion
-
-    // region consume
-
-    @Override
-    public void consumeSessions(Collection<TagPair> tagPairs, Consumer<String> consumer) {
-
-    }
-
-    // endregion
-
-    // region remove
-
-    @Override
-    public void removeTags(Collection<String> sessionIds, Collection<TagPair> tagPairs) {
-        for (String sessionId : sessionIds) {
-            log.debug("删除会话标签[{}][{}]", sessionId, tagPairs);
-
-            Map<String, Set<String>> tagPairMap = sessionIdAndTagPairMap.get(sessionId);
-            if (tagPairMap == null) {
-                // 此会话没有记录任何标签，继续下一次循环
-                continue;
+        //noinspection SuspiciousMethodCalls
+        for (K removedKey : removedKeys) {
+            synchronized (StringPool.intern(removedKey.toString())) {
+                multiValueMap.remove(removedKey, value);
             }
+        }
+        return removedKeys;
+    }
 
-            for (TagPair tagPair : tagPairs) {
-                Set<String> realTagValues = tagPairMap.get(tagPair.getKey());
-                if (realTagValues == null) {
-                    // 此会话没有此标签，不用删除。继续下一次循环
-                    continue;
-                }
+    public boolean removeValues(Object key, Iterable<? extends V> values) {
+        boolean removed = false;
+        for (V value : values) {
+            removed |= remove(key, value);
+        }
+        return removed;
+    }
 
-                realTagValues.removeAll(tagPair.getValues());
-                if (realTagValues.isEmpty()) {
-                    tagPairMap.remove(tagPair.getKey());
-                }
-            }
-
-            if (tagPairMap.isEmpty()) {
-                sessionIdAndTagPairMap.remove(sessionId);
-            }
+    @Override
+    public void clear() {
+        synchronized (this) {
+            multiValueMap.clear();
+            reverseMap.clear();
         }
     }
 
     @Override
-    public void removeTags(Collection<String> sessionIds) {
-        sessionIds.forEach(sessionId -> {
-            log.debug("删除全部会话标签[{}]", sessionId);
-            sessionIdAndTagPairMap.remove(sessionId);
-        });
+    public Collection<Map.Entry<K, V>> entries() {
+        return multiValueMap.entries();
     }
 
-    // endregion
+    @Override
+    public Multiset<K> keys() {
+        return multiValueMap.keys();
+    }
+
+    @Override
+    public Set<K> keySet() {
+        return multiValueMap.keySet();
+    }
+
+    @Override
+    public Collection<V> values() {
+        return reverseMap.keySet();
+    }
+
+    @Override
+    public Map<K, Collection<V>> asMap() {
+        return multiValueMap.asMap();
+    }
 
 }

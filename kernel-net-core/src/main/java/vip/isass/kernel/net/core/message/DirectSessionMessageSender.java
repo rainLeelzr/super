@@ -177,7 +177,6 @@ import org.springframework.context.annotation.Configuration;
 import vip.isass.kernel.net.core.server.Server;
 import vip.isass.kernel.net.core.session.ISessionService;
 import vip.isass.kernel.net.core.session.Session;
-import vip.isass.kernel.net.core.tag.ITagService;
 
 import javax.annotation.Resource;
 
@@ -194,9 +193,6 @@ public class DirectSessionMessageSender implements IMessageSender {
 
     @Resource
     private ISessionService sessionService;
-
-    @Autowired
-    private ITagService tagService;
 
     @Override
     public void sendMessage(Message message) {

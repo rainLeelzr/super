@@ -176,7 +176,6 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.Topic;
 import org.springframework.stereotype.Component;
 import vip.isass.core.cache.redis.IRedisSubscriber;
-import vip.isass.kernel.net.core.tag.ITagService;
 import vip.isass.kernel.net.transfer.core.NetTransferRedisKeyConst;
 
 import java.util.List;

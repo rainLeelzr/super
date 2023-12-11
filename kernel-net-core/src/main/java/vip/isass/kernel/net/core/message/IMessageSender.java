@@ -169,21 +169,12 @@
 
 package vip.isass.kernel.net.core.message;
 
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
-import vip.isass.core.structure.service.V2ServiceManagerUtil;
-import vip.isass.core.support.api.ApiOrder;
-import vip.isass.kernel.net.core.tag.TagKeys;
-import vip.isass.kernel.net.core.tag.TagPair;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -442,33 +433,5 @@ public interface IMessageSender extends Ordered {
      * @return 发送器类型
      */
     SenderType getSenderType();
-
-    /**
-     * @author rain
-     */
-    @Primary
-    @Configuration
-    class MessageSenderManager implements IMessageSender {
-
-        @Getter
-        @Autowired(required = false)
-        private List<IMessageSender> services;
-
-        @Override
-        public void sendMessage(Message message) {
-            log.debug("发送消息:{}}", message);
-            V2ServiceManagerUtil.consume(services, s -> s.sendMessage(message));
-        }
-
-        @Override
-        public SenderType getSenderType() {
-            return null;
-        }
-
-        @Override
-        public int getOrder() {
-            return ApiOrder.SERVER_MANAGER;
-        }
-    }
 
 }

@@ -171,8 +171,8 @@ package vip.isass.kernel.net.core.session;
 
 import cn.hutool.core.lang.Assert;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * 会话服务，记录已经建立链接的会话，上层应用使用本接口发送消息给对端
@@ -203,7 +203,7 @@ public interface ISessionService {
      */
     default void removeSession(Session<?> session) {
         Assert.notNull(session, "session 不能为 null");
-        removeSessionById(session.getSessionId());
+        removeSession(session.getSessionId());
     }
 
     /**
@@ -212,7 +212,7 @@ public interface ISessionService {
      * @param sessionId 会话 id
      * @return 被删除的会话
      */
-    Session<?> removeSessionById(String sessionId);
+    Session<?> removeSession(String sessionId);
 
     /**
      * 根据链接通道获取会话
@@ -256,14 +256,21 @@ public interface ISessionService {
      * @param userId 用户 id
      * @return 会话 id 集合
      */
-    Collection<String> getSessionIds(String userId);
+    Collection<String> getSessionIdsByUserId(String userId);
 
     /**
      * 设置用户 id
      *
      * @param userId 用户 id
      */
-    void setUserId(String sessionId, String userId);
+    void setUserId(String userId, String sessionId);
+
+    /**
+     * 删除指定会话绑定的用户
+     *
+     * @param sessionId 会话 id
+     */
+    void removeUserId(String sessionId);
 
     // endregion
 
@@ -274,14 +281,29 @@ public interface ISessionService {
      *
      * @return 别名
      */
-    String getAlias();
+    String getAlias(String sessionId);
 
     /**
      * 设置别名
      *
      * @param alias 别名
      */
-    void setAlias(String alias);
+    void setAlias(String alias, String sessionId);
+
+    /**
+     * 添加别名
+     *
+     * @param alias     别名
+     * @param sessionId 会话 id
+     */
+    void addAlias(String alias, String sessionId);
+
+    /**
+     * 删除会话的别名
+     *
+     * @param sessionId 会话 id
+     */
+    void removeAlias(String sessionId);
 
     // endregion
 
@@ -292,14 +314,48 @@ public interface ISessionService {
      *
      * @return 标签列表
      */
-    List<String> getTags(String sessionId);
+    Collection<String> getTags(String sessionId);
 
     /**
      * 根据用户获取标签
      *
      * @return 标签列表
      */
-    List<String> getTagsByUserId(String userId);
+    Collection<String> getTagsByUserId(String userId);
+
+    /**
+     * 查找符合所有标签的会话
+     *
+     * @param tags 标签集合
+     * @return 符合条件的会话集合
+     */
+    Collection<String> findSessions(Collection<String> tags);
+
+    /**
+     * 根据标签查找会话
+     *
+     * @param tags 标签集合
+     * @return 符合条件的会话集合
+     */
+    Collection<String> findSessionsByAnyMatchTags(Collection<String> tags);
+
+    /**
+     * 判断会话是否拥有任意给定的标签
+     *
+     * @param sessionId 会话 id
+     * @param tags      给定的标签
+     * @return 是否拥有标签
+     */
+    boolean containAnyTag(@Nonnull String sessionId, @Nonnull Collection<String> tags);
+
+    /**
+     * 判断会话是否拥有所有给定的标签
+     *
+     * @param sessionId 会话 id
+     * @param tags      给定的标签
+     * @return 是否拥有标签
+     */
+    boolean containAllTags(String sessionId, Collection<String> tags);
 
     /**
      * 设置标签
@@ -332,7 +388,15 @@ public interface ISessionService {
     /**
      * 删除标签
      *
-     * @param tags 标签集合
+     * @param sessionId 会话 id
+     */
+    void removeTags(String sessionId);
+
+    /**
+     * 删除标签
+     *
+     * @param sessionId 会话 id
+     * @param tags      标签集合
      */
     void removeTags(String sessionId, Collection<String> tags);
 
