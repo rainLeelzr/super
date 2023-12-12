@@ -208,7 +208,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Service
 public class MessageRedisStreamListener implements StreamListener<String, ObjectRecord<String, Message>> {
 
-    @Autowired
+    @Resource
     private IEventManager eventManager;
 
     private ThreadPoolTaskExecutor executor;
@@ -273,19 +273,19 @@ public class MessageRedisStreamListener implements StreamListener<String, Object
 
         @SuppressWarnings("unchecked")
         StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, Message>> options =
-            StreamMessageListenerContainer.StreamMessageListenerContainerOptions
-                .builder()
-                .objectMapper(RedisConfig.HASH_MAPPER)
-                .serializer(redisTemplate.getDefaultSerializer())
-                .hashValueSerializer(redisTemplate.getHashValueSerializer())
-                .pollTimeout(Duration.ofSeconds(4))
-                .batchSize(5)
-                .targetType(Message.class)
-                .executor(this.executor)
-                .build();
+                StreamMessageListenerContainer.StreamMessageListenerContainerOptions
+                        .builder()
+                        .objectMapper(RedisConfig.HASH_MAPPER)
+                        .serializer(redisTemplate.getDefaultSerializer())
+                        .hashValueSerializer(redisTemplate.getHashValueSerializer())
+                        .pollTimeout(Duration.ofSeconds(4))
+                        .batchSize(5)
+                        .targetType(Message.class)
+                        .executor(this.executor)
+                        .build();
 
         StreamMessageListenerContainer<String, ObjectRecord<String, Message>> listenerContainer =
-            StreamMessageListenerContainer.create(factory, options);
+                StreamMessageListenerContainer.create(factory, options);
 
         // 创建本微服务的消费组
         try {
@@ -305,39 +305,39 @@ public class MessageRedisStreamListener implements StreamListener<String, Object
 
         // 监听本微服务的中转消息
         listenerContainer.register(
-            StreamMessageListenerContainer.StreamReadRequest
-                .builder(StreamOffset.create(streamServiceKey, ReadOffset.lastConsumed()))
-                .consumer(CONSUMER)
-                .autoAcknowledge(true)
-                .cancelOnError(throwable -> false)
-                .errorHandler(t -> {
-                    //noinspection unchecked
-                    if (ExceptionUtil.isCausedBy(t, RedissonShutdownException.class)) {
-                        log.info("redis stream listener[{}:{}]is closed", streamServiceKey, CONSUMER);
-                    } else {
-                        throw new RuntimeException(t);
-                    }
-                })
-                .build(),
-            this);
+                StreamMessageListenerContainer.StreamReadRequest
+                        .builder(StreamOffset.create(streamServiceKey, ReadOffset.lastConsumed()))
+                        .consumer(CONSUMER)
+                        .autoAcknowledge(true)
+                        .cancelOnError(throwable -> false)
+                        .errorHandler(t -> {
+                            //noinspection unchecked
+                            if (ExceptionUtil.isCausedBy(t, RedissonShutdownException.class)) {
+                                log.info("redis stream listener[{}:{}]is closed", streamServiceKey, CONSUMER);
+                            } else {
+                                throw new RuntimeException(t);
+                            }
+                        })
+                        .build(),
+                this);
 
         // 监听 unknowns 的中转消息
         listenerContainer.register(
-            StreamMessageListenerContainer.StreamReadRequest
-                .builder(StreamOffset.create(NetTransferRedisKeyConst.REDIS_STREAM_UNKNOWN_SERVICE_KEY, ReadOffset.lastConsumed()))
-                .consumer(CONSUMER)
-                .autoAcknowledge(true)
-                .cancelOnError(throwable -> false)
-                .errorHandler(t -> {
-                    //noinspection unchecked
-                    if (ExceptionUtil.isCausedBy(t, RedissonShutdownException.class)) {
-                        log.info("redis stream listener[{}:{}]is closed", NetTransferRedisKeyConst.REDIS_STREAM_UNKNOWN_SERVICE_KEY, CONSUMER);
-                    } else {
-                        throw new RuntimeException(t);
-                    }
-                })
-                .build(),
-            this);
+                StreamMessageListenerContainer.StreamReadRequest
+                        .builder(StreamOffset.create(NetTransferRedisKeyConst.REDIS_STREAM_UNKNOWN_SERVICE_KEY, ReadOffset.lastConsumed()))
+                        .consumer(CONSUMER)
+                        .autoAcknowledge(true)
+                        .cancelOnError(throwable -> false)
+                        .errorHandler(t -> {
+                            //noinspection unchecked
+                            if (ExceptionUtil.isCausedBy(t, RedissonShutdownException.class)) {
+                                log.info("redis stream listener[{}:{}]is closed", NetTransferRedisKeyConst.REDIS_STREAM_UNKNOWN_SERVICE_KEY, CONSUMER);
+                            } else {
+                                throw new RuntimeException(t);
+                            }
+                        })
+                        .build(),
+                this);
         return listenerContainer;
     }
 

@@ -173,8 +173,6 @@ package vip.isass.kernel.net.core.session;
 import vip.isass.kernel.net.core.server.Server;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 会话
@@ -230,11 +228,10 @@ public interface Session<svr extends Server> {
     /**
      * 发送消息
      *
-     * @param cmd    路由命令
-     * @param object 消息体
+     * @param cmd     路由命令
+     * @param payload 消息体
      */
-    void sendMessage(String cmd, Object object);
-
+    void sendMessage(String cmd, Object payload);
 
     default Type getServerType() {
         return this.getClass().getGenericInterfaces()[0];

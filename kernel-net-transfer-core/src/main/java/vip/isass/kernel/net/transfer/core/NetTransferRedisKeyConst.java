@@ -176,52 +176,5 @@ package vip.isass.kernel.net.transfer.core;
  */
 public interface NetTransferRedisKeyConst {
 
-    /**
-     * 各微服务上报 cmd 的 key
-     */
-    String CMD_COLLECT_KEY = "kernel:net:transfer:cmd";
-
-    /**
-     * redis message key (channel)
-     * 服务端推送消息给客户端时，使用 redis 的 pubsub 功能中转消息
-     */
-    String REDIS_PUBSUB_KEY = "kernel:net:transfer:message:s2c";
-
-    /**
-     * 客户端发送消息给服务端推，使用 redis 的 stream 功能中转消息
-     */
-    String REDIS_STREAM_PREFIX_KEY = "kernel:net:transfer:message:c2s:";
-
-    /**
-     * 客户端发送消息给服务端推，无法从 cmd 解析出是发送给哪个微服务时，统一使用此 stream
-     */
-    String REDIS_STREAM_UNKNOWN_SERVICE_KEY = REDIS_STREAM_PREFIX_KEY + "unknown";
-
-    /**
-     * redis stream 的消费组名
-     */
-    String CONSUMER_GROUP = "g";
-
-    // region 中转 tag 用到的 key
-
-    /**
-     * redis add tag key
-     * 微服务设置会话标签时，使用 redis 的 pubsub 功能中转标签信息
-     */
-    String ADD_TAG_PUBSUB_KEY = "kernel:net:transfer:tag:add";
-
-    /**
-     * redis remove match tag key
-     * 微服务删除会话指定标签时，使用 redis 的 pubsub 功能中转标签信息
-     */
-    String REMOVE_TAG_PUBSUB_KEY = "kernel:net:transfer:tag:removeMatch";
-
-    /**
-     * redis remove all tag key
-     * 微服务删除全部会话标签时，使用 redis 的 pubsub 功能中转会话 id 的信息
-     */
-    String REMOVE_ALL_TAG_PUBSUB_KEY = "kernel:net:transfer:tag:removeALl";
-
-    // endregion
 
 }

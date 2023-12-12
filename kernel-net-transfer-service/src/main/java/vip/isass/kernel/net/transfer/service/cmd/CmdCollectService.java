@@ -175,12 +175,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import vip.isass.core.support.LocalDateTimeUtil;
+import vip.isass.core.support.SystemClock;
 import vip.isass.kernel.net.core.handler.OnMessageEventHandler;
 import vip.isass.kernel.net.core.message.CmdCollectDto;
 import vip.isass.kernel.net.transfer.core.CmdRedisService;
-import vip.isass.core.support.LocalDateTimeUtil;
-import vip.isass.core.support.SystemClock;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -195,7 +196,7 @@ import java.util.stream.Collectors;
 @Component
 public class CmdCollectService {
 
-    @Autowired
+    @Resource
     private CmdRedisService cmdRedisService;
 
     @Autowired(required = false)
@@ -213,17 +214,17 @@ public class CmdCollectService {
 
         Long now = SystemClock.now();
         Collection<CmdCollectDto> cmdCollectDtoList = onMessageEventHandlers.stream()
-            .map(OnMessageEventHandler::getCmd)
-            .map(c -> CmdCollectDto.builder().cmd(c).collectTime(now).build())
-            .collect(Collectors.toSet());
+                .map(OnMessageEventHandler::getCmd)
+                .map(c -> CmdCollectDto.builder().cmd(c).collectTime(now).build())
+                .collect(Collectors.toSet());
 
         List<CmdCollectDto> commands = cmdRedisService.findCommands(applicationName);
         if (CollUtil.isNotEmpty(commands)) {
             // 若 cmd 的收集时间超过了2天，说明已经没有实例使用该 cmd,应该删除
             long threeDaysAgo = LocalDateTimeUtil.toMilliseconds(LocalDateTimeUtil.now().minusDays(2));
             commands = commands.stream()
-                .filter(c -> c.getCollectTime() > threeDaysAgo)
-                .collect(Collectors.toList());
+                    .filter(c -> c.getCollectTime() > threeDaysAgo)
+                    .collect(Collectors.toList());
 
             cmdCollectDtoList.addAll(commands);
         }

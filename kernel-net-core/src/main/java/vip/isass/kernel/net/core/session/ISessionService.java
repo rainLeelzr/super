@@ -170,6 +170,7 @@
 package vip.isass.kernel.net.core.session;
 
 import cn.hutool.core.lang.Assert;
+import vip.isass.kernel.net.core.message.Message;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -409,4 +410,109 @@ public interface ISessionService {
 
     // endregion
 
+    // region message
+
+    /**
+     * 广播消息
+     *
+     * @param cmd     路由命令
+     * @param payload 消息内容
+     */
+    void broadcastMessage(String cmd, Object payload);
+
+    /**
+     * 发送消息给指定的用户
+     *
+     * @param cmd     路由命令
+     * @param payload 消息内容
+     * @param userId  用户 id
+     */
+    void sendMessageByUserId(String cmd, Object payload, String userId);
+
+    /**
+     * 发送消息给指定的用户集合
+     *
+     * @param cmd     路由命令
+     * @param payload 消息内容
+     * @param userIds 用户 id 集合
+     */
+    void sendMessageByUserIds(String cmd, Object payload, Collection<String> userIds);
+
+    /**
+     * 发送消息给已登录用户
+     *
+     * @param cmd     路由命令
+     * @param payload 消息内容
+     */
+    void sendMessageToLoginUsers(String cmd, Object payload);
+
+    /**
+     * 发送消息给拥有指定标签的用户
+     *
+     * @param cmd     路由命令
+     * @param payload 消息内容
+     * @param alias   标签
+     */
+    void sendMessageByAlias(String cmd, Object payload, String alias);
+
+    /**
+     * 发送消息给拥有指定标签的用户
+     *
+     * @param cmd     路由命令
+     * @param payload 消息内容
+     * @param aliases 标签集合
+     */
+    void sendMessageByAlias(String cmd, Object payload, Collection<String> aliases);
+
+    /**
+     * 发送消息给拥有任意指定标签的用户
+     *
+     * @param cmd     路由命令
+     * @param payload 消息内容
+     * @param aliases 标签集合
+     */
+    void sendMessageByAnyAlias(String cmd, Object payload, Collection<String> aliases);
+
+    /**
+     * 发送消息给拥有指定标签的用户
+     *
+     * @param cmd     路由命令
+     * @param payload 消息内容
+     * @param tag     标签
+     */
+    void sendMessageByTag(String cmd, Object payload, String tag);
+
+    /**
+     * 发送消息给拥有指定标签的用户
+     *
+     * @param cmd     路由命令
+     * @param payload 消息内容
+     * @param tags    标签集合
+     */
+    void sendMessageByTags(String cmd, Object payload, Collection<String> tags);
+
+    /**
+     * 发送消息给拥有任意指定标签的用户
+     *
+     * @param cmd     路由命令
+     * @param payload 消息内容
+     * @param tags    标签集合
+     */
+    void sendMessageByAnyTags(String cmd, Object payload, Collection<String> tags);
+
+    /**
+     * 发送消息给客户端
+     *
+     * @param message 消息
+     */
+    void sendMessage(Message message);
+
+    /**
+     * 发送消息给客户端
+     *
+     * @param messages 消息列表
+     */
+    void sendMessages(Collection<Message> messages);
+
+    // endregion
 }

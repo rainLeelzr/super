@@ -206,9 +206,6 @@ public class EventManager implements IEventManager {
     @Autowired
     private ISessionService sessionService;
 
-    @Autowired
-    private IMessageSender messageSender;
-
     @Autowired(required = false)
     private List<OnConnectEventHandler> onConnectEventHandlers;
 
@@ -357,7 +354,7 @@ public class EventManager implements IEventManager {
             return;
         }
 
-        messageSender.sendMessage(Message.builder()
+        sessionService.sendMessage(Message.builder()
                 .receiverSession(message.getSenderSession())
                 .receiverSessionId(message.getSenderSessionId())
                 .cmd(cmd)
