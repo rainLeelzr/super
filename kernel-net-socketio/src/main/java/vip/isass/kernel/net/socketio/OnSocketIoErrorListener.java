@@ -176,9 +176,9 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import vip.isass.kernel.net.core.handler.manager.EventManager;
 import vip.isass.kernel.net.core.message.MessageCmd;
 import vip.isass.kernel.net.core.session.Session;
-import vip.isass.kernel.net.core.handler.manager.EventManager;
 
 import java.util.List;
 
@@ -219,6 +219,12 @@ public class OnSocketIoErrorListener implements ExceptionListener {
 
     @Override
     public void onPingException(Exception e, SocketIOClient client) {
+        Session<?> session = socketioSessionService.getSessionById(client.getSessionId().toString());
+        eventManager.onError(session, e);
+    }
+
+    @Override
+    public void onPongException(Exception e, SocketIOClient client) {
         Session<?> session = socketioSessionService.getSessionById(client.getSessionId().toString());
         eventManager.onError(session, e);
     }

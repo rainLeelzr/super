@@ -260,8 +260,8 @@
         <mysql.version>8.0.33</mysql.version>
 
         <!-- net -->
-        <netty.version>4.1.76.Final</netty.version>
-        <netty-socketio.version>1.7.19</netty-socketio.version>
+        <netty.version>4.1.100.Final</netty.version>
+        <netty-socketio.version>2.0.6</netty-socketio.version>
         <protobuf-java.version>3.9.0</protobuf-java.version>
         <protobuf-java-format.version>1.2</protobuf-java-format.version>
 
