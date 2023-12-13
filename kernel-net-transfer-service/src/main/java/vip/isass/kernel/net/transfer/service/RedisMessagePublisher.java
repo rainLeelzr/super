@@ -176,7 +176,6 @@ import vip.isass.core.support.api.ApiOrder;
 import vip.isass.kernel.net.core.message.IMessageSender;
 import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.message.SenderType;
-import vip.isass.kernel.net.transfer.core.NetTransferRedisKeyConst;
 
 /**
  * 微服务推送消息给客户端的 redis 中转消息推送实现。

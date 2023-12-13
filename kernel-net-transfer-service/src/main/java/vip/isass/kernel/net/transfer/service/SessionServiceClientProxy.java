@@ -171,10 +171,10 @@ package vip.isass.kernel.net.transfer.service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import vip.isass.kernel.net.core.NetRedisKey;
 import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.session.ISessionService;
 import vip.isass.kernel.net.core.session.Session;
-import vip.isass.kernel.net.transfer.core.NetTransferRedisKeyConst;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Resource;
@@ -189,22 +189,22 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public void addSession(Session<?> session) {
-
+        throw new UnsupportedOperationException("net proxy client cannot add session");
     }
 
     @Override
     public Session<?> removeSession(String sessionId) {
-        return null;
+        throw new UnsupportedOperationException("net proxy client cannot remove session");
     }
 
     @Override
     public Session<?> getSessionById(String sessionId) {
-        return null;
+        throw new UnsupportedOperationException("net proxy client cannot get session");
     }
 
     @Override
     public Collection<Session<?>> getAllSessions() {
-        return null;
+        throw new UnsupportedOperationException("net proxy client cannot get session");
     }
 
     @Override
@@ -364,7 +364,7 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public void sendMessage(Message message) {
-        redisTemplate.convertAndSend(NetTransferRedisKeyConst.REDIS_PUBSUB_KEY, message);
+        redisTemplate.convertAndSend(NetRedisKey.REDIS_PUBSUB_KEY, message);
     }
 
     @Override

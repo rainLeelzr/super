@@ -193,7 +193,6 @@ import org.springframework.stereotype.Service;
 import vip.isass.core.cache.redis.RedisConfig;
 import vip.isass.kernel.net.core.handler.manager.IEventManager;
 import vip.isass.kernel.net.core.message.Message;
-import vip.isass.kernel.net.transfer.core.NetTransferRedisKeyConst;
 
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;

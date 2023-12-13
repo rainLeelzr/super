@@ -7,7 +7,7 @@ isass:
       # 网络模块公共配置
       # 网络通信模块总开关
       enabled: true
-`     # 默认通信协议：tcp(开发中)、websocket(开发中)、socketio(已实现)、mqtt(规划中)
+`     # 默认通信协议：tcp(已失效)、websocket(已失效)、socketio(已实现)、mqtt(未实现)
       protocol: socketio
       # 是否使用通信代理
       proxy: true

@@ -177,9 +177,9 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
-import vip.isass.kernel.net.core.message.Message;
-import vip.isass.kernel.net.transfer.core.NetTransferRedisKeyConst;
 import vip.isass.core.support.LocalDateTimeUtil;
+import vip.isass.kernel.net.core.NetRedisKey;
+import vip.isass.kernel.net.core.message.Message;
 
 import javax.annotation.Resource;
 import java.util.Collections;
@@ -212,11 +212,11 @@ public class RemoveEarlyMessageService {
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(luaScript, Long.class);
         String fiveMinuteAgo = LocalDateTimeUtil.localDateTimeToEpochMilli(LocalDateTimeUtil.now().minusMinutes(5)) + "";
         keys.forEach(k -> redisTemplate.execute(
-            redisScript,
-            RedisSerializer.string(),
-            (RedisSerializer<Long>) redisTemplate.getValueSerializer(),
-            Collections.singletonList(k),
-            fiveMinuteAgo));
+                redisScript,
+                RedisSerializer.string(),
+                (RedisSerializer<Long>) redisTemplate.getValueSerializer(),
+                Collections.singletonList(k),
+                fiveMinuteAgo));
     }
 
     public Set<String> scanKeys() {
@@ -224,10 +224,10 @@ public class RemoveEarlyMessageService {
         return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
             Set<String> keys = new HashSet<>();
             try (Cursor<byte[]> cursor = connection.scan(
-                new ScanOptions.ScanOptionsBuilder()
-                    .match(NetTransferRedisKeyConst.REDIS_STREAM_PREFIX_KEY.concat("*"))
-                    .count(1000)
-                    .build())) {
+                    new ScanOptions.ScanOptionsBuilder()
+                            .match(NetRedisKey.REDIS_STREAM_PREFIX_KEY.concat("*"))
+                            .count(1000)
+                            .build())) {
                 while (cursor.hasNext()) {
                     Object key = keySerializer.deserialize(cursor.next());
                     if (key != null) {
