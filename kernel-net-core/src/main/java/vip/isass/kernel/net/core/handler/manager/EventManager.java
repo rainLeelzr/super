@@ -182,7 +182,6 @@ import vip.isass.kernel.net.core.handler.OnConnectEventHandler;
 import vip.isass.kernel.net.core.handler.OnDisconnectEventHandler;
 import vip.isass.kernel.net.core.handler.OnErrorEventHandler;
 import vip.isass.kernel.net.core.handler.OnMessageEventHandler;
-import vip.isass.kernel.net.core.message.IMessageSender;
 import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.message.MessageCmd;
 import vip.isass.kernel.net.core.session.ISessionService;

@@ -166,53 +166,260 @@
  * Library.
  */
 
-package vip.isass.kernel.net.socketio;
+package vip.isass.kernel.net.proxy.client;
 
-import cn.hutool.core.net.NetUtil;
-import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
-import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+import vip.isass.kernel.net.core.NetRedisKey;
+import vip.isass.kernel.net.core.message.Message;
+import vip.isass.kernel.net.core.session.ISessionService;
+import vip.isass.kernel.net.core.session.Session;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.Collections;
 
-@Configuration
-@ConditionalOnProperty(name = "kernel.net.proxy.enabled", havingValue = "false", matchIfMissing = true)
-public class SocketIoLocalNodeAllocatorService implements INodeAllocatorService, InitializingBean {
+@Component
+@ConditionalOnProperty(name = "kernel.net.session.store", havingValue = "remote")
+public class SessionServiceClientProxy implements ISessionService {
 
     @Resource
-    private SocketIoConfiguration socketIoConfiguration;
-
-    @Value("${kernel.net.socketio.exposeUrl:}")
-    private String exposeUrl;
-
-    private String finallyExposeUrl;
-
-    @Getter
-    private final NetProtocol netProtocol = NetProtocol.socketio;
-
-    private NetServerInfo netServerInfo;
+    private RedisTemplate<String, ?> redisTemplate;
 
     @Override
-    public NetServerInfo allocate(String clientIp, String userId) {
-        return netServerInfo;
+    public void addSession(Session<?> session) {
+        throw new UnsupportedOperationException("net proxy client cannot add session");
     }
 
     @Override
-    public void afterPropertiesSet() {
-        if (StrUtil.isNotBlank(exposeUrl)) {
-            finallyExposeUrl = exposeUrl;
-            return;
-        }
+    public Session<?> removeSession(String sessionId) {
+        throw new UnsupportedOperationException("net proxy client cannot remove session");
+    }
 
-        int port = socketIoConfiguration.getPort();
-        String ip = NetUtil.getLocalhostStr();
-        finallyExposeUrl = "http://" + ip + ":" + port;
+    @Override
+    public Session<?> getSessionById(String sessionId) {
+        throw new UnsupportedOperationException("net proxy client cannot get session");
+    }
+
+    @Override
+    public Collection<Session<?>> getAllSessions() {
+        throw new UnsupportedOperationException("net proxy client cannot get session");
+    }
+
+    @Override
+    public String getUserId(String sessionId) {
+        return null;
+    }
+
+    @Override
+    public Collection<String> getSessionIdsByUserId(String userId) {
+        return null;
+    }
+
+    @Override
+    public void setUserId(String userId, String sessionId) {
+
+    }
+
+    @Override
+    public void removeUserId(String sessionId) {
+
+    }
+
+    @Override
+    public String getAlias(String sessionId) {
+        return null;
+    }
+
+    @Override
+    public void setAlias(String alias, String sessionId) {
+
+    }
+
+    @Override
+    public void addAlias(String alias, String sessionId) {
+
+    }
+
+    @Override
+    public void removeAlias(String sessionId) {
+
+    }
+
+    @Override
+    public Collection<String> getTags(String sessionId) {
+        return null;
+    }
+
+    @Override
+    public Collection<String> getTagsByUserId(String userId) {
+        return null;
+    }
+
+    @Override
+    public Collection<String> findSessions(Collection<String> tags) {
+        return null;
+    }
+
+    @Override
+    public Collection<String> findSessionsByAnyMatchTags(Collection<String> tags) {
+        return null;
+    }
+
+    @Override
+    public boolean containAnyTag(@Nonnull String sessionId, @Nonnull Collection<String> tags) {
+        return false;
+    }
+
+    @Override
+    public boolean containAllTags(String sessionId, Collection<String> tags) {
+        return false;
+    }
+
+    @Override
+    public void setTags(String sessionId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void setTagsByUserId(String userId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void addTags(String sessionId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void addTagsByUserId(String userId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void removeTags(String sessionId) {
+
+    }
+
+    @Override
+    public void removeTags(String sessionId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void removeTagsByUserId(String userId, Collection<String> tags) {
+
+    }
+
+    @Override
+    public void broadcastMessage(String cmd, Object payload) {
+        redisTemplate.convertAndSend(
+                NetRedisKey.REDIS_PUBSUB_KEY,
+                Message.builder()
+                        .cmd(cmd)
+                        .payload(payload)
+                        .build());
+    }
+
+    @Override
+    public void sendMessageByUserId(String cmd, Object payload, String userId) {
+        redisTemplate.convertAndSend(
+                NetRedisKey.REDIS_PUBSUB_KEY,
+                Message.builder()
+                        .cmd(cmd)
+                        .payload(payload)
+                        .userIds(Collections.singleton(userId))
+                        .build());
+    }
+
+    @Override
+    public void sendMessageByUserIds(String cmd, Object payload, Collection<String> userIds) {
+        redisTemplate.convertAndSend(
+                NetRedisKey.REDIS_PUBSUB_KEY,
+                Message.builder()
+                        .cmd(cmd)
+                        .payload(payload)
+                        .userIds(userIds)
+                        .build());
+    }
+
+    @Override
+    public void sendMessageToLoginUsers(String cmd, Object payload) {
+        redisTemplate.convertAndSend(
+                NetRedisKey.REDIS_PUBSUB_KEY,
+                Message.builder()
+                        .cmd(cmd)
+                        .payload(payload)
+                        .userIds(Collections.singleton("LoginUser"))
+                        .build());
+    }
+
+    @Override
+    public void sendMessageByAlias(String cmd, Object payload, String alias) {
+        redisTemplate.convertAndSend(
+                NetRedisKey.REDIS_PUBSUB_KEY,
+                Message.builder()
+                        .cmd(cmd)
+                        .payload(payload)
+                        .aliases(Collections.singleton(alias))
+                        .build());
+    }
+
+    @Override
+    public void sendMessageByAlias(String cmd, Object payload, Collection<String> aliases) {
+        redisTemplate.convertAndSend(
+                NetRedisKey.REDIS_PUBSUB_KEY,
+                Message.builder()
+                        .cmd(cmd)
+                        .payload(payload)
+                        .aliases(aliases)
+                        .build());
+    }
+
+    @Override
+    public void sendMessageByTag(String cmd, Object payload, String tag) {
+        redisTemplate.convertAndSend(
+                NetRedisKey.REDIS_PUBSUB_KEY,
+                Message.builder()
+                        .cmd(cmd)
+                        .payload(payload)
+                        .tags(Collections.singleton(tag))
+                        .build());
+    }
+
+    @Override
+    public void sendMessageByTags(String cmd, Object payload, Collection<String> tags) {
+        redisTemplate.convertAndSend(
+                NetRedisKey.REDIS_PUBSUB_KEY,
+                Message.builder()
+                        .cmd(cmd)
+                        .payload(payload)
+                        .tags(tags)
+                        .build());
+    }
+
+    @Override
+    public void sendMessageByAnyTags(String cmd, Object payload, Collection<String> tags) {
+        redisTemplate.convertAndSend(
+                NetRedisKey.REDIS_PUBSUB_KEY,
+                Message.builder()
+                        .cmd(cmd)
+                        .payload(payload)
+                        .tagsAny(tags)
+                        .build());
+    }
+
+    @Override
+    public void sendMessage(Message message) {
+        redisTemplate.convertAndSend(NetRedisKey.REDIS_PUBSUB_KEY, message);
+    }
+
+    @Override
+    public void sendMessages(Collection<Message> messages) {
+        for (Message message : messages) {
+            redisTemplate.convertAndSend(NetRedisKey.REDIS_PUBSUB_KEY, message);
+        }
     }
 }

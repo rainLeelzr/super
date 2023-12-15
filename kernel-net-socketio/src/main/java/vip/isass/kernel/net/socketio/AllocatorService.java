@@ -168,51 +168,53 @@
 
 package vip.isass.kernel.net.socketio;
 
-import cn.hutool.core.net.NetUtil;
+import cn.hutool.cache.Cache;
+import cn.hutool.cache.CacheUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import vip.isass.kernel.net.core.server.NetProtocol;
 import vip.isass.kernel.net.core.server.NetServerInfo;
 import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
 
-import javax.annotation.Resource;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-@Configuration
-@ConditionalOnProperty(name = "kernel.net.proxy.enabled", havingValue = "false", matchIfMissing = true)
-public class SocketIoLocalNodeAllocatorService implements INodeAllocatorService, InitializingBean {
+/**
+ * 节点分配器服务
+ */
+@Service
+public class AllocatorService {
 
-    @Resource
-    private SocketIoConfiguration socketIoConfiguration;
+    private INodeAllocatorService nodeAllocatorService;
 
-    @Value("${kernel.net.socketio.exposeUrl:}")
-    private String exposeUrl;
+    private static final Cache<NetServerInfo, String> SERVER_INFO_CACHE = CacheUtil.newTimedCache(TimeUnit.DAYS.toMillis(1));
 
-    private String finallyExposeUrl;
-
-    @Getter
-    private final NetProtocol netProtocol = NetProtocol.socketio;
-
-    private NetServerInfo netServerInfo;
-
-    @Override
-    public NetServerInfo allocate(String clientIp, String userId) {
-        return netServerInfo;
+    @Autowired
+    private void setNodeAllocatorService(List<INodeAllocatorService> nodeAllocatorServices) {
+        nodeAllocatorService = nodeAllocatorServices.stream()
+                .filter(s -> s.getNetProtocol() == NetProtocol.socketio)
+                .findAny()
+                .orElseThrow(() -> new RuntimeException("未找到socketio分配器bean，请检查程序"));
     }
 
-    @Override
-    public void afterPropertiesSet() {
-        if (StrUtil.isNotBlank(exposeUrl)) {
-            finallyExposeUrl = exposeUrl;
-            return;
-        }
-
-        int port = socketIoConfiguration.getPort();
-        String ip = NetUtil.getLocalhostStr();
-        finallyExposeUrl = "http://" + ip + ":" + port;
+    /**
+     * 分配节点
+     * <p>
+     * 优先根据用户 id 分配，其次客户端 ip
+     * </p>
+     *
+     * @param clientIp 客户端 ip
+     * @param userId   用户 id
+     * @return 分配到的节点
+     */
+    public String allocate(String clientIp, String userId) {
+        NetServerInfo info = nodeAllocatorService.allocate(clientIp, userId);
+        return SERVER_INFO_CACHE.get(
+                info,
+                () -> StrUtil.blankToDefault(
+                        info.getNetExternalUrl(),
+                        "http://" + info.getExternalIp() + ":" + info.getNetExternalPort()));
     }
+
 }

@@ -178,8 +178,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import vip.isass.kernel.net.core.handler.manager.EventManager;
 import vip.isass.kernel.net.core.message.MessageCmd;
+import vip.isass.kernel.net.core.session.ISessionService;
 import vip.isass.kernel.net.core.session.Session;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -194,38 +196,38 @@ public class OnSocketIoErrorListener implements ExceptionListener {
     @Autowired
     private EventManager eventManager;
 
-    @Autowired
-    private SocketioSessionService socketioSessionService;
+    @Resource
+    private ISessionService sessionService;
 
     @Override
     public void onEventException(Exception e, List<Object> args, SocketIOClient client) {
         log.error(e.getMessage(), e);
         Throwable unwrap = ExceptionUtil.unwrap(e);
-        Session<?> session = socketioSessionService.getSessionById(client.getSessionId().toString());
-        session.sendMessage(MessageCmd.ERROR, "发生异常：" + unwrap.getMessage());
+        log.warn("socketio event exception: {}", unwrap.getMessage());
+        client.sendEvent(MessageCmd.ERROR, "发生异常：" + unwrap.getMessage());
     }
 
     @Override
     public void onDisconnectException(Exception e, SocketIOClient client) {
-        Session<?> session = socketioSessionService.getSessionById(client.getSessionId().toString());
+        Session<?> session = sessionService.getSessionById(client.getSessionId().toString());
         eventManager.onError(session, e);
     }
 
     @Override
     public void onConnectException(Exception e, SocketIOClient client) {
-        Session<?> session = socketioSessionService.getSessionById(client.getSessionId().toString());
+        Session<?> session = sessionService.getSessionById(client.getSessionId().toString());
         eventManager.onError(session, e);
     }
 
     @Override
     public void onPingException(Exception e, SocketIOClient client) {
-        Session<?> session = socketioSessionService.getSessionById(client.getSessionId().toString());
+        Session<?> session = sessionService.getSessionById(client.getSessionId().toString());
         eventManager.onError(session, e);
     }
 
     @Override
     public void onPongException(Exception e, SocketIOClient client) {
-        Session<?> session = socketioSessionService.getSessionById(client.getSessionId().toString());
+        Session<?> session = sessionService.getSessionById(client.getSessionId().toString());
         eventManager.onError(session, e);
     }
 

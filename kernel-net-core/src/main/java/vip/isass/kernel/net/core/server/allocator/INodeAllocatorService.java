@@ -166,53 +166,18 @@
  * Library.
  */
 
-package vip.isass.kernel.net.socketio;
+package vip.isass.kernel.net.core.server.allocator;
 
-import cn.hutool.core.net.NetUtil;
-import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
 import vip.isass.kernel.net.core.server.NetProtocol;
 import vip.isass.kernel.net.core.server.NetServerInfo;
-import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
 
-import javax.annotation.Resource;
+/**
+ * 节点分配器
+ */
+public interface INodeAllocatorService {
 
-@Configuration
-@ConditionalOnProperty(name = "kernel.net.proxy.enabled", havingValue = "false", matchIfMissing = true)
-public class SocketIoLocalNodeAllocatorService implements INodeAllocatorService, InitializingBean {
+    NetServerInfo allocate(String clientIp, String userId);
 
-    @Resource
-    private SocketIoConfiguration socketIoConfiguration;
+    NetProtocol getNetProtocol();
 
-    @Value("${kernel.net.socketio.exposeUrl:}")
-    private String exposeUrl;
-
-    private String finallyExposeUrl;
-
-    @Getter
-    private final NetProtocol netProtocol = NetProtocol.socketio;
-
-    private NetServerInfo netServerInfo;
-
-    @Override
-    public NetServerInfo allocate(String clientIp, String userId) {
-        return netServerInfo;
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        if (StrUtil.isNotBlank(exposeUrl)) {
-            finallyExposeUrl = exposeUrl;
-            return;
-        }
-
-        int port = socketIoConfiguration.getPort();
-        String ip = NetUtil.getLocalhostStr();
-        finallyExposeUrl = "http://" + ip + ":" + port;
-    }
 }

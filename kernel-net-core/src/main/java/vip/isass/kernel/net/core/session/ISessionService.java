@@ -224,16 +224,6 @@ public interface ISessionService {
     Session<?> getSessionById(String sessionId);
 
     /**
-     * 是否存在指定 id 的会话
-     *
-     * @param sessionId 会话 id
-     * @return 是否存在会话
-     */
-    default boolean existSession(String sessionId) {
-        return getSessionById(sessionId) != null;
-    }
-
-    /**
      * 获取所有会话
      *
      * @return 会话集合
@@ -463,15 +453,6 @@ public interface ISessionService {
      * @param aliases 标签集合
      */
     void sendMessageByAlias(String cmd, Object payload, Collection<String> aliases);
-
-    /**
-     * 发送消息给拥有任意指定标签的用户
-     *
-     * @param cmd     路由命令
-     * @param payload 消息内容
-     * @param aliases 标签集合
-     */
-    void sendMessageByAnyAlias(String cmd, Object payload, Collection<String> aliases);
 
     /**
      * 发送消息给拥有指定标签的用户

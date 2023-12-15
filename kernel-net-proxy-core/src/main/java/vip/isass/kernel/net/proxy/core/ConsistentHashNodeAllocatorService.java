@@ -166,53 +166,129 @@
  * Library.
  */
 
-package vip.isass.kernel.net.socketio;
+package vip.isass.kernel.net.proxy.core;
 
-import cn.hutool.core.net.NetUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.ConsistentHash;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.InitializingBean;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.scheduling.annotation.Scheduled;
 import vip.isass.kernel.net.core.server.NetProtocol;
 import vip.isass.kernel.net.core.server.NetServerInfo;
 import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-@Configuration
-@ConditionalOnProperty(name = "kernel.net.proxy.enabled", havingValue = "false", matchIfMissing = true)
-public class SocketIoLocalNodeAllocatorService implements INodeAllocatorService, InitializingBean {
+/**
+ * 一致性 hash 算法的实例存储，在使用网关代理时，需要用到此算法分配网关节点给客户端连接
+ */
+@Slf4j
+public class ConsistentHashNodeAllocatorService implements INodeAllocatorService {
 
-    @Resource
-    private SocketIoConfiguration socketIoConfiguration;
+    /**
+     * 总节点数量不低于，非实际总节点数。
+     * <p>
+     * 在虚拟节点数没配置或为 -1 的情况下，会根据实际物理节点数和总节点数，算出一个不低于总节点数的虚拟节点数。总节点数量会保持在这个数量之上
+     * </p>
+     */
+    @Value("${kernel.net.consistentHash.totalNodeAbove:1000}")
+    private int totalNodeAbove = 1000;
 
-    @Value("${kernel.net.socketio.exposeUrl:}")
-    private String exposeUrl;
-
-    private String finallyExposeUrl;
+    /**
+     * 每个物理节点对应的虚拟节点数量
+     */
+    @Value("${kernel.net.consistentHash.virtualNodeCount:-1}")
+    private int virtualNodeCount = -1;
 
     @Getter
-    private final NetProtocol netProtocol = NetProtocol.socketio;
+    private final NetProtocol netProtocol;
 
-    private NetServerInfo netServerInfo;
+    public ConsistentHashNodeAllocatorService(NetProtocol netProtocol) {
+        this.netProtocol = netProtocol;
+    }
 
-    @Override
+    @Resource
+    private DiscoveryClient discoveryClient;
+
+    private Map<String, NetServerInfo> serviceInstanceMap = new HashMap<>();
+
+    private ConsistentHash<String> hashServer;
+
     public NetServerInfo allocate(String clientIp, String userId) {
+        Assert.isTrue(hashServer != null, () -> new RuntimeException("未查询到可用节点，请稍后再试"));
+        Assert.isFalse(StrUtil.isAllBlank(clientIp, userId), "clientIp, userId 必填其一");
+        String instanceKey = StrUtil.isBlank(userId)
+                ? hashServer.get(clientIp)
+                : hashServer.get(userId);
+        NetServerInfo netServerInfo = serviceInstanceMap.get(instanceKey);
+        if (netServerInfo == null) {
+            throw new RuntimeException("节点分配失败，请稍后再试");
+        }
         return netServerInfo;
     }
 
-    @Override
-    public void afterPropertiesSet() {
-        if (StrUtil.isNotBlank(exposeUrl)) {
-            finallyExposeUrl = exposeUrl;
-            return;
+    /**
+     * 每隔 10s 刷新一次节点
+     */
+    @Scheduled(fixedDelay = 10 * 1000)
+    public void refreshNode() {
+        List<ServiceInstance> instances = discoveryClient.getInstances(netProtocol.getServiceName());
+        Map<String, NetServerInfo> infoMap = new HashMap<>();
+        for (ServiceInstance instance : instances) {
+            Map<String, String> metadata = instance.getMetadata();
+            NetServerInfo serverInfo = NetServerInfo.builder()
+                    .netProtocol(netProtocol)
+                    .externalIp(metadata.get("externalIp"))
+                    .internalIp(instance.getHost())
+                    .httpPort(instance.getPort())
+                    .httpSecure(instance.isSecure())
+                    .netExternalPort(MapUtil.getInt(metadata, "netExternalPort"))
+                    .netExternalUrl(metadata.get("netExternalUrl"))
+                    .build();
+            if (StrUtil.isBlank(serverInfo.getExternalIp())) {
+                serverInfo.setExternalIp(serverInfo.getInternalIp());
+            }
+            infoMap.put(serverInfo.getExternalIp() + ":" + serverInfo.getNetExternalPort() + ":" + serverInfo.getNetExternalUrl(), serverInfo);
         }
 
-        int port = socketIoConfiguration.getPort();
-        String ip = NetUtil.getLocalhostStr();
-        finallyExposeUrl = "http://" + ip + ":" + port;
+        if (checkModify(infoMap)) {
+            this.serviceInstanceMap = infoMap;
+            int numberOfReplicas = calculateNumberOfReplicas(totalNodeAbove, virtualNodeCount, serviceInstanceMap.size());
+            hashServer = new ConsistentHash<>(numberOfReplicas, this.serviceInstanceMap.keySet());
+        }
+    }
+
+    private boolean checkModify(Map<String, NetServerInfo> infoMap) {
+        if (infoMap.size() != serviceInstanceMap.size()) {
+            return true;
+        }
+        for (Map.Entry<String, NetServerInfo> entry : infoMap.entrySet()) {
+            if (!serviceInstanceMap.containsKey(entry.getKey())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static int calculateNumberOfReplicas(int totalNodeAbove, int virtualNodeCount, int nodeSize) {
+        return virtualNodeCount >= 0
+                ? ++virtualNodeCount
+                : new BigDecimal(totalNodeAbove)
+                .divide(new BigDecimal(nodeSize), RoundingMode.CEILING)
+                .intValue();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(calculateNumberOfReplicas(100, 0, 3));
     }
 }

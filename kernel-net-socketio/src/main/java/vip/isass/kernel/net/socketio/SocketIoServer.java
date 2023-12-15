@@ -174,6 +174,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import vip.isass.kernel.net.core.server.NetProtocol;
 import vip.isass.kernel.net.core.server.Server;
 
 /**
@@ -204,6 +205,11 @@ public class SocketIoServer implements Server {
         if (socketIoServer != null) {
             socketIoServer.stop();
         }
+    }
+
+    @Override
+    public NetProtocol netProtocol() {
+        return NetProtocol.socketio;
     }
 
 }

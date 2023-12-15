@@ -228,19 +228,14 @@ public class Message {
     private Object payload;
 
     /**
-     * 消息体二进制数组，如果此字段不为空，则发送 payload 的内容
-     */
-    private byte[] payloadBytes;
-
-    /**
      * 用户 id，如果值等于"LoginUser"，则发送给所有已登录用户，如果等于"UnLoginUser"，则发给所有未登录用户
      */
-    private String userId;
+    private Collection<String> userIds;
 
     /**
      * 别名
      */
-    private String alias;
+    private Collection<String> aliases;
 
     /**
      * 标签列表，并且关系

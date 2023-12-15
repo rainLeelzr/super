@@ -193,4 +193,6 @@ public interface Server {
      */
     void stop();
 
+    NetProtocol netProtocol();
+
 }

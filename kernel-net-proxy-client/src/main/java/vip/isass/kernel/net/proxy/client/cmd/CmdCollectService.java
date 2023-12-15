@@ -167,62 +167,75 @@
  *
  */
 
-package vip.isass.kernel.net.core.server;
+package vip.isass.kernel.net.proxy.client.cmd;
 
+import cn.hutool.core.collection.CollUtil;
+import com.baomidou.lock.annotation.Lock4j;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import vip.isass.core.support.LocalDateTimeUtil;
+import vip.isass.core.support.SystemClock;
+import vip.isass.kernel.net.core.handler.OnMessageEventHandler;
+import vip.isass.kernel.net.core.message.CmdCollectDto;
+import vip.isass.kernel.net.proxy.core.CmdRedisService;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * 服务端启动管理器
+ * cmd 收集服务
+ * 扫描本微服务的 onMessageEventHandler 集合，收集 cmd，保存到 redis
  *
  * @author rain
  */
 @Slf4j
-@Configuration
-@ConditionalOnBean(Server.class)
-public class ServerStartupManager implements SmartLifecycle {
-
-    private static boolean IS_RUNNING = false;
+@Component
+public class CmdCollectService {
 
     @Resource
-    private List<Server> servers;
+    private CmdRedisService cmdRedisService;
 
-    @Override
-    public void start() {
-        if (IS_RUNNING || servers == null) {
+    @Autowired(required = false)
+    private List<OnMessageEventHandler<?>> onMessageEventHandlers;
+
+    @Value("${spring.application.name:}")
+    private String applicationName;
+
+    @Lock4j(name = "CmdCollectService:", keys = "#applicationName", acquireTimeout = 10_000, expire = 30_000)
+    public void collect(List<OnMessageEventHandler<?>> onMessageEventHandlers, String applicationName) {
+        if (applicationName.isEmpty()) {
+            log.error("未配置spring.application.name，net 模块 cmd 收集服务无法执行");
             return;
         }
 
-        servers.forEach(s -> {
-            log.info("正在启动 net 模块[{}] 监听地址[{}]", s.getClass().getSimpleName(), s.getListeningAddress());
-            s.start();
-        });
+        Long now = SystemClock.now();
+        Collection<CmdCollectDto> cmdCollectDtoList = onMessageEventHandlers.stream()
+                .map(OnMessageEventHandler::getCmd)
+                .map(c -> CmdCollectDto.builder().cmd(c).collectTime(now).build())
+                .collect(Collectors.toSet());
 
-        IS_RUNNING = true;
-    }
+        List<CmdCollectDto> commands = cmdRedisService.findCommands(applicationName);
+        if (CollUtil.isNotEmpty(commands)) {
+            // 若 cmd 的收集时间超过了2天，说明已经没有实例使用该 cmd,应该删除
+            long threeDaysAgo = LocalDateTimeUtil.toMilliseconds(LocalDateTimeUtil.now().minusDays(2));
+            commands = commands.stream()
+                    .filter(c -> c.getCollectTime() > threeDaysAgo)
+                    .collect(Collectors.toList());
 
-    @Override
-    public void stop() {
-        if (servers == null) {
-            return;
+            cmdCollectDtoList.addAll(commands);
         }
 
-        servers.forEach(s -> {
-            log.info("正在关闭 net 模块[{}]", s.getClass().getSimpleName());
-            s.stop();
-        });
-
-        IS_RUNNING = false;
+        cmdRedisService.put(applicationName, cmdCollectDtoList);
     }
 
-    @Override
-    public boolean isRunning() {
-        return IS_RUNNING;
+    public void collect() {
+        if (onMessageEventHandlers == null) {
+            return;
+        }
+        collect(onMessageEventHandlers, applicationName);
     }
-
 }

@@ -176,6 +176,7 @@ import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.store.RedissonStoreFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RRemoteService;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -212,7 +213,6 @@ public class SocketIoAutoConfiguration {
         config.setMaxFramePayloadLength(socketIoConfiguration.getMaxFramePayloadLength());
         config.setBossThreads(1);
         config.setExceptionListener(onErrorListener);
-        config.setStoreFactory(new RedissonStoreFactory(redissonClient));
 
         SocketConfig sockConfig = new SocketConfig();
         // 解决SOCKET服务端重启"Address already in use"异常

@@ -168,51 +168,36 @@
 
 package vip.isass.kernel.net.socketio;
 
-import cn.hutool.core.net.NetUtil;
-import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
-import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
+import cn.hutool.extra.servlet.ServletUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import vip.isass.core.login.LoginUser;
+import vip.isass.core.login.LoginUserUtil;
+import vip.isass.core.web.Resp;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
-@Configuration
-@ConditionalOnProperty(name = "kernel.net.proxy.enabled", havingValue = "false", matchIfMissing = true)
-public class SocketIoLocalNodeAllocatorService implements INodeAllocatorService, InitializingBean {
+@RestController
+@Api(tags = "节点分配器")
+@RequestMapping("/${spring.application.name}/allocator")
+public class AllocatorController {
 
     @Resource
-    private SocketIoConfiguration socketIoConfiguration;
+    private AllocatorService allocatorService;
 
-    @Value("${kernel.net.socketio.exposeUrl:}")
-    private String exposeUrl;
-
-    private String finallyExposeUrl;
-
-    @Getter
-    private final NetProtocol netProtocol = NetProtocol.socketio;
-
-    private NetServerInfo netServerInfo;
-
-    @Override
-    public NetServerInfo allocate(String clientIp, String userId) {
-        return netServerInfo;
+    @ApiOperation(value = "分配节点", notes = "优先根据用户 id 分配，其次客户端 ip")
+    @GetMapping("/node")
+    public Resp<String> allocate(HttpServletRequest request) {
+        String userId = Optional.ofNullable(LoginUserUtil.getLoginUser())
+                .map(LoginUser::getUserId)
+                .orElse(null);
+        String clientIp = userId == null ? ServletUtil.getClientIP(request) : null;
+        return Resp.bizSuccess(allocatorService.allocate(clientIp, userId));
     }
 
-    @Override
-    public void afterPropertiesSet() {
-        if (StrUtil.isNotBlank(exposeUrl)) {
-            finallyExposeUrl = exposeUrl;
-            return;
-        }
-
-        int port = socketIoConfiguration.getPort();
-        String ip = NetUtil.getLocalhostStr();
-        finallyExposeUrl = "http://" + ip + ":" + port;
-    }
 }

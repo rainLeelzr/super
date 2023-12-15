@@ -166,53 +166,39 @@
  * Library.
  */
 
-package vip.isass.kernel.net.socketio;
+package vip.isass.kernel.net.core.session;
 
-import cn.hutool.core.net.NetUtil;
-import cn.hutool.core.util.StrUtil;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
-import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-import javax.annotation.Resource;
+import java.util.List;
 
-@Configuration
-@ConditionalOnProperty(name = "kernel.net.proxy.enabled", havingValue = "false", matchIfMissing = true)
-public class SocketIoLocalNodeAllocatorService implements INodeAllocatorService, InitializingBean {
+@Getter
+@Setter
+@ToString
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SessionInfoChangeReq {
 
-    @Resource
-    private SocketIoConfiguration socketIoConfiguration;
+    private String sessionId;
 
-    @Value("${kernel.net.socketio.exposeUrl:}")
-    private String exposeUrl;
+    private String resetUserId;
 
-    private String finallyExposeUrl;
+    private List<String> addAliases;
 
-    @Getter
-    private final NetProtocol netProtocol = NetProtocol.socketio;
+    private List<String> resetAliases;
 
-    private NetServerInfo netServerInfo;
+    private List<String> removeAliases;
 
-    @Override
-    public NetServerInfo allocate(String clientIp, String userId) {
-        return netServerInfo;
-    }
+    private List<String> addTags;
 
-    @Override
-    public void afterPropertiesSet() {
-        if (StrUtil.isNotBlank(exposeUrl)) {
-            finallyExposeUrl = exposeUrl;
-            return;
-        }
+    private List<String> resetTags;
 
-        int port = socketIoConfiguration.getPort();
-        String ip = NetUtil.getLocalhostStr();
-        finallyExposeUrl = "http://" + ip + ":" + port;
-    }
+    private List<String> removeTags;
+
 }

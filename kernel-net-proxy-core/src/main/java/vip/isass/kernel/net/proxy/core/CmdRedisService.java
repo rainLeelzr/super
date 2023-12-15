@@ -167,62 +167,54 @@
  *
  */
 
-package vip.isass.kernel.net.core.server;
+package vip.isass.kernel.net.proxy.core;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import vip.isass.core.support.JsonUtil;
+import vip.isass.kernel.net.core.NetRedisKey;
+import vip.isass.kernel.net.core.message.CmdCollectDto;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
- * 服务端启动管理器
+ * 路由命令 redis 服务
  *
  * @author rain
  */
 @Slf4j
-@Configuration
-@ConditionalOnBean(Server.class)
-public class ServerStartupManager implements SmartLifecycle {
-
-    private static boolean IS_RUNNING = false;
+@Service
+public class CmdRedisService {
 
     @Resource
-    private List<Server> servers;
+    private RedisTemplate<String, Object> redisTemplate;
 
-    @Override
-    public void start() {
-        if (IS_RUNNING || servers == null) {
-            return;
-        }
+    private static final TypeReference<Map<String, List<CmdCollectDto>>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, List<CmdCollectDto>>>() {
+    };
 
-        servers.forEach(s -> {
-            log.info("正在启动 net 模块[{}] 监听地址[{}]", s.getClass().getSimpleName(), s.getListeningAddress());
-            s.start();
-        });
+    private static final TypeReference<List<CmdCollectDto>> LIST_TYPE_REFERENCE = new TypeReference<List<CmdCollectDto>>() {
+    };
 
-        IS_RUNNING = true;
+    public Map<String, List<CmdCollectDto>> findCommands() {
+        Map<String, List<Object>> map = redisTemplate.<String, List<Object>>opsForHash().entries(NetRedisKey.CMD_COLLECT_KEY);
+        return JsonUtil.DEFAULT_INSTANCE.convertValue(map, MAP_TYPE_REFERENCE);
     }
 
-    @Override
-    public void stop() {
-        if (servers == null) {
-            return;
-        }
-
-        servers.forEach(s -> {
-            log.info("正在关闭 net 模块[{}]", s.getClass().getSimpleName());
-            s.stop();
-        });
-
-        IS_RUNNING = false;
+    public List<CmdCollectDto> findCommands(String applicationName) {
+        List<Object> list = redisTemplate.<String, List<Object>>opsForHash().get(NetRedisKey.CMD_COLLECT_KEY, applicationName);
+        return JsonUtil.DEFAULT_INSTANCE.convertValue(list, LIST_TYPE_REFERENCE);
     }
 
-    @Override
-    public boolean isRunning() {
-        return IS_RUNNING;
+    public void put(String applicationName, Collection<CmdCollectDto> cmdRegisters) {
+        redisTemplate.opsForHash().put(NetRedisKey.CMD_COLLECT_KEY, applicationName, cmdRegisters);
+        redisTemplate.expire(NetRedisKey.CMD_COLLECT_KEY, 2, TimeUnit.DAYS);
     }
 
 }

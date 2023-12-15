@@ -195,7 +195,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "isass.core.net.proxy", havingValue = "false")
+@ConditionalOnProperty(name = "kernel.net.session.store", havingValue = "local")
 public class LocalSessionService implements ISessionService {
 
     // region sessionId 和 session 关系
@@ -458,13 +458,6 @@ public class LocalSessionService implements ISessionService {
 
     @Override
     public void sendMessageByAlias(String cmd, Object payload, Collection<String> aliases) {
-        for (String alias : aliases) {
-            sendMessageByAlias(cmd, payload, alias);
-        }
-    }
-
-    @Override
-    public void sendMessageByAnyAlias(String cmd, Object payload, Collection<String> aliases) {
         Set<String> sentSessionIds = new HashSet<>();
         for (String alias : aliases) {
             Collection<String> sessionIds = aliasAndSessionMap.get(alias);
@@ -545,17 +538,27 @@ public class LocalSessionService implements ISessionService {
 
         // 2：判断 userId
         boolean modifiable = false;
-        Set<String> finalSessionIds = Collections.emptySet();
-        if (StrUtil.isNotBlank(message.getUserId())) {
-            Collection<String> sessionIdsFromUserId = userAndSessionMap.get(message.getUserId());
-            if (CollUtil.isEmpty(sessionIdsFromUserId)) {
-                return;
+        Set<String> finalSessionIds = null;
+        if (CollUtil.isNotEmpty(message.getUserIds())) {
+            for (String userId : message.getUserIds()) {
+                Collection<String> sessionIdsFromUserId = userAndSessionMap.get(userId);
+                if (CollUtil.isEmpty(sessionIdsFromUserId)) {
+                    continue;
+                }
+                if (finalSessionIds == null) {
+                    if (sessionIdsFromUserId instanceof Set) {
+                        finalSessionIds = (Set<String>) sessionIdsFromUserId;
+                    } else {
+                        finalSessionIds = new HashSet<>(sessionIdsFromUserId);
+                        modifiable = true;
+                    }
+                } else {
+                    finalSessionIds.addAll(sessionIdsFromUserId);
+                }
             }
-            if (sessionIdsFromUserId instanceof Set) {
-                finalSessionIds = (Set<String>) sessionIdsFromUserId;
-            } else {
-                finalSessionIds = new HashSet<>(sessionIdsFromUserId);
-                modifiable = true;
+
+            if (finalSessionIds == null) {
+                return;
             }
         }
 
@@ -665,7 +668,6 @@ public class LocalSessionService implements ISessionService {
         finalSessionIds.parallelStream()
                 .map(sessionMap::get)
                 .forEach(s -> s.sendMessage(message.getCmd(), message.getPayload()));
-
     }
 
     @Override

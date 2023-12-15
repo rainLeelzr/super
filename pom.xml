@@ -211,9 +211,8 @@
         <module>kernel-net-core</module>
         <module>kernel-net-netty</module>
         <module>kernel-net-socketio</module>
-        <module>kernel-net-transfer-core</module>
-        <module>kernel-net-transfer-gateway</module>
-        <module>kernel-net-transfer-service</module>
+        <module>kernel-net-proxy-core</module>
+        <module>kernel-net-proxy-client</module>
         <module>super-core-protobuf</module>
         <module>super-core-elasticsearch</module>
         <module>super-core-encryption</module>
@@ -522,19 +521,13 @@
 
             <dependency>
                 <groupId>vip.isass</groupId>
-                <artifactId>kernel-net-transfer-core</artifactId>
+                <artifactId>kernel-net-proxy-core</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
-                <artifactId>kernel-net-transfer-gateway</artifactId>
-                <version>${super-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>vip.isass</groupId>
-                <artifactId>kernel-net-transfer-service</artifactId>
+                <artifactId>kernel-net-proxy-client</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
