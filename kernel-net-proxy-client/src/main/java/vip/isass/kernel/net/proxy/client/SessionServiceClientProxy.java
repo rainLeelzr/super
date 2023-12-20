@@ -205,7 +205,11 @@ public class SessionServiceClientProxy implements ISessionService {
 
     private static final TypeReference<Resp<String>> STRING_RESP_TYPE_REF = new TypeReference<Resp<String>>() {
     };
+
     private static final TypeReference<Resp<Collection<String>>> COLL_STRING_RESP_TYPE_REF = new TypeReference<Resp<Collection<String>>>() {
+    };
+
+    private static final TypeReference<Resp<Boolean>> BOOLEAN_RESP_TYPE_REF = new TypeReference<Resp<Boolean>>() {
     };
 
     static {
@@ -295,7 +299,14 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public String getAlias(String sessionId) {
-        return null;
+        String urlTemplate = "http://192.168.137.146:20170/{serverName}/{sessionId}/alias";
+        Resp<String> resp = OkHttpUtil.get(
+                urlTemplate,
+                new String[]{"socketio-service", sessionId},
+                null,
+                STRING_RESP_TYPE_REF);
+
+        return resp.dataIfSuccessOrException();
     }
 
     @Override
@@ -316,32 +327,80 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public Collection<String> getTags(String sessionId) {
-        return null;
+        String urlTemplate = "http://192.168.137.146:20170/{serverName}/{sessionId}/tags";
+        Resp<Collection<String>> resp = OkHttpUtil.get(
+                urlTemplate,
+                new String[]{"socketio-service", sessionId},
+                null,
+                COLL_STRING_RESP_TYPE_REF);
+
+        return resp.dataIfSuccessOrException();
     }
 
     @Override
     public Collection<String> getTagsByUserId(String userId) {
-        return null;
+        String urlTemplate = "http://192.168.137.146:20170/{serverName}/tags/{userId}";
+        Resp<Collection<String>> resp = OkHttpUtil.get(
+                urlTemplate,
+                new String[]{"socketio-service", userId},
+                null,
+                COLL_STRING_RESP_TYPE_REF);
+
+        return resp.dataIfSuccessOrException();
     }
 
     @Override
     public Collection<String> findSessions(Collection<String> tags) {
-        return null;
+        String urlTemplate = "http://192.168.137.146:20170/{serverName}/ids";
+        Resp<Collection<String>> resp = OkHttpUtil.get(
+                urlTemplate,
+                new String[]{"socketio-service"},
+                MapUtil.<String, Collection<String>>builder()
+                        .put("tags", Collections.singleton("t1"))
+                        .build(),
+                COLL_STRING_RESP_TYPE_REF);
+
+        return resp.dataIfSuccessOrException();
     }
 
     @Override
     public Collection<String> findSessionsByAnyMatchTags(Collection<String> tags) {
-        return null;
+        String urlTemplate = "http://192.168.137.146:20170/{serverName}/ids/any";
+        Resp<Collection<String>> resp = OkHttpUtil.get(
+                urlTemplate,
+                new String[]{"socketio-service"},
+                MapUtil.<String, Collection<String>>builder()
+                        .put("tags", Collections.singleton("t1"))
+                        .build(),
+                COLL_STRING_RESP_TYPE_REF);
+        return resp.dataIfSuccessOrException();
     }
 
     @Override
     public boolean containAnyTag(@Nonnull String sessionId, @Nonnull Collection<String> tags) {
-        return true;
+        String urlTemplate = "http://192.168.137.146:20170/{serverName}/{sessionId}/containAnyTag";
+        Resp<Boolean> resp = OkHttpUtil.get(
+                urlTemplate,
+                new String[]{"socketio-service", sessionId},
+                MapUtil.<String, Collection<String>>builder()
+                        .put("tags", Collections.singleton("t1"))
+                        .build(),
+                BOOLEAN_RESP_TYPE_REF);
+
+        return resp.dataIfSuccessOrException();
     }
 
     @Override
     public boolean containAllTags(String sessionId, Collection<String> tags) {
-        return true;
+        String urlTemplate = "http://192.168.137.146:20170/{serverName}/{sessionId}/containTags";
+        Resp<Boolean> resp = OkHttpUtil.get(
+                urlTemplate,
+                new String[]{"socketio-service", sessionId},
+                MapUtil.<String, Collection<String>>builder()
+                        .put("tags", Collections.singleton("t1"))
+                        .build(),
+                BOOLEAN_RESP_TYPE_REF);
+        return resp.dataIfSuccessOrException();
     }
 
     @Override
