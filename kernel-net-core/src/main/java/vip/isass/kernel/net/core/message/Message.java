@@ -169,6 +169,7 @@
 
 package vip.isass.kernel.net.core.message;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -204,6 +205,7 @@ public class Message {
     /**
      * 发送方的会话会话
      */
+    @JsonIgnore
     private transient Session<?> senderSession;
 
     /**

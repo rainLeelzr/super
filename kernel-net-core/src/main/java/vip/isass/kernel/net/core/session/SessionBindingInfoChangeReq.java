@@ -166,140 +166,75 @@
  * Library.
  */
 
-package vip.isass.kernel.net.proxy.core;
+package vip.isass.kernel.net.core.session;
 
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.lang.ConsistentHash;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.StrUtil;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.scheduling.annotation.Scheduled;
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
-import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 
-/**
- * 一致性 hash 算法的实例存储，在使用网关代理时，需要用到此算法分配网关节点给客户端连接
- */
-@Slf4j
-public class ConsistentHashNodeAllocatorService implements INodeAllocatorService {
+@Getter
+@Setter
+@ToString
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SessionBindingInfoChangeReq {
 
     /**
-     * 总节点数量不低于，非实际总节点数。
-     * <p>
-     * 在虚拟节点数没配置或为 -1 的情况下，会根据实际物理节点数和总节点数，算出一个不低于总节点数的虚拟节点数。总节点数量会保持在这个数量之上
-     * </p>
+     * 根据 sessionId 修改信息。sessionId(优先)、userId 二选一
      */
-    @Value("${kernel.net.consistentHash.totalNodeAbove:1000}")
-    private int totalNodeAbove = 1000;
+    private String sessionId;
 
     /**
-     * 每个物理节点对应的虚拟节点数量
+     * 根据 userId 修改信息
      */
-    @Value("${kernel.net.consistentHash.virtualNodeCount:-1}")
-    private int virtualNodeCount = -1;
-
-    @Getter
-    private final NetProtocol netProtocol;
-
-    public ConsistentHashNodeAllocatorService(NetProtocol netProtocol) {
-        this.netProtocol = netProtocol;
-    }
-
-    @Resource
-    private DiscoveryClient discoveryClient;
-
-    private Map<String, NetServerInfo> serviceInstanceMap = new HashMap<>();
-
-    private ConsistentHash<String> hashServer;
-
-    public NetServerInfo allocate(String clientIp, String userId) {
-        Assert.isTrue(hashServer != null, () -> new RuntimeException("未查询到可用节点，请稍后再试"));
-        Assert.isFalse(StrUtil.isAllBlank(clientIp, userId), "clientIp, userId 必填其一");
-        String instanceKey = StrUtil.isBlank(userId)
-                ? hashServer.get(clientIp)
-                : hashServer.get(userId);
-        NetServerInfo netServerInfo = serviceInstanceMap.get(instanceKey);
-        if (netServerInfo == null) {
-            throw new RuntimeException("节点分配失败，请稍后再试");
-        }
-        return netServerInfo;
-    }
+    private String userId;
 
     /**
-     * 每隔 10s 刷新一次节点
+     * 重新设置会话绑定的用户，resetUserId(优先)、removeUserIdFlag 二选一
+     * resetUserId 只能用在根据 sessionId 修改信息的情况
      */
-    @Scheduled(fixedDelay = 10 * 1000)
-    public void refreshNode() {
-        List<ServiceInstance> instances = discoveryClient.getInstances(netProtocol.getServiceName());
-        Map<String, NetServerInfo> infoMap = new HashMap<>();
-        for (ServiceInstance instance : instances) {
-            Map<String, String> metadata = instance.getMetadata();
-            NetServerInfo serverInfo = NetServerInfo.builder()
-                    .netProtocol(netProtocol)
-                    .externalIp(metadata.get("externalIp"))
-                    .internalIp(instance.getHost())
-                    .httpPort(instance.getPort())
-                    .httpSecure(instance.isSecure())
-                    .netExternalPort(MapUtil.getInt(metadata, "netExternalPort"))
-                    .netExternalUrl(metadata.get("netExternalUrl"))
-                    .build();
-            if (StrUtil.isBlank(serverInfo.getExternalIp())) {
-                serverInfo.setExternalIp(serverInfo.getInternalIp());
-            }
-            String key = StrUtil.isBlank(serverInfo.getNetExternalUrl())
-                    ? serverInfo.getExternalIp() + ":" + serverInfo.getNetExternalPort()
-                    : serverInfo.getNetExternalUrl();
-            infoMap.put(key, serverInfo);
-        }
-
-        if (checkModify(infoMap)) {
-            this.serviceInstanceMap = infoMap;
-            int numberOfReplicas = calculateNumberOfReplicas(totalNodeAbove, virtualNodeCount, serviceInstanceMap.size());
-            hashServer = new ConsistentHash<>(numberOfReplicas, this.serviceInstanceMap.keySet());
-        }
-    }
+    private String resetUserId;
 
     /**
-     * 检查服务节点是否有变更
-     *
-     * @param latestNodeMap 最新的节点
-     * @return 是否有变更
+     * 移除会话绑定的用户
      */
-    private boolean checkModify(Map<String, NetServerInfo> latestNodeMap) {
-        if (latestNodeMap.size() != serviceInstanceMap.size()) {
-            return true;
-        }
-        for (Map.Entry<String, NetServerInfo> entry : latestNodeMap.entrySet()) {
-            if (!serviceInstanceMap.containsKey(entry.getKey())) {
-                return true;
-            }
-        }
-        return false;
-    }
+    private Boolean removeUserId;
 
-    private static int calculateNumberOfReplicas(int totalNodeAbove, int virtualNodeCount, int nodeSize) {
-        return nodeSize == 0
-                ? 0
-                : virtualNodeCount >= 0
-                ? ++virtualNodeCount
-                : new BigDecimal(totalNodeAbove)
-                .divide(new BigDecimal(nodeSize), RoundingMode.CEILING)
-                .intValue();
-    }
+    /**
+     * 重新设置会话绑定的别名，resetAlias(优先)、removeAlias 二选一
+     * resetAlias 只能用在根据 sessionId 修改信息的情况
+     */
+    private String alias;
 
-    public static void main(String[] args) {
-        System.out.println(calculateNumberOfReplicas(100, 0, 3));
-    }
+    /**
+     * 移除会话绑定的别名
+     * removeAlias 只能用在根据 sessionId 修改信息的情况
+     */
+    private Boolean removeAlias;
+
+    /**
+     * 重新设置会话绑定的标签，resetTags(优先)、removeAllTags 二选一
+     * resetAlias 只能用在根据 sessionId 修改信息的情况
+     */
+    private Collection<String> tags;
+
+    private Boolean removeAllTags;
+
+    /**
+     * 添加标签，resetTags、removeAllTags 为空时生效
+     */
+    private Collection<String> addTags;
+
+    /**
+     * 需要删除的标签，resetTags、removeAllTags 为空时生效
+     */
+    private Collection<String> removeTags;
+
+
 }

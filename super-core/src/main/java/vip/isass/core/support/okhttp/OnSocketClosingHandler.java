@@ -166,39 +166,12 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.session;
+package vip.isass.core.support.okhttp;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import okhttp3.WebSocket;
 
-import java.util.List;
+public interface OnSocketClosingHandler {
 
-@Getter
-@Setter
-@ToString
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-public class SessionInfoChangeReq {
-
-    private String sessionId;
-
-    private String resetUserId;
-
-    private List<String> addAliases;
-
-    private List<String> resetAliases;
-
-    private List<String> removeAliases;
-
-    private List<String> addTags;
-
-    private List<String> resetTags;
-
-    private List<String> removeTags;
+    void handle(WebSocket webSocket, int code, String reason);
 
 }

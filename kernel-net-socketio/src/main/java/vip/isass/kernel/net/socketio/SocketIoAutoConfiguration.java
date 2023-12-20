@@ -170,13 +170,9 @@
 package vip.isass.kernel.net.socketio;
 
 import com.corundumstudio.socketio.SocketConfig;
-import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
-import com.corundumstudio.socketio.listener.ConnectListener;
-import com.corundumstudio.socketio.store.RedissonStoreFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RRemoteService;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -192,7 +188,7 @@ import javax.annotation.Resource;
 @Slf4j
 @ComponentScan
 @Configuration
-@ConditionalOnProperty(name = {"kernel.net.enabled", "kernel.net.socketio.enabled"}, havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(name = {"kernel.net.enabled", "kernel.net.socketio.enabled"}, havingValue = "true")
 public class SocketIoAutoConfiguration {
 
     @Resource
@@ -200,9 +196,6 @@ public class SocketIoAutoConfiguration {
 
     @Autowired
     private OnSocketIoErrorListener onErrorListener;
-
-    @Resource
-    private RedissonClient redissonClient;
 
     @Bean
     public SocketIOServer socketIOServer() {
@@ -220,15 +213,7 @@ public class SocketIoAutoConfiguration {
         sockConfig.setTcpKeepAlive(false);
         config.setSocketConfig(sockConfig);
 
-        SocketIOServer socketIOServer = new SocketIOServer(config);
-        socketIOServer.addConnectListener(new ConnectListener() {
-            @Override
-            public void onConnect(SocketIOClient client) {
-                System.out.println("连接了");
-                System.out.println(client);
-            }
-        });
-        return socketIOServer;
+        return new SocketIOServer(config);
     }
 
     /**

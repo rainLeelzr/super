@@ -224,6 +224,14 @@ public interface ISessionService {
     Session<?> getSessionById(String sessionId);
 
     /**
+     * 获取会话 id
+     *
+     * @param userId 用户 id
+     * @return 会话 id 集合
+     */
+    Collection<String> getSessionIdsByUserId(String userId);
+
+    /**
      * 获取所有会话
      *
      * @return 会话集合
@@ -242,19 +250,11 @@ public interface ISessionService {
     String getUserId(String sessionId);
 
     /**
-     * 获取会话 id
-     *
-     * @param userId 用户 id
-     * @return 会话 id 集合
-     */
-    Collection<String> getSessionIdsByUserId(String userId);
-
-    /**
      * 设置用户 id
      *
      * @param userId 用户 id
      */
-    void setUserId(String userId, String sessionId);
+    void setUserId(String sessionId, String userId);
 
     /**
      * 删除指定会话绑定的用户
@@ -277,17 +277,10 @@ public interface ISessionService {
     /**
      * 设置别名
      *
-     * @param alias 别名
-     */
-    void setAlias(String alias, String sessionId);
-
-    /**
-     * 添加别名
-     *
+     * @param sessionId 会话
      * @param alias     别名
-     * @param sessionId 会话 id
      */
-    void addAlias(String alias, String sessionId);
+    void setAlias(String sessionId, String alias);
 
     /**
      * 删除会话的别名

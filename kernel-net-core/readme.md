@@ -17,10 +17,6 @@ kernel:
     totalNodeAbove: 1000
     virtualNodeCount: -1
     
-    session:
-      # 标签存储方式：local(本地)、remote(远程)
-      store: local
-    
     # 网络通信 socketio 协议实现
     socketio:
       enabled: true

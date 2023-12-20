@@ -168,25 +168,61 @@
 
 package vip.isass.kernel.net.proxy.client;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
+import okhttp3.Call;
+import okhttp3.ConnectionPool;
+import okhttp3.Dispatcher;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import vip.isass.core.support.JsonUtil;
+import vip.isass.core.support.okhttp.OkHttpUtil;
+import vip.isass.core.web.Resp;
 import vip.isass.kernel.net.core.NetRedisKey;
 import vip.isass.kernel.net.core.message.Message;
+import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
 import vip.isass.kernel.net.core.session.ISessionService;
 import vip.isass.kernel.net.core.session.Session;
+import vip.isass.kernel.net.core.session.SessionBindingInfoChangeReq;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 @Component
-@ConditionalOnProperty(name = "kernel.net.session.store", havingValue = "remote")
 public class SessionServiceClientProxy implements ISessionService {
+
+    public static final OkHttpClient CLIENT;
+
+    private static final TypeReference<Resp<String>> STRING_RESP_TYPE_REF = new TypeReference<Resp<String>>() {
+    };
+    private static final TypeReference<Resp<Collection<String>>> COLL_STRING_RESP_TYPE_REF = new TypeReference<Resp<Collection<String>>>() {
+    };
+
+    static {
+        Dispatcher dispatcher = new Dispatcher();
+        dispatcher.setMaxRequests(100);
+        dispatcher.setMaxRequestsPerHost(100);
+        CLIENT = new OkHttpClient.Builder()
+                .dispatcher(dispatcher)
+                .connectionPool(new ConnectionPool(10, 10, TimeUnit.MINUTES))
+                .build();
+    }
 
     @Resource
     private RedisTemplate<String, ?> redisTemplate;
+
+    // @Resource
+    private INodeAllocatorService nodeAllocatorService;
 
     @Override
     public void addSession(Session<?> session) {
@@ -204,28 +240,57 @@ public class SessionServiceClientProxy implements ISessionService {
     }
 
     @Override
+    public Collection<String> getSessionIdsByUserId(String userId) {
+        String urlTemplate = "http://192.168.137.146:20170/{serverName}/session";
+        Resp<Collection<String>> resp = OkHttpUtil.get(
+                urlTemplate,
+                new String[]{"socketio-service"},
+                MapUtil.<String, String>builder().put("userId", userId).build(),
+                COLL_STRING_RESP_TYPE_REF);
+
+        return resp.dataIfSuccessOrException();
+    }
+
+    @Override
     public Collection<Session<?>> getAllSessions() {
         throw new UnsupportedOperationException("net proxy client cannot get session");
     }
 
     @Override
     public String getUserId(String sessionId) {
-        return null;
+        // NetServerInfo info = nodeAllocatorService.allocate(sessionId, null);
+        // String url = StrUtil.format(
+        //         "http{s}://{host}:{port}/{serverName}/session/{sessionId}/userId",
+        //         info.getHttpSecure() ? "s" : "",
+        //         info.getInternalIp(),
+        //         info.getHttpPort(),
+        //         info.getNetProtocol().getServiceName(),
+        //         sessionId
+        // );
+        String urlTemplate = "http://192.168.137.146:20170/{serverName}/session/{sessionId}/userId";
+        Resp<String> resp = OkHttpUtil.get(
+                urlTemplate,
+                new String[]{"socketio-service", sessionId},
+                null,
+                STRING_RESP_TYPE_REF);
+
+        return resp.dataIfSuccessOrException();
     }
 
     @Override
-    public Collection<String> getSessionIdsByUserId(String userId) {
-        return null;
-    }
-
-    @Override
-    public void setUserId(String userId, String sessionId) {
-
+    public void setUserId(String sessionId, String userId) {
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .sessionId(sessionId)
+                .resetUserId(userId)
+                .build());
     }
 
     @Override
     public void removeUserId(String sessionId) {
-
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .sessionId(sessionId)
+                .removeUserId(Boolean.TRUE)
+                .build());
     }
 
     @Override
@@ -235,17 +300,18 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public void setAlias(String alias, String sessionId) {
-
-    }
-
-    @Override
-    public void addAlias(String alias, String sessionId) {
-
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .sessionId(sessionId)
+                .alias(alias)
+                .build());
     }
 
     @Override
     public void removeAlias(String sessionId) {
-
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .sessionId(sessionId)
+                .removeAlias(Boolean.TRUE)
+                .build());
     }
 
     @Override
@@ -270,47 +336,68 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public boolean containAnyTag(@Nonnull String sessionId, @Nonnull Collection<String> tags) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean containAllTags(String sessionId, Collection<String> tags) {
-        return false;
+        return true;
     }
 
     @Override
     public void setTags(String sessionId, Collection<String> tags) {
-
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .sessionId(sessionId)
+                .tags(tags)
+                .build());
     }
 
     @Override
     public void setTagsByUserId(String userId, Collection<String> tags) {
-
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .userId(userId)
+                .tags(tags)
+                .build());
     }
 
     @Override
     public void addTags(String sessionId, Collection<String> tags) {
-
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .sessionId(sessionId)
+                .addTags(tags)
+                .build());
     }
 
     @Override
     public void addTagsByUserId(String userId, Collection<String> tags) {
-
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .userId(userId)
+                .addTags(tags)
+                .build());
     }
 
     @Override
     public void removeTags(String sessionId) {
-
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .sessionId(sessionId)
+                .removeAllTags(Boolean.TRUE)
+                .build());
     }
 
     @Override
     public void removeTags(String sessionId, Collection<String> tags) {
-
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .sessionId(sessionId)
+                .removeTags(tags)
+                .build());
     }
 
     @Override
     public void removeTagsByUserId(String userId, Collection<String> tags) {
-
+        saveSessionInfo(SessionBindingInfoChangeReq.builder()
+                .userId(userId)
+                .removeTags(tags)
+                .build());
     }
 
     @Override
@@ -420,6 +507,37 @@ public class SessionServiceClientProxy implements ISessionService {
     public void sendMessages(Collection<Message> messages) {
         for (Message message : messages) {
             redisTemplate.convertAndSend(NetRedisKey.REDIS_PUBSUB_KEY, message);
+        }
+    }
+
+    private void saveSessionInfo(SessionBindingInfoChangeReq req) {
+        okhttp3.RequestBody requestBody = okhttp3.RequestBody.create(
+                okhttp3.MediaType.get(MediaType.APPLICATION_JSON_VALUE),
+                JsonUtil.writeValue(req));
+        String url = StrUtil.format(
+                "http{}://{}:{}/{}/session/info",
+                "",
+                "192.168.137.146",
+                "20170",
+                "socketio-service"
+        );
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .build();
+        Call call = CLIENT.newCall(request);
+        try (Response execute = call.execute();
+             ResponseBody body = execute.body();) {
+            String bodyStr = body == null ? "" : body.string();
+            if (execute.isSuccessful()) {
+                Resp<?> resp = JsonUtil.readValue(bodyStr, Resp.class);
+                resp.exceptionIfUnSuccess();
+            } else {
+                throw new RuntimeException("调用[post " + url + "]失败，状态码：" + execute.code() + " 响应体：" + bodyStr);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

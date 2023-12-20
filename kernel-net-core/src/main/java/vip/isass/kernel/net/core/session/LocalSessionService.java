@@ -173,7 +173,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Configuration;
 import vip.isass.core.map.MultiKeyMultiValueBiMap;
 import vip.isass.core.map.MultiValueBiMap;
@@ -184,6 +184,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -195,7 +196,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "kernel.net.session.store", havingValue = "local")
+@ConditionalOnMissingClass("vip.isass.kernel.net.proxy.client.SessionServiceClientProxy")
 public class LocalSessionService implements ISessionService {
 
     // region sessionId 和 session 关系
@@ -244,6 +245,11 @@ public class LocalSessionService implements ISessionService {
     }
 
     @Override
+    public Collection<String> getSessionIdsByUserId(String userId) {
+        return userAndSessionMap.get(userId);
+    }
+
+    @Override
     public Collection<Session<?>> getAllSessions() {
         return unmodifiableSessionMap.values();
     }
@@ -258,13 +264,9 @@ public class LocalSessionService implements ISessionService {
     }
 
     @Override
-    public Collection<String> getSessionIdsByUserId(String userId) {
-        return userAndSessionMap.get(userId);
-    }
-
-    @Override
-    public void setUserId(String userId, String sessionId) {
-        userAndSessionMap.replaceValues(userId, Collections.singleton(sessionId));
+    public void setUserId(String sessionId, String userId) {
+        userAndSessionMap.removeValue(sessionId);
+        userAndSessionMap.put(userId, sessionId);
     }
 
     @Override
@@ -282,12 +284,8 @@ public class LocalSessionService implements ISessionService {
     }
 
     @Override
-    public void setAlias(String alias, String sessionId) {
-        aliasAndSessionMap.replaceValues(alias, Collections.singleton(sessionId));
-    }
-
-    @Override
-    public void addAlias(String alias, String sessionId) {
+    public void setAlias(String sessionId, String alias) {
+        aliasAndSessionMap.removeValue(sessionId);
         aliasAndSessionMap.put(alias, sessionId);
     }
 
@@ -537,8 +535,8 @@ public class LocalSessionService implements ISessionService {
         }
 
         // 2：判断 userId
-        boolean modifiable = false;
         Set<String> finalSessionIds = null;
+        boolean modifiable = false; // finalSessionIds 是否可修改的集合
         if (CollUtil.isNotEmpty(message.getUserIds())) {
             for (String userId : message.getUserIds()) {
                 Collection<String> sessionIdsFromUserId = userAndSessionMap.get(userId);
@@ -553,7 +551,12 @@ public class LocalSessionService implements ISessionService {
                         modifiable = true;
                     }
                 } else {
-                    finalSessionIds.addAll(sessionIdsFromUserId);
+                    if (modifiable) {
+                        finalSessionIds.addAll(sessionIdsFromUserId);
+                    } else {
+                        finalSessionIds = new HashSet<>(finalSessionIds);
+                        modifiable = true;
+                    }
                 }
             }
 
@@ -563,29 +566,35 @@ public class LocalSessionService implements ISessionService {
         }
 
         // 3：叠加判断 alias
-        if (StrUtil.isNotBlank(message.getAlias())) {
-            Collection<String> sessionIdsFromAlias = aliasAndSessionMap.get(message.getAlias());
-            if (CollUtil.isEmpty(sessionIdsFromAlias)) {
-                return;
+        if (CollUtil.isNotEmpty(message.getAliases())) {
+            for (String alias : message.getAliases()) {
+                Collection<String> sessionIdsFromAlias = aliasAndSessionMap.get(alias);
+                if (CollUtil.isEmpty(sessionIdsFromAlias)) {
+                    continue;
+                }
+
+                // 如果 userId 和 alias 都设置了，则判断其交集
+                if (finalSessionIds == null) {
+                    if (sessionIdsFromAlias instanceof Set) {
+                        finalSessionIds = (Set<String>) sessionIdsFromAlias;
+                    } else {
+                        finalSessionIds = new HashSet<>(sessionIdsFromAlias);
+                        modifiable = true;
+                    }
+                } else {
+                    if (!modifiable) {
+                        finalSessionIds = new HashSet<>(finalSessionIds);
+                        modifiable = true;
+                    }
+                    finalSessionIds.retainAll(sessionIdsFromAlias);
+                    if (finalSessionIds.isEmpty()) {
+                        return;
+                    }
+                }
             }
 
-            // 如果 userId 和 alias 都设置了，则判断其交集
-            if (finalSessionIds.isEmpty()) {
-                if (sessionIdsFromAlias instanceof Set) {
-                    finalSessionIds = (Set<String>) sessionIdsFromAlias;
-                } else {
-                    finalSessionIds = new HashSet<>(sessionIdsFromAlias);
-                    modifiable = true;
-                }
-            } else {
-                if (!modifiable) {
-                    finalSessionIds = new HashSet<>(finalSessionIds);
-                    modifiable = true;
-                }
-                finalSessionIds.retainAll(sessionIdsFromAlias);
-                if (finalSessionIds.isEmpty()) {
-                    return;
-                }
+            if (CollUtil.isEmpty(finalSessionIds)) {
+                return;
             }
         }
 
@@ -598,7 +607,7 @@ public class LocalSessionService implements ISessionService {
                 }
 
                 // 如果上一步找到了sessionId，则判断此步找到的sessionId是否被上一步的包含
-                if (finalSessionIds.isEmpty()) {
+                if (finalSessionIds == null) {
                     if (sessionIdsFromKey instanceof Set) {
                         finalSessionIds = (Set<String>) sessionIdsFromKey;
                     } else {
@@ -617,10 +626,11 @@ public class LocalSessionService implements ISessionService {
                 }
             }
 
-            // 因为设置了 tags，所忽略判断 tagsAny，如果 finalSessionIds 非空，则给这些会话发送消息
+            // 因为设置了 tags，所以忽略判断 tagsAny，如果 finalSessionIds 非空，则给这些会话发送消息
             if (!finalSessionIds.isEmpty()) {
                 finalSessionIds.parallelStream()
                         .map(sessionMap::get)
+                        .filter(Objects::nonNull)
                         .forEach(s -> s.sendMessage(message.getCmd(), message.getPayload()));
             }
             return;
@@ -639,6 +649,7 @@ public class LocalSessionService implements ISessionService {
                     sessionIdsFromKey.parallelStream()
                             .filter(s -> sentSessionIds.putIfAbsent(s, Boolean.TRUE) == null)
                             .map(sessionMap::get)
+                            .filter(Objects::nonNull)
                             .forEach(s -> s.sendMessage(message.getCmd(), message.getPayload()));
                 } else {
                     Collection<String> firstColl;
@@ -664,10 +675,15 @@ public class LocalSessionService implements ISessionService {
             return;
         }
 
-        // 6：最后方法依然没 return，则发消息给 finalSessionIds
-        finalSessionIds.parallelStream()
-                .map(sessionMap::get)
-                .forEach(s -> s.sendMessage(message.getCmd(), message.getPayload()));
+        // 6：最后方法依然没 return，则广播或者发消息给 finalSessionIds
+        if (finalSessionIds == null) {
+            broadcastMessage(message.getCmd(), message.getPayload());
+        } else {
+            finalSessionIds.parallelStream()
+                    .map(sessionMap::get)
+                    .filter(Objects::nonNull)
+                    .forEach(s -> s.sendMessage(message.getCmd(), message.getPayload()));
+        }
     }
 
     @Override
