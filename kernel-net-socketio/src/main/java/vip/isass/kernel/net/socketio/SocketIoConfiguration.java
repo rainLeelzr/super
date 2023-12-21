@@ -188,4 +188,10 @@ public class SocketIoConfiguration {
 
     private int maxFramePayloadLength = 64 * 1024;
 
+    private String externalIp;
+
+    private Integer netExternalPort;
+
+    private String netExternalUrl;
+
 }

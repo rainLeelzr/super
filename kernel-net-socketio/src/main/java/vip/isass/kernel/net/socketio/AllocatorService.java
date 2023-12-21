@@ -208,8 +208,8 @@ public class AllocatorService {
      * @param userId   用户 id
      * @return 分配到的节点
      */
-    public String allocate(String clientIp, String userId) {
-        NetServerInfo info = nodeAllocatorService.allocate(clientIp, userId);
+    public String allocate(String clientIp) {
+        NetServerInfo info = nodeAllocatorService.allocate(clientIp);
         return SERVER_INFO_CACHE.get(
                 info,
                 () -> StrUtil.blankToDefault(

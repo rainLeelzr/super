@@ -171,6 +171,7 @@ package vip.isass.kernel.net.proxy.core;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.ConsistentHash;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -185,6 +186,7 @@ import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -224,17 +226,21 @@ public class ConsistentHashNodeAllocatorService implements INodeAllocatorService
 
     private ConsistentHash<String> hashServer;
 
-    public NetServerInfo allocate(String clientIp, String userId) {
-        Assert.isTrue(hashServer != null, () -> new RuntimeException("未查询到可用节点，请稍后再试"));
-        Assert.isFalse(StrUtil.isAllBlank(clientIp, userId), "clientIp, userId 必填其一");
-        String instanceKey = StrUtil.isBlank(userId)
-                ? hashServer.get(clientIp)
-                : hashServer.get(userId);
+    public NetServerInfo allocate(String clientIp) {
+        Assert.isFalse(serviceInstanceMap.isEmpty() || hashServer == null, () -> new RuntimeException("未查询到可用网关节点，请稍后再试"));
+        String instanceKey = StrUtil.isBlank(clientIp)
+                ? hashServer.get(RandomUtil.randomString(2))
+                : hashServer.get(clientIp);
         NetServerInfo netServerInfo = serviceInstanceMap.get(instanceKey);
         if (netServerInfo == null) {
             throw new RuntimeException("节点分配失败，请稍后再试");
         }
         return netServerInfo;
+    }
+
+    @Override
+    public Collection<NetServerInfo> getAll() {
+        return serviceInstanceMap.values();
     }
 
     /**
@@ -265,8 +271,8 @@ public class ConsistentHashNodeAllocatorService implements INodeAllocatorService
         }
 
         if (checkModify(infoMap)) {
-            this.serviceInstanceMap = infoMap;
             int numberOfReplicas = calculateNumberOfReplicas(totalNodeAbove, virtualNodeCount, serviceInstanceMap.size());
+            this.serviceInstanceMap = infoMap;
             hashServer = new ConsistentHash<>(numberOfReplicas, this.serviceInstanceMap.keySet());
         }
     }

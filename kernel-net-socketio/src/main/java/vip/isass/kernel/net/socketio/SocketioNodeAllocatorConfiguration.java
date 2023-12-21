@@ -168,59 +168,22 @@
 
 package vip.isass.kernel.net.socketio;
 
-import cn.hutool.core.net.NetUtil;
-import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
 import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
+import vip.isass.kernel.net.proxy.core.ConsistentHashNodeAllocatorService;
 
-import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
-
+/**
+ * @author isass
+ */
 @Configuration
-@ConditionalOnProperty(name = "kernel.net.proxy.enabled", havingValue = "false", matchIfMissing = true)
-public class SocketIoLocalNodeAllocatorService implements INodeAllocatorService, InitializingBean {
+@ConditionalOnProperty(name = {"kernel.net.enabled", "kernel.net.proxy.enabled"}, havingValue = "true")
+public class SocketioNodeAllocatorConfiguration {
 
-    @Resource
-    private SocketIoConfiguration socketIoConfiguration;
-
-    @Value("${server.port}")
-    private int httpPort;
-
-    @Getter
-    private final NetProtocol netProtocol = NetProtocol.socketio;
-
-    private NetServerInfo netServerInfo;
-
-    @Override
-    public NetServerInfo allocate(String clientIp) {
-        return netServerInfo;
-    }
-
-    @Override
-    public Collection<NetServerInfo> getAll() {
-        return Collections.singleton(netServerInfo);
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        String internalIp = NetUtil.getLocalhostStr();
-        this.netServerInfo = NetServerInfo.builder()
-                .netProtocol(netProtocol)
-                .externalIp(StrUtil.blankToDefault(socketIoConfiguration.getExternalIp(), internalIp))
-                .internalIp(internalIp)
-                .httpPort(httpPort)
-                .httpSecure(Boolean.FALSE)
-                .netExternalPort(socketIoConfiguration.getNetExternalPort() == null
-                        ? socketIoConfiguration.getPort()
-                        : socketIoConfiguration.getNetExternalPort())
-                .netExternalUrl(socketIoConfiguration.getNetExternalUrl())
-                .build();
+    @Bean
+    public INodeAllocatorService consistentHashNodeAllocatorService() {
+        return new ConsistentHashNodeAllocatorService(NetProtocol.socketio);
     }
 }

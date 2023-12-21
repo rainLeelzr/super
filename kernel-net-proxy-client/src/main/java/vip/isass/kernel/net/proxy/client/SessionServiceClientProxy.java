@@ -168,9 +168,11 @@
 
 package vip.isass.kernel.net.proxy.client;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
@@ -178,6 +180,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -186,6 +190,8 @@ import vip.isass.core.support.okhttp.OkHttpUtil;
 import vip.isass.core.web.Resp;
 import vip.isass.kernel.net.core.NetRedisKey;
 import vip.isass.kernel.net.core.message.Message;
+import vip.isass.kernel.net.core.server.NetProtocol;
+import vip.isass.kernel.net.core.server.NetServerInfo;
 import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
 import vip.isass.kernel.net.core.session.ISessionService;
 import vip.isass.kernel.net.core.session.Session;
@@ -196,8 +202,15 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class SessionServiceClientProxy implements ISessionService {
 
@@ -222,11 +235,29 @@ public class SessionServiceClientProxy implements ISessionService {
                 .build();
     }
 
+    private NetProtocol defaultNetProtocol;
+
     @Resource
     private RedisTemplate<String, ?> redisTemplate;
 
-    // @Resource
-    private INodeAllocatorService nodeAllocatorService;
+    private Map<NetProtocol, INodeAllocatorService> nodeAllocatorServiceMap;
+
+    @Autowired
+    private void setNodeAllocatorServiceMap(@Value("${kernel.net.defaultProtocol:}") String defaultProtocol,
+                                            List<INodeAllocatorService> nodeAllocatorServices) {
+        this.nodeAllocatorServiceMap = nodeAllocatorServices.stream()
+                .collect(Collectors.toMap(INodeAllocatorService::getNetProtocol, Function.identity()));
+
+        if (StrUtil.isBlank(defaultProtocol)) {
+            defaultNetProtocol = nodeAllocatorServiceMap.values().iterator().next().getNetProtocol();
+        } else {
+            try {
+                defaultNetProtocol = NetProtocol.valueOf(defaultProtocol);
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("kernel.net.defaultProtocol 配置错误，请检查");
+            }
+        }
+    }
 
     @Override
     public void addSession(Session<?> session) {
@@ -243,42 +274,38 @@ public class SessionServiceClientProxy implements ISessionService {
         throw new UnsupportedOperationException("net proxy client cannot get session");
     }
 
-    @Override
-    public Collection<String> getSessionIdsByUserId(String userId) {
-        String urlTemplate = "http://192.168.137.146:20170/{serverName}/session";
-        Resp<Collection<String>> resp = OkHttpUtil.get(
-                urlTemplate,
-                new String[]{"socketio-service"},
-                MapUtil.<String, String>builder().put("userId", userId).build(),
-                COLL_STRING_RESP_TYPE_REF);
+    // @Override
+    // public Collection<String> findSessionIds(String userId) {
+    //     INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+    //     NetServerInfo info = nodeAllocatorService.allocate(null);
+    //     String url = StrUtil.format(
+    //             "http{}://{}:{}/{}/session",
+    //             info.getHttpSecure() ? "s" : "",
+    //             info.getInternalIp(),
+    //             info.getHttpPort(),
+    //             info.getNetProtocol().getServiceName()
+    //     );
+    //     Resp<Collection<String>> resp = OkHttpUtil.get(
+    //             url,
+    //             null,
+    //             MapUtil.<String, String>builder().put("userId", userId).build(),
+    //             COLL_STRING_RESP_TYPE_REF);
+    //     return resp.dataIfSuccessOrException();
+    // }
 
-        return resp.dataIfSuccessOrException();
-    }
-
     @Override
-    public Collection<Session<?>> getAllSessions() {
+    public Collection<Session<?>> findAllSessions() {
         throw new UnsupportedOperationException("net proxy client cannot get session");
     }
 
     @Override
     public String getUserId(String sessionId) {
-        // NetServerInfo info = nodeAllocatorService.allocate(sessionId, null);
-        // String url = StrUtil.format(
-        //         "http{s}://{host}:{port}/{serverName}/session/{sessionId}/userId",
-        //         info.getHttpSecure() ? "s" : "",
-        //         info.getInternalIp(),
-        //         info.getHttpPort(),
-        //         info.getNetProtocol().getServiceName(),
-        //         sessionId
-        // );
-        String urlTemplate = "http://192.168.137.146:20170/{serverName}/session/{sessionId}/userId";
-        Resp<String> resp = OkHttpUtil.get(
-                urlTemplate,
-                new String[]{"socketio-service", sessionId},
+        String userId = fetch(
+                StrUtil.format("/session/{}/userId", sessionId),
                 null,
+                StrUtil::isNotBlank,
                 STRING_RESP_TYPE_REF);
-
-        return resp.dataIfSuccessOrException();
+        return userId;
     }
 
     @Override
@@ -299,18 +326,21 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public String getAlias(String sessionId) {
-        String urlTemplate = "http://192.168.137.146:20170/{serverName}/{sessionId}/alias";
-        Resp<String> resp = OkHttpUtil.get(
-                urlTemplate,
-                new String[]{"socketio-service", sessionId},
-                null,
-                STRING_RESP_TYPE_REF);
-
+        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+        NetServerInfo info = nodeAllocatorService.allocate(null);
+        String url = StrUtil.format(
+                "http{}://{}:{}/{}/session/{sessionId}/alias",
+                info.getHttpSecure() ? "s" : "",
+                info.getInternalIp(),
+                info.getHttpPort(),
+                info.getNetProtocol().getServiceName()
+        );
+        Resp<String> resp = OkHttpUtil.get(url, STRING_RESP_TYPE_REF);
         return resp.dataIfSuccessOrException();
     }
 
     @Override
-    public void setAlias(String alias, String sessionId) {
+    public void setAlias(String sessionId, String alias) {
         saveSessionInfo(SessionBindingInfoChangeReq.builder()
                 .sessionId(sessionId)
                 .alias(alias)
@@ -326,51 +356,72 @@ public class SessionServiceClientProxy implements ISessionService {
     }
 
     @Override
-    public Collection<String> getTags(String sessionId) {
-        String urlTemplate = "http://192.168.137.146:20170/{serverName}/{sessionId}/tags";
-        Resp<Collection<String>> resp = OkHttpUtil.get(
-                urlTemplate,
-                new String[]{"socketio-service", sessionId},
-                null,
-                COLL_STRING_RESP_TYPE_REF);
-
+    public Collection<String> findTags(String sessionId) {
+        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+        NetServerInfo info = nodeAllocatorService.allocate(null);
+        String url = StrUtil.format(
+                "http{}://{}:{}/{}/session/{sessionId}/tags",
+                info.getHttpSecure() ? "s" : "",
+                info.getInternalIp(),
+                info.getHttpPort(),
+                info.getNetProtocol().getServiceName()
+        );
+        Resp<Collection<String>> resp = OkHttpUtil.get(url, COLL_STRING_RESP_TYPE_REF);
         return resp.dataIfSuccessOrException();
     }
 
     @Override
-    public Collection<String> getTagsByUserId(String userId) {
-        String urlTemplate = "http://192.168.137.146:20170/{serverName}/tags/{userId}";
-        Resp<Collection<String>> resp = OkHttpUtil.get(
-                urlTemplate,
-                new String[]{"socketio-service", userId},
-                null,
-                COLL_STRING_RESP_TYPE_REF);
-
+    public Collection<String> findTagsByUserId(String userId) {
+        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+        NetServerInfo info = nodeAllocatorService.allocate(null);
+        String url = StrUtil.format(
+                "http{}://{}:{}/{}/session/{sessionId}/tags/{userId}",
+                info.getHttpSecure() ? "s" : "",
+                info.getInternalIp(),
+                info.getHttpPort(),
+                info.getNetProtocol().getServiceName()
+        );
+        Resp<Collection<String>> resp = OkHttpUtil.get(url, COLL_STRING_RESP_TYPE_REF);
         return resp.dataIfSuccessOrException();
     }
 
-    @Override
-    public Collection<String> findSessions(Collection<String> tags) {
-        String urlTemplate = "http://192.168.137.146:20170/{serverName}/ids";
-        Resp<Collection<String>> resp = OkHttpUtil.get(
-                urlTemplate,
-                new String[]{"socketio-service"},
-                MapUtil.<String, Collection<String>>builder()
-                        .put("tags", Collections.singleton("t1"))
-                        .build(),
-                COLL_STRING_RESP_TYPE_REF);
-
-        return resp.dataIfSuccessOrException();
-    }
+    // @Override
+    // public Collection<String> findSessionIds(Collection<String> tags) {
+    //     INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+    //     NetServerInfo info = nodeAllocatorService.allocate(null);
+    //     String url = StrUtil.format(
+    //             "http{}://{}:{}/{}/session/",
+    //             info.getHttpSecure() ? "s" : "",
+    //             info.getInternalIp(),
+    //             info.getHttpPort(),
+    //             info.getNetProtocol().getServiceName()
+    //     );
+    //     Resp<Collection<String>> resp = OkHttpUtil.get(
+    //             url,
+    //             null,
+    //             MapUtil.<String, Collection<String>>builder()
+    //                     .put("tags", tags)
+    //                     .build(),
+    //             COLL_STRING_RESP_TYPE_REF);
+    //     return resp.dataIfSuccessOrException();
+    // }
 
     @Override
     public Collection<String> findSessionsByAnyMatchTags(Collection<String> tags) {
-        String urlTemplate = "http://192.168.137.146:20170/{serverName}/ids/any";
+        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+        NetServerInfo info = nodeAllocatorService.allocate(null);
+        String url = StrUtil.format(
+                "http{}://{}:{}/{}/session/any",
+                info.getHttpSecure() ? "s" : "",
+                info.getInternalIp(),
+                info.getHttpPort(),
+                info.getNetProtocol().getServiceName()
+        );
         Resp<Collection<String>> resp = OkHttpUtil.get(
-                urlTemplate,
-                new String[]{"socketio-service"},
+                url,
+                null,
                 MapUtil.<String, Collection<String>>builder()
-                        .put("tags", Collections.singleton("t1"))
+                        .put("tags", tags)
                         .build(),
                 COLL_STRING_RESP_TYPE_REF);
         return resp.dataIfSuccessOrException();
@@ -378,12 +429,20 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public boolean containAnyTag(@Nonnull String sessionId, @Nonnull Collection<String> tags) {
-        String urlTemplate = "http://192.168.137.146:20170/{serverName}/{sessionId}/containAnyTag";
+        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+        NetServerInfo info = nodeAllocatorService.allocate(null);
+        String url = StrUtil.format(
+                "http{}://{}:{}/{}/session/{sessionId}/containAnyTag",
+                info.getHttpSecure() ? "s" : "",
+                info.getInternalIp(),
+                info.getHttpPort(),
+                info.getNetProtocol().getServiceName()
+        );
         Resp<Boolean> resp = OkHttpUtil.get(
-                urlTemplate,
-                new String[]{"socketio-service", sessionId},
+                url,
+                null,
                 MapUtil.<String, Collection<String>>builder()
-                        .put("tags", Collections.singleton("t1"))
+                        .put("tags", tags)
                         .build(),
                 BOOLEAN_RESP_TYPE_REF);
 
@@ -392,12 +451,20 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public boolean containAllTags(String sessionId, Collection<String> tags) {
-        String urlTemplate = "http://192.168.137.146:20170/{serverName}/{sessionId}/containTags";
+        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+        NetServerInfo info = nodeAllocatorService.allocate(null);
+        String url = StrUtil.format(
+                "http{}://{}:{}/{}/session/{sessionId}/containTags",
+                info.getHttpSecure() ? "s" : "",
+                info.getInternalIp(),
+                info.getHttpPort(),
+                info.getNetProtocol().getServiceName()
+        );
         Resp<Boolean> resp = OkHttpUtil.get(
-                urlTemplate,
-                new String[]{"socketio-service", sessionId},
+                url,
+                null,
                 MapUtil.<String, Collection<String>>builder()
-                        .put("tags", Collections.singleton("t1"))
+                        .put("tags", tags)
                         .build(),
                 BOOLEAN_RESP_TYPE_REF);
         return resp.dataIfSuccessOrException();
@@ -569,17 +636,59 @@ public class SessionServiceClientProxy implements ISessionService {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private <T> T fetch(String urlSuffix,
+                        Map<String, Object> requestParam,
+                        Predicate<T> checkHttpResp,
+                        TypeReference<Resp<T>> typeReference) {
+        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+        Collection<NetServerInfo> serverInfos = nodeAllocatorService.getAll();
+        Assert.notEmpty(serverInfos, "未发现[{}]网关，根据会话id获取用户id失败", defaultNetProtocol);
+        Object[] returnArr = new Object[1];
+        CompletableFuture<T>[] futures = (CompletableFuture<T>[]) new CompletableFuture<?>[serverInfos.size()];
+        int idx = 0;
+        for (NetServerInfo serverInfo : serverInfos) {
+            futures[idx] = CompletableFuture.supplyAsync(() -> {
+                        String url = StrUtil.format(
+                                "http{}://{}:{}/{}" + urlSuffix,
+                                serverInfo.getHttpSecure() ? "s" : "",
+                                serverInfo.getInternalIp(),
+                                serverInfo.getHttpPort(),
+                                serverInfo.getNetProtocol().getServiceName()
+                        );
+                        return OkHttpUtil.get(url, null, requestParam, typeReference)
+                                .dataIfSuccessOrException();
+                    })
+                    .whenComplete((returnData, throwable) -> {
+                        if (checkHttpResp.test(returnData)) {
+                            returnArr[0] = returnData;
+                        }
+                    });
+            idx++;
+        }
+
+        CompletableFuture<Void> voidCompletableFuture = CompletableFuture.allOf(futures);
+        try {
+            voidCompletableFuture.get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.error("请求网关[{}]获取信息超时", defaultNetProtocol);
+        }
+        return (T) returnArr[0];
+    }
+
     private void saveSessionInfo(SessionBindingInfoChangeReq req) {
+        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+        NetServerInfo info = nodeAllocatorService.allocate(req.getSessionId());
+        String url = StrUtil.format(
+                "http{}://{}:{}/{}/session/info",
+                info.getHttpSecure() ? "s" : "",
+                info.getInternalIp(),
+                info.getHttpPort(),
+                info.getNetProtocol().getServiceName()
+        );
         okhttp3.RequestBody requestBody = okhttp3.RequestBody.create(
                 okhttp3.MediaType.get(MediaType.APPLICATION_JSON_VALUE),
                 JsonUtil.writeValue(req));
-        String url = StrUtil.format(
-                "http{}://{}:{}/{}/session/info",
-                "",
-                "192.168.137.146",
-                "20170",
-                "socketio-service"
-        );
 
         Request request = new Request.Builder()
                 .url(url)
@@ -599,4 +708,5 @@ public class SessionServiceClientProxy implements ISessionService {
             throw new RuntimeException(e);
         }
     }
+
 }

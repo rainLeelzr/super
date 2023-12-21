@@ -244,13 +244,13 @@ public class LocalSessionService implements ISessionService {
         return sessionMap.get(sessionId);
     }
 
-    @Override
-    public Collection<String> getSessionIdsByUserId(String userId) {
-        return userAndSessionMap.get(userId);
-    }
+    // @Override
+    // public Collection<String> findSessionIds(String userId) {
+    //     return userAndSessionMap.get(userId);
+    // }
 
     @Override
-    public Collection<Session<?>> getAllSessions() {
+    public Collection<Session<?>> findAllSessions() {
         return unmodifiableSessionMap.values();
     }
 
@@ -299,43 +299,43 @@ public class LocalSessionService implements ISessionService {
     // region tag
 
     @Override
-    public Collection<String> getTags(String sessionId) {
+    public Collection<String> findTags(String sessionId) {
         return sessionAndTagMap.get(sessionId);
     }
 
     @Override
-    public Collection<String> getTagsByUserId(String userId) {
-        Collection<String> sessionIds = getSessionIdsByUserId(userId);
+    public Collection<String> findTagsByUserId(String userId) {
+        Collection<String> sessionIds = userAndSessionMap.get(userId);
         if (CollUtil.isEmpty(sessionIds)) {
             return Collections.emptySet();
         }
         return sessionIds.stream()
-                .map(this::getTags)
+                .map(this::findTags)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
     }
 
-    @Override
-    public Collection<String> findSessions(Collection<String> tags) {
-        Set<String> sessionIds = null;
-        for (String tag : tags) {
-            Collection<String> tempSessionIds = sessionAndTagMap.getKey(tag);
-            if (CollUtil.isEmpty(tempSessionIds)) {
-                return Collections.emptySet();
-            }
-
-            if (sessionIds == null) {
-                sessionIds = new HashSet<>(tempSessionIds);
-                continue;
-            }
-
-            sessionIds.retainAll(tempSessionIds);
-            if (sessionIds.isEmpty()) {
-                return Collections.emptySet();
-            }
-        }
-        return sessionIds;
-    }
+    // @Override
+    // public Collection<String> findSessionIds(Collection<String> tags) {
+    //     Set<String> sessionIds = null;
+    //     for (String tag : tags) {
+    //         Collection<String> tempSessionIds = sessionAndTagMap.getKey(tag);
+    //         if (CollUtil.isEmpty(tempSessionIds)) {
+    //             return Collections.emptySet();
+    //         }
+    //
+    //         if (sessionIds == null) {
+    //             sessionIds = new HashSet<>(tempSessionIds);
+    //             continue;
+    //         }
+    //
+    //         sessionIds.retainAll(tempSessionIds);
+    //         if (sessionIds.isEmpty()) {
+    //             return Collections.emptySet();
+    //         }
+    //     }
+    //     return sessionIds;
+    // }
 
     @Override
     public Collection<String> findSessionsByAnyMatchTags(Collection<String> tags) {
@@ -370,7 +370,7 @@ public class LocalSessionService implements ISessionService {
 
     @Override
     public void setTagsByUserId(String userId, Collection<String> tags) {
-        Collection<String> sessionIds = getSessionIdsByUserId(userId);
+        Collection<String> sessionIds = userAndSessionMap.get(userId);
         if (CollUtil.isEmpty(sessionIds)) {
             return;
         }
@@ -379,7 +379,7 @@ public class LocalSessionService implements ISessionService {
 
     @Override
     public void addTagsByUserId(String userId, Collection<String> tags) {
-        Collection<String> sessionIds = getSessionIdsByUserId(userId);
+        Collection<String> sessionIds = userAndSessionMap.get(userId);
         if (CollUtil.isEmpty(sessionIds)) {
             return;
         }
@@ -398,7 +398,7 @@ public class LocalSessionService implements ISessionService {
 
     @Override
     public void removeTagsByUserId(String userId, Collection<String> tags) {
-        Collection<String> sessionIds = getSessionIdsByUserId(userId);
+        Collection<String> sessionIds = userAndSessionMap.get(userId);
         if (CollUtil.isEmpty(sessionIds)) {
             return;
         }
@@ -418,7 +418,7 @@ public class LocalSessionService implements ISessionService {
 
     @Override
     public void sendMessageByUserId(String cmd, Object payload, String userId) {
-        Collection<String> sessions = getSessionIdsByUserId(userId);
+        Collection<String> sessions = userAndSessionMap.get(userId);
         if (CollUtil.isEmpty(sessions)) {
             return;
         }
@@ -489,10 +489,25 @@ public class LocalSessionService implements ISessionService {
 
     @Override
     public void sendMessageByTags(String cmd, Object payload, Collection<String> tags) {
-        findSessions(tags)
-                .parallelStream()
-                .map(sessionMap::get)
-                .forEach(s -> s.sendMessage(cmd, payload));
+        Set<String> sentSessionIds = new HashSet<>();
+        for (String tag : tags) {
+            Collection<String> sessionIds = sessionAndTagMap.getKey(tag);
+            if (CollUtil.isEmpty(sessionIds)) {
+                continue;
+            }
+
+            for (String sessionId : sessionIds) {
+                if (sentSessionIds.contains(sessionId)) {
+                    continue;
+                }
+                sentSessionIds.add(sessionId);
+                Session<?> session = sessionMap.get(sessionId);
+                if (session == null) {
+                    continue;
+                }
+                session.sendMessage(cmd, payload);
+            }
+        }
     }
 
     @Override

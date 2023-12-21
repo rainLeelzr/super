@@ -229,14 +229,14 @@ public interface ISessionService {
      * @param userId 用户 id
      * @return 会话 id 集合
      */
-    Collection<String> getSessionIdsByUserId(String userId);
+    // Collection<String> findSessionIds(String userId);
 
     /**
      * 获取所有会话
      *
      * @return 会话集合
      */
-    Collection<Session<?>> getAllSessions();
+    Collection<Session<?>> findAllSessions();
 
     // endregion
 
@@ -298,14 +298,14 @@ public interface ISessionService {
      *
      * @return 标签列表
      */
-    Collection<String> getTags(String sessionId);
+    Collection<String> findTags(String sessionId);
 
     /**
      * 根据用户获取标签
      *
      * @return 标签列表
      */
-    Collection<String> getTagsByUserId(String userId);
+    Collection<String> findTagsByUserId(String userId);
 
     /**
      * 查找符合所有标签的会话
@@ -313,7 +313,7 @@ public interface ISessionService {
      * @param tags 标签集合
      * @return 符合条件的会话集合
      */
-    Collection<String> findSessions(Collection<String> tags);
+    // Collection<String> findSessionIds(Collection<String> tags);
 
     /**
      * 根据标签查找会话

@@ -168,6 +168,7 @@
 
 package vip.isass.core.support.okhttp;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.json.JSONUtil;
@@ -223,7 +224,14 @@ public class OkHttpUtil {
         }
         if (MapUtil.isNotEmpty(queryParams)) {
             for (Map.Entry<String, ?> entry : queryParams.entrySet()) {
-                builder.addQueryParameter(entry.getKey(), entry.getValue().toString());
+                String valStr;
+                Object value = entry.getValue();
+                if (value instanceof Iterable) {
+                    valStr = CollUtil.join((Iterable<?>) value, ",");
+                } else {
+                    valStr = value.toString();
+                }
+                builder.addQueryParameter(entry.getKey(), valStr);
             }
         }
         return builder.build();

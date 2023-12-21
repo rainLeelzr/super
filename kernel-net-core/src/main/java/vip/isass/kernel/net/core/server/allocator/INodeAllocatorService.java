@@ -171,12 +171,16 @@ package vip.isass.kernel.net.core.server.allocator;
 import vip.isass.kernel.net.core.server.NetProtocol;
 import vip.isass.kernel.net.core.server.NetServerInfo;
 
+import java.util.Collection;
+
 /**
  * 节点分配器
  */
 public interface INodeAllocatorService {
 
-    NetServerInfo allocate(String clientIp, String userId);
+    NetServerInfo allocate(String clientIp);
+
+    Collection<NetServerInfo> getAll();
 
     NetProtocol getNetProtocol();
 

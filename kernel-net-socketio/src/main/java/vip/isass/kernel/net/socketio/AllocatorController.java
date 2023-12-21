@@ -174,13 +174,10 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import vip.isass.core.login.LoginUser;
-import vip.isass.core.login.LoginUserUtil;
 import vip.isass.core.web.Resp;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 @RestController
 @Api(tags = "节点分配器")
@@ -190,14 +187,11 @@ public class AllocatorController {
     @Resource
     private AllocatorService allocatorService;
 
-    @ApiOperation(value = "分配节点", notes = "优先根据用户 id 分配，其次客户端 ip")
+    @ApiOperation(value = "分配节点", notes = "根据客户端 ip 分配节点")
     @GetMapping("/node")
     public Resp<String> allocate(HttpServletRequest request) {
-        String userId = Optional.ofNullable(LoginUserUtil.getLoginUser())
-                .map(LoginUser::getUserId)
-                .orElse(null);
-        String clientIp = userId == null ? ServletUtil.getClientIP(request) : null;
-        return Resp.bizSuccess(allocatorService.allocate(clientIp, userId));
+        String clientIp = ServletUtil.getClientIP(request);
+        return Resp.bizSuccess(allocatorService.allocate(clientIp));
     }
 
 }

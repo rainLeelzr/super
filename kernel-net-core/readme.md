@@ -6,16 +6,17 @@ kernel:
     # 网络模块公共配置
     # 网络通信模块总开关
     enabled: true
-  `     # 默认通信协议：tcp(已失效)、websocket(已失效)、socketio(已实现)、mqtt(未实现)
-    protocol: socketio
+  ` # 默认通信协议：tcp(已失效)、websocket(已失效)、socketio(已实现)、mqtt(未实现)
+    defaultProtocol: socketio
   
     # 是否使用网格进行网络代理
     proxy:
       enabled: true
     
     # 使用网关代理模式时，一致性 hash 算法的参数
-    totalNodeAbove: 1000
-    virtualNodeCount: -1
+    consistentHash:
+      totalNodeAbove: 1000
+      virtualNodeCount: -1
     
     # 网络通信 socketio 协议实现
     socketio:
