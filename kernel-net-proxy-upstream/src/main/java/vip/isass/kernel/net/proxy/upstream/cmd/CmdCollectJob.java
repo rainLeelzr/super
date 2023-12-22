@@ -167,7 +167,7 @@
  *
  */
 
-package vip.isass.kernel.net.proxy.client.cmd;
+package vip.isass.kernel.net.proxy.upstream.cmd;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

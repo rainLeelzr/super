@@ -171,9 +171,10 @@ package vip.isass.kernel.net.core.session;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Configuration;
 import vip.isass.core.map.MultiKeyMultiValueBiMap;
 import vip.isass.core.map.MultiValueBiMap;
@@ -196,7 +197,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Configuration
-@ConditionalOnMissingClass("vip.isass.kernel.net.proxy.client.SessionServiceClientProxy")
+@ConditionalOnMissingBean(type = "sessionServiceClientProxy")
 public class LocalSessionService implements ISessionService {
 
     // region sessionId 和 session 关系
@@ -265,6 +266,10 @@ public class LocalSessionService implements ISessionService {
 
     @Override
     public void setUserId(String sessionId, String userId) {
+        Session<?> session = sessionMap.get(sessionId);
+        if (session == null) {
+            return;
+        }
         userAndSessionMap.removeValue(sessionId);
         userAndSessionMap.put(userId, sessionId);
     }
@@ -272,6 +277,15 @@ public class LocalSessionService implements ISessionService {
     @Override
     public void removeUserId(String sessionId) {
         userAndSessionMap.removeValue(sessionId);
+    }
+
+    @Override
+    public Map<String, Boolean> isOnline(Collection<String> userIds) {
+        Map<String, Boolean> result = MapUtil.newHashMap(userIds.size());
+        for (String userId : userIds) {
+            result.put(userId, CollUtil.isNotEmpty(userAndSessionMap.get(userId)));
+        }
+        return result;
     }
 
     // endregion
@@ -285,6 +299,10 @@ public class LocalSessionService implements ISessionService {
 
     @Override
     public void setAlias(String sessionId, String alias) {
+        Session<?> session = sessionMap.get(sessionId);
+        if (session == null) {
+            return;
+        }
         aliasAndSessionMap.removeValue(sessionId);
         aliasAndSessionMap.put(alias, sessionId);
     }
@@ -360,11 +378,19 @@ public class LocalSessionService implements ISessionService {
 
     @Override
     public void setTags(String sessionId, Collection<String> tags) {
+        Session<?> session = sessionMap.get(sessionId);
+        if (session == null) {
+            return;
+        }
         sessionAndTagMap.replaceValues(sessionId, tags);
     }
 
     @Override
     public void addTags(String sessionId, Collection<String> tags) {
+        Session<?> session = sessionMap.get(sessionId);
+        if (session == null) {
+            return;
+        }
         sessionAndTagMap.putAll(sessionId, tags);
     }
 
@@ -393,6 +419,10 @@ public class LocalSessionService implements ISessionService {
 
     @Override
     public void removeTags(String sessionId, Collection<String> tags) {
+        Session<?> session = sessionMap.get(sessionId);
+        if (session == null) {
+            return;
+        }
         sessionAndTagMap.removeValues(sessionId, tags);
     }
 

@@ -271,7 +271,7 @@ public class ConsistentHashNodeAllocatorService implements INodeAllocatorService
         }
 
         if (checkModify(infoMap)) {
-            int numberOfReplicas = calculateNumberOfReplicas(totalNodeAbove, virtualNodeCount, serviceInstanceMap.size());
+            int numberOfReplicas = calculateNumberOfReplicas(totalNodeAbove, virtualNodeCount, infoMap.size());
             this.serviceInstanceMap = infoMap;
             hashServer = new ConsistentHash<>(numberOfReplicas, this.serviceInstanceMap.keySet());
         }

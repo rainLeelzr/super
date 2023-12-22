@@ -167,7 +167,7 @@
  *
  */
 
-package vip.isass.kernel.net.proxy.client;
+package vip.isass.kernel.net.proxy.upstream;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.RandomUtil;

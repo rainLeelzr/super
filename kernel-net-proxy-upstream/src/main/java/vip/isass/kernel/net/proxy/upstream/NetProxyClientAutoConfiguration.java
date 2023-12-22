@@ -167,75 +167,20 @@
  *
  */
 
-package vip.isass.kernel.net.proxy.client.cmd;
+package vip.isass.kernel.net.proxy.upstream;
 
-import cn.hutool.core.collection.CollUtil;
-import com.baomidou.lock.annotation.Lock4j;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import vip.isass.core.support.LocalDateTimeUtil;
-import vip.isass.core.support.SystemClock;
-import vip.isass.kernel.net.core.handler.OnMessageEventHandler;
-import vip.isass.kernel.net.core.message.CmdCollectDto;
-import vip.isass.kernel.net.proxy.core.CmdRedisService;
-
-import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * cmd 收集服务
- * 扫描本微服务的 onMessageEventHandler 集合，收集 cmd，保存到 redis
- *
- * @author rain
+ * @author Rain
  */
-@Slf4j
-@Component
-public class CmdCollectService {
+@ComponentScan
+@Configuration
+@EnableScheduling
+@ConditionalOnProperty(name = {"kernel.net.enabled", "kernel.net.proxy.enabled"}, havingValue = "true")
+public class NetProxyClientAutoConfiguration {
 
-    @Resource
-    private CmdRedisService cmdRedisService;
-
-    @Autowired(required = false)
-    private List<OnMessageEventHandler<?>> onMessageEventHandlers;
-
-    @Value("${spring.application.name:}")
-    private String applicationName;
-
-    @Lock4j(name = "CmdCollectService:", keys = "#applicationName", acquireTimeout = 10_000, expire = 30_000)
-    public void collect(List<OnMessageEventHandler<?>> onMessageEventHandlers, String applicationName) {
-        if (applicationName.isEmpty()) {
-            log.error("未配置spring.application.name，net 模块 cmd 收集服务无法执行");
-            return;
-        }
-
-        Long now = SystemClock.now();
-        Collection<CmdCollectDto> cmdCollectDtoList = onMessageEventHandlers.stream()
-                .map(OnMessageEventHandler::getCmd)
-                .map(c -> CmdCollectDto.builder().cmd(c).collectTime(now).build())
-                .collect(Collectors.toSet());
-
-        List<CmdCollectDto> commands = cmdRedisService.findCommands(applicationName);
-        if (CollUtil.isNotEmpty(commands)) {
-            // 若 cmd 的收集时间超过了2天，说明已经没有实例使用该 cmd,应该删除
-            long threeDaysAgo = LocalDateTimeUtil.toMilliseconds(LocalDateTimeUtil.now().minusDays(2));
-            commands = commands.stream()
-                    .filter(c -> c.getCollectTime() > threeDaysAgo)
-                    .collect(Collectors.toList());
-
-            cmdCollectDtoList.addAll(commands);
-        }
-
-        cmdRedisService.put(applicationName, cmdCollectDtoList);
-    }
-
-    public void collect() {
-        if (onMessageEventHandlers == null) {
-            return;
-        }
-        collect(onMessageEventHandlers, applicationName);
-    }
 }

@@ -166,10 +166,12 @@
  * Library.
  */
 
-package vip.isass.kernel.net.proxy.client;
+package vip.isass.kernel.net.proxy.upstream;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
@@ -206,6 +208,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -223,6 +226,9 @@ public class SessionServiceClientProxy implements ISessionService {
     };
 
     private static final TypeReference<Resp<Boolean>> BOOLEAN_RESP_TYPE_REF = new TypeReference<Resp<Boolean>>() {
+    };
+
+    private static final TypeReference<Resp<Map<String, Boolean>>> MAP_STRING_BOOLEAN_RESP_TYPE_REF = new TypeReference<Resp<Map<String, Boolean>>>() {
     };
 
     static {
@@ -300,12 +306,11 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public String getUserId(String sessionId) {
-        String userId = fetch(
+        return fetchGetFromAllNode(
                 StrUtil.format("/session/{}/userId", sessionId),
                 null,
                 StrUtil::isNotBlank,
                 STRING_RESP_TYPE_REF);
-        return userId;
     }
 
     @Override
@@ -314,6 +319,34 @@ public class SessionServiceClientProxy implements ISessionService {
                 .sessionId(sessionId)
                 .resetUserId(userId)
                 .build());
+    }
+
+    @Override
+    public Map<String, Boolean> isOnline(Collection<String> userIds) {
+        return fetchPostFromAllNode(
+                "/session/user/isOnline",
+                null,
+                userIds,
+                (httpReturnMap, methodRetuenMap) -> {
+                    if (MapUtil.isEmpty(httpReturnMap)) {
+                        return methodRetuenMap;
+                    }
+
+                    if (MapUtil.isEmpty(methodRetuenMap)) {
+                        return httpReturnMap;
+                    }
+
+                    for (Map.Entry<String, Boolean> entry : httpReturnMap.entrySet()) {
+                        Boolean b = methodRetuenMap.get(entry.getKey());
+                        if (b == null) {
+                            methodRetuenMap.put(entry.getKey(), entry.getValue());
+                            continue;
+                        }
+                        methodRetuenMap.merge(entry.getKey(), entry.getValue(), (oldValue, newValue) -> oldValue || newValue);
+                    }
+                    return methodRetuenMap;
+                },
+                MAP_STRING_BOOLEAN_RESP_TYPE_REF);
     }
 
     @Override
@@ -326,17 +359,11 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public String getAlias(String sessionId) {
-        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
-        NetServerInfo info = nodeAllocatorService.allocate(null);
-        String url = StrUtil.format(
-                "http{}://{}:{}/{}/session/{sessionId}/alias",
-                info.getHttpSecure() ? "s" : "",
-                info.getInternalIp(),
-                info.getHttpPort(),
-                info.getNetProtocol().getServiceName()
-        );
-        Resp<String> resp = OkHttpUtil.get(url, STRING_RESP_TYPE_REF);
-        return resp.dataIfSuccessOrException();
+        return fetchGetFromAllNode(
+                StrUtil.format("/session/{}/alias", sessionId),
+                null,
+                StrUtil::isNotBlank,
+                STRING_RESP_TYPE_REF);
     }
 
     @Override
@@ -357,32 +384,20 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public Collection<String> findTags(String sessionId) {
-        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
-        NetServerInfo info = nodeAllocatorService.allocate(null);
-        String url = StrUtil.format(
-                "http{}://{}:{}/{}/session/{sessionId}/tags",
-                info.getHttpSecure() ? "s" : "",
-                info.getInternalIp(),
-                info.getHttpPort(),
-                info.getNetProtocol().getServiceName()
-        );
-        Resp<Collection<String>> resp = OkHttpUtil.get(url, COLL_STRING_RESP_TYPE_REF);
-        return resp.dataIfSuccessOrException();
+        return fetchGetFromAllNode(
+                StrUtil.format("/session/{}/tags", sessionId),
+                null,
+                CollUtil::isNotEmpty,
+                COLL_STRING_RESP_TYPE_REF);
     }
 
     @Override
     public Collection<String> findTagsByUserId(String userId) {
-        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
-        NetServerInfo info = nodeAllocatorService.allocate(null);
-        String url = StrUtil.format(
-                "http{}://{}:{}/{}/session/{sessionId}/tags/{userId}",
-                info.getHttpSecure() ? "s" : "",
-                info.getInternalIp(),
-                info.getHttpPort(),
-                info.getNetProtocol().getServiceName()
-        );
-        Resp<Collection<String>> resp = OkHttpUtil.get(url, COLL_STRING_RESP_TYPE_REF);
-        return resp.dataIfSuccessOrException();
+        return fetchGetFromAllNode(
+                StrUtil.format("/session/tags/{}", userId),
+                null,
+                CollUtil::isNotEmpty,
+                COLL_STRING_RESP_TYPE_REF);
     }
 
     // @Override
@@ -408,66 +423,39 @@ public class SessionServiceClientProxy implements ISessionService {
 
     @Override
     public Collection<String> findSessionsByAnyMatchTags(Collection<String> tags) {
-        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
-        NetServerInfo info = nodeAllocatorService.allocate(null);
-        String url = StrUtil.format(
-                "http{}://{}:{}/{}/session/any",
-                info.getHttpSecure() ? "s" : "",
-                info.getInternalIp(),
-                info.getHttpPort(),
-                info.getNetProtocol().getServiceName()
-        );
-        Resp<Collection<String>> resp = OkHttpUtil.get(
-                url,
-                null,
-                MapUtil.<String, Collection<String>>builder()
+        return fetchGetFromAllNode(
+                "/session/any",
+                MapUtil.<String, Object>builder()
                         .put("tags", tags)
                         .build(),
+                CollUtil::isNotEmpty,
                 COLL_STRING_RESP_TYPE_REF);
-        return resp.dataIfSuccessOrException();
     }
 
     @Override
     public boolean containAnyTag(@Nonnull String sessionId, @Nonnull Collection<String> tags) {
-        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
-        NetServerInfo info = nodeAllocatorService.allocate(null);
-        String url = StrUtil.format(
-                "http{}://{}:{}/{}/session/{sessionId}/containAnyTag",
-                info.getHttpSecure() ? "s" : "",
-                info.getInternalIp(),
-                info.getHttpPort(),
-                info.getNetProtocol().getServiceName()
-        );
-        Resp<Boolean> resp = OkHttpUtil.get(
-                url,
-                null,
-                MapUtil.<String, Collection<String>>builder()
-                        .put("tags", tags)
-                        .build(),
-                BOOLEAN_RESP_TYPE_REF);
-
-        return resp.dataIfSuccessOrException();
+        return ObjectUtil.defaultIfNull(
+                fetchGetFromAllNode(
+                        StrUtil.format("/session/{}/containAnyTag", sessionId),
+                        MapUtil.<String, Object>builder()
+                                .put("tags", tags)
+                                .build(),
+                        Boolean.TRUE::equals,
+                        BOOLEAN_RESP_TYPE_REF),
+                Boolean.FALSE);
     }
 
     @Override
     public boolean containAllTags(String sessionId, Collection<String> tags) {
-        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
-        NetServerInfo info = nodeAllocatorService.allocate(null);
-        String url = StrUtil.format(
-                "http{}://{}:{}/{}/session/{sessionId}/containTags",
-                info.getHttpSecure() ? "s" : "",
-                info.getInternalIp(),
-                info.getHttpPort(),
-                info.getNetProtocol().getServiceName()
-        );
-        Resp<Boolean> resp = OkHttpUtil.get(
-                url,
-                null,
-                MapUtil.<String, Collection<String>>builder()
-                        .put("tags", tags)
-                        .build(),
-                BOOLEAN_RESP_TYPE_REF);
-        return resp.dataIfSuccessOrException();
+        return ObjectUtil.defaultIfNull(
+                fetchGetFromAllNode(
+                        StrUtil.format("/session/{}/containTags", sessionId),
+                        MapUtil.<String, Object>builder()
+                                .put("tags", tags)
+                                .build(),
+                        Boolean.TRUE::equals,
+                        BOOLEAN_RESP_TYPE_REF),
+                Boolean.FALSE);
     }
 
     @Override
@@ -636,11 +624,21 @@ public class SessionServiceClientProxy implements ISessionService {
         }
     }
 
+    /**
+     * 从所有网关节点获取会话信息
+     *
+     * @param urlSuffix     url 后缀，用于拼接完整的服务地址
+     * @param requestParam  请求参数
+     * @param checkHttpResp 网关节点响应的数据是否符合要求需要返回给调用方
+     * @param typeReference 用于网关节点返回数据时用到的反序列化
+     * @param <T>           返回给调用方的对象类型
+     * @return 数据
+     */
     @SuppressWarnings("unchecked")
-    private <T> T fetch(String urlSuffix,
-                        Map<String, Object> requestParam,
-                        Predicate<T> checkHttpResp,
-                        TypeReference<Resp<T>> typeReference) {
+    private <T> T fetchGetFromAllNode(String urlSuffix,
+                                      Map<String, Object> requestParam,
+                                      Predicate<T> checkHttpResp,
+                                      TypeReference<Resp<T>> typeReference) {
         INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
         Collection<NetServerInfo> serverInfos = nodeAllocatorService.getAll();
         Assert.notEmpty(serverInfos, "未发现[{}]网关，根据会话id获取用户id失败", defaultNetProtocol);
@@ -676,36 +674,95 @@ public class SessionServiceClientProxy implements ISessionService {
         return (T) returnArr[0];
     }
 
+    @SuppressWarnings("unchecked")
+    private <T> T fetchPostFromAllNode(String urlSuffix,
+                                       Map<String, Object> requestParam,
+                                       Object requestBody,
+                                       BiFunction<T, T, T> mapReduce,
+                                       TypeReference<Resp<T>> typeReference) {
+        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
+        Collection<NetServerInfo> serverInfos = nodeAllocatorService.getAll();
+        Assert.notEmpty(serverInfos, "未发现[{}]网关，根据会话id获取用户id失败", defaultNetProtocol);
+        Object[] returnArr = new Object[1];
+        CompletableFuture<T>[] futures = (CompletableFuture<T>[]) new CompletableFuture<?>[serverInfos.size()];
+        int idx = 0;
+        for (NetServerInfo serverInfo : serverInfos) {
+            futures[idx] = CompletableFuture.supplyAsync(() -> {
+                        String url = StrUtil.format(
+                                "http{}://{}:{}/{}" + urlSuffix,
+                                serverInfo.getHttpSecure() ? "s" : "",
+                                serverInfo.getInternalIp(),
+                                serverInfo.getHttpPort(),
+                                serverInfo.getNetProtocol().getServiceName()
+                        );
+                        return OkHttpUtil.post(url, null, requestParam, requestBody, typeReference)
+                                .dataIfSuccessOrException();
+                    })
+                    .whenComplete((returnData, throwable) -> {
+                        returnArr[0] = mapReduce.apply(returnData, (T) returnArr[0]);
+                    });
+            idx++;
+        }
+
+        CompletableFuture<Void> voidCompletableFuture = CompletableFuture.allOf(futures);
+        try {
+            voidCompletableFuture.get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.error("请求网关[{}]获取信息错误: {}", defaultNetProtocol, e.getMessage());
+        }
+        return (T) returnArr[0];
+    }
+
+    @SuppressWarnings("unchecked")
     private void saveSessionInfo(SessionBindingInfoChangeReq req) {
         INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(defaultNetProtocol);
-        NetServerInfo info = nodeAllocatorService.allocate(req.getSessionId());
-        String url = StrUtil.format(
-                "http{}://{}:{}/{}/session/info",
-                info.getHttpSecure() ? "s" : "",
-                info.getInternalIp(),
-                info.getHttpPort(),
-                info.getNetProtocol().getServiceName()
-        );
-        okhttp3.RequestBody requestBody = okhttp3.RequestBody.create(
+        Collection<NetServerInfo> serverInfos = nodeAllocatorService.getAll();
+        Assert.notEmpty(serverInfos, "未发现[{}]网关，根据会话id获取用户id失败", defaultNetProtocol);
+        final okhttp3.RequestBody requestBody = okhttp3.RequestBody.create(
                 okhttp3.MediaType.get(MediaType.APPLICATION_JSON_VALUE),
                 JsonUtil.writeValue(req));
+        CompletableFuture<Void>[] futures = (CompletableFuture<Void>[]) new CompletableFuture<?>[serverInfos.size()];
+        int idx = 0;
+        for (NetServerInfo serverInfo : serverInfos) {
+            futures[idx] = CompletableFuture.runAsync(() -> {
+                String url = StrUtil.format(
+                        "http{}://{}:{}/{}/session/info",
+                        serverInfo.getHttpSecure() ? "s" : "",
+                        serverInfo.getInternalIp(),
+                        serverInfo.getHttpPort(),
+                        serverInfo.getNetProtocol().getServiceName()
+                );
 
-        Request request = new Request.Builder()
-                .url(url)
-                .post(requestBody)
-                .build();
-        Call call = CLIENT.newCall(request);
-        try (Response execute = call.execute();
-             ResponseBody body = execute.body();) {
-            String bodyStr = body == null ? "" : body.string();
-            if (execute.isSuccessful()) {
-                Resp<?> resp = JsonUtil.readValue(bodyStr, Resp.class);
-                resp.exceptionIfUnSuccess();
-            } else {
-                throw new RuntimeException("调用[post " + url + "]失败，状态码：" + execute.code() + " 响应体：" + bodyStr);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+                Request request = new Request.Builder()
+                        .url(url)
+                        .post(requestBody)
+                        .build();
+                Call call = CLIENT.newCall(request);
+                try (Response execute = call.execute();
+                     ResponseBody body = execute.body();) {
+                    String bodyStr = body == null ? "" : body.string();
+                    if (bodyStr.contains("false")) {
+                        JsonUtil.readValue(bodyStr, BOOLEAN_RESP_TYPE_REF).exceptionIfUnSuccess();
+                    } else if (!execute.isSuccessful()) {
+                        String msg = StrUtil.format(
+                                "调用[post {}]失败，状态码：{},响应体：{}",
+                                url,
+                                execute.code(),
+                                body == null ? "" : body.string());
+                        throw new RuntimeException(msg);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException("远程调用失败：" + request, e);
+                }
+            });
+            idx++;
+        }
+
+        CompletableFuture<Void> voidCompletableFuture = CompletableFuture.allOf(futures);
+        try {
+            voidCompletableFuture.get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.error("请求网关[{}]报错会话信息超时", defaultNetProtocol);
         }
     }
 

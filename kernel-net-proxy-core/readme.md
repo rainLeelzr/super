@@ -1,2 +1,2 @@
- # kernel-net-transfer-service
-网络消息中转-微服务端
+ # kernel-net-proxy-core
+ 网络通讯模块-代理服务-核心模块

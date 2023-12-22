@@ -174,6 +174,7 @@ import vip.isass.kernel.net.core.message.Message;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * 会话服务，记录已经建立链接的会话，上层应用使用本接口发送消息给对端
@@ -192,6 +193,7 @@ public interface ISessionService {
 
     /**
      * 新增会话
+     * todo 不应该暴露此接口给应用调用
      *
      * @param session 会话
      */
@@ -199,6 +201,7 @@ public interface ISessionService {
 
     /**
      * 删除会话
+     * todo 不应该暴露此接口给应用调用
      *
      * @param session 会话
      */
@@ -209,6 +212,7 @@ public interface ISessionService {
 
     /**
      * 根据会话 id 删除会话
+     * todo 不应该暴露此接口给应用调用
      *
      * @param sessionId 会话 id
      * @return 被删除的会话
@@ -217,6 +221,7 @@ public interface ISessionService {
 
     /**
      * 根据链接通道获取会话
+     * todo 不应该暴露此接口给应用调用
      *
      * @param sessionId 会话 id
      * @return 会话
@@ -262,6 +267,14 @@ public interface ISessionService {
      * @param sessionId 会话 id
      */
     void removeUserId(String sessionId);
+
+    /**
+     * 批量判断用户是否在线
+     *
+     * @param userIds 用户 id 集合
+     * @return 每个用户是否在线
+     */
+    Map<String, Boolean> isOnline(Collection<String> userIds);
 
     // endregion
 
