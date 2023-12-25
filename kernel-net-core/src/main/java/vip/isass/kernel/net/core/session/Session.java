@@ -170,6 +170,7 @@
 package vip.isass.kernel.net.core.session;
 
 
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import vip.isass.kernel.net.core.server.Server;
 
 import java.lang.reflect.Type;
@@ -233,8 +234,10 @@ public interface Session<svr extends Server> {
      */
     void sendMessage(String cmd, Object payload);
 
-    default Type getServerType() {
-        return this.getClass().getGenericInterfaces()[0];
+    default Class<svr> getServerType() {
+        Type genericInterface = this.getClass().getGenericInterfaces()[0];
+        Type actualTypeArgument = ((ParameterizedTypeImpl) genericInterface).getActualTypeArguments()[0];
+        return ((Class<svr>) actualTypeArgument);
     }
 
 }

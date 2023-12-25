@@ -171,10 +171,9 @@ package vip.isass.kernel.net.websocket.session;
 
 import cn.hutool.core.lang.Assert;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.DefaultChannelPromise;
-import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
+import vip.isass.core.support.JsonUtil;
 import vip.isass.core.support.SystemClock;
 import vip.isass.kernel.net.core.session.ClientSession;
 import vip.isass.kernel.net.websocket.packet.WebsocketPacket;
@@ -249,20 +248,12 @@ public class WebsocketClientSession implements ClientSession<WebsocketServer> {
             log.debug("channel is inactive, send Message fail. session info: {}", this);
             return;
         }
-        channel.writeAndFlush(
-                WebsocketPacket.builder()
-                        .cmd(cmd)
-                        .payload(payload)
-                        .build(),
-                new DefaultChannelPromise(channel, channel.eventLoop())
-                        .addListener((GenericFutureListener<ChannelFuture>) future -> {
-                            if (future.isSuccess()) {
-                                log.debug("发送给客户端[{}]成功,cmd[{}]：{}", this.getRemoteIp(), cmd, payload.toString());
-                            } else {
-                                log.error("发送给客户端[{}]失败。", this.getRemoteIp(), future.cause());
-                            }
-                        })
-        );
+
+        TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JsonUtil.writeValue(WebsocketPacket.builder()
+                .cmd(cmd)
+                .payload(payload)
+                .build()));
+        channel.writeAndFlush(textWebSocketFrame);
     }
 
 

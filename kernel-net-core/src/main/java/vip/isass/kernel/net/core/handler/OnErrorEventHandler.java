@@ -184,8 +184,8 @@ public interface OnErrorEventHandler {
      * @param session   会话
      * @param cmd       数据包
      * @param payload   数据图
-     * @param exception 异常
+     * @param throwable 异常
      */
-    void onError(Session<?> session, String cmd, Object payload, Exception exception);
+    void onError(Session<?> session, String cmd, Object payload, Throwable throwable);
 
 }

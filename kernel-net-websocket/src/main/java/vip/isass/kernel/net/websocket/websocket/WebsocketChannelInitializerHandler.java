@@ -203,6 +203,9 @@ public class WebsocketChannelInitializerHandler extends ChannelInitializer<Socke
     @Resource
     private WebsocketChannelInboundHandler websocketChannelInboundHandler;
 
+    // @Resource
+    // private WebsocketPacketEncoder websocketPacketEncoder;
+
     @Override
     protected void initChannel(SocketChannel socketChannel) {
         ChannelPipeline pipeline = socketChannel.pipeline();
@@ -212,9 +215,14 @@ public class WebsocketChannelInitializerHandler extends ChannelInitializer<Socke
                 "idleStateHandler",
                 new IdleStateHandler(0, 0, timeout, TimeUnit.MILLISECONDS));
 
+        // 将请求和应答消息编码或者解码为HTTP消息
         pipeline.addLast("http-codec", new HttpServerCodec());
+        // 将HTTP消息的多个部分组合成一条完整的HTTP消息
         pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
+        // 用来向客户端发送HTML5文件，主要用于支持浏览器和服务端进行WebSocket通信
         pipeline.addLast("http-chunked", new ChunkedWriteHandler());
+
+        // pipeline.addLast("decoder", websocketPacketEncoder);
         pipeline.addLast(websocketChannelInboundHandler);
     }
 }

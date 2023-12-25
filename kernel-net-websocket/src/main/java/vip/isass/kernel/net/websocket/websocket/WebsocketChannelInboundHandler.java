@@ -199,8 +199,10 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import vip.isass.core.support.JsonUtil;
+import vip.isass.kernel.net.core.handler.manager.EventManager;
+import vip.isass.kernel.net.core.message.Message;
+import vip.isass.kernel.net.core.message.MessageCmd;
 import vip.isass.kernel.net.core.session.ISessionService;
-import vip.isass.kernel.net.core.session.Session;
 import vip.isass.kernel.net.websocket.packet.WebsocketPacket;
 import vip.isass.kernel.net.websocket.session.WebsocketClientSession;
 
@@ -218,18 +220,19 @@ public class WebsocketChannelInboundHandler extends SimpleChannelInboundHandler<
 
     private Map<Channel, WebSocketServerHandshaker> handshakers = new ConcurrentHashMap<>(128);
 
-    @Resource
     @Getter
+    @Resource
     private ISessionService sessionService;
+
+    @Resource
+    private EventManager eventManager;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         // 新的channel激活时，绑定channel与session的关系
         Channel channel = ctx.channel();
-        log.debug("websocket 接收到客户端的连接，客户端ip：{}", channel.remoteAddress());
-
-        Session<WebsocketServer> session = new WebsocketClientSession(channel);
-        getSessionService().addSession(session);
+        WebsocketClientSession session = new WebsocketClientSession(channel);
+        eventManager.onConnect(session);
         channelRegistered(ctx);
     }
 
@@ -249,8 +252,8 @@ public class WebsocketChannelInboundHandler extends SimpleChannelInboundHandler<
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.ALL_IDLE) {
                 log.debug(
-                        "channel超时没有读写操作，将主动关闭链接通道！session={}",
-                        getSessionService().getSessionById(ctx.channel().id().toString()));
+                        "channel超时没有读写操作，将主动关闭链接通道！sessionId[{}]",
+                        ctx.channel().id().toString());
                 ctx.close();
             }
         }
@@ -258,15 +261,9 @@ public class WebsocketChannelInboundHandler extends SimpleChannelInboundHandler<
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        if (!"远程主机强迫关闭了一个现有的连接。".equals(cause.getMessage())) {
-            log.error(cause.getMessage(), cause);
-        }
-        if (cause instanceof java.io.IOException) {
-            log.error(cause.getMessage());
-            return;
-        } else {
-            log.error(cause.getMessage(), cause);
-        }
+        Channel channel = ctx.channel();
+        WebsocketClientSession session = new WebsocketClientSession(channel);
+        eventManager.onError(session, cause);
         ctx.close();
     }
 
@@ -275,8 +272,8 @@ public class WebsocketChannelInboundHandler extends SimpleChannelInboundHandler<
         ctx.fireChannelInactive();
         Channel channel = ctx.channel();
         if (channel != null) {
-            Session<WebsocketServer> session = (WebsocketClientSession) getSessionService().removeSession(ctx.channel().id().toString());
-            log.debug("成功关闭了一个websocket连接：session={}", session.toString());
+            WebsocketClientSession session = new WebsocketClientSession(channel);
+            eventManager.onDisconnect(session);
         }
 
         // todo 分发用户下线事件
@@ -296,22 +293,25 @@ public class WebsocketChannelInboundHandler extends SimpleChannelInboundHandler<
         }
 
         if (frame instanceof BinaryWebSocketFrame) {
-            // todo deal binaryFrame
+            WebsocketClientSession session = new WebsocketClientSession(ctx.channel());
+            session.sendMessage(MessageCmd.ERROR, "暂不支持二进制帧");
             return;
         }
 
         if (frame instanceof TextWebSocketFrame) {
             Channel channel = ctx.channel();
             String request = ((TextWebSocketFrame) frame).text();
-            log.debug("接收到文本请求：{}", request);
+            log.trace("接收到文本请求：{}", request);
 
             WebsocketPacket packet = JsonUtil.DEFAULT_INSTANCE.readValue(request, WebsocketPacket.class);
-
-            WebsocketClientSession session = (WebsocketClientSession) getSessionService().getSessionById(channel.id().toString());
-            if (session == null) {
-                log.error("channelRead 失败，channel对应的session为null");
-                return;
-            }
+            WebsocketClientSession session = new WebsocketClientSession(channel);
+            eventManager.onMessage(
+                    Message.builder()
+                            .senderSessionId(session.getSessionId())
+                            .senderSession(session)
+                            .cmd(packet.getCmd())
+                            .payload(packet.getPayload())
+                            .build());
         }
     }
 

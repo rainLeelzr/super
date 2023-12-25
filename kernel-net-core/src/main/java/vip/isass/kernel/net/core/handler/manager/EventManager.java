@@ -241,7 +241,8 @@ public class EventManager implements IEventManager {
         if (onConnectEventHandlers != null) {
             onConnectEventHandlers.forEach(h -> h.onConnect(session));
         }
-        log.debug("新建立连接");
+
+        log.debug("[{}]客户端连接，客户端ip：{}", session.getServerType().getSimpleName(), session.getRemoteIp());
     }
 
     @Override
@@ -254,6 +255,7 @@ public class EventManager implements IEventManager {
             }
         }
         sessionService.removeSession(session);
+        log.debug("[{}]客户端断连，客户端ip：{}", session.getServerType().getSimpleName(), session.getRemoteIp());
     }
 
     @Override
@@ -332,13 +334,16 @@ public class EventManager implements IEventManager {
     }
 
     @Override
-    public void onError(Session<?> session, Exception exception) {
+    public void onError(Session<?> session, Throwable throwable) {
         if (onErrorEventHandlers != null) {
-            onErrorEventHandlers.forEach(h -> h.onError(session, null, null, exception));
+            onErrorEventHandlers.forEach(h -> h.onError(session, null, null, throwable));
         }
-        Throwable e = ExceptionUtil.unwrap(exception);
+        Throwable e = ExceptionUtil.unwrap(throwable);
         session.sendMessage(MessageCmd.ERROR, "发生异常" + e.getMessage());
-        log.error("socket通道[{}]发生异常[{}]，将关闭该连接", session.getSessionId(), e.getMessage());
+        log.error("[{}]sessionId[{}]发生异常[{}]，将关闭该连接",
+                session.getServerType().getSimpleName(),
+                session.getSessionId(),
+                e.getMessage());
         sessionService.removeSession(session);
         session.close();
     }

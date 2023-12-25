@@ -167,45 +167,39 @@
  *
  */
 
-package vip.isass.kernel.net.core.handler.manager;
+package vip.isass.kernel.net.websocket.websocket;
 
-import vip.isass.kernel.net.core.message.Message;
-import vip.isass.kernel.net.core.session.Session;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import vip.isass.core.support.JsonUtil;
+import vip.isass.kernel.net.websocket.packet.WebsocketPacket;
 
 /**
- * 事件处理器
+ * 发送数据给客户端的时，执行此类进行编码
  *
  * @author Rain
  */
-public interface IEventManager {
+@Slf4j
+@ChannelHandler.Sharable
+// @Component
+public class WebsocketPacketEncoder extends MessageToByteEncoder<WebsocketPacket> {
 
-    /**
-     * 连接创建事件
-     *
-     * @param session 会话
-     */
-    void onConnect(Session<?> session);
+    @Override
+    protected void encode(ChannelHandlerContext ctx, WebsocketPacket packet, ByteBuf out) {
+        out.writeBytes(encode(packet));
+    }
 
-    /**
-     * 断开连接事件
-     *
-     * @param session 会话
-     */
-    void onDisconnect(Session<?> session);
-
-    /**
-     * 收到路由消息事件
-     *
-     * @param message 消息
-     */
-    <T> void onMessage(Message message);
-
-    /**
-     * 收到错误消息事件
-     *
-     * @param session   会话
-     * @param throwable 异常
-     */
-    void onError(Session<?> session, Throwable throwable);
+    @SneakyThrows
+    public static ByteBuf encode(WebsocketPacket packet) {
+        TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JsonUtil.writeValue(packet));
+        return textWebSocketFrame.content().retain();
+    }
 
 }
