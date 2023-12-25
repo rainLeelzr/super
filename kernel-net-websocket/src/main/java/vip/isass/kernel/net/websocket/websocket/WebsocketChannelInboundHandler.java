@@ -169,6 +169,7 @@
 
 package vip.isass.kernel.net.websocket.websocket;
 
+import cn.hutool.core.util.StrUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -203,6 +204,7 @@ import vip.isass.kernel.net.core.handler.manager.EventManager;
 import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.message.MessageCmd;
 import vip.isass.kernel.net.core.session.ISessionService;
+import vip.isass.kernel.net.websocket.WebsocketProperties;
 import vip.isass.kernel.net.websocket.packet.WebsocketPacket;
 import vip.isass.kernel.net.websocket.session.WebsocketClientSession;
 
@@ -214,8 +216,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Rain
  */
 @Slf4j
-@ChannelHandler.Sharable
 @Component
+@ChannelHandler.Sharable
 public class WebsocketChannelInboundHandler extends SimpleChannelInboundHandler<Object> {
 
     private Map<Channel, WebSocketServerHandshaker> handshakers = new ConcurrentHashMap<>(128);
@@ -317,7 +319,7 @@ public class WebsocketChannelInboundHandler extends SimpleChannelInboundHandler<
 
     private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) {
         // 如果HTTP解码失败，或者请求头没有websocket，则返回HTTP异常
-        // req.decoderResult().isFailure()
+        // 如果消息头中没有包含Upgrade字段或者它的值不是websocket，则返回Http 400响应
         if (req.decoderResult().isFailure()
                 || (!HttpHeaderValues.WEBSOCKET.toString().equals(req.headers().get(HttpHeaderNames.UPGRADE)))) {
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST));
@@ -325,14 +327,16 @@ public class WebsocketChannelInboundHandler extends SimpleChannelInboundHandler<
         }
 
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
-                "ws://localhost:8080/websocket",
+                StrUtil.format("ws://{}", req.headers().get(HttpHeaderNames.HOST)),
                 null,
                 false);
         WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(req);
         if (handshaker == null) {
+            // 不支持websocket协议
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
         } else {
             handshakers.put(ctx.channel(), handshaker);
+            // 响应消息返回给客户端
             handshaker.handshake(ctx.channel(), req);
         }
     }

@@ -167,39 +167,32 @@
  *
  */
 
-package vip.isass.kernel.net.websocket.websocket;
+package vip.isass.kernel.net.websocket;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import vip.isass.core.support.JsonUtil;
-import vip.isass.kernel.net.websocket.packet.WebsocketPacket;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-/**
- * 发送数据给客户端的时，执行此类进行编码
- *
- * @author Rain
- */
-@Slf4j
-@ChannelHandler.Sharable
-// @Component
-public class WebsocketPacketEncoder extends MessageToByteEncoder<WebsocketPacket> {
+@Getter
+@Setter
+@Configuration
+@ConfigurationProperties(prefix = "kernel.net.websocket")
+public class WebsocketProperties {
 
-    @Override
-    protected void encode(ChannelHandlerContext ctx, WebsocketPacket packet, ByteBuf out) {
-        out.writeBytes(encode(packet));
-    }
+    private String hostName = "0.0.0.0";
 
-    @SneakyThrows
-    public static ByteBuf encode(WebsocketPacket packet) {
-        TextWebSocketFrame textWebSocketFrame = new TextWebSocketFrame(JsonUtil.writeValue(packet));
-        return textWebSocketFrame.content().retain();
-    }
+    private int port = 20003;
+
+    /**
+     * 链路空闲超时时间，包括读和写
+     */
+    private int timeout = 300_000;
+
+    private String externalIp;
+
+    private Integer netExternalPort;
+
+    private String netExternalUrl;
 
 }

@@ -169,6 +169,7 @@
 
 package vip.isass.kernel.net.websocket.websocket;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -176,10 +177,9 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import vip.isass.kernel.net.websocket.WebsocketProperties;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
@@ -191,20 +191,18 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+// 本实例是线程安全的可以被多个 channel 复用
+@ChannelHandler.Sharable
 public class WebsocketChannelInitializerHandler extends ChannelInitializer<SocketChannel> {
 
     /**
      * 默认4分钟
      */
-    @Getter
-    @Value("${server.websocket.timeout:240000}")
-    private int timeout;
+    @Resource
+    private WebsocketProperties websocketProperties;
 
     @Resource
     private WebsocketChannelInboundHandler websocketChannelInboundHandler;
-
-    // @Resource
-    // private WebsocketPacketEncoder websocketPacketEncoder;
 
     @Override
     protected void initChannel(SocketChannel socketChannel) {
@@ -213,7 +211,7 @@ public class WebsocketChannelInitializerHandler extends ChannelInitializer<Socke
         // 设置tcp链路空闲超时时间
         pipeline.addLast(
                 "idleStateHandler",
-                new IdleStateHandler(0, 0, timeout, TimeUnit.MILLISECONDS));
+                new IdleStateHandler(0, 0, websocketProperties.getTimeout(), TimeUnit.MILLISECONDS));
 
         // 将请求和应答消息编码或者解码为HTTP消息
         pipeline.addLast("http-codec", new HttpServerCodec());
@@ -221,8 +219,6 @@ public class WebsocketChannelInitializerHandler extends ChannelInitializer<Socke
         pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
         // 用来向客户端发送HTML5文件，主要用于支持浏览器和服务端进行WebSocket通信
         pipeline.addLast("http-chunked", new ChunkedWriteHandler());
-
-        // pipeline.addLast("decoder", websocketPacketEncoder);
         pipeline.addLast(websocketChannelInboundHandler);
     }
 }

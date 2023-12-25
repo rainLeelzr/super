@@ -178,10 +178,10 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import vip.isass.kernel.net.core.server.NetProtocol;
 import vip.isass.kernel.net.core.server.Server;
+import vip.isass.kernel.net.websocket.WebsocketProperties;
 
 import javax.annotation.Resource;
 import java.util.concurrent.ExecutorService;
@@ -198,11 +198,8 @@ public class WebsocketServer implements Server {
     @Resource
     private WebsocketChannelInitializerHandler websocketChannelInitializerHandler;
 
-    @Value("${kernel.net.websocket.hostname:0.0.0.0}")
-    private String hostname;
-
-    @Value("${kernel.net.websocket.port:20003}")
-    private int port;
+    @Resource
+    private WebsocketProperties websocketProperties;
 
     private ExecutorService executorService;
 
@@ -212,7 +209,7 @@ public class WebsocketServer implements Server {
 
     @Override
     public String getListeningAddress() {
-        return hostname + ":" + port;
+        return websocketProperties.getHostName() + ":" + websocketProperties.getPort();
     }
 
     public void start() {
@@ -235,7 +232,7 @@ public class WebsocketServer implements Server {
                         .handler(new LoggingHandler(LogLevel.DEBUG))
                         .childHandler(websocketChannelInitializerHandler);
 
-                ChannelFuture f = bootstrap.bind(hostname, port).sync();
+                ChannelFuture f = bootstrap.bind(websocketProperties.getHostName(), websocketProperties.getPort()).sync();
                 f.channel().closeFuture().sync();
             } catch (InterruptedException e) {
                 log.error("websocket 服务器启动失败！{}", e.getMessage(), e);
