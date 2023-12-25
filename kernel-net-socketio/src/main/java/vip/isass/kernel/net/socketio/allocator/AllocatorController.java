@@ -166,24 +166,32 @@
  * Library.
  */
 
-package vip.isass.kernel.net.socketio;
+package vip.isass.kernel.net.socketio.allocator;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
-import vip.isass.kernel.net.proxy.core.ConsistentHashNodeAllocatorService;
+import cn.hutool.extra.servlet.ServletUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import vip.isass.core.web.Resp;
 
-/**
- * @author isass
- */
-@Configuration
-@ConditionalOnProperty(name = {"kernel.net.enabled", "kernel.net.proxy.enabled"}, havingValue = "true")
-public class SocketioNodeAllocatorConfiguration {
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
-    @Bean
-    public INodeAllocatorService consistentHashNodeAllocatorService() {
-        return new ConsistentHashNodeAllocatorService(NetProtocol.socketio);
+@RestController
+@Api(tags = "节点分配器")
+@RequestMapping("/${spring.application.name}/allocator")
+public class AllocatorController {
+
+    @Resource
+    private AllocatorService allocatorService;
+
+    @ApiOperation(value = "分配节点", notes = "根据客户端 ip 分配节点")
+    @GetMapping("/node")
+    public Resp<String> allocate(HttpServletRequest request) {
+        String clientIp = ServletUtil.getClientIP(request);
+        return Resp.bizSuccess(allocatorService.allocate(clientIp));
     }
+
 }

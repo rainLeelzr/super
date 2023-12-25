@@ -167,72 +167,196 @@
  *
  */
 
-package vip.isass.kernel.net.socketio;
+package vip.isass.kernel.net.websocket.websocket;
 
-import cn.hutool.core.exceptions.ExceptionUtil;
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.listener.ExceptionListener;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.CharsetUtil;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import vip.isass.kernel.net.core.handler.manager.EventManager;
-import vip.isass.kernel.net.core.message.MessageCmd;
+import vip.isass.core.support.JsonUtil;
 import vip.isass.kernel.net.core.session.ISessionService;
 import vip.isass.kernel.net.core.session.Session;
+import vip.isass.kernel.net.websocket.packet.WebsocketPacket;
+import vip.isass.kernel.net.websocket.session.WebsocketClientSession;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * socketIo 异常事件监听器
- *
- * @author rain
+ * @author Rain
  */
 @Slf4j
+@ChannelHandler.Sharable
 @Component
-public class OnSocketIoErrorListener implements ExceptionListener {
+public class WebsocketChannelInboundHandler extends SimpleChannelInboundHandler<Object> {
 
-    @Autowired
-    private EventManager eventManager;
+    private Map<Channel, WebSocketServerHandshaker> handshakers = new ConcurrentHashMap<>(128);
 
     @Resource
+    @Getter
     private ISessionService sessionService;
 
     @Override
-    public void onEventException(Exception e, List<Object> args, SocketIOClient client) {
-        log.error(e.getMessage(), e);
-        Throwable unwrap = ExceptionUtil.unwrap(e);
-        log.warn("socketio event exception: {}", unwrap.getMessage());
-        client.sendEvent(MessageCmd.ERROR, "发生异常：" + unwrap.getMessage());
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        // 新的channel激活时，绑定channel与session的关系
+        Channel channel = ctx.channel();
+        log.debug("websocket 接收到客户端的连接，客户端ip：{}", channel.remoteAddress());
+
+        Session<WebsocketServer> session = new WebsocketClientSession(channel);
+        getSessionService().addSession(session);
+        channelRegistered(ctx);
     }
 
     @Override
-    public void onDisconnectException(Exception e, SocketIOClient client) {
-        Session<?> session = sessionService.getSessionById(client.getSessionId().toString());
-        eventManager.onError(session, e);
+    protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
+        if (msg instanceof FullHttpRequest) {
+            handleHttpRequest(ctx, (FullHttpRequest) msg);
+        } else if (msg instanceof WebSocketFrame) {
+            handleWebsocketFrame(ctx, (WebSocketFrame) msg);
+        }
     }
 
     @Override
-    public void onConnectException(Exception e, SocketIOClient client) {
-        Session<?> session = sessionService.getSessionById(client.getSessionId().toString());
-        eventManager.onError(session, e);
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
+        ctx.fireUserEventTriggered(evt);
+        if (evt instanceof IdleStateEvent) {
+            IdleState state = ((IdleStateEvent) evt).state();
+            if (state == IdleState.ALL_IDLE) {
+                log.debug(
+                        "channel超时没有读写操作，将主动关闭链接通道！session={}",
+                        getSessionService().getSessionById(ctx.channel().id().toString()));
+                ctx.close();
+            }
+        }
     }
 
     @Override
-    public void onPingException(Exception e, SocketIOClient client) {
-        Session<?> session = sessionService.getSessionById(client.getSessionId().toString());
-        eventManager.onError(session, e);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        if (!"远程主机强迫关闭了一个现有的连接。".equals(cause.getMessage())) {
+            log.error(cause.getMessage(), cause);
+        }
+        if (cause instanceof java.io.IOException) {
+            log.error(cause.getMessage());
+            return;
+        } else {
+            log.error(cause.getMessage(), cause);
+        }
+        ctx.close();
     }
 
     @Override
-    public void onPongException(Exception e, SocketIOClient client) {
-        Session<?> session = sessionService.getSessionById(client.getSessionId().toString());
-        eventManager.onError(session, e);
+    public void channelInactive(ChannelHandlerContext ctx) {
+        ctx.fireChannelInactive();
+        Channel channel = ctx.channel();
+        if (channel != null) {
+            Session<WebsocketServer> session = (WebsocketClientSession) getSessionService().removeSession(ctx.channel().id().toString());
+            log.debug("成功关闭了一个websocket连接：session={}", session.toString());
+        }
+
+        // todo 分发用户下线事件
     }
 
-    @Override
-    public boolean exceptionCaught(ChannelHandlerContext ctx, Throwable e) {
-        return true;
+    @SneakyThrows
+    private void handleWebsocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
+        if (frame instanceof CloseWebSocketFrame) {
+            handshakers.get(ctx.channel())
+                    .close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
+            return;
+        }
+
+        if (frame instanceof PingWebSocketFrame) {
+            ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
+            return;
+        }
+
+        if (frame instanceof BinaryWebSocketFrame) {
+            // todo deal binaryFrame
+            return;
+        }
+
+        if (frame instanceof TextWebSocketFrame) {
+            Channel channel = ctx.channel();
+            String request = ((TextWebSocketFrame) frame).text();
+            log.debug("接收到文本请求：{}", request);
+
+            WebsocketPacket packet = JsonUtil.DEFAULT_INSTANCE.readValue(request, WebsocketPacket.class);
+
+            WebsocketClientSession session = (WebsocketClientSession) getSessionService().getSessionById(channel.id().toString());
+            if (session == null) {
+                log.error("channelRead 失败，channel对应的session为null");
+                return;
+            }
+        }
     }
+
+    private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) {
+        // 如果HTTP解码失败，或者请求头没有websocket，则返回HTTP异常
+        // req.decoderResult().isFailure()
+        if (req.decoderResult().isFailure()
+                || (!HttpHeaderValues.WEBSOCKET.toString().equals(req.headers().get(HttpHeaderNames.UPGRADE)))) {
+            sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST));
+            return;
+        }
+
+        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
+                "ws://localhost:8080/websocket",
+                null,
+                false);
+        WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(req);
+        if (handshaker == null) {
+            WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
+        } else {
+            handshakers.put(ctx.channel(), handshaker);
+            handshaker.handshake(ctx.channel(), req);
+        }
+    }
+
+    private void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, DefaultFullHttpResponse resp) {
+        if (resp.status().code() != HttpResponseStatus.OK.code()) {
+            ByteBuf buf = Unpooled.copiedBuffer(resp.status().toString(), CharsetUtil.UTF_8);
+            resp.content().writeBytes(buf);
+            buf.release();
+            setContentLength(resp, resp.content().readableBytes());
+        }
+
+        ChannelFuture channelFuture = ctx.channel().writeAndFlush(resp);
+        if (!isKeepAlive(req) || resp.status().code() != HttpResponseStatus.OK.code()) {
+            channelFuture.addListener(ChannelFutureListener.CLOSE);
+        }
+    }
+
+    private boolean isKeepAlive(FullHttpRequest req) {
+        return HttpHeaderValues.KEEP_ALIVE.toString().equals(req.headers().get(HttpHeaderNames.CONNECTION));
+    }
+
+    private void setContentLength(DefaultFullHttpResponse resp, int length) {
+        resp.headers().set(HttpHeaderNames.CONTENT_LENGTH, length);
+    }
+
 }

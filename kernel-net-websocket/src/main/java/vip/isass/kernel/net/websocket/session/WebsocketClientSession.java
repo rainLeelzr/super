@@ -167,31 +167,115 @@
  *
  */
 
-package vip.isass.kernel.net.socketio;
+package vip.isass.kernel.net.websocket.session;
 
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.annotation.OnConnect;
+import cn.hutool.core.lang.Assert;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.DefaultChannelPromise;
+import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import vip.isass.kernel.net.core.handler.manager.EventManager;
+import vip.isass.core.support.SystemClock;
+import vip.isass.kernel.net.core.session.ClientSession;
+import vip.isass.kernel.net.websocket.packet.WebsocketPacket;
+import vip.isass.kernel.net.websocket.websocket.WebsocketServer;
 
 /**
- * socketIo  新建连接事件监听器
+ * tcp 客户端会话
  *
- * @author rain
+ * @author Rain
  */
 @Slf4j
-@Component
-public class OnSocketIoConnectListener {
+public class WebsocketClientSession implements ClientSession<WebsocketServer> {
 
-    @Autowired
-    private EventManager eventManager;
+    /**
+     * 与客户端的链接通道
+     */
+    private Channel channel;
 
-    @OnConnect
-    public void onConnect(SocketIOClient client) {
-        SocketIoSession socketIoSession = new SocketIoSession(client);
-        eventManager.onConnect(socketIoSession);
+    /**
+     * 创建session的时间
+     */
+    private Long createTime;
+
+    private WebsocketClientSession() {
+    }
+
+    public WebsocketClientSession(Channel channel) {
+        Assert.notNull(channel, "channel不能为null");
+        this.channel = channel;
+        this.createTime = SystemClock.now();
+    }
+
+    @Override
+    public boolean isActive() {
+        return channel.isActive();
+    }
+
+    @Override
+    public void close() {
+        if (channel == null) {
+            return;
+        }
+        channel.close();
+    }
+
+    @Override
+    public String getRemoteIp() {
+        return channel.remoteAddress().toString();
+    }
+
+    @Override
+    public String getRemotePort() {
+        return null;
+    }
+
+    @Override
+    public String getSessionId() {
+        return channel.id().toString();
+    }
+
+    @Override
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 原则上系统向客户端发消息，均统一调用此方法
+     */
+    @Override
+    public void sendMessage(String cmd, Object payload) {
+        if (!isActive()) {
+            log.debug("channel is inactive, send Message fail. session info: {}", this);
+            return;
+        }
+        channel.writeAndFlush(
+                WebsocketPacket.builder()
+                        .cmd(cmd)
+                        .payload(payload)
+                        .build(),
+                new DefaultChannelPromise(channel, channel.eventLoop())
+                        .addListener((GenericFutureListener<ChannelFuture>) future -> {
+                            if (future.isSuccess()) {
+                                log.debug("发送给客户端[{}]成功,cmd[{}]：{}", this.getRemoteIp(), cmd, payload.toString());
+                            } else {
+                                log.error("发送给客户端[{}]失败。", this.getRemoteIp(), future.cause());
+                            }
+                        })
+        );
+    }
+
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public String toString() {
+        return "WebsocketClientSession{" +
+                "channel=" + channel +
+                ", createTime=" + createTime +
+                '}';
     }
 
 }

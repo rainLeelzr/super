@@ -169,34 +169,29 @@
 
 package vip.isass.kernel.net.socketio;
 
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.annotation.OnDisconnect;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import vip.isass.kernel.net.core.session.ISessionService;
-import vip.isass.kernel.net.core.session.Session;
-import vip.isass.kernel.net.core.handler.manager.EventManager;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-/**
- * socketIo 断开连接事件监听器
- *
- * @author rain
- */
-@Slf4j
-@Component
-public class OnSocketIoDisconnectListener {
+@Getter
+@Setter
+@Configuration
+@ConfigurationProperties(prefix = "kernel.net.socketio")
+public class SocketIoProperties {
 
-    @Autowired
-    private ISessionService sessionManager;
+    private String hostName = "0.0.0.0";
 
-    @Autowired
-    private EventManager eventManager;
+    private int port = 20001;
 
-    @OnDisconnect
-    public void onDisconnect(SocketIOClient client) {
-        Session<?> session = sessionManager.getSessionById(client.getSessionId().toString());
-        eventManager.onDisconnect(session);
-    }
+    private int maxHttpContentLength = 64 * 1024;
+
+    private int maxFramePayloadLength = 64 * 1024;
+
+    private String externalIp;
+
+    private Integer netExternalPort;
+
+    private String netExternalUrl;
 
 }

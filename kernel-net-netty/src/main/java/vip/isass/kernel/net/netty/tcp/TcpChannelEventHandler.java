@@ -198,7 +198,7 @@ public class TcpChannelEventHandler extends ChannelInboundHandlerAdapter impleme
 
     @Resource
     @Getter
-    private ISessionService sessionManager;
+    private ISessionService sessionService;
 
     @Resource
     @Getter

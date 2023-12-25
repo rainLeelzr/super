@@ -173,12 +173,12 @@ import com.corundumstudio.socketio.SocketConfig;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import vip.isass.kernel.net.socketio.handler.OnSocketIoErrorListener;
 
 import javax.annotation.Resource;
 
@@ -192,7 +192,7 @@ import javax.annotation.Resource;
 public class SocketIoAutoConfiguration {
 
     @Resource
-    private SocketIoConfiguration socketIoConfiguration;
+    private SocketIoProperties socketIoProperties;
 
     @Autowired
     private OnSocketIoErrorListener onErrorListener;
@@ -200,10 +200,10 @@ public class SocketIoAutoConfiguration {
     @Bean
     public SocketIOServer socketIOServer() {
         com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
-        config.setHostname(socketIoConfiguration.getHostName());
-        config.setPort(socketIoConfiguration.getPort());
-        config.setMaxHttpContentLength(socketIoConfiguration.getMaxHttpContentLength());
-        config.setMaxFramePayloadLength(socketIoConfiguration.getMaxFramePayloadLength());
+        config.setHostname(socketIoProperties.getHostName());
+        config.setPort(socketIoProperties.getPort());
+        config.setMaxHttpContentLength(socketIoProperties.getMaxHttpContentLength());
+        config.setMaxFramePayloadLength(socketIoProperties.getMaxFramePayloadLength());
         config.setBossThreads(1);
         config.setExceptionListener(onErrorListener);
 

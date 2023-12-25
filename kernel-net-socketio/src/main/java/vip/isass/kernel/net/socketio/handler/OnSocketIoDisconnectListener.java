@@ -166,32 +166,36 @@
  * Library.
  */
 
-package vip.isass.kernel.net.socketio;
+package vip.isass.kernel.net.socketio.handler;
 
-import cn.hutool.extra.servlet.ServletUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import vip.isass.core.web.Resp;
+import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.annotation.OnDisconnect;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import vip.isass.kernel.net.core.session.ISessionService;
+import vip.isass.kernel.net.core.session.Session;
+import vip.isass.kernel.net.core.handler.manager.EventManager;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+/**
+ * socketIo 断开连接事件监听器
+ *
+ * @author rain
+ */
+@Slf4j
+@Component
+public class OnSocketIoDisconnectListener {
 
-@RestController
-@Api(tags = "节点分配器")
-@RequestMapping("/${spring.application.name}/allocator")
-public class AllocatorController {
+    @Autowired
+    private ISessionService sessionManager;
 
-    @Resource
-    private AllocatorService allocatorService;
+    @Autowired
+    private EventManager eventManager;
 
-    @ApiOperation(value = "分配节点", notes = "根据客户端 ip 分配节点")
-    @GetMapping("/node")
-    public Resp<String> allocate(HttpServletRequest request) {
-        String clientIp = ServletUtil.getClientIP(request);
-        return Resp.bizSuccess(allocatorService.allocate(clientIp));
+    @OnDisconnect
+    public void onDisconnect(SocketIOClient client) {
+        Session<?> session = sessionManager.getSessionById(client.getSessionId().toString());
+        eventManager.onDisconnect(session);
     }
 
 }

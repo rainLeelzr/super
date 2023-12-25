@@ -167,31 +167,54 @@
  *
  */
 
-package vip.isass.kernel.net.socketio;
+package vip.isass.kernel.net.websocket.websocket;
 
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@Getter
-@Setter
-@Configuration
-@ConfigurationProperties(prefix = "kernel.net.socketio")
-public class SocketIoConfiguration {
+import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
-    private String hostName = "0.0.0.0";
+/**
+ * 客户端成功connect后执行此类来初始化化此channel的行为
+ *
+ * @author Rain
+ */
+@Slf4j
+@Component
+public class WebsocketChannelInitializerHandler extends ChannelInitializer<SocketChannel> {
 
-    private int port = 20001;
+    /**
+     * 默认4分钟
+     */
+    @Getter
+    @Value("${server.websocket.timeout:240000}")
+    private int timeout;
 
-    private int maxHttpContentLength = 64 * 1024;
+    @Resource
+    private WebsocketChannelInboundHandler websocketChannelInboundHandler;
 
-    private int maxFramePayloadLength = 64 * 1024;
+    @Override
+    protected void initChannel(SocketChannel socketChannel) {
+        ChannelPipeline pipeline = socketChannel.pipeline();
 
-    private String externalIp;
+        // 设置tcp链路空闲超时时间
+        pipeline.addLast(
+                "idleStateHandler",
+                new IdleStateHandler(0, 0, timeout, TimeUnit.MILLISECONDS));
 
-    private Integer netExternalPort;
-
-    private String netExternalUrl;
-
+        pipeline.addLast("http-codec", new HttpServerCodec());
+        pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
+        pipeline.addLast("http-chunked", new ChunkedWriteHandler());
+        pipeline.addLast(websocketChannelInboundHandler);
+    }
 }

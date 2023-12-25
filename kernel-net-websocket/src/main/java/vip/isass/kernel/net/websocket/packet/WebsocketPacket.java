@@ -166,61 +166,28 @@
  * Library.
  */
 
-package vip.isass.kernel.net.socketio;
+package vip.isass.kernel.net.websocket.packet;
 
-import cn.hutool.core.net.NetUtil;
-import cn.hutool.core.util.StrUtil;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
-import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
+/**
+ * @author Rain
+ */
+@Getter
+@Setter
+@ToString
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+public class WebsocketPacket {
 
-@Configuration
-@ConditionalOnProperty(name = "kernel.net.proxy.enabled", havingValue = "false", matchIfMissing = true)
-public class SocketIoLocalNodeAllocatorService implements INodeAllocatorService, InitializingBean {
+    private String cmd;
 
-    @Resource
-    private SocketIoConfiguration socketIoConfiguration;
+    private Object payload;
 
-    @Value("${server.port}")
-    private int httpPort;
-
-    @Getter
-    private final NetProtocol netProtocol = NetProtocol.socketio;
-
-    private NetServerInfo netServerInfo;
-
-    @Override
-    public NetServerInfo allocate(String clientIp) {
-        return netServerInfo;
-    }
-
-    @Override
-    public Collection<NetServerInfo> getAll() {
-        return Collections.singleton(netServerInfo);
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        String internalIp = NetUtil.getLocalhostStr();
-        this.netServerInfo = NetServerInfo.builder()
-                .netProtocol(netProtocol)
-                .externalIp(StrUtil.blankToDefault(socketIoConfiguration.getExternalIp(), internalIp))
-                .internalIp(internalIp)
-                .httpPort(httpPort)
-                .httpSecure(Boolean.FALSE)
-                .netExternalPort(socketIoConfiguration.getNetExternalPort() == null
-                        ? socketIoConfiguration.getPort()
-                        : socketIoConfiguration.getNetExternalPort())
-                .netExternalUrl(socketIoConfiguration.getNetExternalUrl())
-                .build();
-    }
 }

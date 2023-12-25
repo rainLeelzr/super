@@ -210,9 +210,10 @@
         <module>super-core-web-rpc-feign</module>
         <module>kernel-net-core</module>
         <module>kernel-net-netty</module>
-        <module>kernel-net-socketio</module>
         <module>kernel-net-proxy-core</module>
         <module>kernel-net-proxy-upstream</module>
+        <module>kernel-net-websocket</module>
+        <module>kernel-net-socketio</module>
         <module>super-core-protobuf</module>
         <module>super-core-elasticsearch</module>
         <module>super-core-encryption</module>
@@ -510,6 +511,12 @@
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>kernel-net-netty</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>kernel-net-websocket</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
