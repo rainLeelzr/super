@@ -223,5 +223,8 @@ public class WebsocketLocalNodeAllocatorService implements INodeAllocatorService
                         : websocketProperties.getNetExternalPort())
                 .netExternalUrl(websocketProperties.getNetExternalUrl())
                 .build();
+        if (StrUtil.isBlank(netServerInfo.getNetExternalUrl())) {
+            netServerInfo.setNetExternalUrl("ws://" + netServerInfo.getExternalIp() + ":" + netServerInfo.getNetExternalPort());
+        }
     }
 }

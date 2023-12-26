@@ -197,7 +197,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Configuration
-@ConditionalOnMissingBean(type = "sessionServiceClientProxy")
+@ConditionalOnMissingBean(name = "sessionServiceClientProxy")
 public class LocalSessionService implements ISessionService {
 
     // region sessionId 和 session 关系

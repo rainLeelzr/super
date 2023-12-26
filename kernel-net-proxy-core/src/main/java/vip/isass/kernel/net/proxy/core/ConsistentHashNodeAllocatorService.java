@@ -195,7 +195,7 @@ import java.util.Map;
  * 一致性 hash 算法的实例存储，在使用网关代理时，需要用到此算法分配网关节点给客户端连接
  */
 @Slf4j
-public class ConsistentHashNodeAllocatorService implements INodeAllocatorService {
+public abstract class ConsistentHashNodeAllocatorService implements INodeAllocatorService {
 
     /**
      * 总节点数量不低于，非实际总节点数。
@@ -227,13 +227,14 @@ public class ConsistentHashNodeAllocatorService implements INodeAllocatorService
     private ConsistentHash<String> hashServer;
 
     public NetServerInfo allocate(String clientIp) {
-        Assert.isFalse(serviceInstanceMap.isEmpty() || hashServer == null, () -> new RuntimeException("未查询到可用网关节点，请稍后再试"));
+        Assert.isFalse(serviceInstanceMap.isEmpty() || hashServer == null,
+                () -> new RuntimeException(StrUtil.format("未查询到可用的[{}]网关节点，请稍后再试", netProtocol)));
         String instanceKey = StrUtil.isBlank(clientIp)
                 ? hashServer.get(RandomUtil.randomString(2))
                 : hashServer.get(clientIp);
         NetServerInfo netServerInfo = serviceInstanceMap.get(instanceKey);
         if (netServerInfo == null) {
-            throw new RuntimeException("节点分配失败，请稍后再试");
+            throw new RuntimeException(StrUtil.format("[{}]节点分配失败，请稍后再试", netProtocol));
         }
         return netServerInfo;
     }
@@ -264,10 +265,10 @@ public class ConsistentHashNodeAllocatorService implements INodeAllocatorService
             if (StrUtil.isBlank(serverInfo.getExternalIp())) {
                 serverInfo.setExternalIp(serverInfo.getInternalIp());
             }
-            String key = StrUtil.isBlank(serverInfo.getNetExternalUrl())
-                    ? serverInfo.getExternalIp() + ":" + serverInfo.getNetExternalPort()
-                    : serverInfo.getNetExternalUrl();
-            infoMap.put(key, serverInfo);
+            if (StrUtil.isBlank(serverInfo.getNetExternalUrl())) {
+                formatNetExternalUrl(serverInfo);
+            }
+            infoMap.put(serverInfo.getNetExternalUrl(), serverInfo);
         }
 
         if (checkModify(infoMap)) {
@@ -308,4 +309,7 @@ public class ConsistentHashNodeAllocatorService implements INodeAllocatorService
     public static void main(String[] args) {
         System.out.println(calculateNumberOfReplicas(100, 0, 3));
     }
+
+    public abstract void formatNetExternalUrl(NetServerInfo netServerInfo);
+
 }

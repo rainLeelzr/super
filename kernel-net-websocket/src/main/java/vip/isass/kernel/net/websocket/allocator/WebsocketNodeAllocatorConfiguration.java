@@ -166,55 +166,34 @@
  * Library.
  */
 
-package vip.isass.kernel.net.socketio.allocator;
+package vip.isass.kernel.net.websocket.allocator;
 
-import cn.hutool.cache.Cache;
-import cn.hutool.cache.CacheUtil;
 import cn.hutool.core.util.StrUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import vip.isass.kernel.net.core.server.NetProtocol;
 import vip.isass.kernel.net.core.server.NetServerInfo;
 import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import vip.isass.kernel.net.proxy.core.ConsistentHashNodeAllocatorService;
 
 /**
- * 节点分配器服务
+ * @author isass
  */
-@Service
-public class AllocatorService {
+@Configuration
+@ConditionalOnProperty(name = {"kernel.net.enabled", "kernel.net.proxy.enabled"}, havingValue = "true")
+public class WebsocketNodeAllocatorConfiguration {
 
-    private INodeAllocatorService nodeAllocatorService;
+    @Bean
+    public INodeAllocatorService consistentHashNodeAllocatorService() {
+        return new ConsistentHashNodeAllocatorService(NetProtocol.websocket) {
 
-    private static final Cache<NetServerInfo, String> SERVER_INFO_CACHE = CacheUtil.newTimedCache(TimeUnit.DAYS.toMillis(1));
-
-    @Autowired
-    private void setNodeAllocatorService(List<INodeAllocatorService> nodeAllocatorServices) {
-        nodeAllocatorService = nodeAllocatorServices.stream()
-                .filter(s -> s.getNetProtocol() == NetProtocol.socketio)
-                .findAny()
-                .orElseThrow(() -> new RuntimeException("未找到socketio分配器bean，请检查程序"));
+            @Override
+            public void formatNetExternalUrl(NetServerInfo netServerInfo) {
+                if (StrUtil.isBlank(netServerInfo.getNetExternalUrl())) {
+                    netServerInfo.setNetExternalUrl("ws://" + netServerInfo.getExternalIp() + ":" + netServerInfo.getNetExternalPort());
+                }
+            }
+        };
     }
-
-    /**
-     * 分配节点
-     * <p>
-     * 优先根据用户 id 分配，其次客户端 ip
-     * </p>
-     *
-     * @param clientIp 客户端 ip
-     * @param userId   用户 id
-     * @return 分配到的节点
-     */
-    public String allocate(String clientIp) {
-        NetServerInfo info = nodeAllocatorService.allocate(clientIp);
-        return SERVER_INFO_CACHE.get(
-                info,
-                () -> StrUtil.blankToDefault(
-                        info.getNetExternalUrl(),
-                        "http://" + info.getExternalIp() + ":" + info.getNetExternalPort()));
-    }
-
 }

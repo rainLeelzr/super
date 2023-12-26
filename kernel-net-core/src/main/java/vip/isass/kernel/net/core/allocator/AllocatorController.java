@@ -166,33 +166,34 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.server.allocator;
+package vip.isass.kernel.net.core.allocator;
 
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
+import cn.hutool.extra.servlet.ServletUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import vip.isass.core.web.Resp;
 
-import java.util.Collection;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
-/**
- * 节点分配器
- */
-public interface INodeAllocatorService {
+@RestController
+@Api(tags = "节点分配器")
+@RequestMapping
+public class AllocatorController {
 
-    NetServerInfo allocate(String clientIp);
+    @Resource
+    private AllocatorService allocatorService;
 
-    /**
-     * 分配接入 url
-     *
-     * @param clientIp 客户端 ip
-     * @return 前端接入的 url
-     */
-    default String allocateAccessUrl(String clientIp) {
-        NetServerInfo info = allocate(clientIp);
-        return info.getNetExternalUrl();
+    @ApiOperation(value = "分配节点", notes = "根据客户端 ip 分配节点")
+    @GetMapping("/{serverName}/allocator/node")
+    public Resp<String> allocate(HttpServletRequest request,
+                                 @PathVariable("serverName") String serverName) {
+        String clientIp = ServletUtil.getClientIP(request);
+        return Resp.bizSuccess(allocatorService.allocateAccessUrl(serverName, clientIp));
     }
-
-    Collection<NetServerInfo> getAll();
-
-    NetProtocol getNetProtocol();
 
 }

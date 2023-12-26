@@ -166,33 +166,31 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.server.allocator;
+package vip.isass.kernel.net.proxy.service.job;
 
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import vip.isass.kernel.net.proxy.service.service.RemoveC2SMessageService;
 
-import java.util.Collection;
+import javax.annotation.Resource;
 
 /**
- * 节点分配器
+ * 定时删除 redis 旧的中转消息
+ *
+ * @author rain
  */
-public interface INodeAllocatorService {
+@Component
+public class RemoveEarlyMessageJob {
 
-    NetServerInfo allocate(String clientIp);
+    @Resource
+    private RemoveC2SMessageService removeC2SMessageService;
 
     /**
-     * 分配接入 url
-     *
-     * @param clientIp 客户端 ip
-     * @return 前端接入的 url
+     * 每5分钟执行一次
      */
-    default String allocateAccessUrl(String clientIp) {
-        NetServerInfo info = allocate(clientIp);
-        return info.getNetExternalUrl();
+    @Scheduled(initialDelay = 5 * 60 * 1000, fixedDelay = 5 * 60 * 1000)
+    public void process() {
+        removeC2SMessageService.process();
     }
-
-    Collection<NetServerInfo> getAll();
-
-    NetProtocol getNetProtocol();
 
 }

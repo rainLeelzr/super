@@ -166,33 +166,53 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.server.allocator;
+package vip.isass.kernel.net.proxy.service.handler.net;
 
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
+import cn.hutool.core.lang.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import vip.isass.kernel.net.core.handler.OnAnyMessageEventHandler;
+import vip.isass.kernel.net.core.message.Message;
+import vip.isass.kernel.net.core.message.MessageCmd;
+import vip.isass.kernel.net.proxy.service.service.GatewayToRedisMessageService;
 
-import java.util.Collection;
+import javax.annotation.Resource;
 
 /**
- * 节点分配器
+ * 消息分发器，收到客户端消息时，应该由网关直接消费，还是分发到各微服务
+ *
+ * @author Administrator
  */
-public interface INodeAllocatorService {
+@Service
+public class MessageDispatcherHandler implements OnAnyMessageEventHandler<Object> {
 
-    NetServerInfo allocate(String clientIp);
+    private String msPrefix;
 
-    /**
-     * 分配接入 url
-     *
-     * @param clientIp 客户端 ip
-     * @return 前端接入的 url
-     */
-    default String allocateAccessUrl(String clientIp) {
-        NetServerInfo info = allocate(clientIp);
-        return info.getNetExternalUrl();
+    @Resource
+    private GatewayToRedisMessageService gatewayToRedisMessageService;
+
+    @Autowired
+    public void setApplicationName(@Value("${spring.application.name:}") String applicationName) {
+        Assert.notBlank(applicationName, "未配置spring.application.name，启动失败");
+        this.msPrefix = "/" + applicationName + "/";
     }
 
-    Collection<NetServerInfo> getAll();
+    @Override
+    public Object onMessage(Message message, Object payload) {
+        // 如果是本微服务或 core 的路由，已经由 eventManager 进行过处理
+        if (message.getCmd().startsWith(msPrefix) || message.getCmd().startsWith(MessageCmd.CORE_PREFIX)) {
+            return null;
+        }
 
-    NetProtocol getNetProtocol();
+        // 属于其他微服务的消息，把消息推送到 redis，让具体的微服务处理消息
+        gatewayToRedisMessageService.push(Message.builder()
+                .senderSessionId(message.getSenderSessionId())
+                .senderSession(message.getSenderSession())
+                .cmd(message.getCmd())
+                .payload(payload)
+                .build());
+        return null;
+    }
 
 }

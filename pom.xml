@@ -212,6 +212,7 @@
         <module>kernel-net-netty</module>
         <module>kernel-net-proxy-core</module>
         <module>kernel-net-proxy-upstream</module>
+        <module>kernel-net-proxy-service</module>
         <module>kernel-net-websocket</module>
         <module>kernel-net-socketio</module>
         <module>super-core-protobuf</module>
@@ -535,6 +536,12 @@
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>kernel-net-proxy-upstream</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>kernel-net-proxy-service</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 

@@ -168,10 +168,12 @@
 
 package vip.isass.kernel.net.socketio.allocator;
 
+import cn.hutool.core.util.StrUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import vip.isass.kernel.net.core.server.NetProtocol;
+import vip.isass.kernel.net.core.server.NetServerInfo;
 import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
 import vip.isass.kernel.net.proxy.core.ConsistentHashNodeAllocatorService;
 
@@ -184,6 +186,14 @@ public class SocketioNodeAllocatorConfiguration {
 
     @Bean
     public INodeAllocatorService consistentHashNodeAllocatorService() {
-        return new ConsistentHashNodeAllocatorService(NetProtocol.socketio);
+        return new ConsistentHashNodeAllocatorService(NetProtocol.socketio) {
+
+            @Override
+            public void formatNetExternalUrl(NetServerInfo netServerInfo) {
+                if (StrUtil.isBlank(netServerInfo.getNetExternalUrl())) {
+                    netServerInfo.setNetExternalUrl("http://" + netServerInfo.getExternalIp() + ":" + netServerInfo.getNetExternalPort());
+                }
+            }
+        };
     }
 }

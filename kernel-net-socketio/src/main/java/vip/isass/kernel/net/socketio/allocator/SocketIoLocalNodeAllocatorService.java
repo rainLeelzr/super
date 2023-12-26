@@ -223,5 +223,8 @@ public class SocketIoLocalNodeAllocatorService implements INodeAllocatorService,
                         : socketIoProperties.getNetExternalPort())
                 .netExternalUrl(socketIoProperties.getNetExternalUrl())
                 .build();
+        if (StrUtil.isBlank(netServerInfo.getNetExternalUrl())) {
+            netServerInfo.setNetExternalUrl("http://" + netServerInfo.getExternalIp() + ":" + netServerInfo.getNetExternalPort());
+        }
     }
 }

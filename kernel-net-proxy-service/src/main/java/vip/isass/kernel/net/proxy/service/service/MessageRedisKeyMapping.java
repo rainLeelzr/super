@@ -166,33 +166,30 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.server.allocator;
+package vip.isass.kernel.net.proxy.service.service;
 
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
-
-import java.util.Collection;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
- * 节点分配器
+ * @author rain
  */
-public interface INodeAllocatorService {
+@Getter
+@Setter
+@Builder
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class MessageRedisKeyMapping {
 
-    NetServerInfo allocate(String clientIp);
+    private String cmdPrefix;
 
-    /**
-     * 分配接入 url
-     *
-     * @param clientIp 客户端 ip
-     * @return 前端接入的 url
-     */
-    default String allocateAccessUrl(String clientIp) {
-        NetServerInfo info = allocate(clientIp);
-        return info.getNetExternalUrl();
-    }
+    private String serviceName;
 
-    Collection<NetServerInfo> getAll();
-
-    NetProtocol getNetProtocol();
+    private String redisKey;
 
 }

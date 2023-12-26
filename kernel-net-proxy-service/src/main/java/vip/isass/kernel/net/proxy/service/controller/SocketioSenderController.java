@@ -166,33 +166,68 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.server.allocator;
+package vip.isass.kernel.net.proxy.service.controller;
 
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
+import cn.hutool.core.collection.CollUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.stream.RecordId;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import vip.isass.core.web.Resp;
+import vip.isass.kernel.net.core.message.Message;
+import vip.isass.kernel.net.core.session.ISessionService;
+import vip.isass.kernel.net.proxy.service.service.GatewayToRedisMessageService;
+import vip.isass.kernel.net.proxy.service.service.RemoveC2SMessageService;
 
-import java.util.Collection;
+import javax.annotation.Resource;
 
 /**
- * 节点分配器
+ * @author rain
  */
-public interface INodeAllocatorService {
+@Slf4j
+@Api(tags = "网络通信消息发送")
+@RestController
+@RequestMapping("/${spring.application.name}/sender")
+public class SocketioSenderController {
 
-    NetServerInfo allocate(String clientIp);
+    @Resource
+    private ISessionService sessionService;
 
-    /**
-     * 分配接入 url
-     *
-     * @param clientIp 客户端 ip
-     * @return 前端接入的 url
-     */
-    default String allocateAccessUrl(String clientIp) {
-        NetServerInfo info = allocate(clientIp);
-        return info.getNetExternalUrl();
+    @Resource
+    private GatewayToRedisMessageService gatewayToRedisMessageService;
+
+    @Resource
+    private RemoveC2SMessageService removeC2SMessageService;
+
+    @PostMapping("/send")
+    @ApiOperation(value = "发送消息给客户端")
+    public void sendMessage(@RequestBody Message message) {
+        sessionService.sendMessage(message);
     }
 
-    Collection<NetServerInfo> getAll();
+    @GetMapping("/pushToRedis")
+    @ApiOperation("发送消息到redis 调试专用")
+    public Resp<RecordId> pushToRedis(@RequestParam("cmd") String cmd) {
+        RecordId push = gatewayToRedisMessageService.push(
+                Message.builder()
+                        .cmd(cmd)
+                        .payload(23)
+                        .tags(CollUtil.newArrayList("ios"))
+                        .build());
+        return Resp.bizSuccess(push);
+    }
 
-    NetProtocol getNetProtocol();
+    @GetMapping("/removeEarlyMessageService")
+    @ApiOperation("删除redis旧的c2s消息")
+    public Resp<?> removeEarlyMessage() {
+        removeC2SMessageService.process();
+        return Resp.bizSuccess();
+    }
 
 }

@@ -166,33 +166,52 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.server.allocator;
+package vip.isass.kernel.net.core.allocator;
 
-import vip.isass.kernel.net.core.server.NetProtocol;
+import cn.hutool.cache.Cache;
+import cn.hutool.cache.CacheUtil;
+import cn.hutool.core.lang.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import vip.isass.kernel.net.core.server.NetServerInfo;
+import vip.isass.kernel.net.core.server.allocator.INodeAllocatorService;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
- * 节点分配器
+ * 节点分配器服务
  */
-public interface INodeAllocatorService {
+@Service
+public class AllocatorService {
 
-    NetServerInfo allocate(String clientIp);
+    private Map<String, INodeAllocatorService> nodeAllocatorServiceMap;
 
-    /**
-     * 分配接入 url
-     *
-     * @param clientIp 客户端 ip
-     * @return 前端接入的 url
-     */
-    default String allocateAccessUrl(String clientIp) {
-        NetServerInfo info = allocate(clientIp);
-        return info.getNetExternalUrl();
+    private static final Cache<NetServerInfo, String> SERVER_INFO_CACHE = CacheUtil.newTimedCache(TimeUnit.DAYS.toMillis(1));
+
+    @Autowired
+    private void setNodeAllocatorService(List<INodeAllocatorService> nodeAllocatorServices) {
+        nodeAllocatorServiceMap = nodeAllocatorServices.stream()
+                .collect(Collectors.toMap(s -> s.getNetProtocol().getServiceName(), Function.identity()));
     }
 
-    Collection<NetServerInfo> getAll();
-
-    NetProtocol getNetProtocol();
+    /**
+     * 分配节点
+     * <p>
+     * 优先根据用户 id 分配，其次客户端 ip
+     * </p>
+     *
+     * @param serverName 服务名
+     * @param clientIp   客户端 ip
+     * @return 分配到的节点
+     */
+    public String allocateAccessUrl(String serverName, String clientIp) {
+        INodeAllocatorService nodeAllocatorService = nodeAllocatorServiceMap.get(serverName);
+        Assert.notNull(nodeAllocatorService, "找不到服务[{}]的节点分配器", serverName);
+        return nodeAllocatorService.allocateAccessUrl(clientIp);
+    }
 
 }

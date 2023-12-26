@@ -166,33 +166,33 @@
  * Library.
  */
 
-package vip.isass.kernel.net.core.server.allocator;
+package vip.isass.kernel.net.proxy.service.job;
 
-import vip.isass.kernel.net.core.server.NetProtocol;
-import vip.isass.kernel.net.core.server.NetServerInfo;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import vip.isass.kernel.net.proxy.service.service.ProxyClientCmdListeningService;
 
-import java.util.Collection;
+import javax.annotation.Resource;
 
 /**
- * 节点分配器
+ * cmd 监听任务，拉取 redis 指定的 key，取出 cmd，供 socketio 框架监听
+ *
+ * @author rain
  */
-public interface INodeAllocatorService {
+@Slf4j
+@Component
+public class ProxyClientCmdListeningJob {
 
-    NetServerInfo allocate(String clientIp);
+    @Resource
+    public ProxyClientCmdListeningService proxyClientCmdListeningService;
 
     /**
-     * 分配接入 url
-     *
-     * @param clientIp 客户端 ip
-     * @return 前端接入的 url
+     * 每隔30秒获取一次 cmd
      */
-    default String allocateAccessUrl(String clientIp) {
-        NetServerInfo info = allocate(clientIp);
-        return info.getNetExternalUrl();
+    @Scheduled(initialDelay = 20 * 1000, fixedDelay = 30 * 1000)
+    public void listening() {
+        proxyClientCmdListeningService.listening();
     }
-
-    Collection<NetServerInfo> getAll();
-
-    NetProtocol getNetProtocol();
 
 }
