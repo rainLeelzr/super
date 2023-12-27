@@ -203,13 +203,13 @@ public abstract class ConsistentHashNodeAllocatorService implements INodeAllocat
      * 在虚拟节点数没配置或为 -1 的情况下，会根据实际物理节点数和总节点数，算出一个不低于总节点数的虚拟节点数。总节点数量会保持在这个数量之上
      * </p>
      */
-    @Value("${kernel.net.consistentHash.totalNodeAbove:1000}")
+    @Value("${kernel.net.proxy.consistentHash.totalNodeAbove:1000}")
     private int totalNodeAbove = 1000;
 
     /**
      * 每个物理节点对应的虚拟节点数量
      */
-    @Value("${kernel.net.consistentHash.virtualNodeCount:-1}")
+    @Value("${kernel.net.proxy.consistentHash.virtualNodeCount:-1}")
     private int virtualNodeCount = -1;
 
     @Getter

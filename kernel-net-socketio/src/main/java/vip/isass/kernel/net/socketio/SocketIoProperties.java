@@ -180,6 +180,8 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "kernel.net.socketio")
 public class SocketIoProperties {
 
+    private boolean enabled;
+
     private String hostName = "0.0.0.0";
 
     private int port = 20001;

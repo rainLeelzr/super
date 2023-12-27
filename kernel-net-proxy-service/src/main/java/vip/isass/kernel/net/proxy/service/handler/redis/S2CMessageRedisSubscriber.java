@@ -195,7 +195,7 @@ public class S2CMessageRedisSubscriber implements IRedisSubscriber<vip.isass.ker
 
     @Override
     public void onMessage(vip.isass.kernel.net.core.message.Message message, Message redisMessage, byte[] pattern) {
-        log.debug("收到redis的s2c消息[{}]", message);
+        log.trace("收到redis的s2c消息[{}]", message);
         sessionService.sendMessage(message);
     }
 

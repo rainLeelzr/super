@@ -261,7 +261,7 @@ public class EventManager implements IEventManager {
     @Override
     @SuppressWarnings("unchecked")
     public <T> void onMessage(Message message) {
-        log.debug("收到客户端消息: cmd[{}] payload[{}]", message.getCmd(), message.getPayload());
+        log.trace("收到客户端消息: cmd[{}] payload[{}]", message.getCmd(), message.getPayload());
 
         List<OnMessageEventHandler<?>> handlers = StrUtil.isBlank(message.getCmd())
                 ? onMessageEventHandlers

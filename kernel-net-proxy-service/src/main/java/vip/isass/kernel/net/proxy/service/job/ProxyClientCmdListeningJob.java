@@ -190,7 +190,7 @@ public class ProxyClientCmdListeningJob {
     /**
      * 每隔30秒获取一次 cmd
      */
-    @Scheduled(initialDelay = 20 * 1000, fixedDelay = 30 * 1000)
+    @Scheduled(initialDelay = 10 * 1000, fixedDelay = 30 * 1000)
     public void listening() {
         proxyClientCmdListeningService.listening();
     }

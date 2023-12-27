@@ -185,7 +185,7 @@ import vip.isass.kernel.net.proxy.core.ConsistentHashNodeAllocatorService;
 public class SocketioNodeAllocatorConfiguration {
 
     @Bean
-    public INodeAllocatorService consistentHashNodeAllocatorService() {
+    public INodeAllocatorService socketioConsistentHashNodeAllocatorService() {
         return new ConsistentHashNodeAllocatorService(NetProtocol.socketio) {
 
             @Override

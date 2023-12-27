@@ -185,7 +185,7 @@ import vip.isass.kernel.net.proxy.core.ConsistentHashNodeAllocatorService;
 public class WebsocketNodeAllocatorConfiguration {
 
     @Bean
-    public INodeAllocatorService consistentHashNodeAllocatorService() {
+    public INodeAllocatorService websocketConsistentHashNodeAllocatorService() {
         return new ConsistentHashNodeAllocatorService(NetProtocol.websocket) {
 
             @Override

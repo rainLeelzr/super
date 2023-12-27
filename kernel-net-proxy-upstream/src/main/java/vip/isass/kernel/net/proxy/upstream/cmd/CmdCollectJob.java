@@ -188,11 +188,11 @@ public class CmdCollectJob {
     private CmdCollectService cmdCollectService;
 
     /**
-     * 每天向 redis 更新一次本服务的 cmd
+     * 每2分钟向 redis 更新一次本服务的 cmd，防止 redis 数据被清了要等很长时间才恢复
      */
-    @Scheduled(initialDelay = 30 * 1000, fixedDelay = 24 * 60 * 60 * 1000)
+    @Scheduled(initialDelay = 10 * 1000, fixedDelay = 2 * 60 * 1000)
     public void cmdCollect() {
-        log.info("running CmdCollectJob");
+        log.debug("[kernel:net:proxy] running CmdCollectJob");
         cmdCollectService.collect();
     }
 }

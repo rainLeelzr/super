@@ -182,10 +182,10 @@ public class WebsocketProperties {
 
     private String hostName = "0.0.0.0";
 
-    private int port = 20003;
+    private int port = 20071;
 
     /**
-     * 链路空闲超时时间，包括读和写
+     * 链路空闲超时时间(ms)，包括读和写
      */
     private int timeout = 300_000;
 
