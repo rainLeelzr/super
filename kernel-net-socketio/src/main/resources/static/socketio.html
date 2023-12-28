@@ -1,62 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>SocketIOClient test page</title>
-    <base>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocketIOClient Test Page</title>
+    <link rel="stylesheet" href="./styles.css">
     <script src="./jquery/3.3.1/jquery.min.js"></script>
     <script src="./socket.io.js"></script>
     <style>
         body {
             padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        textarea {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
         }
 
         #console {
             height: 100%;
             max-height: 600px;
             overflow: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+        }
+
+        .status {
+            color: red;
         }
 
         .username-msg {
-            color: orange;
+            color: blue;
         }
 
-        .connect-msg {
+        .connect-msg,
+        .disconnect-msg {
             color: green;
         }
 
-        .disconnect-msg {
-            color: red;
+        .inline-block {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .flex-container {
+            display: flex;
+            align-items: center;
+        }
+
+        #url,
+        #connect,
+        #disconnect,
+        #status {
+            margin-right: 10px;
+        }
+
+        #filterEvents,
+        #setFilterEvents {
+            margin-right: 10px;
         }
     </style>
 </head>
 
 <body>
-<h2>SocketIOClient test page</h2>
-<div style="border: 1px;">
-    <label>socketIoUrl:</label><input type="text" id="url" style="width:300px">
-    <br>
-    <button id="connect">connect</button>
-    <button id="disconnect">disconnect</button>
-    <span>状态：</span><span id="status" style="color: red">未连接</span>
-
-</div>
-<br>
-<div style="border: 1px;">
-    <label>socketEvent:</label><input type="text" id="socketEvent" style="width:300px">
-    <br>
-    <div>
-        <label>只显示以下event(英文逗号分割):</label><input type="filterEvents" id="filterEvents" style="width:98%">
-        <button id="setFilterEvents" style="position: absolute">应用</button>
+<div class="container">
+    <h2>SocketIOClient Test Page</h2>
+    <div class="flex-container">
+        <label for="url" class="inline-block">SocketIoUrl:</label>
+        <input type="text" id="url" placeholder="Enter SocketIO URL" class="inline-block" style="width: 50%;">
+        <button id="connect" class="inline-block" style=" margin-top: -10px">Connect</button>
+        <button id="disconnect" class="inline-block" style=" margin-top: -10px">Disconnect</button>
+        <span>Status:</span><span id="status" class="status inline-block">Not connected</span>
     </div>
-    <label>content:</label><br><textarea id="content" rows="5" style="width: 100%"></textarea>
-    <br>
-    <button id="send">send</button>
-    <button id="clear">clearOutput</button>
 </div>
-<br>
-<div id="console" class="well"></div>
-</body>
+
+<div class="container">
+    <div class="flex-container">
+        <label for="socketEvent" class="inline-block">发送Event:</label>
+        <input type="text" id="socketEvent" placeholder="Enter Socket Event" class="inline-block">
+        <label for="filterEvents" class="inline-block" style="margin-left: 5%" >仅显示的event(英文逗号分割):</label>
+        <input type="text" id="filterEvents" class="inline-block"  style="width: 50%;">
+        <button id="setFilterEvents" class="inline-block">Apply</button>
+        <span id="statusFilterEvents"></span>
+    </div>
+    <label for="content">发送Content:</label>
+    <textarea id="content" rows="5" style="width: 100%"></textarea>
+    <br>
+    <button id="send">Send</button>
+    <button id="clear">Clear Output</button>
+</div>
+
+<div id="console"></div>
+
 <script type="text/javascript">
     var socket;
     var errorCount = 0;
@@ -210,6 +284,9 @@
 
     $("#setFilterEvents").click(function () {
         let filterEventsStr = $("#filterEvents").val().trim();
+
+        let time = getNowTime();
+        $("#statusFilterEvents").text("Success:"+time);
         parseFilterEvents(filterEventsStr);
     })
 
@@ -227,4 +304,5 @@
         return date;
     }
 </script>
+</body>
 </html>

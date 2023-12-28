@@ -176,6 +176,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
@@ -260,6 +261,9 @@ public class JsonUtil {
             // 允许单引号
             .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
 
+            // 忽略 transient 关键字的变量
+            .configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true)
+
             .registerModule(simpleModule);
 
     public static final ObjectMapper NOT_NULL_INSTANCE = new ObjectMapper()
@@ -283,6 +287,9 @@ public class JsonUtil {
 
             // 允许单引号
             .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
+
+            // 忽略 transient 关键字的变量
+            .configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true)
 
             // 只输出非 null 字段
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)

@@ -199,6 +199,9 @@ public class ConvertUtil {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public static <T> T convert(Type actualType, Object value) {
+        if (value == null) {
+            return null;
+        }
         Class<T> clazz = (Class<T>) TypeUtil.getClass(actualType);
         if (clazz == Object.class) {
             return (T) value;
