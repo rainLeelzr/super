@@ -244,6 +244,7 @@
         <!-- spring -->
         <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
         <spring.cloud.version>Hoxton.SR3</spring.cloud.version>
+        <spring-security.version>5.5.8</spring-security.version>
 
         <alibaba-nacos.version>2.2.1.RELEASE</alibaba-nacos.version>
 
