@@ -68,7 +68,7 @@ public class V2${entity}Db extends V2${entity} implements IV2DbEntity<V2${entity
 <#if versionFieldName == field.name><#assign isOrmProperty = true>
     @Version
 </#if>
-<#if logicDeleteFieldName == field.name><#assign isOrmProperty = true>
+<#if logicDeleteFieldName == field.propertyNam><#assign isOrmProperty = true>
     @TableLogic
 </#if>
 <#if field.name == cfg.traceEntity.CREATE_USER_ID_COLUMN_NAME
