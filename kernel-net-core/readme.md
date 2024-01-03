@@ -9,7 +9,7 @@ kernel:
   ` # 默认通信协议：tcp(已失效)、websocket(已失效)、socketio(已实现)、mqtt(未实现)
     defaultProtocol: socketio
   
-    # 是否使用网格进行网络代理
+    # 是否使用网关进行网络通信代理
     proxy:
       enabled: true
     
