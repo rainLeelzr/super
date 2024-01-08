@@ -6,7 +6,7 @@ kernel:
     # 网络模块公共配置
     # 网络通信模块总开关
     enabled: true
-  ` # 默认通信协议：tcp(已失效)、websocket(已失效)、socketio(已实现)、mqtt(未实现)
+  ` # 默认通信协议：tcp(已失效)、websocket(已实现)、socketio(已实现)、mqtt(未实现)
     defaultProtocol: socketio
   
     # 是否使用网关进行网络通信代理
