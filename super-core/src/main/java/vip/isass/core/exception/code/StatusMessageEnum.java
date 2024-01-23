@@ -212,6 +212,7 @@ public enum StatusMessageEnum implements IStatusMessage {
     TOKEN_EXPIRED(1008, "token 已过期"),
     TOKEN_ILLEGAL(1009, "token 错误"),
     CONFIG_ERROR(1010, "配置错误"),
+    DIR_NOT_FOUND(1011, "目录不存在[{}]"),
     ;
 
     private Integer status;
