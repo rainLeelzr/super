@@ -170,6 +170,7 @@
 package vip.isass.core.support;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
@@ -183,6 +184,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 
 @Slf4j
@@ -233,6 +235,15 @@ public class FileUtil {
         }
 
         return null;
+    }
+
+    public static Path getDesktopPath() {
+        String userHomeDir = System.getProperty("user.home");
+        if (StrUtil.isBlank(userHomeDir)) {
+            return null;
+        }
+        Path desktopPath = Paths.get(userHomeDir, "Desktop");
+        return Files.exists(desktopPath) ? desktopPath : null;
     }
 
 }
