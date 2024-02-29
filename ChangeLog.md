@@ -8,7 +8,7 @@
 
 - 重构 net 网络通信模块，新增支持分布式集群情况下的会话信息（标签等）增删改查
 - FileUtil 添加 getFileIgnoreCase 方法，可以不分大小写查找目录下的文件
-
+- FileUtil 添加 getDesktopPath 方法，可以获取桌面路径
 ---
 
 ## 更新日志
