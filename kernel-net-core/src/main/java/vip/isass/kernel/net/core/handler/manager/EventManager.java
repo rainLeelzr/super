@@ -182,7 +182,6 @@ import vip.isass.kernel.net.core.handler.OnConnectEventHandler;
 import vip.isass.kernel.net.core.handler.OnDisconnectEventHandler;
 import vip.isass.kernel.net.core.handler.OnErrorEventHandler;
 import vip.isass.kernel.net.core.handler.OnMessageEventHandler;
-import vip.isass.kernel.net.core.message.IMessageSender;
 import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.message.MessageCmd;
 import vip.isass.kernel.net.core.session.ISessionService;
@@ -205,9 +204,6 @@ public class EventManager implements IEventManager {
 
     @Autowired
     private ISessionService sessionService;
-
-    @Autowired
-    private IMessageSender messageSender;
 
     @Autowired(required = false)
     private List<OnConnectEventHandler> onConnectEventHandlers;
@@ -234,9 +230,9 @@ public class EventManager implements IEventManager {
 
         onMessageEventHandlerMap = MapUtil.newHashMap(onMessageEventHandlers.size());
         onMessageEventHandlers
-            .forEach(h -> onMessageEventHandlerMap
-                .computeIfAbsent(StrUtil.nullToEmpty(h.getCmd()), s -> new ArrayList<>())
-                .add(h));
+                .forEach(h -> onMessageEventHandlerMap
+                        .computeIfAbsent(StrUtil.nullToEmpty(h.getCmd()), s -> new ArrayList<>())
+                        .add(h));
     }
 
     @Override
@@ -245,7 +241,8 @@ public class EventManager implements IEventManager {
         if (onConnectEventHandlers != null) {
             onConnectEventHandlers.forEach(h -> h.onConnect(session));
         }
-        log.debug("新建立连接");
+
+        log.debug("[{}]客户端连接，客户端ip：{}", session.getServerType().getSimpleName(), session.getRemoteIp());
     }
 
     @Override
@@ -258,16 +255,17 @@ public class EventManager implements IEventManager {
             }
         }
         sessionService.removeSession(session);
+        log.debug("[{}]客户端断连，客户端ip：{}", session.getServerType().getSimpleName(), session.getRemoteIp());
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> void onMessage(Message message) {
-        log.debug("收到客户端消息: cmd[{}] payload[{}]", message.getCmd(), message.getPayload());
+        log.trace("收到客户端消息: cmd[{}] payload[{}]", message.getCmd(), message.getPayload());
 
         List<OnMessageEventHandler<?>> handlers = StrUtil.isBlank(message.getCmd())
-            ? onMessageEventHandlers
-            : onMessageEventHandlerMap.get(message.getCmd());
+                ? onMessageEventHandlers
+                : onMessageEventHandlerMap.get(message.getCmd());
 
         Map<Type, T> convertedPayloadMap = MapUtil.newHashMap(2);
 
@@ -278,13 +276,13 @@ public class EventManager implements IEventManager {
                 try {
                     Type actualType = TypeUtil.toParameterizedType(h.getClass()).getActualTypeArguments()[0];
                     convertedPayload = convertedPayloadMap.computeIfAbsent(
-                        actualType,
-                        k -> ConvertUtil.convert(k, message.getPayload()));
+                            actualType,
+                            k -> ConvertUtil.convert(k, message.getPayload()));
                 } catch (Exception e) {
                     String errorMessage = StrUtil.format(
-                        "反序列化消息失败：cmd[{}],error[{}]",
-                        message.getCmd(),
-                        e.getMessage());
+                            "反序列化消息失败：cmd[{}],error[{}]",
+                            message.getCmd(),
+                            e.getMessage());
                     log.error(errorMessage, e);
                     replyMessage(message, MessageCmd.ERROR, errorMessage);
                     continue;
@@ -309,13 +307,13 @@ public class EventManager implements IEventManager {
                 try {
                     Type actualType = TypeUtil.toParameterizedType(h.getClass()).getActualTypeArguments()[0];
                     convertedPayload = convertedPayloadMap.computeIfAbsent(
-                        actualType,
-                        k -> ConvertUtil.convert(k, message.getPayload()));
+                            actualType,
+                            k -> ConvertUtil.convert(k, message.getPayload()));
                 } catch (Exception e) {
                     String errorMessage = StrUtil.format(
-                        "反序列化消息失败：cmd[{}],error[{}]",
-                        message.getCmd(),
-                        e.getMessage());
+                            "反序列化消息失败：cmd[{}],error[{}]",
+                            message.getCmd(),
+                            e.getMessage());
                     log.error(errorMessage, e);
                     replyMessage(message, MessageCmd.ERROR, errorMessage);
                     continue;
@@ -336,13 +334,16 @@ public class EventManager implements IEventManager {
     }
 
     @Override
-    public void onError(Session<?> session, Exception exception) {
+    public void onError(Session<?> session, Throwable throwable) {
         if (onErrorEventHandlers != null) {
-            onErrorEventHandlers.forEach(h -> h.onError(session, null, null, exception));
+            onErrorEventHandlers.forEach(h -> h.onError(session, null, null, throwable));
         }
-        Throwable e = ExceptionUtil.unwrap(exception);
+        Throwable e = ExceptionUtil.unwrap(throwable);
         session.sendMessage(MessageCmd.ERROR, "发生异常" + e.getMessage());
-        log.error("socket通道[{}]发生异常[{}]，将关闭该连接", session.getSessionId(), e.getMessage());
+        log.error("[{}]sessionId[{}]发生异常[{}]，将关闭该连接",
+                session.getServerType().getSimpleName(),
+                session.getSessionId(),
+                e.getMessage());
         sessionService.removeSession(session);
         session.close();
     }
@@ -357,12 +358,12 @@ public class EventManager implements IEventManager {
             return;
         }
 
-        messageSender.sendMessage(Message.builder()
-            .receiverSession(message.getSenderSession())
-            .receiverSessionId(message.getSenderSessionId())
-            .cmd(cmd)
-            .payload(payload)
-            .build());
+        sessionService.sendMessage(Message.builder()
+                .receiverSession(message.getSenderSession())
+                .receiverSessionId(message.getSenderSessionId())
+                .cmd(cmd)
+                .payload(payload)
+                .build());
     }
 
 }

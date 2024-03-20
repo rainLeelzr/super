@@ -218,12 +218,12 @@ public class WebsocketChannelEventHandler extends SimpleChannelInboundHandler<Ob
 
     private Map<Channel, WebSocketServerHandshaker> handshakers = new ConcurrentHashMap<>(128);
 
-    @Resource
     @Getter
-    private ISessionService sessionManager;
+    @Resource
+    private ISessionService sessionService;
 
-    @Resource
     @Getter
+    @Resource
     private RequestManager requestManager;
 
     @Override
@@ -292,15 +292,15 @@ public class WebsocketChannelEventHandler extends SimpleChannelInboundHandler<Ob
         // 如果HTTP解码失败，或者请求头没有websocket，则返回HTTP异常
         // req.decoderResult().isFailure()
         if (req.decoderResult().isFailure()
-            || (!HttpHeaderValues.WEBSOCKET.toString().equals(req.headers().get(HttpHeaderNames.UPGRADE)))) {
+                || (!HttpHeaderValues.WEBSOCKET.toString().equals(req.headers().get(HttpHeaderNames.UPGRADE)))) {
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST));
             return;
         }
 
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
-            "ws://localhost:8080/websocket",
-            null,
-            false);
+                "ws://localhost:8080/websocket",
+                null,
+                false);
         WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(req);
         if (handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());

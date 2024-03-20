@@ -178,6 +178,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import vip.isass.kernel.net.socketio.handler.OnSocketIoErrorListener;
 
 import javax.annotation.Resource;
 
@@ -187,11 +188,11 @@ import javax.annotation.Resource;
 @Slf4j
 @ComponentScan
 @Configuration
-@ConditionalOnProperty(name = {"kernel.net.enabled", "kernel.net.socketio.enabled"}, havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(name = {"kernel.net.enabled", "kernel.net.socketio.enabled"}, havingValue = "true")
 public class SocketIoAutoConfiguration {
 
     @Resource
-    private SocketIoConfiguration socketIoConfiguration;
+    private SocketIoProperties socketIoProperties;
 
     @Autowired
     private OnSocketIoErrorListener onErrorListener;
@@ -199,10 +200,10 @@ public class SocketIoAutoConfiguration {
     @Bean
     public SocketIOServer socketIOServer() {
         com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
-        config.setHostname(socketIoConfiguration.getHostName());
-        config.setPort(socketIoConfiguration.getPort());
-        config.setMaxHttpContentLength(socketIoConfiguration.getMaxHttpContentLength());
-        config.setMaxFramePayloadLength(socketIoConfiguration.getMaxFramePayloadLength());
+        config.setHostname(socketIoProperties.getHostName());
+        config.setPort(socketIoProperties.getPort());
+        config.setMaxHttpContentLength(socketIoProperties.getMaxHttpContentLength());
+        config.setMaxFramePayloadLength(socketIoProperties.getMaxFramePayloadLength());
         config.setBossThreads(1);
         config.setExceptionListener(onErrorListener);
 

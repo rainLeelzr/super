@@ -170,7 +170,10 @@
 package vip.isass.core.support;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
+import vip.isass.core.exception.UnifiedException;
+import vip.isass.core.exception.code.StatusMessageEnum;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
@@ -178,7 +181,10 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 
 @Slf4j
@@ -209,6 +215,35 @@ public class FileUtil {
             log.error("文件[{}]是否图片判断失败", file.getName());
         }
         return isImage;
+    }
+
+    public static File getFileIgnoreCase(Path dirPath, String fileName) {
+        Path filePath = dirPath.resolve(fileName);
+        if (Files.exists(filePath)) {
+            return filePath.toFile();
+        }
+
+        try (DirectoryStream<Path> paths = Files.newDirectoryStream(dirPath)) {
+            for (Path loopPath : paths) {
+                if (loopPath.getFileName().toString().equalsIgnoreCase(fileName)
+                        && !Files.isDirectory(loopPath)) {
+                    return loopPath.toFile();
+                }
+            }
+        } catch (IOException e) {
+            throw new UnifiedException(StatusMessageEnum.IO_ERROR);
+        }
+
+        return null;
+    }
+
+    public static Path getDesktopPath() {
+        String userHomeDir = System.getProperty("user.home");
+        if (StrUtil.isBlank(userHomeDir)) {
+            return null;
+        }
+        Path desktopPath = Paths.get(userHomeDir, "Desktop");
+        return Files.exists(desktopPath) ? desktopPath : null;
     }
 
 }

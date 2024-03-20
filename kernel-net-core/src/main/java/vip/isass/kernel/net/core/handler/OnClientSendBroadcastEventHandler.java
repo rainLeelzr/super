@@ -172,15 +172,15 @@ package vip.isass.kernel.net.core.handler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import vip.isass.kernel.net.core.message.IMessageSender;
 import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.message.MessageCmd;
 import vip.isass.kernel.net.core.server.Server;
+import vip.isass.kernel.net.core.session.ISessionService;
 
 import javax.annotation.Resource;
 
 /**
- * 登录事件处理器
+ * 客户端发送的广播事件处理器
  *
  * @author rain
  */
@@ -190,7 +190,7 @@ import javax.annotation.Resource;
 public class OnClientSendBroadcastEventHandler implements OnMessageEventHandler<Object> {
 
     @Resource
-    private IMessageSender messageSender;
+    private ISessionService sessionService;
 
     @Override
     public String getCmd() {
@@ -199,7 +199,7 @@ public class OnClientSendBroadcastEventHandler implements OnMessageEventHandler<
 
     @Override
     public Object onMessage(Message message, Object payload) {
-        messageSender.broadcastMessage(MessageCmd.CLIENT_SEND_BROADCAST, payload);
+        sessionService.broadcastMessage(MessageCmd.CLIENT_SEND_BROADCAST, payload);
         return null;
     }
 

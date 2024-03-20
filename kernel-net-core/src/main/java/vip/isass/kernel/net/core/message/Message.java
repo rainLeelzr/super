@@ -169,6 +169,7 @@
 
 package vip.isass.kernel.net.core.message;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -176,13 +177,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import vip.isass.kernel.net.core.session.Session;
-import vip.isass.kernel.net.core.tag.TagPair;
 
-import java.beans.Transient;
 import java.util.Collection;
 
 /**
  * 消息对象
+ * 获取消息接收方的优先顺序:
+ * 1：如果有 receiverSession 或 receiverSessionId，则直接发送
+ * 2：发送给所有同时满足已设置的条件
+ * 3：如果 tags、tagsAny 同时设置，则忽略 tagsAny
  *
  * @author rain
  */
@@ -202,6 +205,7 @@ public class Message {
     /**
      * 发送方的会话会话
      */
+    @JsonIgnore
     private transient Session<?> senderSession;
 
     /**
@@ -221,18 +225,28 @@ public class Message {
     private String cmd;
 
     /**
-     * 消息体
+     * 待发送的消息体，payloadBytes 为空时有效
      */
     private Object payload;
 
     /**
-     * 发送消息给拥有这些标签的客户端。如果 tags 为空，则广播消息
+     * 用户 id，如果值等于"LoginUser"，则发送给所有已登录用户，如果等于"UnLoginUser"，则发给所有未登录用户
      */
-    private Collection<TagPair> tags;
+    private Collection<String> userIds;
 
-    @Transient
-    public Session<?> getSenderSession() {
-        return senderSession;
-    }
+    /**
+     * 别名
+     */
+    private Collection<String> aliases;
+
+    /**
+     * 标签列表，并且关系
+     */
+    private Collection<String> tags;
+
+    /**
+     * 标签列表，或者关系
+     */
+    private Collection<String> tagsAny;
 
 }

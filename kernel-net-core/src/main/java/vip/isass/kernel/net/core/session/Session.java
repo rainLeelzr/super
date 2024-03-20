@@ -170,11 +170,16 @@
 package vip.isass.kernel.net.core.session;
 
 
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import vip.isass.kernel.net.core.server.Server;
+
+import java.lang.reflect.Type;
 
 /**
  * 会话
  * <p> 一个客户端连接持有一个 session</p>
+ * 不能在 session 对象，添加标签、别名等逻辑
+ * 因为在 session 对象中保存标签信息，便无法实现方向查找，需要在上层的 sessionService 统一管理
  *
  * @param <svr> 服务端，代表 session 由哪个服务端创建
  * @author Rain
@@ -224,9 +229,15 @@ public interface Session<svr extends Server> {
     /**
      * 发送消息
      *
-     * @param cmd    路由命令
-     * @param object 消息体
+     * @param cmd     路由命令
+     * @param payload 消息体
      */
-    void sendMessage(String cmd, Object object);
+    void sendMessage(String cmd, Object payload);
+
+    default Class<svr> getServerType() {
+        Type genericInterface = this.getClass().getGenericInterfaces()[0];
+        Type actualTypeArgument = ((ParameterizedTypeImpl) genericInterface).getActualTypeArguments()[0];
+        return ((Class<svr>) actualTypeArgument);
+    }
 
 }

@@ -231,7 +231,7 @@ public class SocketIoSession implements ClientSession<SocketIoServer> {
 
     @Override
     public void sendMessage(String cmd, Object payload) {
-        log.debug("向会话[{}]发送: {} {}", getSessionId(), cmd, payload);
+        log.trace("向会话[{}]发送: {} {}", getSessionId(), cmd, payload);
         socketIoClient.sendEvent(cmd, payload);
     }
 

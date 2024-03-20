@@ -204,8 +204,8 @@ public interface IEventManager {
      * 收到错误消息事件
      *
      * @param session   会话
-     * @param exception 异常
+     * @param throwable 异常
      */
-    void onError(Session<?> session, Exception exception);
+    void onError(Session<?> session, Throwable throwable);
 
 }

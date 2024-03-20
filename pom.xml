@@ -184,7 +184,7 @@
     <!-- 快照版格式：super.x.y.z-SNAPSHOT-->
     <groupId>vip.isass</groupId>
     <artifactId>super</artifactId>
-    <version>super.3.3.1-SNAPSHOT</version>
+    <version>super.3.4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -210,10 +210,11 @@
         <module>super-core-web-rpc-feign</module>
         <module>kernel-net-core</module>
         <module>kernel-net-netty</module>
+        <module>kernel-net-proxy-core</module>
+        <module>kernel-net-proxy-upstream</module>
+        <module>kernel-net-proxy-service</module>
+        <module>kernel-net-websocket</module>
         <module>kernel-net-socketio</module>
-        <module>kernel-net-transfer-core</module>
-        <module>kernel-net-transfer-gateway</module>
-        <module>kernel-net-transfer-service</module>
         <module>super-core-protobuf</module>
         <module>super-core-elasticsearch</module>
         <module>super-core-encryption</module>
@@ -236,7 +237,7 @@
 
         <!-- region isass-core -->
 
-        <super-core.version>super.3.3.1-SNAPSHOT</super-core.version>
+        <super-core.version>super.3.4.0-SNAPSHOT</super-core.version>
 
         <!-- endregion -->
 
@@ -516,25 +517,31 @@
 
             <dependency>
                 <groupId>vip.isass</groupId>
+                <artifactId>kernel-net-websocket</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
                 <artifactId>kernel-net-socketio</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
-                <artifactId>kernel-net-transfer-core</artifactId>
+                <artifactId>kernel-net-proxy-core</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
-                <artifactId>kernel-net-transfer-gateway</artifactId>
+                <artifactId>kernel-net-proxy-upstream</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>vip.isass</groupId>
-                <artifactId>kernel-net-transfer-service</artifactId>
+                <artifactId>kernel-net-proxy-service</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 

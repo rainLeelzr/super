@@ -170,13 +170,14 @@
 package vip.isass.kernel.net.socketio;
 
 import cn.hutool.core.collection.CollUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import vip.isass.kernel.net.core.handler.IMessageEventRegister;
-import vip.isass.kernel.net.core.message.Message;
-import vip.isass.kernel.net.core.session.Session;
 import vip.isass.kernel.net.core.handler.manager.EventManager;
+import vip.isass.kernel.net.core.message.Message;
+import vip.isass.kernel.net.core.session.ISessionService;
+import vip.isass.kernel.net.core.session.Session;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 
 /**
@@ -187,13 +188,13 @@ import java.util.Collection;
 @Component
 public class SocketIoEventHandlerRegister implements IMessageEventRegister {
 
-    @Autowired(required = false)
+    @Resource
     private SocketIoServer socketIoServer;
 
-    @Autowired
-    private SocketioSessionService socketioSessionManager;
+    @Resource
+    private ISessionService sessionService;
 
-    @Autowired
+    @Resource
     private EventManager eventManager;
 
     @Override
@@ -204,19 +205,19 @@ public class SocketIoEventHandlerRegister implements IMessageEventRegister {
 
         for (String cmd : commands) {
             socketIoServer.getSocketIoServer()
-                .addEventListener(
-                    cmd,
-                    Object.class,
-                    (client, data, ackSender) -> {
-                        Session<?> session = socketioSessionManager.getSessionById(client.getSessionId().toString());
-                        eventManager.onMessage(
-                            Message.builder()
-                                .senderSessionId(session.getSessionId())
-                                .senderSession(session)
-                                .cmd(cmd)
-                                .payload(data)
-                                .build());
-                    });
+                    .addEventListener(
+                            cmd,
+                            Object.class,
+                            (client, data, ackSender) -> {
+                                Session<?> session = sessionService.getSessionById(client.getSessionId().toString());
+                                eventManager.onMessage(
+                                        Message.builder()
+                                                .senderSessionId(session.getSessionId())
+                                                .senderSession(session)
+                                                .cmd(cmd)
+                                                .payload(data)
+                                                .build());
+                            });
         }
     }
 

@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SocketIOClient Test Page</title>
-    <link rel="stylesheet" href="./styles.css">
     <script src="./jquery/3.3.1/jquery.min.js"></script>
     <script src="./socket.io.js"></script>
     <style>
@@ -117,8 +116,8 @@
     <div class="flex-container">
         <label for="socketEvent" class="inline-block">发送Event:</label>
         <input type="text" id="socketEvent" placeholder="Enter Socket Event" class="inline-block">
-        <label for="filterEvents" class="inline-block" style="margin-left: 5%" >仅显示的event(英文逗号分割):</label>
-        <input type="text" id="filterEvents" class="inline-block"  style="width: 50%;">
+        <label for="filterEvents" class="inline-block" style="margin-left: 5%">仅显示的event(英文逗号分割):</label>
+        <input type="text" id="filterEvents" class="inline-block" style="width: 50%;">
         <button id="setFilterEvents" class="inline-block">Apply</button>
         <span id="statusFilterEvents"></span>
     </div>
@@ -141,7 +140,7 @@
     function parseFilterEvents(filterEventsStr) {
         filterEvents = filterEventsStr.split(",").filter(element => element && element.trim());
         localStorage.setItem("filterEvents", filterEventsStr);
-        console.log(filterEvents)
+        console.log('filterEvents:', filterEvents)
     }
 
     function restoreSocketIoUrl() {
@@ -184,23 +183,6 @@
             let html = `<span class="connect-msg"><span style="color: blue; ">${time}&nbsp;</span>开始第${errorCount + 1}次重连，共${maxError}次</span>`
             serverOutput(html);
         });
-        socket.on('**', function (event, data) {
-            let str = '';
-            let dataType = '';
-            if (data) {
-                str = data[0];
-                dataType = $.type(str);
-            }
-            if (str instanceof Object) {
-                str = JSON.stringify(str);
-            }
-
-            str = `收到消息event[${event}],数据类型[${dataType}]：${str}`
-            if (filterEvents.length == 0 || filterEvents.indexOf(event) > -1) {
-                output('<span class="username-msg"><span style="color: blue; ">' + getNowTime() + '&nbsp;</span>' + str + ' </span>');
-            }
-            console.log(data);
-        });
         socket.on('disconnect', function () {
             isConnected = false;
             console.log("连接断开");
@@ -236,6 +218,20 @@
             serverOutput('<span class="connect-msg"><span style="color: blue; ">' + getNowTime() + '&nbsp;</span>' + str + ' </span>');
 
         });
+
+        socket.onAny(function (event, data) {
+            if (filterEvents.length != 0 && filterEvents.indexOf(event) == -1) {
+                return;
+            }
+
+            let str = data;
+            if (data instanceof Object) {
+                str = JSON.stringify(data);
+            }
+
+            str = `收到消息event[${event}],数据类型[${$.type(data)}]：${str}`
+            output('<span class="username-msg"><span style="color: blue; ">' + getNowTime() + '&nbsp;</span>' + str + ' </span>');
+        })
     }
 
     function output(message) {
@@ -286,7 +282,7 @@
         let filterEventsStr = $("#filterEvents").val().trim();
 
         let time = getNowTime();
-        $("#statusFilterEvents").text("Success:"+time);
+        $("#statusFilterEvents").text("Success:" + time);
         parseFilterEvents(filterEventsStr);
     })
 

@@ -170,11 +170,11 @@
 package vip.isass.kernel.net.core.server;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -189,7 +189,7 @@ public class ServerStartupManager implements SmartLifecycle {
 
     private static boolean IS_RUNNING = false;
 
-    @Autowired
+    @Resource
     private List<Server> servers;
 
     @Override

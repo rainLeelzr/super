@@ -2,30 +2,7 @@
 
 ## 更新日志
 
-### super.3.0.3
-
-#### feat
-
-- 新增跨域配置，支持跨域请求
-
----
-
-### super.3.0.5
-
-#### optimize
-
-- 支持跨域，微服务自动集成跨域功能
-- dynamic-datasource 从 3.0.0 升级为 3.2.1
-
----
-
-### super.3.0.6
-
-#### feat
-
-- 各微服务合成一个单体包后，各微服务的flyway支持独立管理
-
----
+ 更新日志请查看 docs/changelog
 
 ## Git commit 规范
 

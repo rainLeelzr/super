@@ -172,6 +172,7 @@ package vip.isass.core.security.jwt;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.SystemClock;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -199,25 +200,26 @@ public class JwtUtil {
     public static String generateToken(LoginUser loginUser, String secret) {
         // 生产 token
         Map<String, Object> map = MapUtil.<String, Object>builder()
-            .put(JwtInfo.USER_ID, loginUser.getUserId())
-            .put(JwtInfo.NICK_NAME, loginUser.getNickName())
-            .put(JwtInfo.FROM, loginUser.getLoginFrom())
-            .put(JwtInfo.VERSION, loginUser.getVersion())
-            .build();
+                .put(JwtInfo.USER_ID, loginUser.getUserId())
+                .put(JwtInfo.NICK_NAME, loginUser.getNickName())
+                .put(JwtInfo.FROM, loginUser.getLoginFrom())
+                .put(JwtInfo.VERSION, loginUser.getVersion())
+                .build();
         return Jwts.builder()
-            .setClaims(map)
-            .setExpiration(new Date(SystemClock.now() + TOKEN_EFFECTIVE_MILLS))
-            .signWith(SignatureAlgorithm.HS256, secret)
-            .compact();
+                .setClaims(map)
+                .setExpiration(new Date(SystemClock.now() + TOKEN_EFFECTIVE_MILLS))
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
     }
 
     public static JwtInfo parse(String token, String secret) {
+        secret = StrUtil.blankToDefault(secret, DEFAULT_SECRET);
         Claims claims;
         try {
             claims = Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token)
+                    .getBody();
         } catch (ExpiredJwtException e) {
             throw new UnifiedException(StatusMessageEnum.TOKEN_EXPIRED);
         } catch (Exception e) {
