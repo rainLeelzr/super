@@ -178,7 +178,7 @@ import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
 import vip.isass.core.web.security.authentication.AbstractAuthenticationFilter;
 import vip.isass.framework.security.auth.login.DefaultLoginUser;
-import vip.isass.framework.security.jwt.JwtInfo;
+import vip.isass.framework.security.auth.jwt.JwtInfo;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

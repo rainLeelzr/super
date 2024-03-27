@@ -166,7 +166,7 @@
  * Library.
  */
 
-package vip.isass.framework.security.jwt;
+package vip.isass.framework.security.auth.jwt;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.SystemClock;

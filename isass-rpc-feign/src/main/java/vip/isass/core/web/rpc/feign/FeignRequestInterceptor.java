@@ -175,7 +175,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import vip.isass.core.web.header.AdditionalRequestHeaderProvider;
 import vip.isass.core.web.security.authentication.jwt.JwtConst;
 
 import javax.servlet.http.HttpServletRequest;

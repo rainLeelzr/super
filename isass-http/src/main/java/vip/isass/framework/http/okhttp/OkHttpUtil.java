@@ -166,7 +166,7 @@
  * Library.
  */
 
-package vip.isass.framework.web.okhttp;
+package vip.isass.framework.http.okhttp;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;

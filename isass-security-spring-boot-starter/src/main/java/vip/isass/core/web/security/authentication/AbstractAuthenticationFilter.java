@@ -180,7 +180,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import vip.isass.core.web.security.authentication.jwt.JwtAuthenticationFilter;
 import vip.isass.core.web.security.authentication.jwt.JwtConst;
 import vip.isass.core.web.security.authentication.ms.MsAuthenticationFilter;
-import vip.isass.core.web.security.authentication.ms.MsAuthenticationHeaderProvider;
+import vip.isass.framework.security.auth.ms.MsAuthenticationHeaderProvider;
 import vip.isass.framework.security.auth.login.DefaultLoginUser;
 import vip.isass.framework.security.auth.login.LoginUser;
 

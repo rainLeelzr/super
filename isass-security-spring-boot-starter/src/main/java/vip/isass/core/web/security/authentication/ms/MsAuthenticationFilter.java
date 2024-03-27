@@ -176,6 +176,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import vip.isass.core.web.security.authentication.AbstractAuthenticationFilter;
 import vip.isass.framework.security.auth.login.DefaultLoginUser;
+import vip.isass.framework.security.auth.ms.MsAuthenticationHeaderProvider;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

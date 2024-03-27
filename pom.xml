@@ -220,6 +220,7 @@
         <module>isass-database-elasticsearch</module>
         <module>isass-security-encryption</module>
         <module>isass-http</module>
+        <module>isass-web</module>
     </modules>
 
     <!-- 配置属性 -->
@@ -562,6 +563,12 @@
             <dependency>
                 <groupId>vip.isass</groupId>
                 <artifactId>isass-http</artifactId>
+                <version>${super-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>vip.isass</groupId>
+                <artifactId>isass-web</artifactId>
                 <version>${super-core.version}</version>
             </dependency>
 

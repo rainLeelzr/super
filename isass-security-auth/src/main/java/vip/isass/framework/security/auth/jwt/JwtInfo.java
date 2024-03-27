@@ -164,61 +164,56 @@
  * apply, that proxy's public statement of acceptance of any version is
  * permanent authorization for you to choose that version for the
  * Library.
- *
  */
 
-package vip.isass.core.web.security.authentication.ms;
+package vip.isass.framework.security.auth.jwt;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import vip.isass.core.web.header.AdditionalRequestHeaderProvider;
+import lombok.ToString;
 
 /**
  * @author Rain
  */
 @Getter
 @Setter
-@Accessors(chain = true)
-@Component
-public class MsAuthenticationHeaderProvider implements AdditionalRequestHeaderProvider {
+@Builder
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class JwtInfo {
 
-    public static final String HEADER = "ms-authorization";
+    public static final String USER_ID = "uid";
 
-    @Value("${spring.application.name:unknown}")
-    private String appName;
+    public static final String NICK_NAME = "name";
 
-    @Value("${security.ms.secret:qcyAHr35IDzI9FkD}")
-    private String secret;
+    public static final String FROM = "fr";
 
-    @Value(".${security.ms.secret:qcyAHr35IDzI9FkD}")
-    private String dotSecret;
+    public static final String VERSION = "v";
 
-    private String fullMsAuthenticationHeaderValue = "";
+    /**
+     * 用户 id
+     */
+    private String uid;
 
-    @Override
-    public String getHeaderName() {
-        return HEADER;
-    }
+    /**
+     * 用户昵称
+     */
+    private String name;
 
-    @Override
-    public String getValue() {
-        if ("".equals(fullMsAuthenticationHeaderValue)) {
-            fullMsAuthenticationHeaderValue = appName + dotSecret;
-        }
-        return fullMsAuthenticationHeaderValue;
-    }
+    /**
+     * 登录渠道，从什么产品登录
+     */
+    private String fr;
 
-    @Override
-    public boolean override() {
-        return false;
-    }
-
-    @Override
-    public boolean support(String method, String url) {
-        return true;
-    }
+    /**
+     * 版本，当服务端记录对应的登录渠道的版本，大于此值时，此 token 应当失效。
+     * 当服务端无对应的登录渠道的版本记录时，此值不作为失效判断的依据。
+     * 作用：作为强制用户下线或多端登录踢下线的判断依据。
+     */
+    private Integer v;
 
 }

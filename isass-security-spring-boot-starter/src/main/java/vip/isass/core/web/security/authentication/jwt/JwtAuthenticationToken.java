@@ -172,7 +172,7 @@ package vip.isass.core.web.security.authentication.jwt;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import vip.isass.framework.security.jwt.JwtInfo;
+import vip.isass.framework.security.auth.jwt.JwtInfo;
 
 import java.util.Collection;
 

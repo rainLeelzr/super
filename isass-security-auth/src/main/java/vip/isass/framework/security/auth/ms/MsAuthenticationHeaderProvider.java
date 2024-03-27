@@ -164,14 +164,61 @@
  * apply, that proxy's public statement of acceptance of any version is
  * permanent authorization for you to choose that version for the
  * Library.
+ *
  */
 
-package vip.isass.framework.web.okhttp;
+package vip.isass.framework.security.auth.ms;
 
-import okhttp3.WebSocket;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import vip.isass.framework.security.auth.matedata.AdditionalRequestHeaderProvider;
 
-public interface OnSocketClosingHandler {
+/**
+ * @author Rain
+ */
+@Getter
+@Setter
+@Accessors(chain = true)
+@Component
+public class MsAuthenticationHeaderProvider implements AdditionalRequestHeaderProvider {
 
-    void handle(WebSocket webSocket, int code, String reason);
+    public static final String HEADER = "ms-authorization";
+
+    @Value("${spring.application.name:unknown}")
+    private String appName;
+
+    @Value("${security.ms.secret:qcyAHr35IDzI9FkD}")
+    private String secret;
+
+    @Value(".${security.ms.secret:qcyAHr35IDzI9FkD}")
+    private String dotSecret;
+
+    private String fullMsAuthenticationHeaderValue = "";
+
+    @Override
+    public String getHeaderName() {
+        return HEADER;
+    }
+
+    @Override
+    public String getValue() {
+        if ("".equals(fullMsAuthenticationHeaderValue)) {
+            fullMsAuthenticationHeaderValue = appName + dotSecret;
+        }
+        return fullMsAuthenticationHeaderValue;
+    }
+
+    @Override
+    public boolean override() {
+        return false;
+    }
+
+    @Override
+    public boolean support(String method, String url) {
+        return true;
+    }
 
 }

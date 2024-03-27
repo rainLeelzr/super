@@ -184,8 +184,8 @@ import vip.isass.core.exception.UnifiedException;
 import vip.isass.core.exception.code.StatusMessageEnum;
 import vip.isass.core.web.security.IsassGrantedAuthority;
 import vip.isass.core.web.security.metadata.SecurityMetadataSourceProviderManager;
-import vip.isass.framework.security.jwt.JwtInfo;
-import vip.isass.framework.security.jwt.JwtUtil;
+import vip.isass.framework.security.auth.jwt.JwtInfo;
+import vip.isass.framework.security.auth.jwt.JwtUtil;
 
 import javax.annotation.Resource;
 import java.util.Collection;

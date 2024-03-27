@@ -164,56 +164,27 @@
  * apply, that proxy's public statement of acceptance of any version is
  * permanent authorization for you to choose that version for the
  * Library.
+ *
  */
 
-package vip.isass.framework.security.jwt;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+package vip.isass.framework.security.auth.matedata;
 
 /**
  * @author Rain
  */
-@Getter
-@Setter
-@Builder
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class JwtInfo {
+public interface AdditionalRequestHeaderProvider {
 
-    public static final String USER_ID = "uid";
+    String getHeaderName();
 
-    public static final String NICK_NAME = "name";
-
-    public static final String FROM = "fr";
-
-    public static final String VERSION = "v";
+    String getValue();
 
     /**
-     * 用户 id
+     * 当已存在同名的请求头时，是否覆盖旧的值
+     *
+     * @return is override
      */
-    private String uid;
+    boolean override();
 
-    /**
-     * 用户昵称
-     */
-    private String name;
-
-    /**
-     * 登录渠道，从什么产品登录
-     */
-    private String fr;
-
-    /**
-     * 版本，当服务端记录对应的登录渠道的版本，大于此值时，此 token 应当失效。
-     * 当服务端无对应的登录渠道的版本记录时，此值不作为失效判断的依据。
-     * 作用：作为强制用户下线或多端登录踢下线的判断依据。
-     */
-    private Integer v;
+    boolean support(String method, String uri);
 
 }

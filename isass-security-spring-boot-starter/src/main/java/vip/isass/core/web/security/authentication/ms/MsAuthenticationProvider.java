@@ -178,6 +178,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import vip.isass.framework.security.auth.ms.MsAuthenticationHeaderProvider;
 
 import javax.annotation.Resource;
 import java.util.Collection;

@@ -1,7 +1,7 @@
 package ${cfg.feignPackage};
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import vip.isass.core.web.Resp;
+import vip.isass.framework.web.Resp;
 import vip.isass.core.web.feign.FeignEncoder;
 import ${cfg.criteriaPackageName}.*;
 import ${package.Entity}.*
