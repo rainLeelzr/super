@@ -169,18 +169,18 @@
 
 package vip.isass.kernel.net.core.handler;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import vip.isass.core.web.Resp;
 import vip.isass.framework.security.auth.jwt.JwtInfo;
 import vip.isass.framework.security.auth.jwt.JwtUtil;
 import vip.isass.kernel.net.core.message.Message;
 import vip.isass.kernel.net.core.message.MessageCmd;
 import vip.isass.kernel.net.core.server.Server;
 import vip.isass.kernel.net.core.session.ISessionService;
+
+import javax.annotation.Resource;
 
 /**
  * 登录事件处理器
@@ -195,7 +195,7 @@ public class OnLoginEventHandler implements OnMessageEventHandler<String> {
     @Value("${security.jwt.secret:" + JwtUtil.DEFAULT_SECRET + "}")
     private String secret;
 
-    @Autowired
+    @Resource
     private ISessionService sessionService;
 
     @Override
@@ -207,7 +207,7 @@ public class OnLoginEventHandler implements OnMessageEventHandler<String> {
     public Object onMessage(Message message, String token) {
         JwtInfo jwtInfo = JwtUtil.parse(token, secret);
         sessionService.setUserId(message.getSenderSessionId(), jwtInfo.getUid());
-        return Resp.bizSuccess(jwtInfo);
+        return jwtInfo;
     }
 
 }
