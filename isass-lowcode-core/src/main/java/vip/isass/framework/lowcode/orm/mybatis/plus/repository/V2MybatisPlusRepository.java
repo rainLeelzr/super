@@ -186,10 +186,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import vip.isass.core.database.mybatisplus.mapper.IMapper;
-import vip.isass.framework.lowcode.SensitiveDataProperty;
 import vip.isass.core.exception.AbsentException;
 import vip.isass.core.exception.AlreadyPresentException;
 import vip.isass.core.exception.code.StatusMessageEnum;
+import vip.isass.framework.lowcode.SensitiveDataProperty;
 import vip.isass.framework.lowcode.orm.mybatis.plus.V2WrapperUtil;
 import vip.isass.framework.lowcode.v2.criteria.IV2Criteria;
 import vip.isass.framework.lowcode.v2.criteria.type.IV2PageCriteria;
@@ -206,6 +206,7 @@ import vip.isass.framework.lowcode.v2.repository.IV2Repository;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -311,9 +312,13 @@ public abstract class V2MybatisPlusRepository<
     public E addOrUpdate(E entity, List<String> uniqueColumns) {
         Assert.notEmpty(uniqueColumns, "uniqueColumns");
         QueryWrapper<EDB> wrapper = new QueryWrapper<>();
-        Map<String, Object> map = BeanUtil.beanToMap(entity);
+        Map<String, Object> map = BeanUtil.beanToMap(
+                entity,
+                new HashMap<>(16),
+                true,
+                key -> StrUtil.toUnderlineCase(key).toUpperCase());
         for (String uniqueColumn : uniqueColumns) {
-            Object value = map.get(StrUtil.toCamelCase(uniqueColumn));
+            Object value = map.get(uniqueColumn.toUpperCase());
             if (value != null) {
                 wrapper.eq(uniqueColumn, value);
             }
