@@ -174,6 +174,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -211,15 +212,6 @@ import java.util.Map;
  * @author Rain
  */
 public class JsonUtil {
-
-    public static final TypeReference<List<String>> STRING_LIST_TYPE_REFERENCE = new TypeReference<List<String>>() {
-    };
-
-    public static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
-    };
-
-    public static final TypeReference<List<Map<String, Object>>> LIST_MAP_TYPE_REFERENCE = new TypeReference<List<Map<String, Object>>>() {
-    };
 
     @SuppressWarnings("unchecked")
     public static SimpleModule simpleModule = new SimpleModule()
@@ -266,39 +258,10 @@ public class JsonUtil {
 
             .registerModule(simpleModule);
 
-    public static final ObjectMapper NOT_NULL_INSTANCE = new ObjectMapper()
-            // 当实体类中不含有 json 字符串的某些字段时，不抛出异常
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-
-            // 非 bean 对象不抛异常
-            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-
-            // BigDecimal 精度
-            .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
-
-            // 禁用科学计数法
-            .configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true)
-
-            // 允许使用注释
-            .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
-
-            // 允许字段名没有引号
-            .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
-
-            // 允许单引号
-            .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
-
-            // 忽略 transient 关键字的变量
-            .configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true)
+    public static final ObjectMapper NOT_NULL_INSTANCE = DEFAULT_INSTANCE.copy()
 
             // 只输出非 null 字段
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-
-            .registerModule(simpleModule);
-
-    public static Json fromObject(Object object) {
-        return new DefaultJson().fromObject(object);
-    }
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> convertArrayNodeToSimpleObjectList(JsonNode jsonNode, Class<T> clazz) {
@@ -333,12 +296,12 @@ public class JsonUtil {
 
     @SneakyThrows
     public static Map<String, Object> readMap(String json) {
-        return DEFAULT_INSTANCE.readValue(json, MAP_TYPE_REFERENCE);
+        return DEFAULT_INSTANCE.readValue(json, TypeReferences.MAP.javaType());
     }
 
     @SneakyThrows
     public static Map<String, Object> convertToMap(Object object) {
-        return DEFAULT_INSTANCE.convertValue(object, MAP_TYPE_REFERENCE);
+        return DEFAULT_INSTANCE.convertValue(object, TypeReferences.MAP.javaType());
     }
 
     @SneakyThrows
@@ -348,7 +311,7 @@ public class JsonUtil {
 
     @SneakyThrows
     public static List<Map<String, Object>> readListMap(String json) {
-        return DEFAULT_INSTANCE.readValue(json, LIST_MAP_TYPE_REFERENCE);
+        return DEFAULT_INSTANCE.readValue(json, TypeReferences.LIST_MAP.javaType());
     }
 
     @SneakyThrows
@@ -371,4 +334,33 @@ public class JsonUtil {
         return NOT_NULL_INSTANCE.writeValueAsString(object);
     }
 
+    public static Json fromObject(Object object) {
+        return new DefaultJson().fromObject(object);
+    }
+
+    public enum TypeReferences {
+
+        STRING_LIST(new TypeReference<List<String>>() {
+        }),
+
+        MAP(new TypeReference<Map<String, Object>>() {
+        }),
+
+        LIST_MAP(new TypeReference<List<Map<String, Object>>>() {
+        }),
+        ;
+
+        private final TypeReference<?> typeReference;
+
+        TypeReferences(TypeReference<?> typeReference) {
+            this.typeReference = typeReference;
+        }
+
+        private JavaType javaType() {
+            return (JavaType) this.typeReference.getType();
+        }
+
+    }
+
 }
+
