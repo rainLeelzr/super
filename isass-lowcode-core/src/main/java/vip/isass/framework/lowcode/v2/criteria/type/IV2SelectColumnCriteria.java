@@ -175,6 +175,7 @@ import vip.isass.framework.lowcode.v2.criteria.IV2Criteria;
 import vip.isass.framework.lowcode.v2.entity.IV2Entity;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * sql 的 select 字段条件接口
@@ -182,7 +183,7 @@ import java.util.Collection;
  * @author Rain
  */
 public interface IV2SelectColumnCriteria<E extends IV2Entity<E>, C extends IV2SelectColumnCriteria<E, C>>
-    extends IV2Criteria<E, C> {
+        extends IV2Criteria<E, C> {
 
     String DISTINCT = "DISTINCT ";
 
@@ -212,7 +213,7 @@ public interface IV2SelectColumnCriteria<E extends IV2Entity<E>, C extends IV2Se
     default C addSelectColumn(String selectColumn) {
         if (StrUtil.isNotBlank(selectColumn)) {
             if (!getSelectColumns().contains(selectColumn)) {
-                getSelectColumns().add(selectColumn);
+                addSelectColumns(Collections.singleton(selectColumn));
             }
         }
         return (C) this;
@@ -221,7 +222,13 @@ public interface IV2SelectColumnCriteria<E extends IV2Entity<E>, C extends IV2Se
     @SuppressWarnings("unchecked")
     default C addSelectColumns(Collection<String> selectColumns) {
         if (CollUtil.isNotEmpty(selectColumns)) {
-            getSelectColumns().addAll(selectColumns);
+            Collection<String> targetColumns = getSelectColumns();
+            for (String selectColumn : selectColumns) {
+                if (StrUtil.containsAnyIgnoreCase(selectColumn, "select", "insert", "update")) {
+                    throw new IllegalArgumentException("selectColumns can not contains insert, update, select");
+                }
+                targetColumns.add(selectColumn);
+            }
         }
         return (C) this;
     }
@@ -229,7 +236,7 @@ public interface IV2SelectColumnCriteria<E extends IV2Entity<E>, C extends IV2Se
     @SuppressWarnings("unchecked")
     default C addSelectColumns(String... selectColumns) {
         if (ArrayUtil.isNotEmpty(selectColumns)) {
-            getSelectColumns().addAll(CollUtil.toList(selectColumns));
+            addSelectColumns(CollUtil.toList(selectColumns));
         }
         return (C) this;
     }
