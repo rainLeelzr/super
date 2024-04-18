@@ -300,6 +300,11 @@ public class JsonUtil {
     }
 
     @SneakyThrows
+    public static <T> T convertValue(Object fromValue, Class<T> clazz) {
+        return DEFAULT_INSTANCE.convertValue(fromValue, clazz);
+    }
+
+    @SneakyThrows
     public static List<Map<String, Object>> readListMap(String json) {
         return DEFAULT_INSTANCE.readValue(json, TypeReferences.LIST_MAP.javaType());
     }

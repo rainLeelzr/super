@@ -167,116 +167,83 @@
  *
  */
 
-package vip.isass.core.database.postgresql.entity;
+package vip.isass.core.web.security.execption;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
-import org.postgresql.util.PGobject;
-import org.springframework.context.annotation.Scope;
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.exceptions.ValidateException;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.stereotype.Component;
-import vip.isass.core.entity.Json;
-import vip.isass.core.support.JsonUtil;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import vip.isass.core.exception.AbsentException;
+import vip.isass.core.exception.AlreadyPresentException;
+import vip.isass.core.exception.IExceptionMapping;
+import vip.isass.core.exception.code.IStatusMessage;
+import vip.isass.core.exception.code.StatusMessageEnum;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Rain
  */
-@Slf4j
-@Accessors(chain = true)
 @Component
-@Scope("prototype")
-public class JsonPg extends PGobject implements Json {
+public class SpringWebExceptionMapping implements IExceptionMapping {
 
-    public JsonPg() {
-        this.type = "jsonb";
-    }
-
-    private JsonNode jsonNode;
+    private static final Map<Class<? extends Exception>, IStatusMessage> EXCEPTION_MAPPING = MapUtil.<Class<? extends Exception>, IStatusMessage>builder()
+        .put(MethodArgumentNotValidException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
+        .put(HttpMessageConversionException.class, StatusMessageEnum.ILLEGAL_ARGUMENT_ERROR)
+        .build();
 
     @Override
-    public void setValue(String value) {
-        fromString(value);
+    public IStatusMessage getStatusCode(Exception exception) {
+        Throwable unwrap = ExceptionUtil.unwrap(exception);
+        return EXCEPTION_MAPPING.get(unwrap.getClass());
     }
 
-    @Override
-    public JsonPg fromObject(Object obj) {
-        if (obj == null) {
-            this.jsonNode = null;
-            this.value = null;
-            return this;
+    public String parseExceptionMessage(Throwable e) {
+        String message;
+        Throwable unwrap = ExceptionUtil.unwrap(e);
+        if (unwrap instanceof BindException) {
+            message = parseBindExceptionMessage((BindException) unwrap);
+        } else {
+            message = unwrap.getMessage();
         }
-
-        try {
-            this.value = JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(obj);
-            this.jsonNode = JsonUtil.DEFAULT_INSTANCE.readValue(this.value, JsonNode.class);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            this.jsonNode = null;
-            this.value = null;
-        }
-        return this;
+        return message;
     }
 
-    @Override
-    public Json fromJsonNode(JsonNode jsonNode) {
-        if (jsonNode == null) {
-            this.jsonNode = null;
-            this.value = null;
-            return this;
-        }
-        this.jsonNode = jsonNode;
-        try {
-            this.value = JsonUtil.NOT_NULL_INSTANCE.writeValueAsString(jsonNode);
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
-            this.jsonNode = null;
-            this.value = null;
-        }
-        return this;
-    }
+    private String parseBindExceptionMessage(BindException e) {
+        return e.getAllErrors()
+            .stream()
+            .map(error -> {
+                StringBuilder sb = new StringBuilder();
+                sb.append(error.getObjectName());
+                sb.append("[");
 
-    @Override
-    public Json fromJson(Json json) {
-        if (json == null) {
-            this.jsonNode = null;
-            this.value = null;
-            return this;
-        }
+                Object[] args = error.getArguments();
+                if (args != null) {
+                    sb.append(Stream.of(args)
+                        .map(a -> (DefaultMessageSourceResolvable) a)
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                        .collect(Collectors.joining(", ")));
+                }
 
-        return fromJsonNode(json.getJsonNode());
-    }
+                sb.append("]");
+                sb.append(error.getDefaultMessage());
 
-    @Override
-    public JsonPg fromString(String str) {
-        if (str == null) {
-            this.jsonNode = null;
-            this.value = null;
-            return this;
-        }
-        try {
-            this.jsonNode = JsonUtil.DEFAULT_INSTANCE.readValue(str, JsonNode.class);
-            this.value = str;
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            this.jsonNode = null;
-            this.value = null;
-        }
-        return this;
-    }
-
-    @Override
-    @JsonValue
-    public JsonNode getJsonNode() {
-        return jsonNode;
-    }
-
-    @Override
-    public String getStringValue() {
-        return getValue();
+                IStatusMessage statusCode = getStatusCode(e);
+                if (statusCode != null) {
+                    return StrUtil.format(statusCode.getMsg(), sb.toString());
+                }
+                return sb.toString();
+            })
+            .collect(Collectors.joining(", "));
     }
 
 }
