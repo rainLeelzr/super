@@ -169,6 +169,7 @@
 
 package vip.isass.core.criteria;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -182,13 +183,18 @@ import java.util.List;
 @ToString
 @Accessors(chain = true)
 public abstract class AbstractSelectColumnCriteria<E, C extends AbstractSelectColumnCriteria<E, C>>
-    implements ISelectColumnCriteria<E, C> {
+        implements ISelectColumnCriteria<E, C> {
 
     private List<String> selectColumns;
 
     @Override
     @SuppressWarnings("unchecked")
     public C setSelectColumns(List<String> selectColumns) {
+        for (String selectColumn : selectColumns) {
+            if (StrUtil.containsAnyIgnoreCase(selectColumn, "select", "insert", "update")) {
+                throw new IllegalArgumentException("selectColumns can not contains insert, update, select");
+            }
+        }
         this.selectColumns = selectColumns;
         return (C) this;
     }
