@@ -211,14 +211,14 @@
             <artifactId>guava</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
-        </dependency>
+        <!--<dependency>-->
+        <!--    <groupId>com.sun</groupId>-->
+        <!--    <artifactId>tools</artifactId>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-        </dependency>
+        <!--<dependency>-->
+        <!--    <groupId>com.google.auto.service</groupId>-->
+        <!--    <artifactId>auto-service</artifactId>-->
+        <!--</dependency>-->
     </dependencies>
 </project>
