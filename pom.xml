@@ -276,7 +276,8 @@
 
         <disruptor.version>3.4.2</disruptor.version>
 
-        <guava.version>26.0-jre</guava.version>
+        <guava.version>33.1.0-jre</guava.version>
+        <auto-service.version>1.1.1</auto-service.version>
 
         <knife4j.version>2.0.5</knife4j.version>
 
@@ -712,6 +713,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>${auto-service.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>${jjwt.version}</version>
@@ -875,6 +882,15 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun</groupId>
+                <artifactId>tools</artifactId>
+                <version>${java.version}</version>
+                <scope>system</scope>
+                <optional>true</optional>
+                <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
             </dependency>
         </dependencies>
     </dependencyManagement>
