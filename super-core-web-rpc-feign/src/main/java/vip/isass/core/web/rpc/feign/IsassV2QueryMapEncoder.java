@@ -180,7 +180,11 @@ import vip.isass.core.structure.criteria.IV2Criteria;
 import vip.isass.core.structure.criteria.impl.type.V2Condition;
 import vip.isass.core.support.JsonUtil;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class IsassV2QueryMapEncoder implements QueryMapEncoder {
@@ -238,7 +242,7 @@ public class IsassV2QueryMapEncoder implements QueryMapEncoder {
             return Collections.emptyMap();
         }
 
-        Map<String, Object> whereConditionMap = CollUtil.newHashMap(whereConditionCriteria.size());
+        Map<String, Object> whereConditionMap = MapUtil.newHashMap(whereConditionCriteria.size());
         AtomicBoolean lastLoopIsOrCondition = new AtomicBoolean(false);
 
         for (Map<String, Object> criteria : whereConditionCriteria) {
